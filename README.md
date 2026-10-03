@@ -5,7 +5,8 @@
 ## 專案結構
 
 ```
-index.html              GitHub Pages 入口（直接載入 src/ 模組，不需建置）
+index.html              GitHub Pages 入口（載入 dist/app.js，網址帶版本號避免快取）
+dist/app.js             打包後的遊戲程式（由 tools/build.js 產生）
 dist/raid-leader.html   單檔版（JS、CSS 內嵌），用於預覽或分享
 src/
   core/                 遊戲邏輯，不碰畫面，可在 Node 執行
