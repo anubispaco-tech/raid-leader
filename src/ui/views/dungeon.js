@@ -12,6 +12,18 @@ function nextStepCard() {
     : `<button class="btn main" data-act="${b.act}" ${b.d != null ? `data-d="${b.d}"` : ''}>${b.label}</button>`;
   return `<div class="nextstep"><div><span class="label">下一步</span><b>${n.text}</b><span class="sub" style="margin:0">${n.sub}</span></div>${btn}</div>`;
 }
+// ---------- 寶庫 ----------
+function vaultSection() {
+  const S = app.S;
+  if (!G.vaultUnlocked(S)) return `<div class="vault locked"><b>寶庫</b><span class="sub" style="margin:0">通關第 3 層「沉沒神殿」後開放：每天 3 次，打寶藏哥布林賺大量金幣。</span></div>`;
+  const floors = G.vaultFloors(S), left = G.vaultLeft(S);
+  const f = floors.includes(app.vaultFloor) ? app.vaultFloor : floors[floors.length - 1];
+  const best = S.vault.best[f] || 0;
+  return `<div class="vault"><div class="mhead"><div><span class="label">寶庫</span><b>60 秒打寶藏哥布林</b></div><span class="vleft num">今天剩 ${left}/${G.VAULT.daily}</span></div>
+    <div class="seg vfloors">${floors.map(i => `<button data-act="vaultfloor" data-d="${i}" class="${i === f ? 'sel' : ''}">${i + 1}</button>`).join('')}</div>
+    <p class="sub" style="margin:0">第 ${f + 1} 層：每隻 <b class="num">${fmt(G.vaultGoldPerKill(f))}</b> 金，最多算 ${G.vaultMaxKills(f)} 隻・最佳 ${best} 隻。打你目前最高的那層通常最賺。</p>
+    <div class="row"><button class="btn main grow" data-act="vault" data-d="${f}" ${left ? '' : 'disabled'}>${left ? '進入寶庫' : '明天 00:00 再來'}</button><button class="btn" data-act="prepare-vault">備戰</button></div></div>`;
+}
 // ---------- 傳奇秘境 ----------
 function mythicSection() {
   const S = app.S;
@@ -44,7 +56,7 @@ function boardCard() {
 export function viewDungeons() {
   const lv = avgPartyLv(), il = avgPartyIlvl();
   let h = nextStepCard() + `<h2>副本</h2><p class="sub">隊伍平均 <b class="num">Lv${lv}</b>・裝等 <b class="num">${il}</b>・戰力 <b class="num">${fmt(partyPower())}</b>　｜　每隻首領都有弱點，打不過就換陣容，或回頭刷裝備。</p>`;
-  h += mythicSection() + `<div class="dlist">`;
+  h += vaultSection() + mythicSection() + `<div class="dlist">`;
   G.DUNGEONS.forEach((_, i) => {
     const d = G.dungeonInfo(i), locked = i >= app.S.unlocked, clears = app.S.clears[i] || 0;
     const idleHere = app.S.idle === i;

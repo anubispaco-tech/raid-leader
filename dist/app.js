@@ -1,4 +1,4 @@
-/* 副本團長 v0.6.0 */
+/* 副本團長 v0.7.0 */
 (() => {
   // src/core/config.js
   var CLASSES = {
@@ -175,13 +175,60 @@
     xpMult: 1.2
     // 相對第 7 層的獎勵
   };
+  var HERO_RARITY = [
+    { name: "\u666E\u901A", mult: 1, crit: 0, weight: 0.55, hire: 1 },
+    { name: "\u7CBE\u826F", mult: 1.08, crit: 0, weight: 0.28, hire: 1.5 },
+    { name: "\u7A00\u6709", mult: 1.16, crit: 0.02, weight: 0.12, hire: 2.5 },
+    { name: "\u53F2\u8A69", mult: 1.25, crit: 0.04, weight: 0.045, hire: 4, baseCdMult: 0.9 },
+    { name: "\u50B3\u8AAA", mult: 1.4, crit: 0.04, weight: 5e-3, hire: 8, baseCdMult: 0.9 }
+  ];
+  var LEGENDS = {
+    guardian: { name: "\u5DF4\u6D1B\u65AF", title: "\u9435\u58C1", passive: "undying", pname: "\u4E0D\u5C48", desc: "\u6BCF\u5834\u7B2C\u4E00\u6B21\u53D7\u5230\u81F4\u547D\u50B7\u5BB3\u6539\u70BA\u5269 1 \u8840\u4E26\u7121\u6575 3 \u79D2\uFF1B\u5728\u5834\u6642\u5168\u968A\u53D7\u5230\u7684\u50B7\u5BB3 \u22128%" },
+    cleric: { name: "\u827E\u857E\u5A1C", title: "\u6668\u66E6", passive: "overflow", pname: "\u6EA2\u5149", desc: "\u6CBB\u7642\u8D85\u51FA\u7684\u90E8\u5206\u8F49\u70BA\u8B77\u76FE\uFF08\u4E0A\u9650\u662F\u8A72\u968A\u54E1\u751F\u547D\u7684 20%\uFF09" },
+    rogue: { name: "\u5361\u897F\u6069", title: "\u5F71\u5203", passive: "chain", pname: "\u9023\u9396\u66B4\u64CA", desc: "\u66B4\u64CA\u5F8C\u7684\u4E0B\u4E00\u6B21\u653B\u64CA\u5FC5\u5B9A\u66B4\u64CA\uFF0C\u6BCF 6 \u79D2\u6700\u591A\u4E00\u6B21" },
+    mage: { name: "\u8389\u8587\u4E9E", title: "\u661F\u706B", passive: "molten", pname: "\u7194\u71B1", desc: "\u70C8\u7130\u98A8\u66B4\u51B7\u537B \u221250%\uFF0C\u64CA\u6BBA\u6575\u4EBA\u6642\u518D\u6E1B 1 \u79D2" }
+  };
+  var RECRUIT = {
+    scrollBase: 120,
+    scrollPerLevel: 30,
+    // 招募令單抽價格 = base + 每級 × 隊伍平均等級
+    tenDiscount: 0.9,
+    pityEpic: 50,
+    pityLegend: 100,
+    // 連續 N 抽沒出 → 下一抽保底
+    fireRefund: 0.2
+  };
+  var VAULT = {
+    unlockAfter: 2,
+    // 通關第 3 層（index 2）後解鎖
+    daily: 3,
+    dur: 60,
+    // 每天次數、每場秒數
+    strength: 0.7,
+    // 敵人強度 = 該層一般小怪 × 0.7
+    waveGrowth: 0.12,
+    // 每一波哥布林生命 +12%
+    goblinAtk: 0.25,
+    // 哥布林攻擊 = 一般小怪 × 0.25
+    par: [20, 14, 19, 12, 22, 15, 15],
+    // 各層「剛通關的隊伍」60 秒擊殺數（模擬實測）
+    parRuns: 10,
+    // 打到 par 隻 ≈ 該層一般掛機 10 場的金幣
+    capMult: 1.2,
+    // 金幣最多算到 par × 1.2 隻（讓「打自己最高層」最划算）
+    xpMult: 0.2
+    // 經驗 = 該層一般一場 × 0.2
+  };
   var BAG_MILESTONES = [
     { id: "clear3", name: "\u9996\u6B21\u901A\u95DC\u7B2C 3 \u5C64", test: (s) => !!s.clears[2] },
     { id: "clear5", name: "\u9996\u6B21\u901A\u95DC\u7B2C 5 \u5C64", test: (s) => !!s.clears[4] },
     { id: "clear7", name: "\u9996\u6B21\u901A\u95DC\u7B2C 7 \u5C64", test: (s) => !!s.clears[6] },
     { id: "mythic5", name: "\u79D8\u5883 +5 \u9650\u6642\u901A\u95DC", test: (s) => mythicBestLevel(s) >= 5 },
     { id: "mythic10", name: "\u79D8\u5883 +10 \u9650\u6642\u901A\u95DC", test: (s) => mythicBestLevel(s) >= 10 },
-    { id: "mythic15", name: "\u79D8\u5883 +15 \u9650\u6642\u901A\u95DC", test: (s) => mythicBestLevel(s) >= 15 }
+    { id: "mythic15", name: "\u79D8\u5883 +15 \u9650\u6642\u901A\u95DC", test: (s) => mythicBestLevel(s) >= 15 },
+    { id: "vault10", name: "\u5BF6\u5EAB\u7D2F\u8A08 10 \u6B21", test: (s) => (s.vault && s.vault.runs || 0) >= 10 },
+    { id: "vault30", name: "\u5BF6\u5EAB\u7D2F\u8A08 30 \u6B21", test: (s) => (s.vault && s.vault.runs || 0) >= 30 },
+    { id: "vault60", name: "\u5BF6\u5EAB\u7D2F\u8A08 60 \u6B21", test: (s) => (s.vault && s.vault.runs || 0) >= 60 }
   ];
   var BAG_PER_MILESTONE = 5;
   var mythicBestLevel = (s) => Math.max(0, ...Object.values(s.mythic && s.mythic.best || {}).map((b) => b.level));
@@ -214,7 +261,7 @@
     hirePerLevel: 25,
     refreshCost: 10,
     partyMax: 5,
-    rosterMax: 10,
+    rosterMax: 15,
     bagMax: 50,
     // bagMax = 起始格數，達成里程碑再擴充（見 BAG_MILESTONES）
     stashMax: 100,
@@ -420,13 +467,31 @@
 
   // src/core/heroes.js
   var xpNeed = (L) => Math.round(HERO.xpBase * Math.pow(L, HERO.xpExp));
-  function makeHero(cls2, level = 1) {
-    return { id: uid(), cls: cls2, name: pick(HERO.names), level, xp: 0, spec: null, talents: {}, gear: { weapon: null, armor: null, trinket: null } };
+  function makeHero(cls2, level = 1, rarity = 0) {
+    const legend = rarity === 4 ? LEGENDS[cls2] : null;
+    return {
+      id: uid(),
+      cls: cls2,
+      name: legend ? legend.name : pick(HERO.names),
+      level,
+      xp: 0,
+      rarity,
+      legend: !!legend,
+      spec: null,
+      talents: {},
+      gear: { weapon: null, armor: null, trinket: null }
+    };
+  }
+  function rarityMods(h) {
+    const r = HERO_RARITY[h.rarity || 0], m = {};
+    if (r.baseCdMult) m.baseCdMult = r.baseCdMult;
+    if (h.legend) m.legend = LEGENDS[h.cls].passive;
+    return m;
   }
   var gearOf = (h, items) => Object.keys(SLOTS).map((s) => h.gear[s] && items[h.gear[s]]).filter(Boolean);
   function heroStats(h, items) {
-    const c = CLASSES[h.cls], m = heroMods(h);
-    let pow = c.pow + c.powL * (h.level - 1), hp = c.hp + c.hpL * (h.level - 1), crit = c.crit;
+    const c = CLASSES[h.cls], m = heroMods(h), R2 = HERO_RARITY[h.rarity || 0];
+    let pow = (c.pow + c.powL * (h.level - 1)) * R2.mult, hp = (c.hp + c.hpL * (h.level - 1)) * R2.mult, crit = c.crit + R2.crit;
     for (const it of gearOf(h, items)) {
       pow += itemPow(it);
       hp += itemSta(it) * GEAR.staToHp;
@@ -483,6 +548,7 @@
   var spec = (u) => u.spec && SPECS[u.cls][u.spec];
   var specCd = (u, s) => Math.round(s.cd * (u.mods.specCd || 1));
   var fx = (u) => u.mods.specFx || 1;
+  var baseCd = (u, def) => Math.max(1, Math.round((u.mods.baseCd || def) * (u.mods.baseCdMult || 1) * (u.mods.legend === "molten" ? 0.5 : 1)));
   var HERO_ACTIONS = {
     guardian(b, u, foes, focus) {
       const S = spec(u), B = BASE_SKILLS.guardian;
@@ -496,7 +562,7 @@
         b.hitEnemy(u, t, u.pow * B.mult * (u.mods.baseMult || 1), { skill: true });
         t.weak = Math.max(t.weakUntil > b.tick ? t.weak : 0, B.weaken);
         t.weakUntil = b.tick + B.weakenDur;
-        u.cd.base = b.tick + B.cd;
+        u.cd.base = b.tick + baseCd(u, B.cd);
         b.skillLog(u, B.name, t);
         return;
       }
@@ -515,7 +581,7 @@
       if (ready(b, u, "base") && low.hp < low.max * 0.85) {
         const tgt = team.find((x) => x.role === "tank" && x.hp < x.max * 0.85) || low;
         tgt.shield += Math.round(u.pow * B.mult * (u.mods.baseMult || 1) * b.healMult(u));
-        u.cd.base = b.tick + B.cd;
+        u.cd.base = b.tick + baseCd(u, B.cd);
         b.skillLog(u, B.name, tgt);
         return;
       }
@@ -539,7 +605,7 @@
         const t = boss || focus;
         b.hitEnemy(u, t, u.pow * B.mult, { skill: true });
         if (u.mods.bleed) t.bleed = { until: b.tick + 5, amt: u.pow * u.mods.bleed, src: u };
-        u.cd.base = b.tick + (u.mods.baseCd || B.cd);
+        u.cd.base = b.tick + baseCd(u, B.cd);
         b.skillLog(u, B.name, t);
         return;
       }
@@ -569,7 +635,7 @@
       const n = foes.length, chain = 1 + (u.mods.chain || 0) * (n - 1), focusM = n === 1 ? 1 + (u.mods.focus || 0) : 1;
       if (ready(b, u, "base")) {
         for (const e of b.foes()) b.hitEnemy(u, e, u.pow * B.mult * (u.mods.baseMult || 1) * chain * focusM, { skill: true, aoe: true });
-        u.cd.base = b.tick + (u.mods.baseCd || B.cd);
+        u.cd.base = b.tick + baseCd(u, B.cd);
         b.skillLog(u, B.name);
         return;
       }
@@ -609,6 +675,8 @@
       this.dIdx = dIdx;
       this.opts = opts;
       this.mythic = opts.mythic || null;
+      this.vault = opts.vault || null;
+      this.kills = 0;
       this.maxTicks = opts.maxTicks || DUNGEON.maxTicks;
       this.units = party.map((h) => {
         const s = heroStats(h, items), c = CLASSES[h.cls];
@@ -616,10 +684,11 @@
           id: h.id,
           name: h.name,
           cls: h.cls,
+          rarity: h.rarity || 0,
           role: c.role,
           icon: c.icon,
           spec: h.spec || null,
-          mods: heroMods(h),
+          mods: { ...heroMods(h), ...rarityMods(h) },
           max: s.hp,
           hp: s.hp,
           pow: s.pow,
@@ -659,7 +728,7 @@
         u.cold = !!u.mods.coldBlood;
         u.necro = 0;
       }
-      if (this.opts.autoHorn && this.waveIdx === this.waves.length - 1) this.useHorn();
+      if (this.opts.autoHorn && (this.waveIdx === this.waves.length - 1 || this.vault && this.waveIdx === 0)) this.useHorn();
     }
     has(affix) {
       return !!this.mythic && this.mythic.affixes.includes(affix);
@@ -707,7 +776,16 @@
         critC = 1;
         u.cold = false;
       }
-      if (R() < critC) amt *= m.critDmg || 2;
+      if (u.chainCrit) {
+        critC = 1;
+        u.chainCrit = false;
+      }
+      const crit = R() < critC;
+      if (crit) amt *= m.critDmg || 2;
+      if (crit && m.legend === "chain" && !o.dot && (u.chainReady || 0) <= this.tick) {
+        u.chainCrit = true;
+        u.chainReady = this.tick + 6;
+      }
       amt = Math.min(e.hp, Math.round(amt * rnd(0.92, 1.08)));
       e.hp -= amt;
       u.dmgDone += amt;
@@ -722,6 +800,8 @@
         for (const x of this.foes().filter((x2) => x2 !== e).slice(0, SPECS.rogue.combat.extra)) this.hitEnemy(u, x, amt, { extra: true, skill: true });
       }
       if (e.hp === 0) {
+        if (e.goblin) this.kills = (this.kills || 0) + 1;
+        if (m.legend === "molten" && u.cd.base) u.cd.base -= 1;
         this.push(`${e.name} \u88AB\u64CA\u6BBA`, e.boss ? "good" : "");
         if (!e.boss && this.has("bolstering")) {
           const rest = this.foes().filter((x) => !x.boss);
@@ -752,6 +832,7 @@
         }
       }
       red *= 1 - (m.allReduce || 0);
+      if (this.alive().some((x) => x.mods.legend === "undying")) red *= 0.92;
       if (m.lowHpReduce && u.hp < u.max * 0.5) red *= 1 - m.lowHpReduce;
       amt = Math.round(amt * Math.max(0.05, red) * rnd(0.9, 1.1));
       const absorbed = Math.min(u.shield, amt);
@@ -777,6 +858,12 @@
       };
       if (u.spec === "prot") save2("divine", P.below, Math.round(P.dur * fx(u)), P.skill);
       if (u.mods.iceBlock) save2("ice", 0.3, u.mods.iceBlock, "\u5BD2\u51B0\u5C4F\u969C");
+      if (u.mods.legend === "undying" && u.hp === 0 && !u.used.undying) {
+        u.used.undying = true;
+        u.hp = 1;
+        u.buf.immune = this.tick + 3;
+        this.skillLog(u, "\u4E0D\u5C48");
+      }
     }
     onDeath(u) {
       const priest = this.alive().find((x) => x.mods.redemption && !x.used.redemption);
@@ -794,6 +881,10 @@
       const h = Math.min(tgt.max - tgt.hp, Math.round(amt * (raw ? 1 : this.healMult(src)) * necro));
       tgt.hp += h;
       src.healDone += h;
+      if (src.mods.legend === "overflow" && !raw) {
+        const over = Math.round(amt * this.healMult(src)) - h;
+        if (over > 0) tgt.shield = Math.min(Math.round(tgt.max * 0.2), tgt.shield + over);
+      }
       return h;
     }
     enemyTarget() {
@@ -863,9 +954,15 @@
         }
       }
       if (this.tick >= this.maxTicks && !this.over) {
-        this.over = true;
-        this.win = false;
-        this.push("\u231B \u6642\u9593\u8017\u76E1\uFF0C\u64A4\u9000", "bad");
+        if (this.vault) {
+          this.over = true;
+          this.win = true;
+          this.push(`\u23F0 \u6642\u9593\u5230\uFF01\u5171\u6253\u5012 ${this.kills || 0} \u96BB\u5BF6\u85CF\u54E5\u5E03\u6797`, "good");
+        } else {
+          this.over = true;
+          this.win = false;
+          this.push("\u231B \u6642\u9593\u8017\u76E1\uFF0C\u64A4\u9000", "bad");
+        }
       }
     }
     runToEnd() {
@@ -939,9 +1036,9 @@
   }
 
   // src/core/game.js
-  var SAVE_VERSION = 5;
+  var SAVE_VERSION = 6;
   var newPlayer = () => ({ pid: Array.from({ length: 12 }, () => "abcdefghijklmnopqrstuvwxyz0123456789"[Math.floor(Math.random() * 36)]).join(""), name: "", asked: false, playSec: 0 });
-  var hireCost = (h) => ECONOMY.hireBase + ECONOMY.hirePerLevel * h.level;
+  var hireCost = (h) => Math.round((ECONOMY.hireBase + ECONOMY.hirePerLevel * h.level) * HERO_RARITY[h.rarity || 0].hire);
   function rewards(dIdx, win, firstClear) {
     const info = dungeonInfo(dIdx), m = win ? 1 : REWARD.loseMult;
     const gold = Math.round((REWARD.goldBase + REWARD.goldPerTier * dIdx) * m * rnd(0.9, 1.1));
@@ -980,7 +1077,9 @@
       mythic: { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 },
       failStreak: 0,
       player: newPlayer(),
-      bagSeen: []
+      bagSeen: [],
+      recruit: { sinceEpic: 0, sinceLegend: 0, total: 0 },
+      vault: { day: "", used: 0, runs: 0, best: {} }
     };
     for (const c of HERO.starters) {
       const h = makeHero(c);
@@ -1007,19 +1106,65 @@
       s.bagSeen = [];
       newBagMilestones(s);
     }
+    for (const h of [...s.heroes, ...s.tavern || []]) {
+      if (h.rarity == null) h.rarity = 0;
+      if (h.legend == null) h.legend = false;
+    }
+    s.recruit = s.recruit || { sinceEpic: 0, sinceLegend: 0, total: 0 };
+    s.vault = s.vault || { day: "", used: 0, runs: 0, best: {} };
     s.v = SAVE_VERSION;
     return s;
   }
   var partyHeroes = (s) => s.party.map((id) => s.heroes.find((h) => h.id === id)).filter(Boolean);
   var avgLevel = (list) => list.length ? list.reduce((a, h) => a + h.level, 0) / list.length : 1;
+  var ownsLegend = (s, cls2) => [...s.heroes, ...s.tavern || []].some((h) => h.legend && h.cls === cls2);
+  var legendsAvailable = (s) => Object.keys(LEGENDS).filter((c) => !ownsLegend(s, c));
+  function rollHeroRarity(s) {
+    const P = s.recruit || (s.recruit = { sinceEpic: 0, sinceLegend: 0, total: 0 });
+    const canLegend = legendsAvailable(s).length > 0;
+    let r;
+    if (P.sinceLegend >= RECRUIT.pityLegend && canLegend) r = 4;
+    else if (P.sinceEpic >= RECRUIT.pityEpic) r = 3;
+    else {
+      let x = R(), i = HERO_RARITY.length - 1;
+      for (; i > 0; i--) {
+        x -= HERO_RARITY[i].weight;
+        if (x < 0) break;
+      }
+      r = Math.max(0, i);
+    }
+    if (r === 4 && !canLegend) r = 3;
+    P.total++;
+    P.sinceEpic = r >= 3 ? 0 : P.sinceEpic + 1;
+    P.sinceLegend = r === 4 ? 0 : P.sinceLegend + 1;
+    return r;
+  }
+  function newRecruit(s, level) {
+    const r = rollHeroRarity(s);
+    const cls2 = r === 4 ? pick(legendsAvailable(s)) : pick(Object.keys(CLASSES));
+    const h = makeHero(cls2, level, r);
+    if (h.level >= SPEC_LEVEL) h.spec = pick(Object.keys(SPECS[h.cls]));
+    for (const lv of TALENT_ROWS) if (h.level >= lv) h.talents[lv] = pick(["a", "b"]);
+    return h;
+  }
+  var recruitLevel = (s) => Math.max(1, Math.round(avgLevel(s.heroes)) - 1);
   function rollTavern(s) {
-    const L = Math.max(1, Math.round(avgLevel(s.heroes)) - 1);
-    s.tavern = Array.from({ length: 3 }, () => {
-      const h = makeHero(pick(Object.keys(CLASSES)), Math.max(1, L + rint(-1, 0)));
-      if (h.level >= SPEC_LEVEL) h.spec = pick(Object.keys(SPECS[h.cls]));
-      for (const lv of TALENT_ROWS) if (h.level >= lv) h.talents[lv] = pick(["a", "b"]);
-      return h;
-    });
+    const L = recruitLevel(s);
+    s.tavern = [];
+    for (let i = 0; i < 3; i++) s.tavern.push(newRecruit(s, Math.max(1, L + rint(-1, 0))));
+  }
+  var scrollCost = (s, n = 1) => Math.round((RECRUIT.scrollBase + RECRUIT.scrollPerLevel * avgLevel(s.heroes)) * n * (n >= 10 ? RECRUIT.tenDiscount : 1));
+  function recruitScroll(s, n = 1) {
+    const cost = scrollCost(s, n);
+    if (s.heroes.length + n > ECONOMY.rosterMax) return { error: "roster" };
+    if (s.gold < cost) return { error: "gold" };
+    s.gold -= cost;
+    const got = Array.from({ length: n }, () => newRecruit(s, recruitLevel(s)));
+    for (const h of got) {
+      s.heroes.push(h);
+      if (s.party.length < ECONOMY.partyMax) s.party.push(h.id);
+    }
+    return { heroes: got, cost };
   }
   function hire(s, heroId) {
     const h = s.tavern.find((x) => x.id === heroId), cost = h && hireCost(h);
@@ -1031,9 +1176,11 @@
     if (!s.tavern.length) rollTavern(s);
     return h;
   }
+  var refreshCost = (s) => Math.round(scrollCost(s, 1) / 2);
   function refreshTavern(s) {
-    if (s.gold < ECONOMY.refreshCost) return false;
-    s.gold -= ECONOMY.refreshCost;
+    const c = refreshCost(s);
+    if (s.gold < c) return false;
+    s.gold -= c;
     rollTavern(s);
     return true;
   }
@@ -1049,7 +1196,9 @@
     for (const sl in h.gear) if (h.gear[sl]) s.bag.push(h.gear[sl]);
     s.heroes = s.heroes.filter((x) => x.id !== id);
     benchHero(s, id);
-    return h;
+    const refund = Math.round(hireCost(h) * RECRUIT.fireRefund);
+    s.gold += refund;
+    return { ...h, refund };
   }
   var bagMax = (s) => ECONOMY.bagMax + BAG_PER_MILESTONE * BAG_MILESTONES.filter((m) => m.test(s)).length;
   function newBagMilestones(s) {
@@ -1300,6 +1449,47 @@
     return { sec: Math.round(sec), runs, wins, gold, items, stashed, lv };
   }
 
+  // src/core/vault.js
+  var vaultUnlocked = (s) => !!s.clears[VAULT.unlockAfter];
+  function vaultToday(s) {
+    const v = s.vault, today = dayKey();
+    if (v.day !== today) {
+      v.day = today;
+      v.used = 0;
+    }
+    return v;
+  }
+  var vaultLeft = (s) => Math.max(0, VAULT.daily - vaultToday(s).used);
+  var vaultFloors = (s) => Object.keys(s.clears).filter((k) => s.clears[k]).map(Number).sort((a, b) => a - b);
+  var floorGold = (f) => REWARD.goldBase + REWARD.goldPerTier * f;
+  var vaultGoldPerKill = (f) => Math.round(floorGold(f) * VAULT.parRuns / VAULT.par[f]);
+  var vaultMaxKills = (f) => Math.round(VAULT.par[f] * VAULT.capMult);
+  function vaultBattleOpts(floor) {
+    const base = buildWaves(floor)[0][0];
+    const waves = Array.from({ length: 40 }, (_, k) => Array.from({ length: 3 }, () => ({
+      name: "\u5BF6\u85CF\u54E5\u5E03\u6797",
+      boss: false,
+      goblin: true,
+      hp: Math.round(base.hp * VAULT.strength * (1 + VAULT.waveGrowth * k)),
+      atk: base.atk * VAULT.goblinAtk
+    })));
+    return { vault: { floor, dur: VAULT.dur }, waves, maxTicks: VAULT.dur };
+  }
+  function applyVaultResult(s, battle, partyHeroes2) {
+    const f = battle.vault.floor, kills = battle.kills || 0, v = vaultToday(s);
+    const gold = Math.min(kills, vaultMaxKills(f)) * vaultGoldPerKill(f);
+    const xp = Math.round(REWARD.xpBase * Math.pow(f + 1, REWARD.xpExp) * VAULT.xpMult);
+    v.used++;
+    v.runs++;
+    const record = kills > (v.best[f] || 0);
+    if (record) v.best[f] = kills;
+    s.gold += gold;
+    s.stats.runs++;
+    const lvUps = [];
+    for (const h of partyHeroes2(s)) if (gainXp(h, xp)) lvUps.push({ name: h.name, level: h.level });
+    return { vault: true, kills, gold, xp, record, lvUps, loot: [], kept: [], stashed: [], salvaged: 0, first: false, decayed: false };
+  }
+
   // src/core/advice.js
   var ROLE_NAME2 = { tank: "\u5766\u514B", heal: "\u6CBB\u7642", dps: "\u8F38\u51FA" };
   function nextStep(s) {
@@ -1314,6 +1504,7 @@
     if (party.some((h) => pendingPicks(h))) return { text: "\u6709\u5929\u8CE6\u9084\u6C92\u9078", sub: `\u4E00\u9375\u4F9D\u300C${DUNGEONS[top].name}\u300D\u914D\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\u3002`, btn: { label: "\u4E00\u9375\u5099\u6230", act: "prepare", d: top } };
     if ((s.failStreak || 0) >= 2 && top > 0) return { text: `\u300C${DUNGEONS[top].name}\u300D\u9023\u8F38 ${s.failStreak} \u5834`, sub: "\u56DE\u524D\u4E00\u5C64\u639B\u6A5F\u5237\u88DD\u5099\u8207\u7B49\u7D1A\uFF0C\u6216\u8ABF\u6574\u9663\u5BB9\u3002", btn: { label: `\u639B\u6A5F\u5237\u300C${DUNGEONS[top - 1].name}\u300D`, act: "idle", d: top - 1 } };
     if (s.stash && s.stash.length) return { text: `\u6230\u5229\u54C1\u7BB1\u6709 ${s.stash.length} \u4EF6\u88DD\u5099`, sub: "\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\u6389\u7684\u88DD\u5099\u653E\u5728\u9019\u88E1\uFF0C\u8A18\u5F97\u53D6\u51FA\u3002", btn: { label: "\u524D\u5F80\u80CC\u5305", tab: "bag" } };
+    if (vaultUnlocked(s) && vaultLeft(s) && s.stats.runs >= 5) return { text: `\u4ECA\u5929\u5BF6\u5EAB\u9084\u6709 ${vaultLeft(s)} \u6B21`, sub: "60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\uFF0C\u5927\u91CF\u91D1\u5E63\u53EF\u4EE5\u62FF\u53BB\u62DB\u52DF\u82F1\u96C4\u3002", btn: { label: "\u9032\u5165\u5BF6\u5EAB", act: "vault", d: Math.max(...Object.keys(s.clears).filter((k) => s.clears[k]).map(Number)) } };
     if (mythicUnlocked(s) && !s.mythic.runs) return { text: "\u50B3\u5947\u79D8\u5883\u5DF2\u89E3\u9396", sub: "\u5C31\u5728\u4E0B\u65B9\uFF1A\u5C64\u6578\u7121\u4E0A\u9650\uFF0C\u6BCF\u5929\u8A5E\u7DB4\u4E0D\u540C\u3002", btn: null };
     return null;
   }
@@ -1371,6 +1562,8 @@
   var fmt = (n) => Math.round(n).toLocaleString("zh-TW");
   var pct = (a, b) => Math.max(0, Math.min(100, 100 * a / b));
   var esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var heroName = (h) => `<span class="c${h.rarity || 0}">${h.legend ? `${LEGENDS[h.cls].title}\u30FB` : ""}${h.name}</span>`;
+  var rarityTag = (h) => `<span class="rtag r${h.rarity || 0}">${HERO_RARITY[h.rarity || 0].name}</span>`;
   var mmss = (sec) => `${Math.floor(Math.abs(sec) / 60)}:${String(Math.abs(sec) % 60).padStart(2, "0")}`;
   function toast(msg) {
     const el = $("#toast");
@@ -1402,7 +1595,7 @@
   }
 
   // src/core/version.js
-  var VERSION = "0.6.0";
+  var VERSION = "0.7.0";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -1474,6 +1667,17 @@
     const btn = !b ? "" : b.tab ? `<button class="btn main" data-tab="${b.tab}">${b.label}</button>` : `<button class="btn main" data-act="${b.act}" ${b.d != null ? `data-d="${b.d}"` : ""}>${b.label}</button>`;
     return `<div class="nextstep"><div><span class="label">\u4E0B\u4E00\u6B65</span><b>${n.text}</b><span class="sub" style="margin:0">${n.sub}</span></div>${btn}</div>`;
   }
+  function vaultSection() {
+    const S = app.S;
+    if (!vaultUnlocked(S)) return `<div class="vault locked"><b>\u5BF6\u5EAB</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 3 \u5C64\u300C\u6C89\u6C92\u795E\u6BBF\u300D\u5F8C\u958B\u653E\uFF1A\u6BCF\u5929 3 \u6B21\uFF0C\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\u8CFA\u5927\u91CF\u91D1\u5E63\u3002</span></div>`;
+    const floors = vaultFloors(S), left = vaultLeft(S);
+    const f = floors.includes(app.vaultFloor) ? app.vaultFloor : floors[floors.length - 1];
+    const best = S.vault.best[f] || 0;
+    return `<div class="vault"><div class="mhead"><div><span class="label">\u5BF6\u5EAB</span><b>60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797</b></div><span class="vleft num">\u4ECA\u5929\u5269 ${left}/${VAULT.daily}</span></div>
+    <div class="seg vfloors">${floors.map((i) => `<button data-act="vaultfloor" data-d="${i}" class="${i === f ? "sel" : ""}">${i + 1}</button>`).join("")}</div>
+    <p class="sub" style="margin:0">\u7B2C ${f + 1} \u5C64\uFF1A\u6BCF\u96BB <b class="num">${fmt(vaultGoldPerKill(f))}</b> \u91D1\uFF0C\u6700\u591A\u7B97 ${vaultMaxKills(f)} \u96BB\u30FB\u6700\u4F73 ${best} \u96BB\u3002\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002</p>
+    <div class="row"><button class="btn main grow" data-act="vault" data-d="${f}" ${left ? "" : "disabled"}>${left ? "\u9032\u5165\u5BF6\u5EAB" : "\u660E\u5929 00:00 \u518D\u4F86"}</button><button class="btn" data-act="prepare-vault">\u5099\u6230</button></div></div>`;
+  }
   function mythicSection() {
     const S = app.S;
     if (!mythicUnlocked(S)) return `<div class="mythic locked"><b>\u50B3\u5947\u79D8\u5883</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 7 \u5C64\u300C\u9F8D\u7720\u9AD8\u5854\u300D\u5F8C\u89E3\u9396\uFF1A\u7121\u9650\u5C64\u6578\u3001\u9650\u6642\u6311\u6230\u3001\u6BCF\u65E5\u8A5E\u7DB4\u3002</span></div>`;
@@ -1505,7 +1709,7 @@
   function viewDungeons() {
     const lv = avgPartyLv(), il = avgPartyIlvl();
     let h = nextStepCard() + `<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv${lv}</b>\u30FB\u88DD\u7B49 <b class="num">${il}</b>\u30FB\u6230\u529B <b class="num">${fmt(partyPower())}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u90FD\u6709\u5F31\u9EDE\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\uFF0C\u6216\u56DE\u982D\u5237\u88DD\u5099\u3002</p>`;
-    h += mythicSection() + `<div class="dlist">`;
+    h += vaultSection() + mythicSection() + `<div class="dlist">`;
     DUNGEONS.forEach((_, i) => {
       const d = dungeonInfo(i), locked = i >= app.S.unlocked, clears = app.S.clears[i] || 0;
       const idleHere = app.S.idle === i;
@@ -1540,16 +1744,17 @@
     const bar = enemy ? "enemy-bar" : "role-" + u.role;
     return `<div class="unit ${dead ? "dead" : ""} ${u.boss ? "boss" : ""}">
     <div class="ic">${enemy ? u.boss ? "\u{1F451}" : "\u{1F47E}" : u.icon}</div>
-    <div class="nm">${u.name}${enemy ? "" : `<small>${CLASSES[u.cls].name}</small>`}</div>
+    <div class="nm">${enemy ? u.name : `<span class="c${u.rarity || 0}">${u.name}</span><small>${CLASSES[u.cls].name}</small>`}</div>
     <div class="hpn num">${fmt(u.hp)} / ${fmt(u.max)}</div>
     <div class="bar"><i class="${bar}" style="width:${pct(u.hp, u.max)}%"></i></div></div>`;
   }
   function viewBattle() {
     if (!app.battle) return `<h2>\u6230\u9B25</h2><div class="empty">\u76EE\u524D\u6C92\u6709\u9032\u884C\u4E2D\u7684\u6230\u9B25\u3002<br>\u5230\u300C\u526F\u672C\u300D\u9078\u4E00\u5C64\u958B\u59CB\u6311\u6230\u3002<br><br><button class="btn main" data-tab="dungeon">\u524D\u5F80\u526F\u672C</button></div>`;
     const d = dungeonInfo(app.battle.dIdx), b = app.battle;
+    if (b.vault) d.name = `\u5BF6\u5EAB\u30FB\u7B2C ${b.vault.floor + 1} \u5C64`;
     let h = `<div class="bhead"><h2>${d.name}${b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : ""}</h2><span class="sub num" style="margin:0">${b.tick}s</span>
-    <div class="waves">${b.waves.map((_, i) => `<i class="${i < b.waveIdx || b.over && b.win ? "done" : i === b.waveIdx ? "cur" : ""}"></i>`).join("")}</div></div>
-    ${b.mythic ? mythicTimerBar(b) : ""}
+    ${b.vault ? "" : `<div class="waves">`}${b.vault ? "" : b.waves.map((_, i) => `<i class="${i < b.waveIdx || b.over && b.win ? "done" : i === b.waveIdx ? "cur" : ""}"></i>`).join("") + "</div>"}</div>
+    ${b.mythic ? mythicTimerBar(b) : ""}${b.vault ? vaultBar(b) : ""}
     <div class="arena">
       <div class="side foes"><span class="label">\u6575\u65B9\u30FB${b.waveIdx === b.waves.length - 1 ? "\u9996\u9818\u6230" : `\u7B2C ${b.waveIdx + 1} \u6CE2`}</span>${enemyRows(b)}</div>
       <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>${b.units.map((u) => unitRow(u, false)).join("")}</div>
@@ -1570,6 +1775,11 @@
     <span class="num">${over ? `\u8D85\u6642 ${mmss(-left)}` : `\u5269 ${mmss(left)}`}</span></div>
     <div class="chips">${b.mythic.affixes.map((a) => `<span class="chip">${AFFIXES[a].name}</span>`).join("")}</div>`;
   }
+  function vaultBar(b) {
+    const left = Math.max(0, b.vault.dur - b.tick), f = b.vault.floor, cap = vaultMaxKills(f);
+    return `<div class="mtimer"><div class="mtrack"><i style="width:${pct(b.tick, b.vault.dur)}%"></i></div><span class="num">\u5269 ${mmss(left)}</span></div>
+    <div class="vaultcount"><b class="num">${b.kills}</b> \u96BB\u54E5\u5E03\u6797\u30FB<span class="num">+${fmt(Math.min(b.kills, cap) * vaultGoldPerKill(f))}</span> \u91D1${b.kills >= cap ? "\uFF08\u5DF2\u9054\u91D1\u5E63\u4E0A\u9650\uFF09" : `<span class="sub" style="margin:0">\u3000\u91D1\u5E63\u7B97\u5230 ${cap} \u96BB</span>`}</div>`;
+  }
   function hornBtn(b) {
     const on = b.hornActive(), left = b.horn.until - b.tick;
     return `<button class="btn horn ${on ? "on" : ""}" data-act="horn" ${b.horn.used ? "disabled" : ""} aria-label="\u82F1\u52C7\u865F\u89D2">\u{1F4EF} ${on ? `${left}s` : b.horn.used ? "\u5DF2\u7528" : "\u865F\u89D2"}</button>`;
@@ -1578,8 +1788,8 @@
     const r = app.lastResult, b = app.battle;
     const dmgMax = Math.max(1, ...b.units.map((u) => Math.max(u.dmgDone, u.healDone)));
     const sec = Math.max(1, b.tick);
-    const title = r.mythic ? r.inTime ? "\u9650\u6642\u901A\u95DC" : b.win ? "\u8D85\u6642\u901A\u95DC" : "\u5931\u6557" : b.win ? "\u901A\u95DC" : "\u5931\u6557";
-    let h = `<div class="result ${(r.mythic ? r.inTime : b.win) ? "win" : "lose"}"><h3>${title}</h3>
+    const title = r.vault ? `\u6253\u5012 ${r.kills} \u96BB\u54E5\u5E03\u6797` : r.mythic ? r.inTime ? "\u9650\u6642\u901A\u95DC" : b.win ? "\u8D85\u6642\u901A\u95DC" : "\u5931\u6557" : b.win ? "\u901A\u95DC" : "\u5931\u6557";
+    let h = `<div class="result ${r.vault || (r.mythic ? r.inTime : b.win) ? "win" : "lose"}"><h3>${title}</h3>${r.vault && r.record ? '<span class="newrec" style="justify-self:start">\u672C\u5C64\u65B0\u7D00\u9304</span>' : ""}
     ${r.mythic ? `<div class="keychange"><span class="keystone num">+${r.prevKey}</span><span class="arrow">\u2192</span><span class="keystone num ${r.nextKey > r.prevKey ? "up" : r.nextKey < r.prevKey ? "down" : ""}">+${r.nextKey}</span>
       <span class="sub" style="margin:0">\u7528\u6642 <b class="num">${mmss(b.tick)}</b> / \u9650\u6642 ${mmss(b.mythic.timer)}</span>${r.record ? '<span class="newrec">\u65B0\u7D00\u9304</span>' : ""}</div>` : ""}
     <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+${fmt(r.gold)}</b> \u91D1\u5E63</span><span><b class="num">+${fmt(r.xp)}</b> \u7D93\u9A57</span>${r.first ? '<span style="color:var(--brass)">\u9996\u6B21\u901A\u95DC\uFF1A\u5FC5\u6389\u7A00\u6709\u4EE5\u4E0A</span>' : ""}${r.decayed ? '<span style="color:var(--warn)">\u9019\u5C64\u5C0D\u4F60\u592A\u7C21\u55AE\u4E86\uFF0C\u7D93\u9A57\u8207\u91D1\u5E63\u8B8A\u5C11\uFF0C\u5F80\u4E0B\u4E00\u5C64\u5427</span>' : ""}</div>`;
@@ -1590,9 +1800,9 @@
       const sk = u.dmgDone ? Math.round(100 * u.skillDmg / u.dmgDone) : 0;
       return `<div class="mrow"><span>${u.icon} ${u.name}${u.role !== "heal" && sk ? `<small class="num">\u6280\u80FD ${sk}%</small>` : ""}</span><span class="mb"><i class="role-${u.role}" style="width:${pct(v, dmgMax)}%"></i></span><span class="num" style="text-align:right">${fmt(v / sec)}${u.role === "heal" ? " HPS" : " DPS"}</span></div>`;
     }).join("")}</div>`;
-    if (!b.win) h += `<div class="sub" style="margin:0">${failHint(b)}</div>`;
+    if (!b.win && !r.vault) h += `<div class="sub" style="margin:0">${failHint(b)}</div>`;
     h += `<div class="row">${app.pendingRepeat ? `<span class="sub" style="margin:0;align-self:center">\u639B\u6A5F\u4E2D\uFF0C3 \u79D2\u5F8C\u81EA\u52D5\u518D\u6230\u2026</span>` : ""}
-    <button class="btn main grow" data-act="${r.mythic ? "mythic" : "fight"}" data-d="${b.dIdx}">${r.mythic ? `\u518D\u6311\u6230 +${r.nextKey}` : "\u518D\u6253\u4E00\u6B21"}</button>
+    ${r.vault ? vaultLeft(app.S) ? `<button class="btn main grow" data-act="vault" data-d="${b.vault.floor}">\u518D\u6253\u4E00\u6B21\uFF08\u4ECA\u5929\u5269 ${vaultLeft(app.S)} \u6B21\uFF09</button>` : '<span class="sub" style="margin:0;align-self:center">\u4ECA\u5929\u7684\u5BF6\u5EAB\u6B21\u6578\u7528\u5B8C\u4E86</span>' : `<button class="btn main grow" data-act="${r.mythic ? "mythic" : "fight"}" data-d="${b.dIdx}">${r.mythic ? `\u518D\u6311\u6230 +${r.nextKey}` : "\u518D\u6253\u4E00\u6B21"}</button>`}
     ${r.kept.length ? `<button class="btn" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button>` : ""}
     <button class="btn" data-tab="dungeon">\u8FD4\u56DE\u526F\u672C</button></div></div>`;
     return h;
@@ -1618,12 +1828,12 @@
     <div class="party">${Array.from({ length: ECONOMY.partyMax }, (_, i) => {
       const x = party[i];
       if (!x) return `<div class="slot emptyslot">\u7A7A\u4F4D</div>`;
-      return `<button class="slot" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div><div class="n">${x.name}</div><div class="lv num">Lv${x.level}</div><div class="rl role-${cls(x).role}"></div></button>`;
+      return `<button class="slot r-${x.rarity || 0}" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div><div class="n c${x.rarity || 0}">${x.name}</div><div class="lv num">Lv${x.level}</div><div class="rl role-${cls(x).role}"></div></button>`;
     }).join("")}</div>
     <div class="comp"><span><b style="color:var(--tank)">\u5766\u514B</b> ${c.tank}</span><span><b style="color:var(--heal)">\u6CBB\u7642</b> ${c.heal}</span><span><b style="color:var(--dps)">\u8F38\u51FA</b> ${c.dps}</span><span>\u6230\u529B <b class="num" style="color:var(--fg)">${fmt(partyPower())}</b></span>
     ${!c.tank ? '<span style="color:var(--warn)">\u7F3A\u5766\u514B</span>' : ""}${!c.heal ? '<span style="color:var(--warn)">\u7F3A\u6CBB\u7642</span>' : ""}</div>
     <h2 style="font-size:18px">\u540D\u518A <span class="sub num">${app.S.heroes.length}/${ECONOMY.rosterMax}</span></h2><div class="stack">`;
-    const sorted = [...app.S.heroes].sort((a, b) => inParty(b) - inParty(a) || b.level - a.level);
+    const sorted = [...app.S.heroes].sort((a, b) => inParty(b) - inParty(a) || (b.rarity || 0) - (a.rarity || 0) || b.level - a.level);
     for (const x of sorted) h += heroCard(x);
     h += `</div>` + (enabled() ? `<h2 style="font-size:18px">\u610F\u898B\u56DE\u994B</h2><div class="settings">
     <textarea id="fbText" class="fb" maxlength="1000" placeholder="\u54EA\u88E1\u597D\u73A9\u3001\u54EA\u88E1\u5361\u4F4F\u3001\u60F3\u8981\u4EC0\u9EBC\u529F\u80FD\u90FD\u53EF\u4EE5\u5BEB">${esc(app.fbDraft || "")}</textarea>
@@ -1635,8 +1845,8 @@
   function heroCard(x) {
     const st = heroStats(x, app.S.items);
     const need = xpNeed(x.level);
-    return `<button class="hero" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div>
-    <div class="nm">${x.name}<small>${cls(x).name}${x.spec ? `\u30FB${SPECS[x.cls][x.spec].name}` : ""}\u30FB<span class="num">Lv${x.level}</span></small>${pendingPicks(x) ? '<span class="newpick">\u53EF\u9078\u5929\u8CE6</span>' : ""}</div>
+    return `<button class="hero r-${x.rarity || 0}" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div>
+    <div class="nm">${heroName(x)}${rarityTag(x)}<small>${cls(x).name}${x.spec ? `\u30FB${SPECS[x.cls][x.spec].name}` : ""}\u30FB<span class="num">Lv${x.level}</span></small>${pendingPicks(x) ? '<span class="newpick">\u53EF\u9078\u5929\u8CE6</span>' : ""}</div>
     <span class="tag ${inParty(x) ? "in" : ""}">${inParty(x) ? "\u51FA\u6230\u4E2D" : "\u5F85\u547D"}</span>
     <div class="st num"><span>\u751F\u547D ${fmt(st.hp)}</span><span>\u5A01\u529B ${st.pow}</span><span>\u66B4\u64CA ${Math.round(st.crit * 100)}%</span><span>\u88DD\u7B49 ${heroIlvl(x, app.S.items)}</span></div>
     <div class="xpbar"><i style="width:${x.level >= HERO.maxLevel ? 100 : pct(x.xp, need)}%"></i></div></button>`;
@@ -1684,14 +1894,28 @@
 
   // src/ui/views/tavern.js
   function viewTavern() {
-    let h = `<h2>\u9152\u9928</h2><p class="sub">\u62DB\u52DF\u65B0\u82F1\u96C4\uFF0C\u7B49\u7D1A\u6703\u63A5\u8FD1\u4F60\u968A\u4F0D\u7684\u5E73\u5747\u3002\u540D\u518A\u6700\u591A ${ECONOMY.rosterMax} \u4EBA\u3002</p><div class="stack">`;
-    for (const x of app.S.tavern) {
+    const S = app.S, E = ECONOMY, full = S.heroes.length >= E.rosterMax;
+    const one = scrollCost(S, 1), ten = scrollCost(S, 10), P = S.recruit, legendsLeft = legendsAvailable(S).length;
+    let h = `<h2>\u9152\u9928</h2><p class="sub">\u540D\u518A <b class="num">${S.heroes.length}/${E.rosterMax}</b>\u3002\u65B0\u82F1\u96C4\u7684\u7B49\u7D1A\u6703\u63A5\u8FD1\u4F60\u968A\u4F0D\u7684\u5E73\u5747\u3002</p>
+    <div class="recruit"><div><span class="label">\u62DB\u52DF\u4EE4</span><b>\u76F4\u63A5\u62BD\u4E00\u4F4D\u82F1\u96C4\u52A0\u5165\u540D\u518A</b>
+      <span class="sub num" style="margin:0">\u7B2C ${Math.max(1, RECRUIT.pityEpic - P.sinceEpic + 1)} \u62BD\u5167\u5FC5\u51FA\u53F2\u8A69\u4EE5\u4E0A${legendsLeft ? `\u30FB\u7B2C ${Math.max(1, RECRUIT.pityLegend - P.sinceLegend + 1)} \u62BD\u5167\u5FC5\u51FA\u50B3\u8AAA` : ""}</span></div>
+      <div class="row"><button class="btn main grow" data-act="scroll" data-n="1" ${full || S.gold < one ? "disabled" : ""}>\u55AE\u62BD <span class="num">${fmt(one)}</span> \u91D1</button>
+      <button class="btn main grow" data-act="scroll" data-n="10" ${S.heroes.length + 10 > E.rosterMax || S.gold < ten ? "disabled" : ""}>\u5341\u9023 <span class="num">${fmt(ten)}</span> \u91D1</button></div>
+      ${full ? '<span class="sub" style="margin:0;color:var(--warn)">\u540D\u518A\u6EFF\u4E86\uFF0C\u5148\u5230\u300C\u5718\u968A\u300D\u89E3\u96C7\u4E00\u4E9B\u82F1\u96C4</span>' : S.heroes.length + 10 > E.rosterMax ? `<span class="sub" style="margin:0">\u5341\u9023\u9700\u8981\u540D\u518A\u9084\u6709 10 \u500B\u7A7A\u4F4D</span>` : ""}
+      <div class="rates">${HERO_RARITY.map((r, i) => `<span class="c${i}">${r.name} ${+(r.weight * 100).toFixed(1)}%</span>`).join("")}</div></div>
+    <h2 style="font-size:18px">\u4ECA\u65E5\u540D\u55AE</h2><div class="stack">`;
+    for (const x of S.tavern) {
       const c = cls(x), cost = hireCost(x);
-      h += `<div class="hero"><div class="ic">${c.icon}</div><div class="nm">${x.name}<small>${c.name}${x.spec ? `\u30FB${SPECS[x.cls][x.spec].name}` : ""}\u30FB${ROLE_NAME[c.role]}\u30FB<span class="num">Lv${x.level}</span></small></div>
-      <button class="btn sm main" data-act="hire" data-id="${x.id}" ${app.S.gold < cost || app.S.heroes.length >= ECONOMY.rosterMax ? "disabled" : ""} style="grid-row:span 2"><span class="num">${cost}</span> \u91D1</button>
-      <div class="st">${c.desc}</div></div>`;
+      h += `<div class="hero r-${x.rarity || 0}"><div class="ic">${c.icon}</div><div class="nm">${heroName(x)}${rarityTag(x)}<small>${c.name}${x.spec ? `\u30FB${SPECS[x.cls][x.spec].name}` : ""}\u30FB${ROLE_NAME[c.role]}\u30FB<span class="num">Lv${x.level}</span></small></div>
+      <button class="btn sm main" data-act="hire" data-id="${x.id}" ${S.gold < cost || full ? "disabled" : ""} style="grid-row:span 2"><span class="num">${fmt(cost)}</span> \u91D1</button>
+      <div class="st">${x.legend ? `<b class="c4">${LEGENDS[x.cls].pname}</b>\uFF1A${LEGENDS[x.cls].desc}` : c.desc}</div></div>`;
     }
-    h += `</div><div class="row" style="margin-top:12px"><button class="btn" data-act="reroll" ${app.S.gold < ECONOMY.refreshCost ? "disabled" : ""}>\u63DB\u4E00\u6279\uFF08<span class="num">${ECONOMY.refreshCost}</span> \u91D1\uFF09</button></div>
+    const rc = refreshCost(S);
+    h += `</div><div class="row" style="margin-top:12px"><button class="btn" data-act="reroll" ${S.gold < rc ? "disabled" : ""}>\u63DB\u4E00\u6279\uFF08<span class="num">${fmt(rc)}</span> \u91D1\uFF09</button><span class="sub" style="margin:0;align-self:center">\u63DB\u4E00\u6279\u4E5F\u7B97\u9032\u4FDD\u5E95</span></div>
+    <h2 style="font-size:18px">\u50B3\u5947\u82F1\u96C4</h2><div class="stack">${Object.entries(LEGENDS).map(([k, L]) => {
+      const owned = S.heroes.some((x) => x.legend && x.cls === k);
+      return `<div class="hero ${owned ? "r-4" : "unowned"}"><div class="ic">${CLASSES[k].icon}</div><div class="nm"><span class="c4">${L.title}\u30FB${L.name}</span><small>${CLASSES[k].name}\u30FB${owned ? "\u5DF2\u62DB\u52DF" : "\u672A\u62DB\u52DF"}</small></div><span></span><div class="st"><b>${L.pname}</b>\uFF1A${L.desc}</div></div>`;
+    }).join("")}</div>
     <h2 style="font-size:18px">\u8077\u696D\u5716\u9451</h2><div class="stack">${Object.values(CLASSES).map((c) => `<div class="hero"><div class="ic">${c.icon}</div><div class="nm">${c.name}<small>${ROLE_NAME[c.role]}</small></div><span></span><div class="st">${c.desc}</div></div>`).join("")}</div>`;
     return h;
   }
@@ -1732,7 +1956,9 @@
     if (!x) return "";
     const c = cls(x), st = heroStats(x, app.S.items), view = app.modal.view || "gear", pend = pendingPicks(x);
     const sp = x.spec && SPECS[x.cls][x.spec];
-    let h = `<h3>${c.icon} ${x.name}</h3><div class="sub" style="margin:0">${c.name}${sp ? `\u30FB${sp.name}` : ""}\u30FB${ROLE_NAME[c.role]}\u3000${c.desc}</div>
+    const R2 = HERO_RARITY[x.rarity || 0], L = x.legend && LEGENDS[x.cls];
+    let h = `<h3>${c.icon} ${heroName(x)} ${rarityTag(x)}</h3><div class="sub" style="margin:0">${c.name}${sp ? `\u30FB${sp.name}` : ""}\u30FB${ROLE_NAME[c.role]}\u3000${c.desc}</div>
+    ${x.rarity ? `<div class="raritycard r-${x.rarity}"><b class="c${x.rarity}">${R2.name}\u52A0\u6210</b><span>\u57FA\u790E\u5C6C\u6027 \xD7${R2.mult.toFixed(2)}${R2.crit ? `\u30FB\u66B4\u64CA +${Math.round(R2.crit * 100)}%` : ""}${R2.baseCdMult ? "\u30FB\u57FA\u790E\u6280\u80FD\u51B7\u537B \u221210%" : ""}</span>${L ? `<span><b class="c4">${L.pname}</b>\uFF1A${L.desc}</span>` : ""}</div>` : ""}
     <div class="statgrid num"><div><b>${x.level}</b><span>\u7B49\u7D1A</span></div><div><b>${fmt(st.hp)}</b><span>\u751F\u547D</span></div><div><b>${st.pow}</b><span>\u5A01\u529B</span></div><div><b>${Math.round(st.crit * 100)}%</b><span>\u66B4\u64CA</span></div></div>
     <div class="sub" style="margin:0">\u7D93\u9A57 <span class="num">${fmt(x.xp)} / ${fmt(xpNeed(x.level))}</span>\u30FB\u8B77\u7532\u6E1B\u50B7 ${Math.round(st.armor * 100)}%</div>
     <div class="seg wide"><button data-act="heroview" data-id="${x.id}" data-v="gear" class="${view === "gear" ? "sel" : ""}">\u88DD\u5099</button><button data-act="heroview" data-id="${x.id}" data-v="talent" class="${view === "talent" ? "sel" : ""}">\u5929\u8CE6${pend ? `<span class="pip">${pend}</span>` : ""}</button></div>`;
@@ -1753,7 +1979,7 @@
   }
   function heroActions(x) {
     return `<div class="row">${inParty(x) ? `<button class="btn grow" data-act="bench" data-id="${x.id}">\u79FB\u51FA\u968A\u4F0D</button>` : `<button class="btn main grow" data-act="join" data-id="${x.id}" ${app.S.party.length >= ECONOMY.partyMax ? "disabled" : ""}>${app.S.party.length >= ECONOMY.partyMax ? "\u968A\u4F0D\u5DF2\u6EFF" : "\u52A0\u5165\u968A\u4F0D"}</button>`}
-    ${app.S.heroes.length > 1 ? `<button class="btn" data-act="fire" data-id="${x.id}" style="color:var(--bad)">${app.modal.confirmFire ? "\u78BA\u5B9A\u89E3\u96C7\uFF1F" : "\u89E3\u96C7"}</button>` : ""}</div>`;
+    ${app.S.heroes.length > 1 ? `<button class="btn" data-act="fire" data-id="${x.id}" style="color:var(--bad)">${app.modal.confirmFire ? `\u78BA\u5B9A\u89E3\u96C7\uFF1F\u9000 ${fmt(Math.round(hireCost(x) * RECRUIT.fireRefund))} \u91D1` : "\u89E3\u96C7"}</button>` : ""}</div>`;
   }
   function talentView(x) {
     const B = BASE_SKILLS[x.cls], specs = SPECS[x.cls], t = x.talents || {};
@@ -1824,6 +2050,26 @@
     app.battle.push(`\u9032\u5165\u50B3\u5947\u79D8\u5883\uFF1A${DUNGEONS[dIdx].name} +${o.mythic.level}\uFF5C\u8A5E\u7DB4\uFF1A${o.mythic.affixes.map((a) => AFFIXES[a].name).join("\u3001")}`, "info");
     runTimer();
   }
+  function startVault(floor) {
+    const p = partyHeroes(app.S);
+    if (!p.length) {
+      toast("\u968A\u4F0D\u6C92\u6709\u6210\u54E1");
+      app.tab = "team";
+      app.render();
+      return false;
+    }
+    if (!vaultLeft(app.S)) {
+      toast("\u4ECA\u5929\u7684\u5BF6\u5EAB\u6B21\u6578\u7528\u5B8C\u4E86\uFF0C\u660E\u5929 00:00 \u91CD\u7F6E");
+      return false;
+    }
+    clearTimeout(app.pendingRepeat);
+    app.pendingRepeat = null;
+    app.battle = new Battle(p, app.S.items, floor, vaultBattleOpts(floor));
+    app.lastResult = null;
+    app.battle.push(`\u9032\u5165\u5BF6\u5EAB\u7B2C ${floor + 1} \u5C64\uFF1A60 \u79D2\u5167\u6253\u5012\u8D8A\u591A\u5BF6\u85CF\u54E5\u5E03\u6797\uFF0C\u91D1\u5E63\u8D8A\u591A\uFF01`, "info");
+    runTimer();
+    return true;
+  }
   function runTimer() {
     clearInterval(app.bTimer);
     app.bTimer = setInterval(stepBattle, TICK_MS / app.speed);
@@ -1840,13 +2086,14 @@
   }
   function finishBattle() {
     clearInterval(app.bTimer);
-    app.lastResult = app.battle.mythic ? applyMythicResult(app.S, app.battle) : applyResult(app.S, app.battle.dIdx, app.battle);
+    app.lastResult = app.battle.vault ? applyVaultResult(app.S, app.battle, partyHeroes) : app.battle.mythic ? applyMythicResult(app.S, app.battle) : applyResult(app.S, app.battle.dIdx, app.battle);
     save();
     const r = app.lastResult, b = app.battle;
     for (const m of newBagMilestones(app.S)) setTimeout(() => toast(`\u{1F392} ${m.name}\uFF1A\u80CC\u5305 +${BAG_PER_MILESTONE} \u683C`), 400);
-    if (b.mythic) sendEvent("\u79D8\u5883", `${DUNGEONS[b.dIdx].name} +${b.mythic.level} ${r.inTime ? "\u9650\u6642" : b.win ? "\u8D85\u6642" : "\u5931\u6557"} ${mmss(b.tick)}${r.record ? "\uFF08\u65B0\u7D00\u9304\uFF09" : ""}`);
+    if (b.vault) sendEvent("\u5BF6\u5EAB", `\u7B2C ${b.vault.floor + 1} \u5C64 \u6253\u5012 ${r.kills} \u96BB +${r.gold} \u91D1`);
+    else if (b.mythic) sendEvent("\u79D8\u5883", `${DUNGEONS[b.dIdx].name} +${b.mythic.level} ${r.inTime ? "\u9650\u6642" : b.win ? "\u8D85\u6642" : "\u5931\u6557"} ${mmss(b.tick)}${r.record ? "\uFF08\u65B0\u7D00\u9304\uFF09" : ""}`);
     else if (r.first) sendEvent("\u9996\u901A", `\u7B2C ${b.dIdx + 1} \u5C64 ${DUNGEONS[b.dIdx].name}`);
-    if (!app.battle.mythic && app.S.idle === app.battle.dIdx) {
+    if (!app.battle.mythic && !app.battle.vault && app.S.idle === app.battle.dIdx) {
       const d = app.battle.dIdx;
       app.pendingRepeat = setTimeout(() => {
         app.pendingRepeat = null;
@@ -1912,6 +2159,31 @@
         app.tab = "battle";
         window.scrollTo(0, 0);
         break;
+      case "vault":
+        if (startVault(+t.dataset.d)) {
+          app.tab = "battle";
+          window.scrollTo(0, 0);
+        }
+        break;
+      case "vaultfloor":
+        app.vaultFloor = +t.dataset.d;
+        break;
+      case "prepare-vault": {
+        const r = prepare(app.S, ["summon"]);
+        toast(`\u5DF2\u5099\u6230\u5BF6\u5EAB\uFF08\u504F\u7BC4\u570D\u8F38\u51FA\uFF09\uFF1A\u5766 ${r.roles.tank}\u30FB\u88DC ${r.roles.heal}\u30FB\u8F38\u51FA ${r.roles.dps}`);
+        save();
+        break;
+      }
+      case "scroll": {
+        const n = +t.dataset.n, r = recruitScroll(app.S, n);
+        if (r.error) {
+          toast(r.error === "gold" ? "\u91D1\u5E63\u4E0D\u5920" : "\u540D\u518A\u7A7A\u4F4D\u4E0D\u5920");
+          break;
+        }
+        save();
+        showDraw(r.heroes, r.cost);
+        return;
+      }
       case "recommend-mythic": {
         const d = +t.dataset.d, r = prepare(app.S, [...DUNGEONS[d].mech.map((m) => m.t), ...affixHints(activeAffixes(app.S.mythic.key))]);
         toast(`\u5DF2\u4F9D\u300C${DUNGEONS[d].name}\u300D\u8207\u4ECA\u65E5\u8A5E\u7DB4\u5099\u6230\uFF1A\u5766 ${r.roles.tank}\u30FB\u88DC ${r.roles.heal}\u30FB\u8F38\u51FA ${r.roles.dps}`);
@@ -2031,12 +2303,17 @@
         }
         const x = fireHero(app.S, id);
         app.modal = null;
-        if (x) toast(`${x.name} \u96E2\u958B\u4E86\u5718\u968A`);
+        if (x) toast(`${x.name} \u96E2\u958B\u4E86\u5718\u968A\uFF0C\u9000\u9084 ${x.refund} \u91D1`);
         save();
         break;
       }
       case "hire": {
         const x = hire(app.S, id);
+        if (x && x.rarity >= 3) {
+          save();
+          showDraw([x], hireCost(x));
+          return;
+        }
         if (x) {
           toast(`${x.name} \u52A0\u5165\u4E86${app.S.party.includes(x.id) ? "\u968A\u4F0D" : "\u540D\u518A"}`);
           save();
@@ -2230,6 +2507,13 @@
       render();
     }
   });
+  function showDraw(list, cost) {
+    const sorted = [...list].sort((a, b) => (b.rarity || 0) - (a.rarity || 0)), best = sorted[0].rarity || 0;
+    openModal({ type: "text", html: `<h3>${best === 4 ? "\u2728 \u50B3\u8AAA\u964D\u81E8\uFF01" : best === 3 ? "\u53F2\u8A69\u82F1\u96C4\u52A0\u5165\uFF01" : "\u62DB\u52DF\u7D50\u679C"}</h3>
+    <p class="sub" style="margin:0">\u82B1\u8CBB ${fmt(cost)} \u91D1\u30FB\u5DF2\u52A0\u5165\u540D\u518A${app.S.party.length < ECONOMY.partyMax ? "" : "\uFF08\u968A\u4F0D\u5DF2\u6EFF\uFF0C\u5728\u5F85\u547D\u5340\uFF09"}</p>
+    <div class="drawlist">${sorted.map((x) => `<div class="drawcard r-${x.rarity || 0}"><span class="ic">${CLASSES[x.cls].icon}</span><span>${heroName(x)}</span><span class="rtag r${x.rarity || 0}">${HERO_RARITY[x.rarity || 0].name}</span><small>${CLASSES[x.cls].name}\u30FBLv${x.level}</small>${x.legend ? `<small class="c4">${LEGENDS[x.cls].pname}\uFF1A${LEGENDS[x.cls].desc}</small>` : ""}</div>`).join("")}</div>
+    <div class="row"><button class="btn main grow" data-act="closebtn">\u597D</button><button class="btn" data-tab="team">\u53BB\u5718\u968A\u770B\u770B</button></div>` });
+  }
   function openNick() {
     openModal({ type: "text", html: `<h3>\u4F60\u7684\u66B1\u7A31</h3><p class="sub" style="margin:0">\u986F\u793A\u5728\u5929\u68AF\u4E0A\uFF0C\u4E4B\u5F8C\u96A8\u6642\u53EF\u4EE5\u4FEE\u6539\u3002\u904A\u6232\u6703\u8A18\u9304\u66B1\u7A31\u3001\u9032\u5EA6\u8207\u904A\u73A9\u6642\u9593\uFF0C\u4E0D\u6703\u6536\u96C6\u5E33\u865F\u6216\u500B\u4EBA\u8CC7\u6599\u3002</p>
     <input id="nickInp" class="inp" maxlength="16" placeholder="\u4F8B\u5982\uFF1AYomi" value="${esc(app.S.player.name)}" autocomplete="off">

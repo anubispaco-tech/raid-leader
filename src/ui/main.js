@@ -9,9 +9,9 @@ import { viewTeam } from './views/team.js';
 import { viewBag } from './views/bag.js';
 import { viewTavern } from './views/tavern.js';
 import { renderModal, openModal, closeModal } from './views/sheets.js';
-import { startBattle, startMythic, runTimer, finishBattle } from './battle-runner.js';
+import { startBattle, startMythic, startVault, runTimer, finishBattle } from './battle-runner.js';
 import * as T from './telemetry.js';
-import { esc } from './helpers.js';
+import { esc, heroName } from './helpers.js';
 
 // ---------- 分頁 ----------
 const ICONS = {
@@ -53,6 +53,14 @@ document.addEventListener('click', e => {
   switch (a) {
     case 'fight': startBattle(+t.dataset.d); app.tab = 'battle'; break;
     case 'mythic': startMythic(+t.dataset.d); app.tab = 'battle'; window.scrollTo(0, 0); break;
+    case 'vault': if (startVault(+t.dataset.d)) { app.tab = 'battle'; window.scrollTo(0, 0); } break;
+    case 'vaultfloor': app.vaultFloor = +t.dataset.d; break;
+    case 'prepare-vault': { const r = G.prepare(app.S, ['summon']); toast(`已備戰寶庫（偏範圍輸出）：坦 ${r.roles.tank}・補 ${r.roles.heal}・輸出 ${r.roles.dps}`); save(); break; }
+    case 'scroll': {
+      const n = +t.dataset.n, r = G.recruitScroll(app.S, n);
+      if (r.error) { toast(r.error === 'gold' ? '金幣不夠' : '名冊空位不夠'); break; }
+      save(); showDraw(r.heroes, r.cost); return;
+    }
     case 'recommend-mythic': {
       const d = +t.dataset.d, r = G.prepare(app.S, [...G.DUNGEONS[d].mech.map(m => m.t), ...G.affixHints(G.activeAffixes(app.S.mythic.key))]);
       toast(`已依「${G.DUNGEONS[d].name}」與今日詞綴備戰：坦 ${r.roles.tank}・補 ${r.roles.heal}・輸出 ${r.roles.dps}`); save(); break;
@@ -89,10 +97,11 @@ document.addEventListener('click', e => {
     case 'bench': G.benchHero(app.S, id); save(); break;
     case 'fire': {
       if (!app.modal.confirmFire) { app.modal.confirmFire = true; break; }
-      const x = G.fireHero(app.S, id); app.modal = null; if (x) toast(`${x.name} 離開了團隊`); save(); break;
+      const x = G.fireHero(app.S, id); app.modal = null; if (x) toast(`${x.name} 離開了團隊，退還 ${x.refund} 金`); save(); break;
     }
     case 'hire': {
       const x = G.hire(app.S, id);
+      if (x && x.rarity >= 3) { save(); showDraw([x], G.hireCost(x)); return; }
       if (x) { toast(`${x.name} 加入了${app.S.party.includes(x.id) ? '隊伍' : '名冊'}`); save(); }
       break;
     }
@@ -171,6 +180,14 @@ document.addEventListener('visibilitychange', () => {
 setInterval(() => { if (!document.hidden) { T.tick(5); save(); } }, 5000);
 document.addEventListener('input', e => { if (e.target.id === 'fbText') app.fbDraft = e.target.value; });
 document.addEventListener('change', e => { if (e.target.id === 'salvSel') { app.salvSel = +e.target.value; app.salvConfirm = false; render(); } }); // 回饋草稿：畫面重畫時不會消失
+// 抽卡結果：依稀有度由高到低排列，傳說與史詩特別標示
+function showDraw(list, cost) {
+  const sorted = [...list].sort((a, b) => (b.rarity || 0) - (a.rarity || 0)), best = sorted[0].rarity || 0;
+  openModal({ type: 'text', html: `<h3>${best === 4 ? '✨ 傳說降臨！' : best === 3 ? '史詩英雄加入！' : '招募結果'}</h3>
+    <p class="sub" style="margin:0">花費 ${fmt(cost)} 金・已加入名冊${app.S.party.length < G.ECONOMY.partyMax ? '' : '（隊伍已滿，在待命區）'}</p>
+    <div class="drawlist">${sorted.map(x => `<div class="drawcard r-${x.rarity || 0}"><span class="ic">${G.CLASSES[x.cls].icon}</span><span>${heroName(x)}</span><span class="rtag r${x.rarity || 0}">${G.HERO_RARITY[x.rarity || 0].name}</span><small>${G.CLASSES[x.cls].name}・Lv${x.level}</small>${x.legend ? `<small class="c4">${G.LEGENDS[x.cls].pname}：${G.LEGENDS[x.cls].desc}</small>` : ''}</div>`).join('')}</div>
+    <div class="row"><button class="btn main grow" data-act="closebtn">好</button><button class="btn" data-tab="team">去團隊看看</button></div>` });
+}
 // 暱稱：第一次開遊戲時詢問（可跳過），之後可在團隊分頁修改
 function openNick() {
   openModal({ type: 'text', html: `<h3>你的暱稱</h3><p class="sub" style="margin:0">顯示在天梯上，之後隨時可以修改。遊戲會記錄暱稱、進度與遊玩時間，不會收集帳號或個人資料。</p>

@@ -240,3 +240,26 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 .selwrap select{background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;font-size:14px}
 .btn.danger{border-color:var(--bad);color:var(--bad)}
 .okc{color:var(--good)}
+
+/* v0.7 稀有度、招募、寶庫 */
+.rtag{font-size:10.5px;font-weight:500;padding:1px 6px;border-radius:999px;border:1px solid currentColor;margin-left:6px;vertical-align:middle}
+.rtag.r0{color:var(--r0)} .rtag.r1{color:var(--r1)} .rtag.r2{color:var(--r2)} .rtag.r3{color:var(--r3)} .rtag.r4{color:var(--r4)}
+.hero.r-1,.slot.r-1,.drawcard.r-1{border-color:color-mix(in srgb,var(--r1) 45%,var(--line))}
+.hero.r-2,.slot.r-2,.drawcard.r-2{border-color:color-mix(in srgb,var(--r2) 55%,var(--line))}
+.hero.r-3,.slot.r-3,.drawcard.r-3{border-color:color-mix(in srgb,var(--r3) 65%,var(--line))}
+.hero.r-4,.slot.r-4,.drawcard.r-4{border-color:var(--r4);box-shadow:0 0 14px -6px var(--r4)}
+.hero.unowned{opacity:.55}
+.raritycard{display:grid;gap:2px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:12.5px}
+.recruit{display:grid;gap:10px;background:linear-gradient(160deg,color-mix(in srgb,var(--r3) 12%,var(--panel)),var(--panel) 60%);border:1px solid color-mix(in srgb,var(--r3) 45%,var(--line));border-radius:12px;padding:14px}
+.recruit>div:first-child{display:grid;gap:2px}
+.rates{display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px}
+.drawlist{display:grid;gap:6px;max-height:55vh;overflow-y:auto}
+.drawcard{display:grid;grid-template-columns:28px 1fr auto;gap:2px 8px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.drawcard small{grid-column:2/-1;font-size:11.5px;color:var(--muted)}
+.drawcard .ic{grid-row:span 3;font-size:20px;text-align:center}
+.vault{background:linear-gradient(160deg,color-mix(in srgb,var(--brass) 14%,var(--panel)),var(--panel) 60%);border:1px solid color-mix(in srgb,var(--brass) 50%,var(--line));border-radius:12px;padding:14px;display:grid;gap:10px;margin-top:16px}
+.vault.locked{background:var(--panel);border-color:var(--line);opacity:.7;gap:4px}
+.vleft{font-size:13px;color:var(--brass)}
+.vfloors{display:grid;grid-template-columns:repeat(7,1fr)}
+.vfloors button{padding:6px 0}
+.vaultcount{margin-top:6px;font-size:14px}

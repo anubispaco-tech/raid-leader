@@ -128,7 +128,7 @@ export class Battle {
     this.maxTicks = opts.maxTicks || DUNGEON.maxTicks;
     this.units = party.map(h => {
       const s = heroStats(h, items), c = CLASSES[h.cls];
-      return { id: h.id, name: h.name, cls: h.cls, role: c.role, icon: c.icon, spec: h.spec || null, mods: { ...heroMods(h), ...rarityMods(h) },
+      return { id: h.id, name: h.name, cls: h.cls, rarity: h.rarity || 0, role: c.role, icon: c.icon, spec: h.spec || null, mods: { ...heroMods(h), ...rarityMods(h) },
         max: s.hp, hp: s.hp, pow: s.pow, crit: s.crit, armor: s.armor, shield: 0, hots: [], cd: {}, buf: {}, used: {},
         dmgDone: 0, skillDmg: 0, healDone: 0, taken: 0 };
     });

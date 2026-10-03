@@ -18,6 +18,7 @@ src/
     dungeons.js         副本難度與敵人
     battle.js           戰鬥模擬（職業行為、技能、首領機制、詞綴、英勇號角）
     mythic.js           傳奇秘境：鑰石、每日詞綴、敵人成長、結算
+    vault.js            寶庫：每日次數、哥布林、金幣結算
     advice.js           下一步建議
     version.js          版本號（由 build.js 產生）
     game.js             存檔操作：獎勵、招募、配裝、掛機
@@ -49,12 +50,13 @@ tools/
 | `node tools/sim.js 10` | 模擬 10 次完整遊玩 |
 | `node tools/specs.js` | 選對 / 選錯專精的勝率差 |
 | `node tools/sim-mythic.js 4 300` | 秘境節奏 |
-| `node tools/e2e.js`、`e2e-actions.js`、`e2e-talents.js`、`e2e-mythic.js`、`e2e-telemetry.js` | 瀏覽器測試 |
+| `node tools/e2e.js`、`e2e-actions.js`、`e2e-talents.js`、`e2e-mythic.js`、`e2e-telemetry.js`、`e2e-v07.js` | 瀏覽器測試 |
 
 調整數值只改 `src/core/config.js` 與 `src/core/talents.js`，改完跑 `sim.js` 與 `specs.js` 確認節奏。
 
 ## 版本
 
+- **v0.7.0** 英雄稀有度（普通~傳說）、4 位傳奇英雄、招募令與保底、寶庫
 - **v0.6.0** 分解下拉、背包擴充里程碑、一鍵強化 / 卸下、一鍵備戰（推薦陣容＋天賦＋配裝）、文字口吻調整
 - **v0.5.0** 天梯（排行榜）、遊玩數據、意見回饋（GAS + 試算表）、暱稱
 - **v0.4.0** 傳奇秘境（鑰石、限時、每日詞綴、個人紀錄）、傳說裝備、下一步建議卡
