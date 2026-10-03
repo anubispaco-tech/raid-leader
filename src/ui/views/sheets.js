@@ -41,9 +41,13 @@ function sheetHero(x) {
       <button class="btn sm" data-act="pick" data-id="${x.id}" data-slot="${slot}" ${n ? '' : 'disabled'}>更換</button></span></div>`;
   }
   const plan = G.upgradeAll(app.S, x.id, true), hasGear = Object.values(x.gear).some(Boolean);
+  const better = G.autoEquip(app.S, x.id, true);
   h += `</div><div class="row">
+    <button class="btn grow ${better ? 'main' : ''}" data-act="autoequip1" data-id="${x.id}" ${better ? '' : 'disabled'}>${better ? `一鍵配裝（${better} 件更好）` : '已是最佳配裝'}</button>
+    <button class="btn" data-act="unequipall" data-id="${x.id}" ${hasGear ? '' : 'disabled'}>全部卸下</button></div>
+    <div class="row">
     <button class="btn grow" data-act="upall" data-id="${x.id}" ${plan.count ? '' : 'disabled'}>${plan.empty ? '沒有裝備' : plan.count ? `一鍵強化 ${plan.count} 次（${fmt(plan.spent)} 金）` : plan.maxed ? '已全部強化到 +5' : '金幣不夠強化'}</button>
-    <button class="btn" data-act="unequipall" data-id="${x.id}" ${hasGear ? '' : 'disabled'}>全部卸下</button></div>`;
+</div>`;
   return h + heroActions(x);
 }
 function heroActions(x) {

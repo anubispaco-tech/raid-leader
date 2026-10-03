@@ -108,6 +108,7 @@ document.addEventListener('click', e => {
     }
     case 'reroll': if (G.refreshTavern(app.S)) save(); break;
     case 'filter': app.invFilter = t.dataset.v; break;
+    case 'autoequip1': { const n = G.autoEquip(app.S, id); toast(n ? `更換了 ${n} 件裝備` : '目前已是最佳配裝'); save(); break; }
     case 'autoequip': { const n = G.autoEquip(app.S); toast(n ? `更換了 ${n} 件裝備` : '目前已是最佳配裝'); save(); break; }
     case 'salvageupto': {
       const lv = app.salvSel ?? 0;

@@ -49,6 +49,14 @@ await page.click('[data-tab="dungeon"]'); await page.click('.dg [data-act="fight
 sv = await saved(); check(sv.idle == null, '挑戰別層自動停止掛機｜idle=' + sv.idle + ' unlocked=' + sv.unlocked);
 await page.click('[data-tab="dungeon"]'); await page.click('.dg [data-act="prepare"][data-d="2"]'); await page.waitForTimeout(200);
 check((await saved()).party.length === 5, '停掛機後備戰會補滿陣容');
+// 英雄抽屜：單人一鍵配裝（全部卸下後再配回來）
+await page.click('[data-tab="team"]'); await page.locator('.party .slot').first().click(); await page.waitForTimeout(200);
+await page.click('.sheet [data-act="unequipall"]'); await page.waitForTimeout(200);
+const btnTxt = await page.locator('.sheet [data-act="autoequip1"]').innerText();
+await page.click('.sheet [data-act="autoequip1"]'); await page.waitForTimeout(200);
+const sv2 = await saved(), h0 = sv2.heroes.find(h => h.id === sv2.party[0]);
+check(/一鍵配裝（\d+ 件更好）/.test(btnTxt) && Object.values(h0.gear).filter(Boolean).length >= 3 && await page.locator('.sheet [data-act="autoequip1"]').isDisabled(), '單人一鍵配裝｜' + btnTxt + '→' + await toastText());
+await page.screenshot({ path: (process.env.SHOTS || '/tmp/claude-0') + '/m72-hero.png' });
 check(!errs.length, '無 JS 錯誤 ' + errs.join(';'));
 await browser.close();
 if (fails.length) process.exit(1);

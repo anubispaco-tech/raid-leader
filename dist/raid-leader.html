@@ -283,7 +283,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.7.1 */
+/* 副本團長 v0.7.2 */
 (() => {
   // src/core/config.js
   var CLASSES = {
@@ -1695,9 +1695,10 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       });
     }));
   }
-  function autoEquip(s) {
+  function autoEquip(s, heroId, dry) {
     let changed = 0;
-    for (const h of partyHeroes(s)) {
+    const list = heroId ? s.heroes.filter((h) => h.id === heroId) : partyHeroes(s);
+    for (const h of list) {
       for (const slot of Object.keys(SLOTS)) {
         const cur = h.gear[slot] && s.items[h.gear[slot]];
         let best = null;
@@ -1706,7 +1707,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
           if (it.slot === slot && (!best || itemScore(it) > itemScore(best))) best = it;
         }
         if (best && (!cur || itemScore(best) > itemScore(cur))) {
-          equip(s, h.id, best.id);
+          if (!dry) equip(s, h.id, best.id);
           changed++;
         }
       }
@@ -1883,7 +1884,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   }
 
   // src/core/version.js
-  var VERSION = "0.7.1";
+  var VERSION = "0.7.2";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -2260,9 +2261,13 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       <button class="btn sm" data-act="pick" data-id="${x.id}" data-slot="${slot}" ${n ? "" : "disabled"}>\u66F4\u63DB</button></span></div>`;
     }
     const plan = upgradeAll(app.S, x.id, true), hasGear = Object.values(x.gear).some(Boolean);
+    const better = autoEquip(app.S, x.id, true);
     h += `</div><div class="row">
+    <button class="btn grow ${better ? "main" : ""}" data-act="autoequip1" data-id="${x.id}" ${better ? "" : "disabled"}>${better ? `\u4E00\u9375\u914D\u88DD\uFF08${better} \u4EF6\u66F4\u597D\uFF09` : "\u5DF2\u662F\u6700\u4F73\u914D\u88DD"}</button>
+    <button class="btn" data-act="unequipall" data-id="${x.id}" ${hasGear ? "" : "disabled"}>\u5168\u90E8\u5378\u4E0B</button></div>
+    <div class="row">
     <button class="btn grow" data-act="upall" data-id="${x.id}" ${plan.count ? "" : "disabled"}>${plan.empty ? "\u6C92\u6709\u88DD\u5099" : plan.count ? `\u4E00\u9375\u5F37\u5316 ${plan.count} \u6B21\uFF08${fmt(plan.spent)} \u91D1\uFF09` : plan.maxed ? "\u5DF2\u5168\u90E8\u5F37\u5316\u5230 +5" : "\u91D1\u5E63\u4E0D\u5920\u5F37\u5316"}</button>
-    <button class="btn" data-act="unequipall" data-id="${x.id}" ${hasGear ? "" : "disabled"}>\u5168\u90E8\u5378\u4E0B</button></div>`;
+</div>`;
     return h + heroActions(x);
   }
   function heroActions(x) {
@@ -2631,6 +2636,12 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       case "filter":
         app.invFilter = t.dataset.v;
         break;
+      case "autoequip1": {
+        const n = autoEquip(app.S, id);
+        toast(n ? `\u66F4\u63DB\u4E86 ${n} \u4EF6\u88DD\u5099` : "\u76EE\u524D\u5DF2\u662F\u6700\u4F73\u914D\u88DD");
+        save();
+        break;
+      }
       case "autoequip": {
         const n = autoEquip(app.S);
         toast(n ? `\u66F4\u63DB\u4E86 ${n} \u4EF6\u88DD\u5099` : "\u76EE\u524D\u5DF2\u662F\u6700\u4F73\u914D\u88DD");

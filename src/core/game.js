@@ -299,14 +299,16 @@ export function hasUpgrade(s) {
   }));
 }
 // 一鍵配裝：替出戰隊員從背包挑分數最高的
-export function autoEquip(s) {
+// heroId 有給就只配這位英雄（待命英雄也可以）；dry = 只計算會換幾件
+export function autoEquip(s, heroId, dry) {
   let changed = 0;
-  for (const h of partyHeroes(s)) {
+  const list = heroId ? s.heroes.filter(h => h.id === heroId) : partyHeroes(s);
+  for (const h of list) {
     for (const slot of Object.keys(SLOTS)) {
       const cur = h.gear[slot] && s.items[h.gear[slot]];
       let best = null;
       for (const id of s.bag) { const it = s.items[id]; if (it.slot === slot && (!best || itemScore(it) > itemScore(best))) best = it; }
-      if (best && (!cur || itemScore(best) > itemScore(cur))) { equip(s, h.id, best.id); changed++; }
+      if (best && (!cur || itemScore(best) > itemScore(cur))) { if (!dry) equip(s, h.id, best.id); changed++; }
     }
   }
   return changed;
