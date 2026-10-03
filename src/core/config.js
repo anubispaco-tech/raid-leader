@@ -38,6 +38,7 @@ export const RARITY = [
   { name: '精良', mult: 1.2,  color: '#22c55e', weight: 0.30 },
   { name: '稀有', mult: 1.45, color: '#3b82f6', weight: 0.12 },
   { name: '史詩', mult: 1.75, color: '#a855f7', weight: 0.03 },
+  { name: '傳說', mult: 2.1,  color: '#f59e0b', weight: 0 },    // 只從傳奇秘境 +7 起掉落
 ];
 export const SLOTS = { weapon: '武器', armor: '護甲', trinket: '飾品' };
 // 各部位屬性分配（× 裝等 × 稀有度倍率）
@@ -79,6 +80,20 @@ export const DUNGEON = {
   boss: { hp: 850, atk: 13, addHp: 70, addAtk: 5 },
   maxTicks: 240,                    // 超過即失敗（秒）
   waveHeal: 0.5,                    // 波與波之間回血比例
+};
+
+// ---------- 傳奇秘境 ----------
+export const MYTHIC = {
+  unlockAfter: 6,                   // 通關第 7 層（index 6）後解鎖
+  startKey: 2,
+  hpGrowth: 1.10, atkGrowth: 1.08,  // 每 +1 敵人生命 / 攻擊倍率（以第 7 層為基準）
+  timer: [150, 150, 160, 150, 160, 165, 170], // 各副本限時（秒）
+  overtime: 120,                    // 超過限時再撐這麼久仍打不完 → 失敗
+  bonusAt: 0.8,                     // 用不到 80% 時間 → 鑰石 +2
+  affixAt: [2, 5, 8],               // 第 1、2、3 個詞綴生效的等級
+  dropBase: 68, dropPerLevel: 3,    // 掉落裝等 = base + 每級 × 等級
+  legendFrom: 7, legendBase: 0.03, legendPerLevel: 0.01, legendMax: 0.15,
+  goldMult: 1.5, xpMult: 1.2,       // 相對第 7 層的獎勵
 };
 
 // ---------- 團長指令 ----------

@@ -30,6 +30,28 @@ export function playthrough({ maxRuns = 1500, talents = true, horn = false } = {
   }
   return { log, first, s };
 }
+
+// 通關第 7 層後繼續打秘境：每天 perDay 場、輪流打 7 個副本、每場前套用推薦天賦（含詞綴）、首領戰吹號角
+export function mythicRun({ runs = 300, perDay = 15, start = new Date('2026-10-05T04:00:00Z') } = {}) {
+  const { s } = playthrough({ talents: true });
+  const keyAt = {}, hist = [];
+  for (let r = 0; r < runs; r++) {
+    const date = new Date(start.getTime() + Math.floor(r / perDay) * 864e5);
+    for (const h of G.partyHeroes(s)) for (const sl of Object.keys(G.SLOTS)) { const id = h.gear[sl]; if (id && s.gold > 500) G.upgrade(s, id); }
+    G.autoEquip(s);
+    for (const id of [...s.bag]) if (s.bag.length > 20) G.salvage(s, id);
+    const d = r % G.DUNGEONS.length, lvl = s.mythic.key;
+    const o = G.mythicBattleOpts(d, lvl, date);
+    const hints = [...G.DUNGEONS[d].mech.map(m => m.t), ...G.affixHints(o.mythic.affixes)];
+    for (const h of G.partyHeroes(s)) G.applyRecommend(h, hints);
+    const b = new G.Battle(G.partyHeroes(s), s.items, d, { ...o, autoHorn: true }).runToEnd();
+    const res = G.applyMythicResult(s, b);
+    hist.push(res.inTime);
+    for (let k = 2; k <= s.mythic.key; k++) if (keyAt[k] === undefined) keyAt[k] = r + 1;
+  }
+  const lv = G.partyHeroes(s).map(h => h.level), il = G.partyHeroes(s).map(h => G.heroIlvl(h, s.items));
+  return { keyAt, final: s.mythic.key, timedRate: Math.round(100 * hist.filter(Boolean).length / hist.length), lv, il };
+}
 export function average(n, opts) {
   const agg = {};
   let sample;

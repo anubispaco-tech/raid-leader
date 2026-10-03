@@ -6,9 +6,11 @@ import { makeItem, rollRarity, itemScore, salvageValue, upgradeCost } from './it
 import { makeHero, gainXp } from './heroes.js';
 import { dungeonInfo } from './dungeons.js';
 import { SPECS, TALENT_ROWS, SPEC_LEVEL } from './talents.js';
+import { MYTHIC } from './config.js';
+import { mythicRewards, keyChange } from './mythic.js';
 import { Battle } from './battle.js';
 
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 export const hireCost = h => ECONOMY.hireBase + ECONOMY.hirePerLevel * h.level;
 
 // ---------- 獎勵 ----------
@@ -34,7 +36,8 @@ function decayFor(dIdx) {
 // ---------- 存檔 ----------
 export function newGame() {
   const s = { v: SAVE_VERSION, gold: ECONOMY.startGold, heroes: [], items: {}, bag: [], party: [], unlocked: 1, clears: {},
-    tavern: [], idle: null, lastSeen: Date.now(), stats: { runs: 0, wins: 0 }, autoSalvageBelow: 0, keepRarity: ECONOMY.defaultKeepRarity, stash: [], created: Date.now() };
+    tavern: [], idle: null, lastSeen: Date.now(), stats: { runs: 0, wins: 0 }, autoSalvageBelow: 0, keepRarity: ECONOMY.defaultKeepRarity, stash: [], created: Date.now(),
+    mythic: { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 }, failStreak: 0 };
   for (const c of HERO.starters) { const h = makeHero(c); s.heroes.push(h); s.party.push(h.id); }
   rollTavern(s);
   return s;
@@ -49,6 +52,9 @@ export function migrate(s) {
   s.stash = s.stash || [];
   // v2 → v3：英雄加入專精與天賦（舊英雄先留空，等玩家自己選）
   for (const h of [...s.heroes, ...(s.tavern || [])]) { if (h.spec === undefined) h.spec = null; h.talents = h.talents || {}; }
+  // v3 → v4：傳奇秘境、連敗紀錄
+  s.mythic = s.mythic || { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 };
+  s.failStreak = s.failStreak || 0;
   s.v = SAVE_VERSION;
   return s;
 }
@@ -107,6 +113,7 @@ export function applyResult(s, dIdx, battle) {
   const baseXp = rw.xp; rw.xp = Math.round(baseXp * decay(avgL));
   const lvUps = [];
   for (const h of party) { if (gainXp(h, Math.round(baseXp * decay(h.level)))) lvUps.push({ name: h.name, level: h.level }); }
+  if (dIdx === s.unlocked - 1) s.failStreak = battle.win ? 0 : (s.failStreak || 0) + 1;
   if (battle.win) {
     s.stats.wins++;
     s.clears[dIdx] = (s.clears[dIdx] || 0) + 1;
@@ -115,6 +122,25 @@ export function applyResult(s, dIdx, battle) {
   const dest = rw.loot.map(it => addLoot(s, it));
   const kept = rw.loot.filter((_, i) => dest[i] === 'bag'), stashed = rw.loot.filter((_, i) => dest[i] === 'stash');
   return { ...rw, first, lvUps, kept, stashed, salvaged: dest.filter(d => d === 'salvaged').length };
+}
+
+// ---------- 傳奇秘境 ----------
+export const mythicUnlocked = s => !!s.clears[MYTHIC.unlockAfter];
+export function applyMythicResult(s, battle) {
+  const M = battle.mythic, kc = keyChange(M.level, battle, M.timer);
+  const rw = mythicRewards(M.level, kc.inTime);
+  s.stats.runs++; if (battle.win) s.stats.wins++;
+  s.mythic.runs++; if (kc.inTime) s.mythic.timed++;
+  s.gold += rw.gold;
+  const lvUps = [];
+  for (const h of partyHeroes(s)) if (gainXp(h, rw.xp)) lvUps.push({ name: h.name, level: h.level });
+  const prevKey = s.mythic.key; s.mythic.key = kc.next;
+  const best = s.mythic.best[M.dIdx], record = kc.inTime && (!best || M.level > best.level || (M.level === best.level && battle.tick < best.time));
+  if (record) s.mythic.best[M.dIdx] = { level: M.level, time: battle.tick };
+  const dest = rw.loot.map(it => addLoot(s, it));
+  const kept = rw.loot.filter((_, i) => dest[i] === 'bag'), stashed = rw.loot.filter((_, i) => dest[i] === 'stash');
+  return { ...rw, mythic: true, inTime: kc.inTime, prevKey, nextKey: kc.next, record, lvUps, kept, stashed,
+    salvaged: dest.filter(d => d === 'salvaged').length, first: false, decayed: false };
 }
 
 // ---------- 背包與裝備 ----------
@@ -156,6 +182,13 @@ export function upgrade(s, itemId) {
   const it = s.items[itemId]; if (!it || it.up >= GEAR.maxUp) return false;
   const c = upgradeCost(it); if (s.gold < c) return false;
   s.gold -= c; it.up++; return true;
+}
+// 背包裡是否有比出戰隊員身上更好的裝備（下一步建議用）
+export function hasUpgrade(s) {
+  return partyHeroes(s).some(h => Object.keys(SLOTS).some(slot => {
+    const cur = h.gear[slot] && s.items[h.gear[slot]];
+    return s.bag.some(id => { const it = s.items[id]; return it.slot === slot && (!cur || itemScore(it) > itemScore(cur)); });
+  }));
 }
 // 一鍵配裝：替出戰隊員從背包挑分數最高的
 export function autoEquip(s) {

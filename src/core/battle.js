@@ -118,8 +118,11 @@ const BOSS_MECHS = {
 
 export class Battle {
   // opts.autoHorn：首領現身時自動吹英勇號角（掛機、直接結算、模擬用）
+  // opts.mythic / waves / maxTicks：傳奇秘境（見 mythic.js mythicBattleOpts）
   constructor(party, items, dIdx, opts = {}) {
     this.dIdx = dIdx; this.opts = opts;
+    this.mythic = opts.mythic || null;
+    this.maxTicks = opts.maxTicks || DUNGEON.maxTicks;
     this.units = party.map(h => {
       const s = heroStats(h, items), c = CLASSES[h.cls];
       return { id: h.id, name: h.name, cls: h.cls, role: c.role, icon: c.icon, spec: h.spec || null, mods: heroMods(h),
@@ -131,7 +134,7 @@ export class Battle {
     for (const u of this.units) { u.max = Math.round(u.max * (1 + partyHp)); u.hp = u.max; }
     this.partyAoe = Math.min(0.3, this.units.reduce((a, u) => a + (u.mods.partyAoe || 0), 0));
     this.horn = { used: false, until: -1 };
-    this.waves = buildWaves(dIdx);
+    this.waves = opts.waves || buildWaves(dIdx);
     this.waveIdx = 0; this.tick = 0; this.waveTick = 0; this.over = false; this.win = false;
     this.log = [];
     this.loadWave();
@@ -139,9 +142,10 @@ export class Battle {
   loadWave() {
     this.enemies = this.waves[this.waveIdx].map(e => ({ ...e, max: e.hp, id: uid(), weak: 0, weakUntil: -1, poison: 0 }));
     this.waveTick = 0;
-    for (const u of this.units) u.cold = !!u.mods.coldBlood;
+    for (const u of this.units) { u.cold = !!u.mods.coldBlood; u.necro = 0; }
     if (this.opts.autoHorn && this.waveIdx === this.waves.length - 1) this.useHorn();
   }
+  has(affix) { return !!this.mythic && this.mythic.affixes.includes(affix); }
   alive() { return this.units.filter(u => u.hp > 0); }
   foes() { return this.enemies.filter(e => e.hp > 0); }
   push(msg, cls = '') { this.log.push({ t: this.tick, msg, cls }); if (this.log.length > 80) this.log.shift(); }
@@ -176,7 +180,14 @@ export class Battle {
     if (u.buf.flurry > this.tick && !o.aoe && !o.dot && !o.extra) {
       for (const x of this.foes().filter(x => x !== e).slice(0, SPECS.rogue.combat.extra)) this.hitEnemy(u, x, amt, { extra: true, skill: true });
     }
-    if (e.hp === 0) this.push(`${e.name} 被擊殺`, e.boss ? 'good' : '');
+    if (e.hp === 0) {
+      this.push(`${e.name} 被擊殺`, e.boss ? 'good' : '');
+      if (!e.boss && this.has('bolstering')) { // 繁盛：其他小怪變強
+        const rest = this.foes().filter(x => !x.boss);
+        for (const x of rest) { x.max = Math.round(x.max * 1.15); x.hp = Math.round(x.hp * 1.15); x.atk *= 1.15; }
+        if (rest.length) this.push(`🌿 繁盛：其餘 ${rest.length} 隻小怪變強`, 'warn');
+      }
+    }
     return amt;
   }
   // kind：phys 一般攻擊、buster 重擊、magic 範圍魔法（無視護甲）
@@ -195,6 +206,7 @@ export class Battle {
     amt = Math.round(amt * Math.max(0.05, red) * rnd(0.9, 1.1));
     const absorbed = Math.min(u.shield, amt); u.shield -= absorbed; amt -= absorbed;
     u.hp = Math.max(0, u.hp - amt); u.taken += amt;
+    if (u.role === 'tank' && kind !== 'magic' && this.has('necrotic')) u.necro = Math.min(40, u.necro + 1);
     if (kind !== 'magic' && m.counter && attacker && R() < m.counter) this.hitEnemy(u, attacker, u.pow);
     this.lifeSavers(u);
     if (u.hp === 0) this.onDeath(u);
@@ -217,7 +229,8 @@ export class Battle {
   }
   heal(src, tgt, amt, raw = false) {
     if (tgt.hp <= 0) return 0;
-    const h = Math.min(tgt.max - tgt.hp, Math.round(amt * (raw ? 1 : this.healMult(src))));
+    const necro = tgt.necro ? Math.max(0.2, 1 - 0.02 * tgt.necro) : 1; // 壞疽
+    const h = Math.min(tgt.max - tgt.hp, Math.round(amt * (raw ? 1 : this.healMult(src)) * necro));
     tgt.hp += h; src.healDone += h; return h;
   }
   enemyTarget() {
@@ -250,9 +263,15 @@ export class Battle {
       const tgt = this.enemyTarget(); if (!tgt) break;
       this.isBuster = false;
       let atk = e.atk * this.weakMult(e);
+      if (!e.boss && this.has('raging') && e.hp < e.max * 0.3) atk *= 1.5; // 暴怒
       if (e.boss) for (const m of e.mech || []) atk *= BOSS_MECHS[m.t](this, e, m, tgt);
       if (tgt.hp > 0) this.hitHero(tgt, atk, this.isBuster ? 'buster' : 'phys', e);
     }
+    if (this.has('volcanic') && this.waveTick % 8 === 0 && this.alive().length) { // 火山
+      const u = pick(this.alive()); this.push(`🌋 火山爆發，${u.name} 受到傷害`, 'warn');
+      this.hitHero(u, this.mythic.volcanic, 'magic');
+    }
+    if (this.mythic && this.tick === this.mythic.timer && !this.over) this.push('⏰ 超過限時！仍可打完，但鑰石會降級', 'bad');
     this.checkEnd();
   }
   checkEnd() {
@@ -265,7 +284,7 @@ export class Battle {
         this.loadWave();
       } else { this.over = true; this.win = true; this.push('🏆 副本通關！', 'good'); }
     }
-    if (this.tick >= DUNGEON.maxTicks && !this.over) { this.over = true; this.win = false; this.push('⌛ 時間耗盡，撤退', 'bad'); }
+    if (this.tick >= this.maxTicks && !this.over) { this.over = true; this.win = false; this.push('⌛ 時間耗盡，撤退', 'bad'); }
   }
   runToEnd() { while (!this.over) this.step(); return this; }
 }
