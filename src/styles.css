@@ -100,7 +100,7 @@ h2{font-family:var(--f-display);font-weight:700;font-size:22px;margin:22px 0 4px
 .result.win h3{color:var(--brass)} .result.lose h3{color:var(--bad)}
 .rew{display:flex;gap:16px;flex-wrap:wrap;font-size:14px}
 .meter{display:grid;gap:5px}
-.mrow{display:grid;grid-template-columns:72px 1fr 64px;gap:8px;align-items:center;font-size:12px}
+.mrow{display:grid;grid-template-columns:96px 1fr 64px;gap:8px;align-items:center;font-size:12px}
 .mrow .mb{height:14px;background:#0d1015;border-radius:3px;overflow:hidden}
 .mrow .mb i{display:block;height:100%}
 .empty{color:var(--muted);text-align:center;padding:40px 10px;border:1px dashed var(--line);border-radius:10px;margin-top:16px}
@@ -149,7 +149,8 @@ h2{font-family:var(--f-display);font-weight:700;font-size:22px;margin:22px 0 4px
 /* 底部抽屜 */
 .scrim{position:fixed;inset:0;background:rgba(5,7,10,.6);z-index:10;display:flex;align-items:flex-end;justify-content:center}
 .sheet{background:var(--panel);border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0;width:100%;max-width:560px;max-height:86%;overflow-y:auto;
-  padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));display:grid;gap:12px;animation:rise .22s ease-out}
+  padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));display:grid;gap:12px}
+.sheet.anim{animation:rise .22s ease-out}
 @keyframes rise{from{transform:translateY(30px);opacity:.4}}
 .sheet h3{margin:0;font-family:var(--f-display);font-size:21px}
 .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
@@ -165,3 +166,24 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
 .howto{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--muted);margin-top:4px}
 .howto b{color:var(--fg);font-weight:500}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* v0.3 天賦與技能 */
+.seg.wide{display:grid;grid-template-columns:1fr 1fr}
+.seg.wide button{padding:8px;font-family:var(--f-body);font-size:14px}
+.pip{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:9px;background:var(--good);color:var(--ink);font-size:11px;margin-left:6px;font-family:var(--f-num)}
+.skillcard{display:grid;gap:2px;background:var(--panel2);border-radius:8px;padding:10px 12px}
+.trow{display:grid;grid-template-columns:44px 1fr 1fr;gap:6px;align-items:stretch}
+.trow.locked{opacity:.45}
+.tlv{font-size:13px;color:var(--brass);display:grid;align-content:center;line-height:1.2}
+.tlv small{font-family:var(--f-body);font-size:10px;color:var(--muted)}
+.opt{display:grid;gap:2px;text-align:left;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
+.opt b{font-size:13px}
+.opt span{font-size:11.5px;color:var(--muted);line-height:1.35}
+.opt.sel{border-color:var(--brass);background:color-mix(in srgb,var(--brass) 14%,var(--panel2))}
+.opt.sel b{color:var(--brass)}
+.opt[disabled]{cursor:not-allowed}
+.newpick{font-size:11px;color:var(--ink);background:var(--good);border-radius:999px;padding:1px 7px;font-weight:500}
+.mrow small{display:block;color:var(--muted);font-size:10.5px}
+.log .skill{color:#b9a77e}
+.btn.horn{flex:0 0 auto;padding-inline:12px}
+.btn.horn.on{border-color:var(--brass);color:var(--brass);background:color-mix(in srgb,var(--brass) 12%,var(--panel2))}

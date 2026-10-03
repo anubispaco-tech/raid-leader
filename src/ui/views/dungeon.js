@@ -6,6 +6,7 @@ import { $, fmt, pct, toast, hero, cls, inParty, itemStatText, itemName, partyPo
 export function viewDungeons() {
   const lv = avgPartyLv(), il = avgPartyIlvl();
   let h = `<h2>副本</h2><p class="sub">隊伍平均 <b class="num">Lv${lv}</b>・裝等 <b class="num">${il}</b>・戰力 <b class="num">${fmt(partyPower())}</b>　｜　每隻首領考驗一種職責，打不過就換陣容或回頭刷裝。</p><div class="dlist">`;
+  const talentsOpen = G.partyHeroes(app.S).some(x => x.level >= G.TALENT_ROWS[0]);
   G.DUNGEONS.forEach((_, i) => {
     const d = G.dungeonInfo(i), locked = i >= app.S.unlocked, clears = app.S.clears[i] || 0;
     const idleHere = app.S.idle === i;
@@ -21,9 +22,10 @@ export function viewDungeons() {
       </div>
       <div class="acts">${locked ? `<span class="sub" style="margin:0">先通關上一層</span>` :
         `<button class="btn main grow" data-act="fight" data-d="${i}">挑戰</button>
-         <button class="btn ${idleHere ? 'on' : ''}" data-act="idle" data-d="${i}" ${clears ? '' : 'disabled title="通關一次後才能掛機"'}>${idleHere ? '掛機中・停止' : '掛機刷'}</button>`}
+         <button class="btn ${idleHere ? 'on' : ''}" data-act="idle" data-d="${i}" ${clears ? '' : 'disabled title="通關一次後才能掛機"'}>${idleHere ? '掛機中・停止' : '掛機刷'}</button>
+         ${talentsOpen ? `<button class="btn" data-act="recommend-party" data-d="${i}" aria-label="全隊套用推薦天賦">推薦天賦</button>` : ''}`}
       </div></div>`;
   });
-  h += `</div><div class="howto" style="margin-top:16px"><b>掛機刷</b>：自動重複挑戰，關掉頁面也會累積（最多 ${G.ECONOMY.offlineCapHours} 小時），回來時一次結算。<br><b>存檔</b>存在這台裝置的瀏覽器，換裝置請到「團隊」最下方匯出存檔碼。</div>`;
+  h += `</div><div class="howto" style="margin-top:16px"><b>推薦天賦</b>：依這層首領的機制，替出戰隊員一鍵配好專精與天賦。<br><b>掛機刷</b>：自動重複挑戰，關掉頁面也會累積（最多 ${G.ECONOMY.offlineCapHours} 小時），回來時一次結算。<br><b>存檔</b>存在這台裝置的瀏覽器，換裝置請到「團隊」最下方匯出存檔碼。</div>`;
   return h;
 }

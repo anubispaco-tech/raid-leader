@@ -31,11 +31,16 @@ export function viewBattle() {
     <div class="log" aria-live="polite">${b.log.map(l => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, ' ')}</span>${l.msg}</p>`).join('')}</div>`;
   if (!b.over) {
     h += `<div class="ctrlbar"><div class="ctrl"><div class="seg">${[1, 2, 4].map(x => `<button data-act="speed" data-x="${x}" class="${app.speed === x ? 'sel' : ''}">${x}×</button>`).join('')}</div>
+      ${hornBtn(b)}
       <button class="btn" data-act="skip">直接結算</button>
       <button class="btn" data-act="retreat">撤退</button></div></div>`;
   }
   if (b.over && app.lastResult) h += viewResult();
   return h;
+}
+function hornBtn(b) {
+  const on = b.hornActive(), left = b.horn.until - b.tick;
+  return `<button class="btn horn ${on ? 'on' : ''}" data-act="horn" ${b.horn.used ? 'disabled' : ''} aria-label="英勇號角">📯 ${on ? `${left}s` : b.horn.used ? '已用' : '號角'}</button>`;
 }
 function viewResult() {
   const r = app.lastResult, b = app.battle;
@@ -47,7 +52,8 @@ function viewResult() {
   if (r.kept.length || r.stashed.length || r.salvaged) h += `<div class="stack">${r.kept.map(it => `<div class="item rar${it.rarity}"><div class="in">${itemName(it)}</div><div class="il">${G.SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div><div class="is">${itemStatText(it)}</div></div>`).join('')}${r.stashed.length ? `<div style="color:var(--brass);font-size:13px">背包已滿，${r.stashed.length} 件放進戰利品箱</div>` : ''}${r.salvaged ? `<div class="sub" style="margin:0">${r.salvaged} 件自動分解為金幣</div>` : ''}</div>`;
   h += `<div class="meter"><span class="label">傷害 / 治療統計（每秒）</span>${b.units.map(u => {
     const v = u.role === 'heal' ? u.healDone : u.dmgDone;
-    return `<div class="mrow"><span>${u.icon} ${u.name}</span><span class="mb"><i class="role-${u.role}" style="width:${pct(v, dmgMax)}%"></i></span><span class="num" style="text-align:right">${fmt(v / sec)}${u.role === 'heal' ? ' HPS' : ' DPS'}</span></div>`;
+    const sk = u.dmgDone ? Math.round(100 * u.skillDmg / u.dmgDone) : 0;
+    return `<div class="mrow"><span>${u.icon} ${u.name}${u.role !== 'heal' && sk ? `<small class="num">技能 ${sk}%</small>` : ''}</span><span class="mb"><i class="role-${u.role}" style="width:${pct(v, dmgMax)}%"></i></span><span class="num" style="text-align:right">${fmt(v / sec)}${u.role === 'heal' ? ' HPS' : ' DPS'}</span></div>`;
   }).join('')}</div>`;
   if (!b.win) h += `<div class="sub" style="margin:0">${failHint(b)}</div>`;
   h += `<div class="row">${app.pendingRepeat ? `<span class="sub" style="margin:0;align-self:center">掛機中，3 秒後自動再戰…</span>` : ''}

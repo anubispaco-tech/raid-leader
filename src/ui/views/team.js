@@ -27,7 +27,7 @@ function heroCard(x) {
   const st = G.heroStats(x, app.S.items);
   const need = G.xpNeed(x.level);
   return `<button class="hero" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div>
-    <div class="nm">${x.name}<small>${cls(x).name}・<span class="num">Lv${x.level}</span></small></div>
+    <div class="nm">${x.name}<small>${cls(x).name}${x.spec ? `・${G.SPECS[x.cls][x.spec].name}` : ''}・<span class="num">Lv${x.level}</span></small>${G.pendingPicks(x) ? '<span class="newpick">可選天賦</span>' : ''}</div>
     <span class="tag ${inParty(x) ? 'in' : ''}">${inParty(x) ? '出戰中' : '待命'}</span>
     <div class="st num"><span>生命 ${fmt(st.hp)}</span><span>威力 ${st.pow}</span><span>暴擊 ${Math.round(st.crit * 100)}%</span><span>裝等 ${G.heroIlvl(x, app.S.items)}</span></div>
     <div class="xpbar"><i style="width:${x.level >= G.HERO.maxLevel ? 100 : pct(x.xp, need)}%"></i></div></button>`;

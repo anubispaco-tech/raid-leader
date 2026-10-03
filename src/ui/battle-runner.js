@@ -8,7 +8,7 @@ export function startBattle(dIdx) {
   const p = G.partyHeroes(app.S);
   if (!p.length) { toast('隊伍沒有成員'); app.tab = 'team'; app.render(); return; }
   clearTimeout(app.pendingRepeat); app.pendingRepeat = null;
-  app.battle = new G.Battle(p, app.S.items, dIdx); app.lastResult = null;
+  app.battle = new G.Battle(p, app.S.items, dIdx, { autoHorn: app.S.idle === dIdx }); app.lastResult = null;
   app.battle.push(`進入 ${G.DUNGEONS[dIdx].name}，第 1 波敵人出現`, 'info');
   runTimer();
 }

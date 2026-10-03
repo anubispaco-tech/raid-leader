@@ -2,7 +2,7 @@
 import * as G from '../core/index.js';
 import { app } from './state.js';
 import { load, save, exportCode, importCode } from './save.js';
-import { $, fmt, toast } from './helpers.js';
+import { $, fmt, toast, hero } from './helpers.js';
 import { viewDungeons } from './views/dungeon.js';
 import { viewBattle } from './views/battle.js';
 import { viewTeam } from './views/team.js';
@@ -22,7 +22,7 @@ const ICONS = {
 const TABS = [['dungeon', '副本'], ['battle', '戰鬥'], ['team', '團隊'], ['bag', '背包'], ['tavern', '酒館']];
 function renderTabs() {
   $('#tabs').innerHTML = TABS.map(([k, n]) =>
-    `<button data-tab="${k}" class="${app.tab === k ? 'sel' : ''}" aria-label="${n}"><svg viewBox="0 0 24 24">${ICONS[k]}</svg>${n}${(k === 'battle' && app.battle && !app.battle.over && app.tab !== 'battle') || (k === 'bag' && app.S.stash.length) ? '<span class="dot"></span>' : ''}</button>`).join('');
+    `<button data-tab="${k}" class="${app.tab === k ? 'sel' : ''}" aria-label="${n}"><svg viewBox="0 0 24 24">${ICONS[k]}</svg>${n}${(k === 'battle' && app.battle && !app.battle.over && app.tab !== 'battle') || (k === 'bag' && app.S.stash.length) || (k === 'team' && app.S.heroes.some(h => G.pendingPicks(h))) ? '<span class="dot"></span>' : ''}</button>`).join('');
 }
 function render(skipModal) {
   $('#gold').textContent = fmt(app.S.gold);
@@ -56,9 +56,21 @@ document.addEventListener('click', e => {
       save(); break;
     }
     case 'speed': app.speed = +t.dataset.x; runTimer(); break;
-    case 'skip': if (app.battle && !app.battle.over) { app.battle.runToEnd(); finishBattle(); } break;
+    case 'skip': if (app.battle && !app.battle.over) {
+      const b = app.battle; b.opts.autoHorn = true; // 直接結算視同掛機：首領戰自動吹號角
+      if (b.waveIdx === b.waves.length - 1) b.useHorn();
+      b.runToEnd(); finishBattle(); } break;
     case 'retreat': if (app.battle && !app.battle.over) { clearInterval(app.bTimer); app.battle.over = true; app.battle.win = false; app.battle.push('🏳 主動撤退', 'bad'); app.lastResult = G.applyResult(app.S, app.battle.dIdx, app.battle); if (app.S.idle === app.battle.dIdx) app.S.idle = null; save(); } break;
-    case 'hero': openModal({ type: 'hero', id }); return;
+    case 'hero': openModal({ type: 'hero', id, view: app.modal && app.modal.id === id ? app.modal.view : undefined }); return;
+    case 'heroview': app.modal = { type: 'hero', id, view: t.dataset.v }; break;
+    case 'spec': G.setSpec(hero(id), t.dataset.v); save(); break;
+    case 'talent': G.setTalent(hero(id), +t.dataset.lv, t.dataset.v); save(); break;
+    case 'recommend': G.applyRecommend(hero(id), G.DUNGEONS[+t.dataset.d].mech.map(m => m.t)); toast('已套用推薦配置'); save(); break;
+    case 'recommend-party': {
+      const d = +t.dataset.d; for (const x of G.partyHeroes(app.S)) G.applyRecommend(x, G.DUNGEONS[d].mech.map(m => m.t));
+      toast(`全隊已套用「${G.DUNGEONS[d].name}」推薦天賦`); save(); break;
+    }
+    case 'horn': if (app.battle && app.battle.useHorn()) app.render(true); return;
     case 'item': openModal({ type: 'item', id }); return;
     case 'pick': openModal({ type: 'pick', id, slot: t.dataset.slot }); return;
     case 'equip': G.equip(app.S, t.dataset.hero, id); toast('已裝備'); save(); app.modal = { type: 'hero', id: t.dataset.hero }; break;
