@@ -1,0 +1,38 @@
+// 秘境測試：用模擬玩到通關第 7 層的存檔 → 秘境區塊、推薦天賦、挑戰、計時、結算鑰石
+import { createRequire } from 'module';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { playthrough } from './sim-lib.js';
+const require = createRequire(import.meta.url);
+const { chromium } = require(process.env.PLAYWRIGHT_PATH || '/opt/npm-tools/node_modules/playwright');
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const entry = process.argv[2] || 'index.html', shots = process.env.SHOTS || '/tmp/claude-0';
+const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
+const { s } = playthrough({ talents: true }); s.lastSeen = Date.now(); s.idle = null;
+
+const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 }, deviceScaleFactor: 2 });
+const errs = []; page.on('pageerror', e => errs.push(e.message));
+await page.addInitScript(v => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('raid-leader-save-v1', v); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(s));
+await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'app.test') return r.abort();
+  const f = path.join(root, u.pathname === '/' ? entry : u.pathname.slice(1));
+  return r.fulfill({ body: fs.readFileSync(f), contentType: types[path.extname(f)] }); });
+await page.goto('https://app.test/'); await page.waitForTimeout(500);
+const out = [];
+out.push('下一步卡：' + ((await page.locator('.nextstep').count()) ? (await page.locator('.nextstep b').innerText()) : '（無）'));
+out.push('秘境鑰石：' + await page.locator('.mhead .keystone').innerText() + '｜生效詞綴：' + (await page.locator('.affix.on b').allInnerTexts()).join('、'));
+await page.screenshot({ path: `${shots}/m-mythic.png` });
+await page.click('[data-act="recommend-mythic"][data-d="3"]');
+await page.click('[data-act="mythic"][data-d="3"]'); await page.waitForTimeout(1200);
+out.push('戰鬥標題：' + (await page.locator('.bhead h2').innerText()).replace(/\n/g, ' ') + '｜計時：' + await page.locator('.mtimer span').innerText());
+await page.click('[data-act="horn"]'); await page.click('[data-act="speed"][data-x="4"]'); await page.waitForTimeout(4000);
+await page.screenshot({ path: `${shots}/m-mythic-battle.png` });
+await page.click('[data-act="skip"]'); await page.waitForTimeout(300);
+out.push('結算：' + await page.locator('.result h3').innerText() + '｜' + (await page.locator('.keychange').innerText()).replace(/\n/g, ' '));
+await page.screenshot({ path: `${shots}/m-mythic-result.png`, fullPage: true });
+const after = await page.evaluate(() => JSON.parse(localStorage.getItem('raid-leader-save-v1')).mythic);
+out.push('存檔：' + JSON.stringify(after));
+await page.click('.result [data-act="mythic"]'); await page.waitForTimeout(300);
+out.push('再挑戰：' + (await page.locator('.bhead h2').innerText()).replace(/\n/g, ' '));
+console.log(out.join('\n') + '\nERRORS: ' + JSON.stringify(errs));
+await browser.close();

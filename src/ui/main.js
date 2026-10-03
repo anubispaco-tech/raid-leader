@@ -9,7 +9,7 @@ import { viewTeam } from './views/team.js';
 import { viewBag } from './views/bag.js';
 import { viewTavern } from './views/tavern.js';
 import { renderModal, openModal, closeModal } from './views/sheets.js';
-import { startBattle, runTimer, finishBattle } from './battle-runner.js';
+import { startBattle, startMythic, runTimer, finishBattle } from './battle-runner.js';
 
 // ---------- 分頁 ----------
 const ICONS = {
@@ -49,6 +49,12 @@ document.addEventListener('click', e => {
   const a = t.dataset.act, id = t.dataset.id;
   switch (a) {
     case 'fight': startBattle(+t.dataset.d); app.tab = 'battle'; break;
+    case 'mythic': startMythic(+t.dataset.d); app.tab = 'battle'; window.scrollTo(0, 0); break;
+    case 'recommend-mythic': {
+      const d = +t.dataset.d, hints = [...G.DUNGEONS[d].mech.map(m => m.t), ...G.affixHints(G.activeAffixes(app.S.mythic.key))];
+      for (const x of G.partyHeroes(app.S)) G.applyRecommend(x, hints);
+      toast(`全隊已依「${G.DUNGEONS[d].name}」與今日詞綴套用推薦天賦`); save(); break;
+    }
     case 'idle': {
       const d = +t.dataset.d;
       if (app.S.idle === d) { app.S.idle = null; clearTimeout(app.pendingRepeat); app.pendingRepeat = null; toast('已停止掛機'); }

@@ -192,6 +192,41 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
 .log .skill{color:#b9a77e}
 .btn.horn{flex:0 0 auto;padding-inline:12px}
 .btn.horn.on{border-color:var(--brass);color:var(--brass);background:color-mix(in srgb,var(--brass) 12%,var(--panel2))}
+
+/* v0.4 傳奇秘境、傳說品質、下一步建議 */
+:root{--r4:#f59e0b}
+.rar4{border-left-color:var(--r4);box-shadow:inset 3px 0 12px -6px var(--r4)} .c4{color:var(--r4)}
+.nextstep{display:flex;gap:12px;align-items:center;justify-content:space-between;background:color-mix(in srgb,var(--good) 10%,var(--panel));border:1px solid color-mix(in srgb,var(--good) 45%,var(--line));border-radius:10px;padding:12px 14px;margin-top:16px}
+.nextstep>div{display:grid;gap:2px;min-width:0}
+.nextstep .label{color:var(--good)}
+.nextstep .btn{flex:0 0 auto}
+.mythic{background:linear-gradient(160deg,color-mix(in srgb,var(--r4) 12%,var(--panel)),var(--panel) 60%);border:1px solid color-mix(in srgb,var(--r4) 45%,var(--line));border-radius:12px;padding:14px;display:grid;gap:12px;margin-bottom:16px}
+.mythic.locked{background:var(--panel);border-color:var(--line);opacity:.7;gap:4px}
+.mhead{display:flex;align-items:center;justify-content:space-between}
+.mhead>div{display:grid}
+.mhead b{font-family:var(--f-display);font-size:18px}
+.keystone{display:inline-grid;place-items:center;min-width:52px;padding:4px 10px;border-radius:999px;background:var(--r4);color:var(--ink);font-weight:700;font-size:20px}
+.keystone.sm{min-width:0;font-size:13px;padding:1px 8px;vertical-align:middle}
+.keystone.up{background:var(--good)} .keystone.down{background:var(--bad);color:#fff}
+.affixes{display:grid;gap:4px}
+.affix{display:grid;grid-template-columns:44px 1fr auto;gap:8px;align-items:baseline;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;opacity:.5;min-width:0}
+.affix.on{opacity:1;border-color:color-mix(in srgb,var(--r4) 60%,var(--line))}
+.affix b{font-size:14px;color:var(--r4)} .affix span{font-size:12px;color:var(--fg);line-height:1.35;min-width:0} .affix small{font-size:10.5px;color:var(--muted);white-space:nowrap}
+.mlist{display:grid;gap:6px}
+.mrow2{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;background:var(--panel2);border-radius:8px;padding:8px 10px}
+.mname{display:grid;min-width:0}
+.mname b{font-size:14px}
+.mtimer{display:flex;align-items:center;gap:10px;margin-top:10px}
+.mtrack{flex:1;height:8px;background:#0d1015;border-radius:4px;position:relative;overflow:hidden}
+.mtrack i{position:absolute;inset:0 auto 0 0;background:var(--r4);border-radius:4px;transition:width .25s}
+.mtrack em{position:absolute;top:0;bottom:0;width:2px;background:var(--fg);opacity:.5}
+.mtimer span{font-size:13px;min-width:72px;text-align:right}
+.mtimer.over .mtrack i{background:var(--bad)} .mtimer.over span{color:var(--bad)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.chip{font-size:11.5px;padding:2px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--r4) 60%,var(--line));color:var(--r4)}
+.keychange{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.keychange .arrow{color:var(--muted)}
+.newrec{font-size:12px;background:var(--brass);color:var(--ink);border-radius:999px;padding:2px 8px;font-weight:700}
 </style>
 <div class="app">
   <header class="top">
@@ -207,7 +242,7 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.3.0 */
+/* 副本團長 v0.4.0 */
 (() => {
   // src/core/config.js
   var CLASSES = {
@@ -304,7 +339,9 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     { name: "\u666E\u901A", mult: 1, color: "#9ca3af", weight: 0.55 },
     { name: "\u7CBE\u826F", mult: 1.2, color: "#22c55e", weight: 0.3 },
     { name: "\u7A00\u6709", mult: 1.45, color: "#3b82f6", weight: 0.12 },
-    { name: "\u53F2\u8A69", mult: 1.75, color: "#a855f7", weight: 0.03 }
+    { name: "\u53F2\u8A69", mult: 1.75, color: "#a855f7", weight: 0.03 },
+    { name: "\u50B3\u8AAA", mult: 2.1, color: "#f59e0b", weight: 0 }
+    // 只從傳奇秘境 +7 起掉落
   ];
   var SLOTS = { weapon: "\u6B66\u5668", armor: "\u8B77\u7532", trinket: "\u98FE\u54C1" };
   var SLOT_STATS = {
@@ -355,6 +392,32 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     // 超過即失敗（秒）
     waveHeal: 0.5
     // 波與波之間回血比例
+  };
+  var MYTHIC = {
+    unlockAfter: 6,
+    // 通關第 7 層（index 6）後解鎖
+    startKey: 2,
+    hpGrowth: 1.1,
+    atkGrowth: 1.08,
+    // 每 +1 敵人生命 / 攻擊倍率（以第 7 層為基準）
+    timer: [150, 150, 160, 150, 160, 165, 170],
+    // 各副本限時（秒）
+    overtime: 120,
+    // 超過限時再撐這麼久仍打不完 → 失敗
+    bonusAt: 0.8,
+    // 用不到 80% 時間 → 鑰石 +2
+    affixAt: [2, 5, 8],
+    // 第 1、2、3 個詞綴生效的等級
+    dropBase: 68,
+    dropPerLevel: 3,
+    // 掉落裝等 = base + 每級 × 等級
+    legendFrom: 7,
+    legendBase: 0.03,
+    legendPerLevel: 0.01,
+    legendMax: 0.15,
+    goldMult: 1.5,
+    xpMult: 1.2
+    // 相對第 7 層的獎勵
   };
   var RAID_HORN = { name: "\u82F1\u52C7\u865F\u89D2", dur: 15, bonus: 0.3 };
   var REWARD = {
@@ -767,9 +830,12 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
   };
   var Battle = class {
     // opts.autoHorn：首領現身時自動吹英勇號角（掛機、直接結算、模擬用）
+    // opts.mythic / waves / maxTicks：傳奇秘境（見 mythic.js mythicBattleOpts）
     constructor(party, items, dIdx, opts = {}) {
       this.dIdx = dIdx;
       this.opts = opts;
+      this.mythic = opts.mythic || null;
+      this.maxTicks = opts.maxTicks || DUNGEON.maxTicks;
       this.units = party.map((h) => {
         const s = heroStats(h, items), c = CLASSES[h.cls];
         return {
@@ -803,7 +869,7 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
       }
       this.partyAoe = Math.min(0.3, this.units.reduce((a, u) => a + (u.mods.partyAoe || 0), 0));
       this.horn = { used: false, until: -1 };
-      this.waves = buildWaves(dIdx);
+      this.waves = opts.waves || buildWaves(dIdx);
       this.waveIdx = 0;
       this.tick = 0;
       this.waveTick = 0;
@@ -815,8 +881,14 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     loadWave() {
       this.enemies = this.waves[this.waveIdx].map((e) => ({ ...e, max: e.hp, id: uid(), weak: 0, weakUntil: -1, poison: 0 }));
       this.waveTick = 0;
-      for (const u of this.units) u.cold = !!u.mods.coldBlood;
+      for (const u of this.units) {
+        u.cold = !!u.mods.coldBlood;
+        u.necro = 0;
+      }
       if (this.opts.autoHorn && this.waveIdx === this.waves.length - 1) this.useHorn();
+    }
+    has(affix) {
+      return !!this.mythic && this.mythic.affixes.includes(affix);
     }
     alive() {
       return this.units.filter((u) => u.hp > 0);
@@ -875,7 +947,18 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
       if (u.buf.flurry > this.tick && !o.aoe && !o.dot && !o.extra) {
         for (const x of this.foes().filter((x2) => x2 !== e).slice(0, SPECS.rogue.combat.extra)) this.hitEnemy(u, x, amt, { extra: true, skill: true });
       }
-      if (e.hp === 0) this.push(`${e.name} \u88AB\u64CA\u6BBA`, e.boss ? "good" : "");
+      if (e.hp === 0) {
+        this.push(`${e.name} \u88AB\u64CA\u6BBA`, e.boss ? "good" : "");
+        if (!e.boss && this.has("bolstering")) {
+          const rest = this.foes().filter((x) => !x.boss);
+          for (const x of rest) {
+            x.max = Math.round(x.max * 1.15);
+            x.hp = Math.round(x.hp * 1.15);
+            x.atk *= 1.15;
+          }
+          if (rest.length) this.push(`\u{1F33F} \u7E41\u76DB\uFF1A\u5176\u9918 ${rest.length} \u96BB\u5C0F\u602A\u8B8A\u5F37`, "warn");
+        }
+      }
       return amt;
     }
     // kind：phys 一般攻擊、buster 重擊、magic 範圍魔法（無視護甲）
@@ -902,6 +985,7 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
       amt -= absorbed;
       u.hp = Math.max(0, u.hp - amt);
       u.taken += amt;
+      if (u.role === "tank" && kind !== "magic" && this.has("necrotic")) u.necro = Math.min(40, u.necro + 1);
       if (kind !== "magic" && m.counter && attacker && R() < m.counter) this.hitEnemy(u, attacker, u.pow);
       this.lifeSavers(u);
       if (u.hp === 0) this.onDeath(u);
@@ -932,7 +1016,8 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     }
     heal(src, tgt, amt, raw = false) {
       if (tgt.hp <= 0) return 0;
-      const h = Math.min(tgt.max - tgt.hp, Math.round(amt * (raw ? 1 : this.healMult(src))));
+      const necro = tgt.necro ? Math.max(0.2, 1 - 0.02 * tgt.necro) : 1;
+      const h = Math.min(tgt.max - tgt.hp, Math.round(amt * (raw ? 1 : this.healMult(src)) * necro));
       tgt.hp += h;
       src.healDone += h;
       return h;
@@ -972,9 +1057,16 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
         if (!tgt) break;
         this.isBuster = false;
         let atk = e.atk * this.weakMult(e);
+        if (!e.boss && this.has("raging") && e.hp < e.max * 0.3) atk *= 1.5;
         if (e.boss) for (const m of e.mech || []) atk *= BOSS_MECHS[m.t](this, e, m, tgt);
         if (tgt.hp > 0) this.hitHero(tgt, atk, this.isBuster ? "buster" : "phys", e);
       }
+      if (this.has("volcanic") && this.waveTick % 8 === 0 && this.alive().length) {
+        const u = pick(this.alive());
+        this.push(`\u{1F30B} \u706B\u5C71\u7206\u767C\uFF0C${u.name} \u53D7\u5230\u50B7\u5BB3`, "warn");
+        this.hitHero(u, this.mythic.volcanic, "magic");
+      }
+      if (this.mythic && this.tick === this.mythic.timer && !this.over) this.push("\u23F0 \u8D85\u904E\u9650\u6642\uFF01\u4ECD\u53EF\u6253\u5B8C\uFF0C\u4F46\u9470\u77F3\u6703\u964D\u7D1A", "bad");
       this.checkEnd();
     }
     checkEnd() {
@@ -996,7 +1088,7 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
           this.push("\u{1F3C6} \u526F\u672C\u901A\u95DC\uFF01", "good");
         }
       }
-      if (this.tick >= DUNGEON.maxTicks && !this.over) {
+      if (this.tick >= this.maxTicks && !this.over) {
         this.over = true;
         this.win = false;
         this.push("\u231B \u6642\u9593\u8017\u76E1\uFF0C\u64A4\u9000", "bad");
@@ -1008,8 +1100,72 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     }
   };
 
+  // src/core/mythic.js
+  var AFFIXES = {
+    fortified: { name: "\u5F37\u97CC", desc: "\u5C0F\u602A\u751F\u547D +30%\u3001\u653B\u64CA +20%", test: "\u7BC4\u570D\u8F38\u51FA", hint: "summon" },
+    tyrannical: { name: "\u66B4\u541B", desc: "\u9996\u9818\u751F\u547D +30%\u3001\u653B\u64CA +15%", test: "\u55AE\u9AD4\u8F38\u51FA", hint: "enrage" },
+    raging: { name: "\u66B4\u6012", desc: "\u5C0F\u602A\u751F\u547D\u4F4E\u65BC 30% \u6642\u50B7\u5BB3 +50%", test: "\u5FEB\u901F\u6536\u5C3E", hint: "enrage" },
+    bolstering: { name: "\u7E41\u76DB", desc: "\u5C0F\u602A\u6B7B\u4EA1\u6642\uFF0C\u5176\u4ED6\u5C0F\u602A\u751F\u547D\u8207\u653B\u64CA +15%", test: "\u5E73\u5747\u6253\u8840", hint: "summon" },
+    volcanic: { name: "\u706B\u5C71", desc: "\u6BCF 8 \u79D2\u96A8\u6A5F\u4E00\u540D\u968A\u54E1\u53D7\u5230\u9B54\u6CD5\u50B7\u5BB3", test: "\u6CBB\u7642", hint: "pulse" },
+    necrotic: { name: "\u58DE\u75BD", desc: "\u5766\u514B\u6BCF\u88AB\u653B\u64CA\u4E00\u6B21\uFF0C\u53D7\u5230\u7684\u6CBB\u7642 \u22122%\uFF0C\u6BCF\u6CE2\u91CD\u7F6E", test: "\u5766\u514B", hint: "buster" }
+  };
+  var BASE_AFFIX = ["fortified", "tyrannical"];
+  var EXTRA_AFFIX = ["raging", "bolstering", "volcanic", "necrotic"];
+  function dayKey(date = /* @__PURE__ */ new Date()) {
+    const d = new Date(date.getTime() + 8 * 36e5);
+    return d.toISOString().slice(0, 10);
+  }
+  function dailyAffixes(date = /* @__PURE__ */ new Date()) {
+    const k = dayKey(date);
+    let seed = [...k].reduce((a, c) => a * 31 + c.charCodeAt(0) >>> 0, 7);
+    const next = () => (seed = seed * 1103515245 + 12345 >>> 0) / 4294967296;
+    const extra = [...EXTRA_AFFIX].sort(() => next() - 0.5);
+    return [BASE_AFFIX[Math.floor(next() * 2)], extra[0], extra[1]];
+  }
+  var activeAffixes = (level, date) => dailyAffixes(date).filter((_, i) => level >= MYTHIC.affixAt[i]);
+  var affixHints = (list) => list.map((a) => AFFIXES[a].hint);
+  var mythicTimer = (dIdx) => MYTHIC.timer[dIdx];
+  function buildMythicWaves(dIdx, level, affixes) {
+    const top = DUNGEONS.length - 1;
+    const base = buildWaves(top), own = buildWaves(dIdx);
+    const sh = Math.pow(MYTHIC.hpGrowth, level), sa = Math.pow(MYTHIC.atkGrowth, level);
+    const fort = affixes.includes("fortified"), tyr = affixes.includes("tyrannical");
+    return base.map((wave, wi) => wave.map((e, ei) => {
+      const o = own[wi][ei];
+      const hp = e.hp * sh * (e.boss ? tyr ? 1.3 : 1 : fort ? 1.3 : 1);
+      const atk = e.atk * sa * (e.boss ? tyr ? 1.15 : 1 : fort ? 1.2 : 1);
+      return { ...e, name: o.name, mech: o.mech, hp: Math.round(hp), atk, addHp: e.addHp && Math.round(e.addHp * sh), addAtk: e.addAtk && e.addAtk * sa };
+    }));
+  }
+  function mythicBattleOpts(dIdx, level, date) {
+    const affixes = activeAffixes(level, date);
+    const top = DUNGEONS.length - 1;
+    return {
+      mythic: { dIdx, level, affixes, timer: mythicTimer(dIdx), volcanic: buildWaves(top)[0][0].atk * Math.pow(MYTHIC.atkGrowth, level) * 2.5 },
+      waves: buildMythicWaves(dIdx, level, affixes),
+      maxTicks: mythicTimer(dIdx) + MYTHIC.overtime
+    };
+  }
+  function mythicRewards(level, inTime) {
+    const top = DUNGEONS.length - 1;
+    const gold = Math.round((REWARD.goldBase + REWARD.goldPerTier * top) * MYTHIC.goldMult * (1 + 0.05 * level) * rnd(0.9, 1.1));
+    const xp = Math.round(REWARD.xpBase * Math.pow(top + 1, REWARD.xpExp) * MYTHIC.xpMult * (1 + 0.1 * level));
+    const n = inTime ? 2 : 1, loot = [];
+    const legend = level >= MYTHIC.legendFrom ? Math.min(MYTHIC.legendMax, MYTHIC.legendBase + MYTHIC.legendPerLevel * (level - MYTHIC.legendFrom)) : 0;
+    for (let k = 0; k < n; k++) {
+      const rar = R() < legend ? RARITY.length - 1 : rollRarity(1);
+      loot.push(makeItem(pick(Object.keys(SLOTS)), MYTHIC.dropBase + MYTHIC.dropPerLevel * level + rint(-1, 2), rar));
+    }
+    return { gold, xp, loot };
+  }
+  function keyChange(level, battle, timer) {
+    const inTime = battle.win && battle.tick <= timer;
+    const delta = inTime ? battle.tick <= timer * MYTHIC.bonusAt ? 2 : 1 : -1;
+    return { inTime, delta, next: Math.max(MYTHIC.startKey, level + delta) };
+  }
+
   // src/core/game.js
-  var SAVE_VERSION = 3;
+  var SAVE_VERSION = 4;
   var hireCost = (h) => ECONOMY.hireBase + ECONOMY.hirePerLevel * h.level;
   function rewards(dIdx, win, firstClear) {
     const info = dungeonInfo(dIdx), m = win ? 1 : REWARD.loseMult;
@@ -1045,7 +1201,9 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
       autoSalvageBelow: 0,
       keepRarity: ECONOMY.defaultKeepRarity,
       stash: [],
-      created: Date.now()
+      created: Date.now(),
+      mythic: { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 },
+      failStreak: 0
     };
     for (const c of HERO.starters) {
       const h = makeHero(c);
@@ -1065,6 +1223,8 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
       if (h.spec === void 0) h.spec = null;
       h.talents = h.talents || {};
     }
+    s.mythic = s.mythic || { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 };
+    s.failStreak = s.failStreak || 0;
     s.v = SAVE_VERSION;
     return s;
   }
@@ -1141,6 +1301,7 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     for (const h of party) {
       if (gainXp(h, Math.round(baseXp * decay(h.level)))) lvUps.push({ name: h.name, level: h.level });
     }
+    if (dIdx === s.unlocked - 1) s.failStreak = battle.win ? 0 : (s.failStreak || 0) + 1;
     if (battle.win) {
       s.stats.wins++;
       s.clears[dIdx] = (s.clears[dIdx] || 0) + 1;
@@ -1149,6 +1310,38 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     const dest = rw.loot.map((it) => addLoot(s, it));
     const kept = rw.loot.filter((_, i) => dest[i] === "bag"), stashed = rw.loot.filter((_, i) => dest[i] === "stash");
     return { ...rw, first, lvUps, kept, stashed, salvaged: dest.filter((d) => d === "salvaged").length };
+  }
+  var mythicUnlocked = (s) => !!s.clears[MYTHIC.unlockAfter];
+  function applyMythicResult(s, battle) {
+    const M = battle.mythic, kc = keyChange(M.level, battle, M.timer);
+    const rw = mythicRewards(M.level, kc.inTime);
+    s.stats.runs++;
+    if (battle.win) s.stats.wins++;
+    s.mythic.runs++;
+    if (kc.inTime) s.mythic.timed++;
+    s.gold += rw.gold;
+    const lvUps = [];
+    for (const h of partyHeroes(s)) if (gainXp(h, rw.xp)) lvUps.push({ name: h.name, level: h.level });
+    const prevKey = s.mythic.key;
+    s.mythic.key = kc.next;
+    const best = s.mythic.best[M.dIdx], record = kc.inTime && (!best || M.level > best.level || M.level === best.level && battle.tick < best.time);
+    if (record) s.mythic.best[M.dIdx] = { level: M.level, time: battle.tick };
+    const dest = rw.loot.map((it) => addLoot(s, it));
+    const kept = rw.loot.filter((_, i) => dest[i] === "bag"), stashed = rw.loot.filter((_, i) => dest[i] === "stash");
+    return {
+      ...rw,
+      mythic: true,
+      inTime: kc.inTime,
+      prevKey,
+      nextKey: kc.next,
+      record,
+      lvUps,
+      kept,
+      stashed,
+      salvaged: dest.filter((d) => d === "salvaged").length,
+      first: false,
+      decayed: false
+    };
   }
   function equip(s, heroId, itemId) {
     const h = s.heroes.find((x) => x.id === heroId), it = s.items[itemId];
@@ -1207,6 +1400,15 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     it.up++;
     return true;
   }
+  function hasUpgrade(s) {
+    return partyHeroes(s).some((h) => Object.keys(SLOTS).some((slot) => {
+      const cur = h.gear[slot] && s.items[h.gear[slot]];
+      return s.bag.some((id) => {
+        const it = s.items[id];
+        return it.slot === slot && (!cur || itemScore(it) > itemScore(cur));
+      });
+    }));
+  }
   function autoEquip(s) {
     let changed = 0;
     for (const h of partyHeroes(s)) {
@@ -1247,6 +1449,24 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
       lv += r.lvUps.length;
     }
     return { sec: Math.round(sec), runs, wins, gold, items, stashed, lv };
+  }
+
+  // src/core/advice.js
+  var ROLE_NAME2 = { tank: "\u5766\u514B", heal: "\u6CBB\u7642", dps: "\u8F38\u51FA" };
+  function nextStep(s) {
+    const party = partyHeroes(s), top = s.unlocked - 1;
+    if (!s.stats.runs) return { text: "\u958B\u59CB\u7B2C\u4E00\u5834\u6230\u9B25", sub: "\u6309\u4E0B\u300C\u8150\u6839\u6D1E\u7A9F\u300D\u7684\u6311\u6230\uFF0C\u968A\u4F0D\u6703\u81EA\u52D5\u4F5C\u6230\u3002", btn: { label: "\u6311\u6230", act: "fight", d: 0 } };
+    if (hasUpgrade(s)) return { text: "\u80CC\u5305\u6709\u66F4\u597D\u7684\u88DD\u5099", sub: "\u4E00\u9375\u66FF\u51FA\u6230\u968A\u54E1\u63DB\u4E0A\u5206\u6578\u66F4\u9AD8\u7684\u88DD\u5099\u3002", btn: { label: "\u4E00\u9375\u914D\u88DD", act: "autoequip" } };
+    if (party.length < ECONOMY.partyMax && s.heroes.length < ECONOMY.rosterMax && s.tavern.some((h) => s.gold >= hireCost(h))) {
+      const have = new Set(party.map((h) => CLASSES[h.cls].role));
+      const need = ["tank", "heal"].find((r) => !have.has(r)) || "dps";
+      return { text: `\u968A\u4F0D\u9084\u6709 ${ECONOMY.partyMax - party.length} \u500B\u7A7A\u4F4D`, sub: `\u53BB\u9152\u9928\u62DB\u52DF\uFF0C\u5EFA\u8B70\u88DC${ROLE_NAME2[need]}\u3002`, btn: { label: "\u524D\u5F80\u9152\u9928", tab: "tavern" } };
+    }
+    if (party.some((h) => pendingPicks(h))) return { text: "\u6709\u5929\u8CE6\u53EF\u4EE5\u9078", sub: `\u4F9D\u300C${DUNGEONS[top].name}\u300D\u7684\u9996\u9818\u6A5F\u5236\u4E00\u9375\u914D\u597D\u5168\u968A\u3002`, btn: { label: "\u63A8\u85A6\u5929\u8CE6", act: "recommend-party", d: top } };
+    if ((s.failStreak || 0) >= 2 && top > 0) return { text: `\u300C${DUNGEONS[top].name}\u300D\u9023\u8F38 ${s.failStreak} \u5834`, sub: "\u56DE\u524D\u4E00\u5C64\u639B\u6A5F\u5237\u88DD\u5099\u8207\u7B49\u7D1A\uFF0C\u6216\u8ABF\u6574\u9663\u5BB9\u3002", btn: { label: `\u639B\u6A5F\u5237\u300C${DUNGEONS[top - 1].name}\u300D`, act: "idle", d: top - 1 } };
+    if (s.stash && s.stash.length) return { text: `\u6230\u5229\u54C1\u7BB1\u6709 ${s.stash.length} \u4EF6\u88DD\u5099`, sub: "\u80CC\u5305\u6EFF\u6642\u6389\u843D\u7684\u88DD\u5099\u66AB\u5B58\u5728\u9019\u88E1\u3002", btn: { label: "\u524D\u5F80\u80CC\u5305", tab: "bag" } };
+    if (mythicUnlocked(s) && !s.mythic.runs) return { text: "\u50B3\u5947\u79D8\u5883\u5DF2\u89E3\u9396", sub: "\u7121\u9650\u5C64\u6578\u3001\u9650\u6642\u6311\u6230\u3001\u6BCF\u65E5\u8A5E\u7DB4\uFF0C\u5C31\u5728\u4E0B\u65B9\u3002", btn: null };
+    return null;
   }
 
   // src/ui/state.js
@@ -1301,6 +1521,7 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
   var $ = (s) => document.querySelector(s);
   var fmt = (n) => Math.round(n).toLocaleString("zh-TW");
   var pct = (a, b) => Math.max(0, Math.min(100, 100 * a / b));
+  var mmss = (sec) => `${Math.floor(Math.abs(sec) / 60)}:${String(Math.abs(sec) % 60).padStart(2, "0")}`;
   function toast(msg) {
     const el = $("#toast");
     el.innerHTML = `<div class="toast">${msg}</div>`;
@@ -1331,9 +1552,33 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
   }
 
   // src/ui/views/dungeon.js
+  function nextStepCard() {
+    const n = nextStep(app.S);
+    if (!n) return "";
+    const b = n.btn;
+    const btn = !b ? "" : b.tab ? `<button class="btn main" data-tab="${b.tab}">${b.label}</button>` : `<button class="btn main" data-act="${b.act}" ${b.d != null ? `data-d="${b.d}"` : ""}>${b.label}</button>`;
+    return `<div class="nextstep"><div><span class="label">\u4E0B\u4E00\u6B65</span><b>${n.text}</b><span class="sub" style="margin:0">${n.sub}</span></div>${btn}</div>`;
+  }
+  function mythicSection() {
+    const S = app.S;
+    if (!mythicUnlocked(S)) return `<div class="mythic locked"><b>\u50B3\u5947\u79D8\u5883</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 7 \u5C64\u300C\u9F8D\u7720\u9AD8\u5854\u300D\u5F8C\u89E3\u9396\uFF1A\u7121\u9650\u5C64\u6578\u3001\u9650\u6642\u6311\u6230\u3001\u6BCF\u65E5\u8A5E\u7DB4\u3002</span></div>`;
+    const key = S.mythic.key, today = dailyAffixes(), active = activeAffixes(key);
+    let h = `<div class="mythic"><div class="mhead"><div><span class="label">\u50B3\u5947\u79D8\u5883</span><b>\u76EE\u524D\u9470\u77F3</b></div><span class="keystone num">+${key}</span></div>
+    <div class="affixes">${today.map((a, i) => `<div class="affix ${active.includes(a) ? "on" : ""}"><b>${AFFIXES[a].name}</b><span>${AFFIXES[a].desc}</span><small>${active.includes(a) ? `\u8003\u9A57${AFFIXES[a].test}` : `+${MYTHIC.affixAt[i]} \u8D77\u751F\u6548`}</small></div>`).join("")}</div>
+    <p class="sub" style="margin:0">\u4ECA\u5929\u7684\u8A5E\u7DB4\uFF0C\u6240\u6709\u4EBA\u76F8\u540C\uFF1B\u660E\u5929\u63DB\u4E00\u7D44\u3002\u9650\u6642\u5167\u901A\u95DC\u9470\u77F3 +1\uFF0C\u7528\u4E0D\u5230 80% \u6642\u9593 +2\uFF1B\u8D85\u6642\u6216\u5931\u6557 \u22121\u3002\u79D8\u5883\u4E0D\u80FD\u639B\u6A5F\u3002</p>
+    <div class="mlist">`;
+    DUNGEONS.forEach((d, i) => {
+      const best = S.mythic.best[i];
+      h += `<div class="mrow2"><div class="mname"><b>${d.name}</b><span class="sub num" style="margin:0">\u9650\u6642 ${mmss(mythicTimer(i))}\u30FB${best ? `\u6700\u4F73 +${best.level}\uFF08${mmss(best.time)}\uFF09` : "\u5C1A\u672A\u9650\u6642"}</span></div>
+      <button class="btn sm" data-act="recommend-mythic" data-d="${i}" aria-label="\u5957\u7528\u63A8\u85A6\u5929\u8CE6">\u5929\u8CE6</button>
+      <button class="btn sm main" data-act="mythic" data-d="${i}">\u6311\u6230 +${key}</button></div>`;
+    });
+    return h + `</div></div>`;
+  }
   function viewDungeons() {
     const lv = avgPartyLv(), il = avgPartyIlvl();
-    let h = `<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv${lv}</b>\u30FB\u88DD\u7B49 <b class="num">${il}</b>\u30FB\u6230\u529B <b class="num">${fmt(partyPower())}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u8003\u9A57\u4E00\u7A2E\u8077\u8CAC\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\u6216\u56DE\u982D\u5237\u88DD\u3002</p><div class="dlist">`;
+    let h = nextStepCard() + `<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv${lv}</b>\u30FB\u88DD\u7B49 <b class="num">${il}</b>\u30FB\u6230\u529B <b class="num">${fmt(partyPower())}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u8003\u9A57\u4E00\u7A2E\u8077\u8CAC\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\u6216\u56DE\u982D\u5237\u88DD\u3002</p>`;
+    h += mythicSection() + `<div class="dlist">`;
     const talentsOpen = partyHeroes(app.S).some((x) => x.level >= TALENT_ROWS[0]);
     DUNGEONS.forEach((_, i) => {
       const d = dungeonInfo(i), locked = i >= app.S.unlocked, clears = app.S.clears[i] || 0;
@@ -1376,8 +1621,9 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
   function viewBattle() {
     if (!app.battle) return `<h2>\u6230\u9B25</h2><div class="empty">\u76EE\u524D\u6C92\u6709\u9032\u884C\u4E2D\u7684\u6230\u9B25\u3002<br>\u5230\u300C\u526F\u672C\u300D\u9078\u4E00\u5C64\u958B\u59CB\u6311\u6230\u3002<br><br><button class="btn main" data-tab="dungeon">\u524D\u5F80\u526F\u672C</button></div>`;
     const d = dungeonInfo(app.battle.dIdx), b = app.battle;
-    let h = `<div class="bhead"><h2>${d.name}</h2><span class="sub num" style="margin:0">${b.tick}s</span>
+    let h = `<div class="bhead"><h2>${d.name}${b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : ""}</h2><span class="sub num" style="margin:0">${b.tick}s</span>
     <div class="waves">${b.waves.map((_, i) => `<i class="${i < b.waveIdx || b.over && b.win ? "done" : i === b.waveIdx ? "cur" : ""}"></i>`).join("")}</div></div>
+    ${b.mythic ? mythicTimerBar(b) : ""}
     <div class="arena">
       <div class="side foes"><span class="label">\u6575\u65B9\u30FB${b.waveIdx === b.waves.length - 1 ? "\u9996\u9818\u6230" : `\u7B2C ${b.waveIdx + 1} \u6CE2`}</span>${enemyRows(b)}</div>
       <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>${b.units.map((u) => unitRow(u, false)).join("")}</div>
@@ -1392,6 +1638,12 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     if (b.over && app.lastResult) h += viewResult();
     return h;
   }
+  function mythicTimerBar(b) {
+    const T = b.mythic.timer, left = T - b.tick, over = left < 0;
+    return `<div class="mtimer ${over ? "over" : ""}"><div class="mtrack"><i style="width:${pct(Math.min(b.tick, T), T)}%"></i><em style="left:${MYTHIC.bonusAt * 100}%"></em></div>
+    <span class="num">${over ? `\u8D85\u6642 ${mmss(-left)}` : `\u5269 ${mmss(left)}`}</span></div>
+    <div class="chips">${b.mythic.affixes.map((a) => `<span class="chip">${AFFIXES[a].name}</span>`).join("")}</div>`;
+  }
   function hornBtn(b) {
     const on = b.hornActive(), left = b.horn.until - b.tick;
     return `<button class="btn horn ${on ? "on" : ""}" data-act="horn" ${b.horn.used ? "disabled" : ""} aria-label="\u82F1\u52C7\u865F\u89D2">\u{1F4EF} ${on ? `${left}s` : b.horn.used ? "\u5DF2\u7528" : "\u865F\u89D2"}</button>`;
@@ -1400,7 +1652,10 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     const r = app.lastResult, b = app.battle;
     const dmgMax = Math.max(1, ...b.units.map((u) => Math.max(u.dmgDone, u.healDone)));
     const sec = Math.max(1, b.tick);
-    let h = `<div class="result ${b.win ? "win" : "lose"}"><h3>${b.win ? "\u901A\u95DC" : "\u5931\u6557"}</h3>
+    const title = r.mythic ? r.inTime ? "\u9650\u6642\u901A\u95DC" : b.win ? "\u8D85\u6642\u901A\u95DC" : "\u5931\u6557" : b.win ? "\u901A\u95DC" : "\u5931\u6557";
+    let h = `<div class="result ${(r.mythic ? r.inTime : b.win) ? "win" : "lose"}"><h3>${title}</h3>
+    ${r.mythic ? `<div class="keychange"><span class="keystone num">+${r.prevKey}</span><span class="arrow">\u2192</span><span class="keystone num ${r.nextKey > r.prevKey ? "up" : r.nextKey < r.prevKey ? "down" : ""}">+${r.nextKey}</span>
+      <span class="sub" style="margin:0">\u7528\u6642 <b class="num">${mmss(b.tick)}</b> / \u9650\u6642 ${mmss(b.mythic.timer)}</span>${r.record ? '<span class="newrec">\u65B0\u7D00\u9304</span>' : ""}</div>` : ""}
     <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+${fmt(r.gold)}</b> \u91D1\u5E63</span><span><b class="num">+${fmt(r.xp)}</b> \u7D93\u9A57</span>${r.first ? '<span style="color:var(--brass)">\u9996\u901A\u734E\u52F5\uFF1A\u4FDD\u5E95\u7A00\u6709</span>' : ""}${r.decayed ? '<span style="color:var(--warn)">\u7B49\u7D1A\u58D3\u5236\uFF1A\u7D93\u9A57\u8207\u91D1\u5E63\u905E\u6E1B\uFF0C\u8A72\u5F80\u4E0B\u4E00\u5C64\u4E86</span>' : ""}</div>`;
     if (r.lvUps.length) h += `<div style="color:var(--good);font-size:14px">\u2B06 ${r.lvUps.map((x) => `${x.name} \u5347\u5230 Lv${x.level}`).join("\u3001")}</div>`;
     if (r.kept.length || r.stashed.length || r.salvaged) h += `<div class="stack">${r.kept.map((it) => `<div class="item rar${it.rarity}"><div class="in">${itemName(it)}</div><div class="il">${SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div><div class="is">${itemStatText(it)}</div></div>`).join("")}${r.stashed.length ? `<div style="color:var(--brass);font-size:13px">\u80CC\u5305\u5DF2\u6EFF\uFF0C${r.stashed.length} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1</div>` : ""}${r.salvaged ? `<div class="sub" style="margin:0">${r.salvaged} \u4EF6\u81EA\u52D5\u5206\u89E3\u70BA\u91D1\u5E63</div>` : ""}</div>`;
@@ -1411,7 +1666,7 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     }).join("")}</div>`;
     if (!b.win) h += `<div class="sub" style="margin:0">${failHint(b)}</div>`;
     h += `<div class="row">${app.pendingRepeat ? `<span class="sub" style="margin:0;align-self:center">\u639B\u6A5F\u4E2D\uFF0C3 \u79D2\u5F8C\u81EA\u52D5\u518D\u6230\u2026</span>` : ""}
-    <button class="btn main grow" data-act="fight" data-d="${b.dIdx}">\u518D\u6253\u4E00\u6B21</button>
+    <button class="btn main grow" data-act="${r.mythic ? "mythic" : "fight"}" data-d="${b.dIdx}">${r.mythic ? `\u518D\u6311\u6230 +${r.nextKey}` : "\u518D\u6253\u4E00\u6B21"}</button>
     ${r.kept.length ? `<button class="btn" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button>` : ""}
     <button class="btn" data-tab="dungeon">\u8FD4\u56DE\u526F\u672C</button></div></div>`;
     return h;
@@ -1616,6 +1871,22 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     app.battle.push(`\u9032\u5165 ${DUNGEONS[dIdx].name}\uFF0C\u7B2C 1 \u6CE2\u6575\u4EBA\u51FA\u73FE`, "info");
     runTimer();
   }
+  function startMythic(dIdx) {
+    const p = partyHeroes(app.S);
+    if (!p.length) {
+      toast("\u968A\u4F0D\u6C92\u6709\u6210\u54E1");
+      app.tab = "team";
+      app.render();
+      return;
+    }
+    clearTimeout(app.pendingRepeat);
+    app.pendingRepeat = null;
+    const o = mythicBattleOpts(dIdx, app.S.mythic.key);
+    app.battle = new Battle(p, app.S.items, dIdx, o);
+    app.lastResult = null;
+    app.battle.push(`\u9032\u5165\u50B3\u5947\u79D8\u5883\uFF1A${DUNGEONS[dIdx].name} +${o.mythic.level}\uFF5C\u8A5E\u7DB4\uFF1A${o.mythic.affixes.map((a) => AFFIXES[a].name).join("\u3001")}`, "info");
+    runTimer();
+  }
   function runTimer() {
     clearInterval(app.bTimer);
     app.bTimer = setInterval(stepBattle, TICK_MS / app.speed);
@@ -1632,9 +1903,9 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
   }
   function finishBattle() {
     clearInterval(app.bTimer);
-    app.lastResult = applyResult(app.S, app.battle.dIdx, app.battle);
+    app.lastResult = app.battle.mythic ? applyMythicResult(app.S, app.battle) : applyResult(app.S, app.battle.dIdx, app.battle);
     save();
-    if (app.S.idle === app.battle.dIdx) {
+    if (!app.battle.mythic && app.S.idle === app.battle.dIdx) {
       const d = app.battle.dIdx;
       app.pendingRepeat = setTimeout(() => {
         app.pendingRepeat = null;
@@ -1694,6 +1965,18 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
         startBattle(+t.dataset.d);
         app.tab = "battle";
         break;
+      case "mythic":
+        startMythic(+t.dataset.d);
+        app.tab = "battle";
+        window.scrollTo(0, 0);
+        break;
+      case "recommend-mythic": {
+        const d = +t.dataset.d, hints = [...DUNGEONS[d].mech.map((m) => m.t), ...affixHints(activeAffixes(app.S.mythic.key))];
+        for (const x of partyHeroes(app.S)) applyRecommend(x, hints);
+        toast(`\u5168\u968A\u5DF2\u4F9D\u300C${DUNGEONS[d].name}\u300D\u8207\u4ECA\u65E5\u8A5E\u7DB4\u5957\u7528\u63A8\u85A6\u5929\u8CE6`);
+        save();
+        break;
+      }
       case "idle": {
         const d = +t.dataset.d;
         if (app.S.idle === d) {
