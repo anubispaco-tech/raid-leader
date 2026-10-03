@@ -22,7 +22,7 @@ const ICONS = {
 const TABS = [['dungeon', '副本'], ['battle', '戰鬥'], ['team', '團隊'], ['bag', '背包'], ['tavern', '酒館']];
 function renderTabs() {
   $('#tabs').innerHTML = TABS.map(([k, n]) =>
-    `<button data-tab="${k}" class="${app.tab === k ? 'sel' : ''}" aria-label="${n}"><svg viewBox="0 0 24 24">${ICONS[k]}</svg>${n}${k === 'battle' && app.battle && !app.battle.over && app.tab !== 'battle' ? '<span class="dot"></span>' : ''}</button>`).join('');
+    `<button data-tab="${k}" class="${app.tab === k ? 'sel' : ''}" aria-label="${n}"><svg viewBox="0 0 24 24">${ICONS[k]}</svg>${n}${(k === 'battle' && app.battle && !app.battle.over && app.tab !== 'battle') || (k === 'bag' && app.S.stash.length) ? '<span class="dot"></span>' : ''}</button>`).join('');
 }
 function render(skipModal) {
   $('#gold').textContent = fmt(app.S.gold);
@@ -77,13 +77,16 @@ document.addEventListener('click', e => {
       break;
     }
     case 'reroll': if (G.refreshTavern(app.S)) save(); break;
-    case 'filter': app.invFilter = t.dataset.f; break;
+    case 'filter': app.invFilter = t.dataset.v; break;
     case 'autoequip': { const n = G.autoEquip(app.S); toast(n ? `更換了 ${n} 件裝備` : '目前已是最佳配裝'); save(); break; }
-    case 'salvagecommon': {
-      const r = G.salvageCommon(app.S);
-      toast(r.count ? `分解 ${r.count} 件，獲得 ${r.gold} 金` : '沒有普通裝備'); save(); break;
+    case 'salvageupto': {
+      const r = G.salvageUpTo(app.S, +t.dataset.v);
+      toast(r.count ? `分解 ${r.count} 件，獲得 ${r.gold} 金` : '沒有可分解的裝備'); save(); break;
     }
-    case 'autosalv': app.S.autoSalvageCommon = !app.S.autoSalvageCommon; save(); break;
+    case 'autosalv': app.S.autoSalvageBelow = +t.dataset.v; save(); break;
+    case 'keeprar': app.S.keepRarity = +t.dataset.v; save(); break;
+    case 'takestash': { const n = G.takeFromStash(app.S); toast(n ? `取出 ${n} 件` : '背包已滿'); save(); break; }
+    case 'salvagestash': { const r = G.salvageStash(app.S); toast(`分解 ${r.count} 件，獲得 ${r.gold} 金`); save(); break; }
     case 'export': openModal({ type: 'text', html: `<h3>匯出存檔碼</h3><p class="sub" style="margin:0">複製這段文字，到另一台裝置的「匯入」貼上。</p><textarea id="expTxt" readonly>${exportCode()}</textarea><div class="row"><button class="btn main" data-act="copy">複製</button><button class="btn" data-act="closebtn">關閉</button></div>` }); return;
     case 'copy': { const ta = $('#expTxt'); navigator.clipboard?.writeText(ta.value).then(() => toast('已複製'), () => { ta.select(); toast('請手動複製'); }) ?? (ta.select(), toast('請手動複製')); return; }
     case 'import': openModal({ type: 'text', html: `<h3>匯入存檔碼</h3><p class="sub" style="margin:0">會覆蓋目前進度。</p><textarea id="impTxt" placeholder="貼上存檔碼"></textarea><div class="row"><button class="btn main" data-act="doimport">匯入</button><button class="btn" data-act="closebtn">取消</button></div>` }); return;
@@ -104,6 +107,7 @@ function settleOffline() {
   const hrs = r.sec >= 3600 ? `${(r.sec / 3600).toFixed(1)} 小時` : `${Math.round(r.sec / 60)} 分鐘`;
   openModal({ type: 'text', html: `<h3>離線收益</h3><p class="sub" style="margin:0">你離開了 ${hrs}，隊伍在 ${G.DUNGEONS[app.S.idle].name} 持續作戰。</p>
     <div class="statgrid num"><div><b>${r.runs}</b><span>挑戰</span></div><div><b>${r.wins}</b><span>通關</span></div><div><b>+${fmt(r.gold)}</b><span>金幣</span></div><div><b>${r.items}</b><span>裝備</span></div></div>
+    ${r.stashed ? `<div style="color:var(--brass)">背包已滿，${r.stashed} 件放進戰利品箱，到背包取出</div>` : ''}
     ${r.lv ? `<div style="color:var(--good)">期間共升級 ${r.lv} 次</div>` : ''}
     <div class="row"><button class="btn main grow" data-act="autoequip">一鍵配裝</button><button class="btn" data-act="closebtn">好</button></div>` });
 }
@@ -116,6 +120,9 @@ document.addEventListener('visibilitychange', () => {
   else if (app.S.idle != null) startBattle(app.S.idle);
 });
 setInterval(() => { if (!document.hidden) save(); }, 5000);
+// 鎖定縮放：iOS Safari 會忽略 viewport 的 user-scalable，另外擋捏合手勢
+for (const ev of ['gesturestart', 'gesturechange']) document.addEventListener(ev, e => e.preventDefault(), { passive: false });
+document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 
 // ---------- 啟動 ----------
 function start(data) {

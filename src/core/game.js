@@ -7,7 +7,7 @@ import { makeHero, gainXp } from './heroes.js';
 import { dungeonInfo } from './dungeons.js';
 import { Battle } from './battle.js';
 
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 export const hireCost = h => ECONOMY.hireBase + ECONOMY.hirePerLevel * h.level;
 
 // ---------- 獎勵 ----------
@@ -33,7 +33,7 @@ function decayFor(dIdx) {
 // ---------- 存檔 ----------
 export function newGame() {
   const s = { v: SAVE_VERSION, gold: ECONOMY.startGold, heroes: [], items: {}, bag: [], party: [], unlocked: 1, clears: {},
-    tavern: [], idle: null, lastSeen: Date.now(), stats: { runs: 0, wins: 0 }, autoSalvageCommon: false, created: Date.now() };
+    tavern: [], idle: null, lastSeen: Date.now(), stats: { runs: 0, wins: 0 }, autoSalvageBelow: 0, keepRarity: ECONOMY.defaultKeepRarity, stash: [], created: Date.now() };
   for (const c of HERO.starters) { const h = makeHero(c); s.heroes.push(h); s.party.push(h.id); }
   rollTavern(s);
   return s;
@@ -41,6 +41,11 @@ export function newGame() {
 // 舊存檔補欄位（之後加天賦等新欄位時在這裡升級）
 export function migrate(s) {
   s.stats = s.stats || { runs: 0, wins: 0 };
+  // v1 → v2：自動分解改成品質門檻、加入戰利品箱
+  if (s.autoSalvageBelow == null) s.autoSalvageBelow = s.autoSalvageCommon ? 1 : 0;
+  delete s.autoSalvageCommon;
+  if (s.keepRarity == null) s.keepRarity = ECONOMY.defaultKeepRarity;
+  s.stash = s.stash || [];
   s.v = SAVE_VERSION;
   return s;
 }
@@ -75,9 +80,12 @@ export function fireHero(s, id) {
 }
 
 // ---------- 戰鬥結算 ----------
+// 新掉落的去向：自動分解 → 背包 → 戰利品箱（只收 keepRarity 以上）→ 分解成金幣
 function addLoot(s, it) {
-  if ((s.autoSalvageCommon && it.rarity === 0) || s.bag.length >= ECONOMY.bagMax) { s.gold += salvageValue(it); return false; }
-  s.items[it.id] = it; s.bag.push(it.id); return true;
+  if (it.rarity < s.autoSalvageBelow) { s.gold += salvageValue(it); return 'salvaged'; }
+  if (s.bag.length < ECONOMY.bagMax) { s.items[it.id] = it; s.bag.push(it.id); return 'bag'; }
+  if (it.rarity >= s.keepRarity && s.stash.length < ECONOMY.stashMax) { s.items[it.id] = it; s.stash.push(it.id); return 'stash'; }
+  s.gold += salvageValue(it); return 'salvaged';
 }
 export function applyResult(s, dIdx, battle) {
   const first = battle.win && !s.clears[dIdx];
@@ -95,8 +103,9 @@ export function applyResult(s, dIdx, battle) {
     s.clears[dIdx] = (s.clears[dIdx] || 0) + 1;
     if (dIdx + 1 >= s.unlocked && dIdx + 1 < DUNGEONS.length) s.unlocked = dIdx + 2;
   }
-  const kept = rw.loot.filter(it => addLoot(s, it));
-  return { ...rw, first, lvUps, kept, salvaged: rw.loot.length - kept.length };
+  const dest = rw.loot.map(it => addLoot(s, it));
+  const kept = rw.loot.filter((_, i) => dest[i] === 'bag'), stashed = rw.loot.filter((_, i) => dest[i] === 'stash');
+  return { ...rw, first, lvUps, kept, stashed, salvaged: dest.filter(d => d === 'salvaged').length };
 }
 
 // ---------- 背包與裝備 ----------
@@ -104,7 +113,7 @@ export function equip(s, heroId, itemId) {
   const h = s.heroes.find(x => x.id === heroId), it = s.items[itemId]; if (!h || !it) return;
   const prev = h.gear[it.slot];
   for (const o of s.heroes) if (o.gear[it.slot] === itemId) o.gear[it.slot] = null; // 從別人身上拿過來
-  s.bag = s.bag.filter(id => id !== itemId);
+  s.bag = s.bag.filter(id => id !== itemId); s.stash = (s.stash || []).filter(id => id !== itemId);
   h.gear[it.slot] = itemId;
   if (prev && prev !== itemId) s.bag.push(prev);
 }
@@ -114,12 +123,25 @@ export function unequip(s, heroId, slot) {
 }
 export function salvage(s, itemId) {
   const it = s.items[itemId]; if (!it) return 0;
-  s.bag = s.bag.filter(id => id !== itemId); delete s.items[itemId];
+  s.bag = s.bag.filter(id => id !== itemId); s.stash = (s.stash || []).filter(id => id !== itemId); delete s.items[itemId];
   const v = salvageValue(it); s.gold += v; return v;
 }
-export function salvageCommon(s) {
-  const ids = s.bag.filter(i => s.items[i].rarity === 0);
+// 分解背包中品質 ≤ maxRarity 的裝備（0 = 普通，1 = 精良以下）
+export function salvageUpTo(s, maxRarity) {
+  const ids = s.bag.filter(i => s.items[i].rarity <= maxRarity);
   return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
+}
+// ---------- 戰利品箱 ----------
+export function takeFromStash(s) {
+  const room = ECONOMY.bagMax - s.bag.length;
+  const ids = [...s.stash].sort((a, b) => itemScore(s.items[b]) - itemScore(s.items[a])).slice(0, Math.max(0, room));
+  s.stash = s.stash.filter(id => !ids.includes(id)); s.bag.push(...ids);
+  return ids.length;
+}
+export function salvageStash(s) {
+  const gold = s.stash.reduce((g, id) => { const v = salvageValue(s.items[id]); delete s.items[id]; return g + v; }, 0);
+  const count = s.stash.length; s.stash = []; s.gold += gold;
+  return { count, gold };
 }
 export function upgrade(s, itemId) {
   const it = s.items[itemId]; if (!it || it.up >= GEAR.maxUp) return false;
@@ -146,12 +168,12 @@ export function offlineProgress(s, now = Date.now()) {
   const sec = Math.min(ECONOMY.offlineCapHours * 3600, Math.max(0, (now - s.lastSeen) / 1000));
   s.lastSeen = now;
   if (sec < 60 || !partyHeroes(s).length) return null;
-  let t = 0, runs = 0, wins = 0, gold = 0, items = 0, lv = 0;
+  let t = 0, runs = 0, wins = 0, gold = 0, items = 0, stashed = 0, lv = 0;
   while (runs < 400) {
     const b = new Battle(partyHeroes(s), s.items, s.idle).runToEnd();
     t += b.tick + 5; if (t > sec) break;
     const r = applyResult(s, s.idle, b);
-    runs++; if (b.win) wins++; gold += r.gold; items += r.kept.length; lv += r.lvUps.length;
+    runs++; if (b.win) wins++; gold += r.gold; items += r.kept.length; stashed += r.stashed.length; lv += r.lvUps.length;
   }
-  return { sec: Math.round(sec), runs, wins, gold, items, lv };
+  return { sec: Math.round(sec), runs, wins, gold, items, stashed, lv };
 }
