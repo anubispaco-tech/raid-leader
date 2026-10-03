@@ -96,6 +96,42 @@ export const MYTHIC = {
   goldMult: 1.5, xpMult: 1.2,       // 相對第 7 層的獎勵
 };
 
+// ---------- 英雄稀有度（v0.7）----------
+// mult 乘在職業基礎＋等級成長（不含裝備）；weight = 招募機率；hire = 僱用價倍率
+export const HERO_RARITY = [
+  { name: '普通', mult: 1.00, crit: 0,    weight: 0.55,  hire: 1 },
+  { name: '精良', mult: 1.08, crit: 0,    weight: 0.28,  hire: 1.5 },
+  { name: '稀有', mult: 1.16, crit: 0.02, weight: 0.12,  hire: 2.5 },
+  { name: '史詩', mult: 1.25, crit: 0.04, weight: 0.045, hire: 4, baseCdMult: 0.9 },
+  { name: '傳說', mult: 1.40, crit: 0.04, weight: 0.005, hire: 8, baseCdMult: 0.9 },
+];
+// 每個職業唯一的傳奇英雄（名字與被動皆為原創）
+export const LEGENDS = {
+  guardian: { name: '巴洛斯', title: '鐵壁', passive: 'undying', pname: '不屈', desc: '每場第一次受到致命傷害改為剩 1 血並無敵 3 秒；在場時全隊受到的傷害 −8%' },
+  cleric:   { name: '艾蕾娜', title: '晨曦', passive: 'overflow', pname: '溢光', desc: '治療超出的部分轉為護盾（上限是該隊員生命的 20%）' },
+  rogue:    { name: '卡西恩', title: '影刃', passive: 'chain', pname: '連鎖暴擊', desc: '暴擊後的下一次攻擊必定暴擊，每 6 秒最多一次' },
+  mage:     { name: '莉薇亞', title: '星火', passive: 'molten', pname: '熔熱', desc: '烈焰風暴冷卻 −50%，擊殺敵人時再減 1 秒' },
+};
+export const RECRUIT = {
+  scrollBase: 120, scrollPerLevel: 30, // 招募令單抽價格 = base + 每級 × 隊伍平均等級
+  tenDiscount: 0.9,
+  pityEpic: 50, pityLegend: 100,      // 連續 N 抽沒出 → 下一抽保底
+  fireRefund: 0.2,
+};
+
+// ---------- 寶庫（v0.7）----------
+export const VAULT = {
+  unlockAfter: 2,                     // 通關第 3 層（index 2）後解鎖
+  daily: 3, dur: 60,                  // 每天次數、每場秒數
+  strength: 0.7,                      // 敵人強度 = 該層一般小怪 × 0.7
+  waveGrowth: 0.12,                   // 每一波哥布林生命 +12%
+  goblinAtk: 0.25,                    // 哥布林攻擊 = 一般小怪 × 0.25
+  par: [20, 14, 19, 12, 22, 15, 15],  // 各層「剛通關的隊伍」60 秒擊殺數（模擬實測）
+  parRuns: 10,                        // 打到 par 隻 ≈ 該層一般掛機 10 場的金幣
+  capMult: 1.2,                       // 金幣最多算到 par × 1.2 隻（讓「打自己最高層」最划算）
+  xpMult: 0.2,                        // 經驗 = 該層一般一場 × 0.2
+};
+
 // ---------- 背包擴充：每達成一項 +5 格 ----------
 // test(s) 回傳是否達成；best = 秘境任一副本的最高限時等級
 export const BAG_MILESTONES = [
@@ -105,6 +141,9 @@ export const BAG_MILESTONES = [
   { id: 'mythic5', name: '秘境 +5 限時通關', test: s => mythicBestLevel(s) >= 5 },
   { id: 'mythic10', name: '秘境 +10 限時通關', test: s => mythicBestLevel(s) >= 10 },
   { id: 'mythic15', name: '秘境 +15 限時通關', test: s => mythicBestLevel(s) >= 15 },
+  { id: 'vault10', name: '寶庫累計 10 次', test: s => ((s.vault && s.vault.runs) || 0) >= 10 },
+  { id: 'vault30', name: '寶庫累計 30 次', test: s => ((s.vault && s.vault.runs) || 0) >= 30 },
+  { id: 'vault60', name: '寶庫累計 60 次', test: s => ((s.vault && s.vault.runs) || 0) >= 60 },
 ];
 export const BAG_PER_MILESTONE = 5;
 export const mythicBestLevel = s => Math.max(0, ...Object.values((s.mythic && s.mythic.best) || {}).map(b => b.level));
@@ -132,7 +171,7 @@ export const ECONOMY = {
   startGold: 60,
   hireBase: 30, hirePerLevel: 25,
   refreshCost: 10,
-  partyMax: 5, rosterMax: 10, bagMax: 50, // bagMax = 起始格數，達成里程碑再擴充（見 BAG_MILESTONES）
+  partyMax: 5, rosterMax: 15, bagMax: 50, // bagMax = 起始格數，達成里程碑再擴充（見 BAG_MILESTONES）
   stashMax: 100,                    // 戰利品箱：背包滿時暫存，需手動取出
   defaultKeepRarity: 2,             // 背包滿後只保留此品質以上（2 = 稀有）
   offlineCapHours: 8,

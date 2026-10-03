@@ -1,7 +1,7 @@
 // ===== 底部抽屜：英雄、裝備、選裝、文字 =====
 import * as G from '../../core/index.js';
 import { app } from '../state.js';
-import { $, fmt, pct, toast, hero, cls, inParty, itemStatText, itemName, partyPower, avgPartyIlvl, avgPartyLv } from '../helpers.js';
+import { $, fmt, pct, toast, hero, cls, inParty, itemStatText, itemName, partyPower, avgPartyIlvl, avgPartyLv, heroName, rarityTag } from '../helpers.js';
 
 export function openModal(m) { app.modal = m; renderModal(); }
 export function closeModal() { app.modal = null; renderModal(); }
@@ -25,7 +25,9 @@ function sheetHero(x) {
   if (!x) return '';
   const c = cls(x), st = G.heroStats(x, app.S.items), view = app.modal.view || 'gear', pend = G.pendingPicks(x);
   const sp = x.spec && G.SPECS[x.cls][x.spec];
-  let h = `<h3>${c.icon} ${x.name}</h3><div class="sub" style="margin:0">${c.name}${sp ? `・${sp.name}` : ''}・${G.ROLE_NAME[c.role]}　${c.desc}</div>
+  const R = G.HERO_RARITY[x.rarity || 0], L = x.legend && G.LEGENDS[x.cls];
+  let h = `<h3>${c.icon} ${heroName(x)} ${rarityTag(x)}</h3><div class="sub" style="margin:0">${c.name}${sp ? `・${sp.name}` : ''}・${G.ROLE_NAME[c.role]}　${c.desc}</div>
+    ${x.rarity ? `<div class="raritycard r-${x.rarity}"><b class="c${x.rarity}">${R.name}加成</b><span>基礎屬性 ×${R.mult.toFixed(2)}${R.crit ? `・暴擊 +${Math.round(R.crit * 100)}%` : ''}${R.baseCdMult ? '・基礎技能冷卻 −10%' : ''}</span>${L ? `<span><b class="c4">${L.pname}</b>：${L.desc}</span>` : ''}</div>` : ''}
     <div class="statgrid num"><div><b>${x.level}</b><span>等級</span></div><div><b>${fmt(st.hp)}</b><span>生命</span></div><div><b>${st.pow}</b><span>威力</span></div><div><b>${Math.round(st.crit * 100)}%</b><span>暴擊</span></div></div>
     <div class="sub" style="margin:0">經驗 <span class="num">${fmt(x.xp)} / ${fmt(G.xpNeed(x.level))}</span>・護甲減傷 ${Math.round(st.armor * 100)}%</div>
     <div class="seg wide"><button data-act="heroview" data-id="${x.id}" data-v="gear" class="${view === 'gear' ? 'sel' : ''}">裝備</button><button data-act="heroview" data-id="${x.id}" data-v="talent" class="${view === 'talent' ? 'sel' : ''}">天賦${pend ? `<span class="pip">${pend}</span>` : ''}</button></div>`;
@@ -48,7 +50,7 @@ function heroActions(x) {
   return `<div class="row">${inParty(x)
     ? `<button class="btn grow" data-act="bench" data-id="${x.id}">移出隊伍</button>`
     : `<button class="btn main grow" data-act="join" data-id="${x.id}" ${app.S.party.length >= G.ECONOMY.partyMax ? 'disabled' : ''}>${app.S.party.length >= G.ECONOMY.partyMax ? '隊伍已滿' : '加入隊伍'}</button>`}
-    ${app.S.heroes.length > 1 ? `<button class="btn" data-act="fire" data-id="${x.id}" style="color:var(--bad)">${app.modal.confirmFire ? '確定解雇？' : '解雇'}</button>` : ''}</div>`;
+    ${app.S.heroes.length > 1 ? `<button class="btn" data-act="fire" data-id="${x.id}" style="color:var(--bad)">${app.modal.confirmFire ? `確定解雇？退 ${fmt(Math.round(G.hireCost(x) * G.RECRUIT.fireRefund))} 金` : '解雇'}</button>` : ''}</div>`;
 }
 // ---------- 天賦頁 ----------
 function talentView(x) {

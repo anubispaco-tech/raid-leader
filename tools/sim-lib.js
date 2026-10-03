@@ -10,7 +10,7 @@ export function playthrough({ maxRuns = 1500, talents = true, horn = false } = {
     if (want) {
       const t = s.tavern.find(h => h.cls === want);
       if (t && s.gold >= G.hireCost(t)) G.hire(s, t.id);
-      else if (!t && s.gold >= G.ECONOMY.refreshCost + 80) G.refreshTavern(s);
+      else if (!t && s.gold >= G.refreshCost(s) + 80) G.refreshTavern(s);
     }
     for (const h of G.partyHeroes(s)) for (const sl of Object.keys(G.SLOTS)) { const id = h.gear[sl]; if (id && s.gold > 300) G.upgrade(s, id); }
     G.autoEquip(s);

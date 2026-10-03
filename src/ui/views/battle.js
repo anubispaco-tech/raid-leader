@@ -15,16 +15,17 @@ function unitRow(u, enemy) {
   const bar = enemy ? 'enemy-bar' : 'role-' + u.role;
   return `<div class="unit ${dead ? 'dead' : ''} ${u.boss ? 'boss' : ''}">
     <div class="ic">${enemy ? (u.boss ? '👑' : '👾') : u.icon}</div>
-    <div class="nm">${u.name}${enemy ? '' : `<small>${G.CLASSES[u.cls].name}</small>`}</div>
+    <div class="nm">${enemy ? u.name : `<span class="c${u.rarity || 0}">${u.name}</span><small>${G.CLASSES[u.cls].name}</small>`}</div>
     <div class="hpn num">${fmt(u.hp)} / ${fmt(u.max)}</div>
     <div class="bar"><i class="${bar}" style="width:${pct(u.hp, u.max)}%"></i></div></div>`;
 }
 export function viewBattle() {
   if (!app.battle) return `<h2>戰鬥</h2><div class="empty">目前沒有進行中的戰鬥。<br>到「副本」選一層開始挑戰。<br><br><button class="btn main" data-tab="dungeon">前往副本</button></div>`;
   const d = G.dungeonInfo(app.battle.dIdx), b = app.battle;
+  if (b.vault) d.name = `寶庫・第 ${b.vault.floor + 1} 層`;
   let h = `<div class="bhead"><h2>${d.name}${b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : ''}</h2><span class="sub num" style="margin:0">${b.tick}s</span>
-    <div class="waves">${b.waves.map((_, i) => `<i class="${i < b.waveIdx || (b.over && b.win) ? 'done' : i === b.waveIdx ? 'cur' : ''}"></i>`).join('')}</div></div>
-    ${b.mythic ? mythicTimerBar(b) : ''}
+    ${b.vault ? '' : `<div class="waves">`}${b.vault ? '' : b.waves.map((_, i) => `<i class="${i < b.waveIdx || (b.over && b.win) ? 'done' : i === b.waveIdx ? 'cur' : ''}"></i>`).join('') + '</div>'}</div>
+    ${b.mythic ? mythicTimerBar(b) : ''}${b.vault ? vaultBar(b) : ''}
     <div class="arena">
       <div class="side foes"><span class="label">敵方・${b.waveIdx === b.waves.length - 1 ? '首領戰' : `第 ${b.waveIdx + 1} 波`}</span>${enemyRows(b)}</div>
       <div class="side"><span class="label">我方隊伍</span>${b.units.map(u => unitRow(u, false)).join('')}</div>
@@ -45,6 +46,11 @@ function mythicTimerBar(b) {
     <span class="num">${over ? `超時 ${mmss(-left)}` : `剩 ${mmss(left)}`}</span></div>
     <div class="chips">${b.mythic.affixes.map(a => `<span class="chip">${G.AFFIXES[a].name}</span>`).join('')}</div>`;
 }
+function vaultBar(b) {
+  const left = Math.max(0, b.vault.dur - b.tick), f = b.vault.floor, cap = G.vaultMaxKills(f);
+  return `<div class="mtimer"><div class="mtrack"><i style="width:${pct(b.tick, b.vault.dur)}%"></i></div><span class="num">剩 ${mmss(left)}</span></div>
+    <div class="vaultcount"><b class="num">${b.kills}</b> 隻哥布林・<span class="num">+${fmt(Math.min(b.kills, cap) * G.vaultGoldPerKill(f))}</span> 金${b.kills >= cap ? '（已達金幣上限）' : `<span class="sub" style="margin:0">　金幣算到 ${cap} 隻</span>`}</div>`;
+}
 function hornBtn(b) {
   const on = b.hornActive(), left = b.horn.until - b.tick;
   return `<button class="btn horn ${on ? 'on' : ''}" data-act="horn" ${b.horn.used ? 'disabled' : ''} aria-label="英勇號角">📯 ${on ? `${left}s` : b.horn.used ? '已用' : '號角'}</button>`;
@@ -53,8 +59,8 @@ function viewResult() {
   const r = app.lastResult, b = app.battle;
   const dmgMax = Math.max(1, ...b.units.map(u => Math.max(u.dmgDone, u.healDone)));
   const sec = Math.max(1, b.tick);
-  const title = r.mythic ? (r.inTime ? '限時通關' : b.win ? '超時通關' : '失敗') : (b.win ? '通關' : '失敗');
-  let h = `<div class="result ${(r.mythic ? r.inTime : b.win) ? 'win' : 'lose'}"><h3>${title}</h3>
+  const title = r.vault ? `打倒 ${r.kills} 隻哥布林` : r.mythic ? (r.inTime ? '限時通關' : b.win ? '超時通關' : '失敗') : (b.win ? '通關' : '失敗');
+  let h = `<div class="result ${(r.vault || (r.mythic ? r.inTime : b.win)) ? 'win' : 'lose'}"><h3>${title}</h3>${r.vault && r.record ? '<span class="newrec" style="justify-self:start">本層新紀錄</span>' : ''}
     ${r.mythic ? `<div class="keychange"><span class="keystone num">+${r.prevKey}</span><span class="arrow">→</span><span class="keystone num ${r.nextKey > r.prevKey ? 'up' : r.nextKey < r.prevKey ? 'down' : ''}">+${r.nextKey}</span>
       <span class="sub" style="margin:0">用時 <b class="num">${mmss(b.tick)}</b> / 限時 ${mmss(b.mythic.timer)}</span>${r.record ? '<span class="newrec">新紀錄</span>' : ''}</div>` : ''}
     <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+${fmt(r.gold)}</b> 金幣</span><span><b class="num">+${fmt(r.xp)}</b> 經驗</span>${r.first ? '<span style="color:var(--brass)">首次通關：必掉稀有以上</span>' : ''}${r.decayed ? '<span style="color:var(--warn)">這層對你太簡單了，經驗與金幣變少，往下一層吧</span>' : ''}</div>`;
@@ -65,9 +71,10 @@ function viewResult() {
     const sk = u.dmgDone ? Math.round(100 * u.skillDmg / u.dmgDone) : 0;
     return `<div class="mrow"><span>${u.icon} ${u.name}${u.role !== 'heal' && sk ? `<small class="num">技能 ${sk}%</small>` : ''}</span><span class="mb"><i class="role-${u.role}" style="width:${pct(v, dmgMax)}%"></i></span><span class="num" style="text-align:right">${fmt(v / sec)}${u.role === 'heal' ? ' HPS' : ' DPS'}</span></div>`;
   }).join('')}</div>`;
-  if (!b.win) h += `<div class="sub" style="margin:0">${failHint(b)}</div>`;
+  if (!b.win && !r.vault) h += `<div class="sub" style="margin:0">${failHint(b)}</div>`;
   h += `<div class="row">${app.pendingRepeat ? `<span class="sub" style="margin:0;align-self:center">掛機中，3 秒後自動再戰…</span>` : ''}
-    <button class="btn main grow" data-act="${r.mythic ? 'mythic' : 'fight'}" data-d="${b.dIdx}">${r.mythic ? `再挑戰 +${r.nextKey}` : '再打一次'}</button>
+    ${r.vault ? (G.vaultLeft(app.S) ? `<button class="btn main grow" data-act="vault" data-d="${b.vault.floor}">再打一次（今天剩 ${G.vaultLeft(app.S)} 次）</button>` : '<span class="sub" style="margin:0;align-self:center">今天的寶庫次數用完了</span>')
+      : `<button class="btn main grow" data-act="${r.mythic ? 'mythic' : 'fight'}" data-d="${b.dIdx}">${r.mythic ? `再挑戰 +${r.nextKey}` : '再打一次'}</button>`}
     ${r.kept.length ? `<button class="btn" data-act="autoequip">一鍵配裝</button>` : ''}
     <button class="btn" data-tab="dungeon">返回副本</button></div></div>`;
   return h;
