@@ -96,6 +96,13 @@ export const MYTHIC = {
   goldMult: 1.5, xpMult: 1.2,       // 相對第 7 層的獎勵
 };
 
+// ---------- 遊玩數據與排行榜（GAS 網頁應用程式；留空就完全不連線）----------
+export const TELEMETRY = {
+  url: 'https://script.google.com/macros/s/AKfycbwytKL7OhbuCd2WavlIopA49-vLdfLZXGQFPoUdnpmigJEWq3B4zuvSdoZqHX47Hhk0mg/exec',
+  snapshotMin: 5,                   // 每玩幾分鐘送一次進度
+  leaderboardSec: 60,               // 排行榜重新讀取間隔
+};
+
 // ---------- 團長指令 ----------
 export const RAID_HORN = { name: '英勇號角', dur: 15, bonus: 0.3 }; // 每場一次，全隊傷害與治療 +30%
 

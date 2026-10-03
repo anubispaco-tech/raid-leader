@@ -15,7 +15,7 @@ const serve = r => { const u = new URL(r.request().url()); if (u.host !== 'app.t
   const browser = await chromium.launch(); let page = await browser.newPage({ viewport: { width: 400, height: 820 } });
   const errs = []; page.on('pageerror', e => errs.push(e.message)); page.on('console', m => { if (m.type()==='error') errs.push(m.text()); });
   await page.route('**/*', serve);
-  await page.goto('https://app.test/'); await page.waitForTimeout(500);
+  await page.goto('https://app.test/'); await page.waitForTimeout(500); await page.locator('[data-act=\"skipnick\"]').click({ timeout: 1500 }).catch(() => {});
   const out = [];
   await page.screenshot({ path: '/tmp/claude-0/shot-dungeon.png' });
   await page.click('[data-act="fight"][data-d="0"]'); await page.waitForTimeout(2300);
@@ -44,7 +44,7 @@ const serve = r => { const u = new URL(r.request().url()); if (u.host !== 'app.t
   await p2.route('**/*', serve);
   await p2.addInitScript(v => { const s=JSON.parse(v); s.lastSeen=Date.now()-2*3600e3; localStorage.setItem('raid-leader-save-v1', JSON.stringify(s)); }, saved);
   await page.close(); page = p2; page.on('pageerror', e => errs.push(e.message));
-  await page.goto('https://app.test/'); await page.waitForTimeout(1500);
+  await page.goto('https://app.test/'); await page.waitForTimeout(1500); await page.locator('[data-act=\"skipnick\"]').click({ timeout: 1500 }).catch(() => {});
   out.push('offline modal: ' + ((await page.locator('.sheet').count()) ? (await page.locator('.sheet').innerText()).replace(/\n/g,' ') : 'NONE'));
   await page.screenshot({ path: '/tmp/claude-0/shot-offline.png' });
   out.push('gold: ' + await page.locator('#gold').innerText());

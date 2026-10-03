@@ -13,7 +13,7 @@ const errs = []; page.on('pageerror', e => errs.push(e.message));
 await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'app.test') return r.abort();
   const f = path.join(root, u.pathname === '/' ? entry : u.pathname.slice(1));
   return r.fulfill({ body: fs.readFileSync(f), contentType: types[path.extname(f)] }); });
-await page.goto('https://app.test/'); await page.waitForTimeout(400);
+await page.goto('https://app.test/'); await page.waitForTimeout(400); await page.locator('[data-act=\"skipnick\"]').click({ timeout: 1500 }).catch(() => {});
 const out = [], gold = async () => +(await page.locator('#gold').innerText()).replace(/,/g, '');
 for (let i = 0; i < 6; i++) { await page.click('[data-act="fight"][data-d="0"]').catch(() => page.click('.result [data-act="fight"]')); await page.click('[data-act="skip"]'); }
 await page.click('[data-tab="bag"]');

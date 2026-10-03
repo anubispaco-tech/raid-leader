@@ -1,7 +1,8 @@
 // ===== 副本分頁 =====
 import * as G from '../../core/index.js';
 import { app } from '../state.js';
-import { fmt, mmss, partyPower, avgPartyIlvl, avgPartyLv } from '../helpers.js';
+import { fmt, mmss, esc, partyPower, avgPartyIlvl, avgPartyLv } from '../helpers.js';
+import { leaderboard } from '../telemetry.js';
 
 // ---------- 下一步建議卡 ----------
 function nextStepCard() {
@@ -28,6 +29,18 @@ function mythicSection() {
   });
   return h + `</div></div>`;
 }
+// ---------- 同事排行榜 ----------
+function boardCard() {
+  const lb = leaderboard(); if (!lb) return '';
+  const me = app.S.player.name;
+  let body;
+  if (!lb.data) body = `<p class="sub" style="margin:0">${lb.error ? '排行榜暫時讀不到，稍後再試。' : '讀取中…'}</p>`;
+  else if (!lb.data.length) body = `<p class="sub" style="margin:0">還沒有人上榜，你可以當第一個。</p>`;
+  else body = `<ol class="board">${lb.data.map((p, i) => `<li class="${me && p.name === me ? 'me' : ''}"><span class="rk num">${i + 1}</span><b>${esc(p.name)}</b>
+      <span class="num">${p.best ? `秘境 +${p.best}` : `第 ${p.top} 層`}</span><span class="sub num" style="margin:0">Lv${p.level}</span></li>`).join('')}</ol>`;
+  return `<div class="boardcard"><div class="row" style="align-items:baseline"><b>同事排行榜</b><span class="sub" style="margin:0 0 0 auto">${me ? `你是「${esc(me)}」` : '匿名'}・<button class="linkbtn" data-act="nick">${me ? '改暱稱' : '設定暱稱'}</button></span></div>${body}
+    <p class="sub" style="margin:0">依秘境最高限時等級排名，同等級比最高層與等級。進度每 5 分鐘更新一次。</p></div>`;
+}
 export function viewDungeons() {
   const lv = avgPartyLv(), il = avgPartyIlvl();
   let h = nextStepCard() + `<h2>副本</h2><p class="sub">隊伍平均 <b class="num">Lv${lv}</b>・裝等 <b class="num">${il}</b>・戰力 <b class="num">${fmt(partyPower())}</b>　｜　每隻首領考驗一種職責，打不過就換陣容或回頭刷裝。</p>`;
@@ -52,6 +65,6 @@ export function viewDungeons() {
          ${talentsOpen ? `<button class="btn" data-act="recommend-party" data-d="${i}" aria-label="全隊套用推薦天賦">推薦天賦</button>` : ''}`}
       </div></div>`;
   });
-  h += `</div><div class="howto" style="margin-top:16px"><b>推薦天賦</b>：依這層首領的機制，替出戰隊員一鍵配好專精與天賦。<br><b>掛機刷</b>：自動重複挑戰，關掉頁面也會累積（最多 ${G.ECONOMY.offlineCapHours} 小時），回來時一次結算。<br><b>存檔</b>存在這台裝置的瀏覽器，換裝置請到「團隊」最下方匯出存檔碼。</div>`;
+  h += `</div>` + boardCard() + `<div class="howto" style="margin-top:16px"><b>推薦天賦</b>：依這層首領的機制，替出戰隊員一鍵配好專精與天賦。<br><b>掛機刷</b>：自動重複挑戰，關掉頁面也會累積（最多 ${G.ECONOMY.offlineCapHours} 小時），回來時一次結算。<br><b>存檔</b>存在這台裝置的瀏覽器，換裝置請到「團隊」最下方匯出存檔碼。</div>`;
   return h;
 }

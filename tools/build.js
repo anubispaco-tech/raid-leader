@@ -13,6 +13,7 @@ const head = read('src/head.html').trim(), body = read('src/body.html').trim();
 const pkg = JSON.parse(read('package.json'));
 
 const dev = process.argv.includes('--dev'), v = pkg.version;
+fs.writeFileSync(path.join(root, 'src/core/version.js'), `// 由 tools/build.js 依 package.json 產生，請勿手動修改\nexport const VERSION = '${v}';\n`);
 const script = dev ? '<script type="module" src="src/ui/main.js"></script>' : `<script src="dist/app.js?v=${v}"></script>`;
 const pages = `<!doctype html>
 <html lang="zh-Hant">

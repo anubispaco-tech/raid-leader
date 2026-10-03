@@ -19,6 +19,7 @@ src/
     battle.js           戰鬥模擬（職業行為、技能、首領機制、詞綴、英勇號角）
     mythic.js           傳奇秘境：鑰石、每日詞綴、敵人成長、結算
     advice.js           下一步建議
+    version.js          版本號（由 build.js 產生）
     game.js             存檔操作：獎勵、招募、配裝、掛機
   ui/                   畫面
     main.js             入口：分頁、點擊事件、離線結算
@@ -26,8 +27,11 @@ src/
     save.js             本機存檔、存檔碼
     battle-runner.js    即時戰鬥計時
     helpers.js          共用小工具
+    telemetry.js        遊玩數據、排行榜、意見回饋（送到 GAS）
     views/              各分頁畫面（dungeon、battle、team、bag、tavern、sheets）
   styles.css  head.html  body.html
+gas/
+  Code.gs               綁定試算表 raid-leader 的 Apps Script（部署步驟寫在檔案開頭）
 tools/
   build.js              產生 index.html 與 dist/
   sim-lib.js / sim.js   數值模擬：各層首通場次（套用推薦天賦、不吹號角）
@@ -45,12 +49,13 @@ tools/
 | `node tools/sim.js 10` | 模擬 10 次完整遊玩 |
 | `node tools/specs.js` | 選對 / 選錯專精的勝率差 |
 | `node tools/sim-mythic.js 4 300` | 秘境節奏 |
-| `node tools/e2e.js`、`e2e-actions.js`、`e2e-talents.js`、`e2e-mythic.js` | 瀏覽器測試 |
+| `node tools/e2e.js`、`e2e-actions.js`、`e2e-talents.js`、`e2e-mythic.js`、`e2e-telemetry.js` | 瀏覽器測試 |
 
 調整數值只改 `src/core/config.js` 與 `src/core/talents.js`，改完跑 `sim.js` 與 `specs.js` 確認節奏。
 
 ## 版本
 
+- **v0.5.0** 同事排行榜、遊玩數據、意見回饋（GAS + 試算表）、暱稱
 - **v0.4.0** 傳奇秘境（鑰石、限時、每日詞綴、個人紀錄）、傳說裝備、下一步建議卡
 - **v0.3.0** 技能、專精、天賦列、英勇號角、推薦天賦；副本難度同步調高
 - **v0.2.1** 遊玩回饋：分解精良、背包 50、戰利品箱、戰鬥控制列固定、鎖定縮放

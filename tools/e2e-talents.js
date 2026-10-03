@@ -21,7 +21,7 @@ await page.addInitScript(v => { if (!sessionStorage.getItem('seeded')) { localSt
 await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'app.test') return r.abort();
   const f = path.join(root, u.pathname === '/' ? entry : u.pathname.slice(1));
   return r.fulfill({ body: fs.readFileSync(f), contentType: types[path.extname(f)] }); });
-await page.goto('https://app.test/'); await page.waitForTimeout(400);
+await page.goto('https://app.test/'); await page.waitForTimeout(400); await page.locator('[data-act=\"skipnick\"]').click({ timeout: 1500 }).catch(() => {});
 const out = [], saved = () => page.evaluate(() => JSON.parse(localStorage.getItem('raid-leader-save-v1')));
 out.push('團隊分頁紅點：' + await page.locator('[data-tab="team"] .dot').count());
 await page.click('[data-tab="team"]');

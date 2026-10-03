@@ -227,6 +227,18 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
 .keychange{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .keychange .arrow{color:var(--muted)}
 .newrec{font-size:12px;background:var(--brass);color:var(--ink);border-radius:999px;padding:2px 8px;font-weight:700}
+
+/* v0.5 排行榜、暱稱、回饋 */
+.inp{width:100%;background:#0e1117;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:16px;font-family:var(--f-body)}
+.inp:focus,.fb:focus{outline:2px solid var(--brass);outline-offset:1px}
+textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;line-height:1.5}
+.boardcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:10px;margin-top:16px}
+.board{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.board li{display:grid;grid-template-columns:24px 1fr auto auto;gap:10px;align-items:baseline;padding:6px 8px;border-radius:6px;background:var(--panel2);font-size:14px}
+.board li:nth-child(-n+3) .rk{color:var(--brass);font-weight:700}
+.board li.me{outline:1px solid var(--brass)}
+.board b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.linkbtn{color:var(--brass);text-decoration:underline;font-size:13px;padding:0}
 </style>
 <div class="app">
   <header class="top">
@@ -242,7 +254,7 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.4.0 */
+/* 副本團長 v0.5.0 */
 (() => {
   // src/core/config.js
   var CLASSES = {
@@ -418,6 +430,13 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     goldMult: 1.5,
     xpMult: 1.2
     // 相對第 7 層的獎勵
+  };
+  var TELEMETRY = {
+    url: "https://script.google.com/macros/s/AKfycbwytKL7OhbuCd2WavlIopA49-vLdfLZXGQFPoUdnpmigJEWq3B4zuvSdoZqHX47Hhk0mg/exec",
+    snapshotMin: 5,
+    // 每玩幾分鐘送一次進度
+    leaderboardSec: 60
+    // 排行榜重新讀取間隔
   };
   var RAID_HORN = { name: "\u82F1\u52C7\u865F\u89D2", dur: 15, bonus: 0.3 };
   var REWARD = {
@@ -1165,7 +1184,8 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
   }
 
   // src/core/game.js
-  var SAVE_VERSION = 4;
+  var SAVE_VERSION = 5;
+  var newPlayer = () => ({ pid: Array.from({ length: 12 }, () => "abcdefghijklmnopqrstuvwxyz0123456789"[Math.floor(Math.random() * 36)]).join(""), name: "", asked: false, playSec: 0 });
   var hireCost = (h) => ECONOMY.hireBase + ECONOMY.hirePerLevel * h.level;
   function rewards(dIdx, win, firstClear) {
     const info = dungeonInfo(dIdx), m = win ? 1 : REWARD.loseMult;
@@ -1203,7 +1223,8 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
       stash: [],
       created: Date.now(),
       mythic: { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 },
-      failStreak: 0
+      failStreak: 0,
+      player: newPlayer()
     };
     for (const c of HERO.starters) {
       const h = makeHero(c);
@@ -1225,6 +1246,7 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     }
     s.mythic = s.mythic || { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 };
     s.failStreak = s.failStreak || 0;
+    s.player = s.player || newPlayer();
     s.v = SAVE_VERSION;
     return s;
   }
@@ -1521,6 +1543,7 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
   var $ = (s) => document.querySelector(s);
   var fmt = (n) => Math.round(n).toLocaleString("zh-TW");
   var pct = (a, b) => Math.max(0, Math.min(100, 100 * a / b));
+  var esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var mmss = (sec) => `${Math.floor(Math.abs(sec) / 60)}:${String(Math.abs(sec) % 60).padStart(2, "0")}`;
   function toast(msg) {
     const el = $("#toast");
@@ -1551,6 +1574,71 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     return p.length ? Math.round(p.reduce((a, h) => a + h.level, 0) / p.length) : 0;
   }
 
+  // src/core/version.js
+  var VERSION = "0.5.0";
+
+  // src/ui/telemetry.js
+  var URL_ = TELEMETRY.url;
+  var enabled = () => !!URL_;
+  var lb = { at: 0, data: null, loading: false, error: false };
+  function post(body, keepalive = false) {
+    if (!URL_ || !app.S) return Promise.resolve(null);
+    const p = app.S.player;
+    return fetch(URL_, {
+      method: "POST",
+      keepalive,
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ pid: p.pid, name: p.name || "\u533F\u540D", ver: VERSION, ...body })
+    }).then((r) => r.json()).catch(() => null);
+  }
+  function progress() {
+    const S = app.S, party = partyHeroes(S);
+    const top = Math.max(0, ...Object.keys(S.clears).filter((k) => S.clears[k]).map((k) => +k + 1));
+    const best = Math.max(0, ...Object.values(S.mythic.best).map((b) => b.level));
+    return {
+      level: party.length ? Math.round(party.reduce((a, h) => a + h.level, 0) / party.length) : 1,
+      top,
+      key: mythicUnlocked(S) ? S.mythic.key : 0,
+      best,
+      playMin: Math.round(S.player.playSec / 60)
+    };
+  }
+  var progressText = () => {
+    const p = progress();
+    return `Lv${p.level}\u30FB\u7B2C ${p.top} \u5C64${p.best ? `\u30FB\u79D8\u5883 +${p.best}` : ""}`;
+  };
+  var sendSnapshot = (keepalive) => post({ type: "snapshot", ...progress() }, keepalive);
+  var sendEvent = (kind, detail) => post({ type: "event", kind, detail });
+  var sendFeedback = (text) => post({ type: "feedback", text, progress: progressText() });
+  function leaderboard() {
+    if (!URL_) return null;
+    const fresh = Date.now() - lb.at < TELEMETRY.leaderboardSec * 1e3;
+    if (!fresh && !lb.loading) {
+      lb.loading = true;
+      fetch(URL_ + "?action=leaderboard").then((r) => r.json()).then((d) => {
+        lb.data = d.ok ? d.list : lb.data;
+        lb.error = !d.ok;
+      }).catch(() => {
+        lb.error = true;
+      }).finally(() => {
+        lb.at = Date.now();
+        lb.loading = false;
+        if (app.tab === "dungeon") app.render(true);
+      });
+    }
+    return lb;
+  }
+  var sinceSnap = 0;
+  function tick(sec) {
+    if (!app.S) return;
+    app.S.player.playSec += sec;
+    sinceSnap += sec;
+    if (sinceSnap >= TELEMETRY.snapshotMin * 60) {
+      sinceSnap = 0;
+      sendSnapshot();
+    }
+  }
+
   // src/ui/views/dungeon.js
   function nextStepCard() {
     const n = nextStep(app.S);
@@ -1575,6 +1663,18 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     });
     return h + `</div></div>`;
   }
+  function boardCard() {
+    const lb2 = leaderboard();
+    if (!lb2) return "";
+    const me = app.S.player.name;
+    let body;
+    if (!lb2.data) body = `<p class="sub" style="margin:0">${lb2.error ? "\u6392\u884C\u699C\u66AB\u6642\u8B80\u4E0D\u5230\uFF0C\u7A0D\u5F8C\u518D\u8A66\u3002" : "\u8B80\u53D6\u4E2D\u2026"}</p>`;
+    else if (!lb2.data.length) body = `<p class="sub" style="margin:0">\u9084\u6C92\u6709\u4EBA\u4E0A\u699C\uFF0C\u4F60\u53EF\u4EE5\u7576\u7B2C\u4E00\u500B\u3002</p>`;
+    else body = `<ol class="board">${lb2.data.map((p, i) => `<li class="${me && p.name === me ? "me" : ""}"><span class="rk num">${i + 1}</span><b>${esc(p.name)}</b>
+      <span class="num">${p.best ? `\u79D8\u5883 +${p.best}` : `\u7B2C ${p.top} \u5C64`}</span><span class="sub num" style="margin:0">Lv${p.level}</span></li>`).join("")}</ol>`;
+    return `<div class="boardcard"><div class="row" style="align-items:baseline"><b>\u540C\u4E8B\u6392\u884C\u699C</b><span class="sub" style="margin:0 0 0 auto">${me ? `\u4F60\u662F\u300C${esc(me)}\u300D` : "\u533F\u540D"}\u30FB<button class="linkbtn" data-act="nick">${me ? "\u6539\u66B1\u7A31" : "\u8A2D\u5B9A\u66B1\u7A31"}</button></span></div>${body}
+    <p class="sub" style="margin:0">\u4F9D\u79D8\u5883\u6700\u9AD8\u9650\u6642\u7B49\u7D1A\u6392\u540D\uFF0C\u540C\u7B49\u7D1A\u6BD4\u6700\u9AD8\u5C64\u8207\u7B49\u7D1A\u3002\u9032\u5EA6\u6BCF 5 \u5206\u9418\u66F4\u65B0\u4E00\u6B21\u3002</p></div>`;
+  }
   function viewDungeons() {
     const lv = avgPartyLv(), il = avgPartyIlvl();
     let h = nextStepCard() + `<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv${lv}</b>\u30FB\u88DD\u7B49 <b class="num">${il}</b>\u30FB\u6230\u529B <b class="num">${fmt(partyPower())}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u8003\u9A57\u4E00\u7A2E\u8077\u8CAC\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\u6216\u56DE\u982D\u5237\u88DD\u3002</p>`;
@@ -1598,7 +1698,7 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
          ${talentsOpen ? `<button class="btn" data-act="recommend-party" data-d="${i}" aria-label="\u5168\u968A\u5957\u7528\u63A8\u85A6\u5929\u8CE6">\u63A8\u85A6\u5929\u8CE6</button>` : ""}`}
       </div></div>`;
     });
-    h += `</div><div class="howto" style="margin-top:16px"><b>\u63A8\u85A6\u5929\u8CE6</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u6A5F\u5236\uFF0C\u66FF\u51FA\u6230\u968A\u54E1\u4E00\u9375\u914D\u597D\u5C08\u7CBE\u8207\u5929\u8CE6\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A ${ECONOMY.offlineCapHours} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\u5B58\u5728\u9019\u53F0\u88DD\u7F6E\u7684\u700F\u89BD\u5668\uFF0C\u63DB\u88DD\u7F6E\u8ACB\u5230\u300C\u5718\u968A\u300D\u6700\u4E0B\u65B9\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>`;
+    h += `</div>` + boardCard() + `<div class="howto" style="margin-top:16px"><b>\u63A8\u85A6\u5929\u8CE6</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u6A5F\u5236\uFF0C\u66FF\u51FA\u6230\u968A\u54E1\u4E00\u9375\u914D\u597D\u5C08\u7CBE\u8207\u5929\u8CE6\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A ${ECONOMY.offlineCapHours} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\u5B58\u5728\u9019\u53F0\u88DD\u7F6E\u7684\u700F\u89BD\u5668\uFF0C\u63DB\u88DD\u7F6E\u8ACB\u5230\u300C\u5718\u968A\u300D\u6700\u4E0B\u65B9\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>`;
     return h;
   }
 
@@ -1699,7 +1799,9 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     <h2 style="font-size:18px">\u540D\u518A <span class="sub num">${app.S.heroes.length}/${ECONOMY.rosterMax}</span></h2><div class="stack">`;
     const sorted = [...app.S.heroes].sort((a, b) => inParty(b) - inParty(a) || b.level - a.level);
     for (const x of sorted) h += heroCard(x);
-    h += `</div><h2 style="font-size:18px">\u5B58\u6A94</h2><div class="row"><button class="btn" data-act="export">\u532F\u51FA\u5B58\u6A94\u78BC</button><button class="btn" data-act="import">\u532F\u5165</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">\u91CD\u65B0\u958B\u59CB</button></div>
+    h += `</div>` + (enabled() ? `<h2 style="font-size:18px">\u610F\u898B\u56DE\u994B</h2><div class="settings">
+    <textarea id="fbText" class="fb" maxlength="1000" placeholder="\u54EA\u88E1\u597D\u73A9\u3001\u54EA\u88E1\u5361\u4F4F\u3001\u60F3\u8981\u4EC0\u9EBC\u529F\u80FD\u90FD\u53EF\u4EE5\u5BEB">${esc(app.fbDraft || "")}</textarea>
+    <div class="row" style="align-items:center"><span class="sub" style="margin:0">\u6703\u9644\u4E0A\u66B1\u7A31\u300C${esc(app.S.player.name || "\u533F\u540D")}\u300D\u8207\u76EE\u524D\u9032\u5EA6</span><button class="btn main" data-act="sendfb" style="margin-left:auto">\u9001\u51FA</button></div></div>` : "") + `<h2 style="font-size:18px">\u5B58\u6A94</h2><div class="row"><button class="btn" data-act="export">\u532F\u51FA\u5B58\u6A94\u78BC</button><button class="btn" data-act="import">\u532F\u5165</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">\u91CD\u65B0\u958B\u59CB</button></div>
     <p class="sub" style="margin-top:8px">\u5171\u6311\u6230 ${app.S.stats.runs} \u6B21\u30FB\u901A\u95DC ${app.S.stats.wins} \u6B21</p>`;
     return h;
   }
@@ -1905,6 +2007,9 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     clearInterval(app.bTimer);
     app.lastResult = app.battle.mythic ? applyMythicResult(app.S, app.battle) : applyResult(app.S, app.battle.dIdx, app.battle);
     save();
+    const r = app.lastResult, b = app.battle;
+    if (b.mythic) sendEvent("\u79D8\u5883", `${DUNGEONS[b.dIdx].name} +${b.mythic.level} ${r.inTime ? "\u9650\u6642" : b.win ? "\u8D85\u6642" : "\u5931\u6557"} ${mmss(b.tick)}${r.record ? "\uFF08\u65B0\u7D00\u9304\uFF09" : ""}`);
+    else if (r.first) sendEvent("\u9996\u901A", `\u7B2C ${b.dIdx + 1} \u5C64 ${DUNGEONS[b.dIdx].name}`);
     if (!app.battle.mythic && app.S.idle === app.battle.dIdx) {
       const d = app.battle.dIdx;
       app.pendingRepeat = setTimeout(() => {
@@ -2182,6 +2287,42 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
       case "closebtn":
         app.modal = null;
         break;
+      case "nick":
+        openNick();
+        return;
+      case "savenick": {
+        const v = ($("#nickInp").value || "").trim().slice(0, 16);
+        app.S.player.name = v;
+        app.S.player.asked = true;
+        app.modal = null;
+        save();
+        toast(v ? `\u66B1\u7A31\u8A2D\u70BA\u300C${v}\u300D` : "\u4EE5\u533F\u540D\u53C3\u52A0");
+        sendSnapshot();
+        break;
+      }
+      case "skipnick":
+        app.S.player.asked = true;
+        app.modal = null;
+        save();
+        sendSnapshot();
+        break;
+      case "sendfb": {
+        const ta = $("#fbText"), text = (ta.value || "").trim();
+        if (!text) {
+          toast("\u8ACB\u5148\u8F38\u5165\u610F\u898B");
+          return;
+        }
+        t.disabled = true;
+        sendFeedback(text).then((r) => {
+          if (r && r.ok) {
+            app.fbDraft = "";
+            ta.value = "";
+            toast("\u5DF2\u9001\u51FA\uFF0C\u8B1D\u8B1D\u56DE\u994B\uFF01");
+          } else toast(r && r.error === "too fast" ? "\u9001\u592A\u5FEB\u4E86\uFF0C\u8ACB\u4E00\u5206\u9418\u5F8C\u518D\u8A66" : "\u9001\u51FA\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66");
+          t.disabled = false;
+        });
+        return;
+      }
     }
     render();
   });
@@ -2205,6 +2346,7 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
       clearTimeout(app.pendingRepeat);
       app.pendingRepeat = null;
       save();
+      if (app.S.player.asked) sendSnapshot(true);
       return;
     }
     if (app.S.idle != null && Date.now() - app.S.lastSeen > 6e4) {
@@ -2217,8 +2359,19 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     else if (app.S.idle != null) startBattle(app.S.idle);
   });
   setInterval(() => {
-    if (!document.hidden) save();
+    if (!document.hidden) {
+      tick(5);
+      save();
+    }
   }, 5e3);
+  document.addEventListener("input", (e) => {
+    if (e.target.id === "fbText") app.fbDraft = e.target.value;
+  });
+  function openNick() {
+    openModal({ type: "text", html: `<h3>\u4F60\u7684\u66B1\u7A31</h3><p class="sub" style="margin:0">\u7528\u65BC\u540C\u4E8B\u6392\u884C\u699C\u3002\u904A\u6232\u6703\u8A18\u9304\u66B1\u7A31\u3001\u9032\u5EA6\u8207\u904A\u73A9\u6642\u9593\uFF0C\u9001\u5230\u958B\u767C\u8005\u7684\u8A66\u7B97\u8868\uFF0C\u4E0D\u6703\u6536\u96C6\u5E33\u865F\u6216\u500B\u4EBA\u8CC7\u6599\u3002</p>
+    <input id="nickInp" class="inp" maxlength="16" placeholder="\u4F8B\u5982\uFF1AYomi" value="${esc(app.S.player.name)}" autocomplete="off">
+    <div class="row"><button class="btn main grow" data-act="savenick">\u78BA\u5B9A</button><button class="btn" data-act="skipnick">\u533F\u540D\u53C3\u52A0</button></div>` });
+  }
   for (const ev of ["gesturestart", "gesturechange"]) document.addEventListener(ev, (e) => e.preventDefault(), { passive: false });
   document.addEventListener("touchmove", (e) => {
     if (e.touches.length > 1) e.preventDefault();
@@ -2228,6 +2381,8 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
     settleOffline();
     if (app.S.idle != null && app.S.clears[app.S.idle]) startBattle(app.S.idle);
     render();
+    if (enabled() && !app.S.player.asked && !app.modal) openNick();
+    else if (app.S.player.asked) setTimeout(() => sendSnapshot(), 3e3);
   }
   window.claude?.hot?.snapshot?.(() => ({ S: app.S }));
   window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});

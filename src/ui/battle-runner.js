@@ -2,7 +2,8 @@
 import * as G from '../core/index.js';
 import { app, TICK_MS } from './state.js';
 import { save } from './save.js';
-import { toast } from './helpers.js';
+import { toast, mmss } from './helpers.js';
+import { sendEvent } from './telemetry.js';
 
 export function startBattle(dIdx) {
   const p = G.partyHeroes(app.S);
@@ -37,6 +38,9 @@ export function finishBattle() {
   clearInterval(app.bTimer);
   app.lastResult = app.battle.mythic ? G.applyMythicResult(app.S, app.battle) : G.applyResult(app.S, app.battle.dIdx, app.battle);
   save();
+  const r = app.lastResult, b = app.battle;
+  if (b.mythic) sendEvent('秘境', `${G.DUNGEONS[b.dIdx].name} +${b.mythic.level} ${r.inTime ? '限時' : b.win ? '超時' : '失敗'} ${mmss(b.tick)}${r.record ? '（新紀錄）' : ''}`);
+  else if (r.first) sendEvent('首通', `第 ${b.dIdx + 1} 層 ${G.DUNGEONS[b.dIdx].name}`);
   if (!app.battle.mythic && app.S.idle === app.battle.dIdx) {
     const d = app.battle.dIdx;
     app.pendingRepeat = setTimeout(() => { app.pendingRepeat = null; if (app.S.idle === d) startBattle(d); }, 3000);

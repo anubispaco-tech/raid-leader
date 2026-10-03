@@ -10,6 +10,8 @@ import { viewBag } from './views/bag.js';
 import { viewTavern } from './views/tavern.js';
 import { renderModal, openModal, closeModal } from './views/sheets.js';
 import { startBattle, startMythic, runTimer, finishBattle } from './battle-runner.js';
+import * as T from './telemetry.js';
+import { esc } from './helpers.js';
 
 // ---------- 分頁 ----------
 const ICONS = {
@@ -112,6 +114,24 @@ document.addEventListener('click', e => {
     case 'reset': openModal({ type: 'text', html: `<h3>重新開始？</h3><p class="sub" style="margin:0">目前的英雄、裝備與進度都會清除，無法復原。</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">清除並重來</button><button class="btn" data-act="closebtn">取消</button></div>` }); return;
     case 'doreset': clearInterval(app.bTimer); clearTimeout(app.pendingRepeat); app.S = G.newGame(); app.battle = null; app.lastResult = null; app.modal = null; app.tab = 'dungeon'; save(); break;
     case 'closebtn': app.modal = null; break;
+    case 'nick': openNick(); return;
+    case 'savenick': {
+      const v = ($('#nickInp').value || '').trim().slice(0, 16);
+      app.S.player.name = v; app.S.player.asked = true; app.modal = null; save();
+      toast(v ? `暱稱設為「${v}」` : '以匿名參加'); T.sendSnapshot(); break;
+    }
+    case 'skipnick': app.S.player.asked = true; app.modal = null; save(); T.sendSnapshot(); break;
+    case 'sendfb': {
+      const ta = $('#fbText'), text = (ta.value || '').trim();
+      if (!text) { toast('請先輸入意見'); return; }
+      t.disabled = true;
+      T.sendFeedback(text).then(r => {
+        if (r && r.ok) { app.fbDraft = ''; ta.value = ''; toast('已送出，謝謝回饋！'); }
+        else toast(r && r.error === 'too fast' ? '送太快了，請一分鐘後再試' : '送出失敗，請稍後再試');
+        t.disabled = false;
+      });
+      return;
+    }
   }
   render();
 });
@@ -131,13 +151,20 @@ function settleOffline() {
 }
 // 切到背景：暫停即時戰鬥並記錄時間；回來時掛機改用離線結算，避免重複計算
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { clearInterval(app.bTimer); clearTimeout(app.pendingRepeat); app.pendingRepeat = null; save(); return; }
+  if (document.hidden) { clearInterval(app.bTimer); clearTimeout(app.pendingRepeat); app.pendingRepeat = null; save(); if (app.S.player.asked) T.sendSnapshot(true); return; }
   if (app.S.idle != null && (Date.now() - app.S.lastSeen) > 60000) {
     app.battle = null; app.lastResult = null; settleOffline(); startBattle(app.S.idle); render();
   } else if (app.battle && !app.battle.over) runTimer();
   else if (app.S.idle != null) startBattle(app.S.idle);
 });
-setInterval(() => { if (!document.hidden) save(); }, 5000);
+setInterval(() => { if (!document.hidden) { T.tick(5); save(); } }, 5000);
+document.addEventListener('input', e => { if (e.target.id === 'fbText') app.fbDraft = e.target.value; }); // 回饋草稿：畫面重畫時不會消失
+// 暱稱：第一次開遊戲時詢問（可跳過），之後可在團隊分頁修改
+function openNick() {
+  openModal({ type: 'text', html: `<h3>你的暱稱</h3><p class="sub" style="margin:0">用於同事排行榜。遊戲會記錄暱稱、進度與遊玩時間，送到開發者的試算表，不會收集帳號或個人資料。</p>
+    <input id="nickInp" class="inp" maxlength="16" placeholder="例如：Yomi" value="${esc(app.S.player.name)}" autocomplete="off">
+    <div class="row"><button class="btn main grow" data-act="savenick">確定</button><button class="btn" data-act="skipnick">匿名參加</button></div>` });
+}
 // 鎖定縮放：iOS Safari 會忽略 viewport 的 user-scalable，另外擋捏合手勢
 for (const ev of ['gesturestart', 'gesturechange']) document.addEventListener(ev, e => e.preventDefault(), { passive: false });
 document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
@@ -148,6 +175,8 @@ function start(data) {
   settleOffline();
   if (app.S.idle != null && app.S.clears[app.S.idle]) startBattle(app.S.idle);
   render();
+  if (T.enabled() && !app.S.player.asked && !app.modal) openNick();
+  else if (app.S.player.asked) setTimeout(() => T.sendSnapshot(), 3000);
 }
 window.claude?.hot?.snapshot?.(() => ({ S: app.S }));
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});

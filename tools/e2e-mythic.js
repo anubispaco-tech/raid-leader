@@ -17,7 +17,7 @@ await page.addInitScript(v => { if (!sessionStorage.getItem('seeded')) { localSt
 await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'app.test') return r.abort();
   const f = path.join(root, u.pathname === '/' ? entry : u.pathname.slice(1));
   return r.fulfill({ body: fs.readFileSync(f), contentType: types[path.extname(f)] }); });
-await page.goto('https://app.test/'); await page.waitForTimeout(500);
+await page.goto('https://app.test/'); await page.waitForTimeout(500); await page.locator('[data-act=\"skipnick\"]').click({ timeout: 1500 }).catch(() => {});
 const out = [];
 out.push('下一步卡：' + ((await page.locator('.nextstep').count()) ? (await page.locator('.nextstep b').innerText()) : '（無）'));
 out.push('秘境鑰石：' + await page.locator('.mhead .keystone').innerText() + '｜生效詞綴：' + (await page.locator('.affix.on b').allInnerTexts()).join('、'));

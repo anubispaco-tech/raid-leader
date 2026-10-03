@@ -10,7 +10,8 @@ import { MYTHIC } from './config.js';
 import { mythicRewards, keyChange } from './mythic.js';
 import { Battle } from './battle.js';
 
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 5;
+const newPlayer = () => ({ pid: Array.from({ length: 12 }, () => 'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)]).join(''), name: '', asked: false, playSec: 0 });
 export const hireCost = h => ECONOMY.hireBase + ECONOMY.hirePerLevel * h.level;
 
 // ---------- 獎勵 ----------
@@ -37,7 +38,7 @@ function decayFor(dIdx) {
 export function newGame() {
   const s = { v: SAVE_VERSION, gold: ECONOMY.startGold, heroes: [], items: {}, bag: [], party: [], unlocked: 1, clears: {},
     tavern: [], idle: null, lastSeen: Date.now(), stats: { runs: 0, wins: 0 }, autoSalvageBelow: 0, keepRarity: ECONOMY.defaultKeepRarity, stash: [], created: Date.now(),
-    mythic: { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 }, failStreak: 0 };
+    mythic: { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 }, failStreak: 0, player: newPlayer() };
   for (const c of HERO.starters) { const h = makeHero(c); s.heroes.push(h); s.party.push(h.id); }
   rollTavern(s);
   return s;
@@ -55,6 +56,8 @@ export function migrate(s) {
   // v3 → v4：傳奇秘境、連敗紀錄
   s.mythic = s.mythic || { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 };
   s.failStreak = s.failStreak || 0;
+  // v4 → v5：玩家識別（隨機 ID、暱稱、累計遊玩秒數），用於遊玩數據與排行榜
+  s.player = s.player || newPlayer();
   s.v = SAVE_VERSION;
   return s;
 }

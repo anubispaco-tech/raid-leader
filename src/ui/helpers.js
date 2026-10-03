@@ -5,6 +5,7 @@ import { app } from './state.js';
 export const $ = s => document.querySelector(s);
 export const fmt = n => Math.round(n).toLocaleString('zh-TW');
 export const pct = (a, b) => Math.max(0, Math.min(100, 100 * a / b));
+export const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 export const mmss = sec => `${Math.floor(Math.abs(sec) / 60)}:${String(Math.abs(sec) % 60).padStart(2, '0')}`;
 
 export function toast(msg) {
