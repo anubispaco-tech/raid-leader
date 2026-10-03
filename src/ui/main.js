@@ -118,7 +118,7 @@ document.addEventListener('click', e => {
     case 'savenick': {
       const v = ($('#nickInp').value || '').trim().slice(0, 16);
       app.S.player.name = v; app.S.player.asked = true; app.modal = null; save();
-      toast(v ? `暱稱設為「${v}」` : '以匿名參加'); T.sendSnapshot(); break;
+      toast(v ? `暱稱設為「${v}」，天梯約 1 分鐘內更新` : '以匿名參加'); T.sendSnapshot(true).then(r => { if (r && r.error === 'too fast') setTimeout(() => T.sendSnapshot(), 25000); }); break;
     }
     case 'skipnick': app.S.player.asked = true; app.modal = null; save(); T.sendSnapshot(); break;
     case 'sendfb': {
@@ -161,7 +161,7 @@ setInterval(() => { if (!document.hidden) { T.tick(5); save(); } }, 5000);
 document.addEventListener('input', e => { if (e.target.id === 'fbText') app.fbDraft = e.target.value; }); // 回饋草稿：畫面重畫時不會消失
 // 暱稱：第一次開遊戲時詢問（可跳過），之後可在團隊分頁修改
 function openNick() {
-  openModal({ type: 'text', html: `<h3>你的暱稱</h3><p class="sub" style="margin:0">用於同事排行榜。遊戲會記錄暱稱、進度與遊玩時間，送到開發者的試算表，不會收集帳號或個人資料。</p>
+  openModal({ type: 'text', html: `<h3>你的暱稱</h3><p class="sub" style="margin:0">顯示在天梯上，之後隨時可以修改。遊戲會記錄暱稱、進度與遊玩時間，不會收集帳號或個人資料。</p>
     <input id="nickInp" class="inp" maxlength="16" placeholder="例如：Yomi" value="${esc(app.S.player.name)}" autocomplete="off">
     <div class="row"><button class="btn main grow" data-act="savenick">確定</button><button class="btn" data-act="skipnick">匿名參加</button></div>` });
 }

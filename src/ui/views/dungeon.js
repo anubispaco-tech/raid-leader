@@ -29,7 +29,7 @@ function mythicSection() {
   });
   return h + `</div></div>`;
 }
-// ---------- 同事排行榜 ----------
+// ---------- 天梯（排行榜）----------
 function boardCard() {
   const lb = leaderboard(); if (!lb) return '';
   const me = app.S.player.name;
@@ -38,7 +38,7 @@ function boardCard() {
   else if (!lb.data.length) body = `<p class="sub" style="margin:0">還沒有人上榜，你可以當第一個。</p>`;
   else body = `<ol class="board">${lb.data.map((p, i) => `<li class="${me && p.name === me ? 'me' : ''}"><span class="rk num">${i + 1}</span><b>${esc(p.name)}</b>
       <span class="num">${p.best ? `秘境 +${p.best}` : `第 ${p.top} 層`}</span><span class="sub num" style="margin:0">Lv${p.level}</span></li>`).join('')}</ol>`;
-  return `<div class="boardcard"><div class="row" style="align-items:baseline"><b>同事排行榜</b><span class="sub" style="margin:0 0 0 auto">${me ? `你是「${esc(me)}」` : '匿名'}・<button class="linkbtn" data-act="nick">${me ? '改暱稱' : '設定暱稱'}</button></span></div>${body}
+  return `<div class="boardcard"><div class="row" style="align-items:baseline"><b>天梯</b><span class="sub" style="margin:0 0 0 auto">${me ? `你是「${esc(me)}」` : '匿名'}・<button class="linkbtn" data-act="nick">${me ? '改暱稱' : '設定暱稱'}</button></span></div>${body}
     <p class="sub" style="margin:0">依秘境最高限時等級排名，同等級比最高層與等級。進度每 5 分鐘更新一次。</p></div>`;
 }
 export function viewDungeons() {

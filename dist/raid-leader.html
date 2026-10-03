@@ -254,7 +254,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.5.0 */
+/* 副本團長 v0.5.1 */
 (() => {
   // src/core/config.js
   var CLASSES = {
@@ -1575,7 +1575,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   }
 
   // src/core/version.js
-  var VERSION = "0.5.0";
+  var VERSION = "0.5.1";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -1672,7 +1672,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     else if (!lb2.data.length) body = `<p class="sub" style="margin:0">\u9084\u6C92\u6709\u4EBA\u4E0A\u699C\uFF0C\u4F60\u53EF\u4EE5\u7576\u7B2C\u4E00\u500B\u3002</p>`;
     else body = `<ol class="board">${lb2.data.map((p, i) => `<li class="${me && p.name === me ? "me" : ""}"><span class="rk num">${i + 1}</span><b>${esc(p.name)}</b>
       <span class="num">${p.best ? `\u79D8\u5883 +${p.best}` : `\u7B2C ${p.top} \u5C64`}</span><span class="sub num" style="margin:0">Lv${p.level}</span></li>`).join("")}</ol>`;
-    return `<div class="boardcard"><div class="row" style="align-items:baseline"><b>\u540C\u4E8B\u6392\u884C\u699C</b><span class="sub" style="margin:0 0 0 auto">${me ? `\u4F60\u662F\u300C${esc(me)}\u300D` : "\u533F\u540D"}\u30FB<button class="linkbtn" data-act="nick">${me ? "\u6539\u66B1\u7A31" : "\u8A2D\u5B9A\u66B1\u7A31"}</button></span></div>${body}
+    return `<div class="boardcard"><div class="row" style="align-items:baseline"><b>\u5929\u68AF</b><span class="sub" style="margin:0 0 0 auto">${me ? `\u4F60\u662F\u300C${esc(me)}\u300D` : "\u533F\u540D"}\u30FB<button class="linkbtn" data-act="nick">${me ? "\u6539\u66B1\u7A31" : "\u8A2D\u5B9A\u66B1\u7A31"}</button></span></div>${body}
     <p class="sub" style="margin:0">\u4F9D\u79D8\u5883\u6700\u9AD8\u9650\u6642\u7B49\u7D1A\u6392\u540D\uFF0C\u540C\u7B49\u7D1A\u6BD4\u6700\u9AD8\u5C64\u8207\u7B49\u7D1A\u3002\u9032\u5EA6\u6BCF 5 \u5206\u9418\u66F4\u65B0\u4E00\u6B21\u3002</p></div>`;
   }
   function viewDungeons() {
@@ -1801,7 +1801,8 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     for (const x of sorted) h += heroCard(x);
     h += `</div>` + (enabled() ? `<h2 style="font-size:18px">\u610F\u898B\u56DE\u994B</h2><div class="settings">
     <textarea id="fbText" class="fb" maxlength="1000" placeholder="\u54EA\u88E1\u597D\u73A9\u3001\u54EA\u88E1\u5361\u4F4F\u3001\u60F3\u8981\u4EC0\u9EBC\u529F\u80FD\u90FD\u53EF\u4EE5\u5BEB">${esc(app.fbDraft || "")}</textarea>
-    <div class="row" style="align-items:center"><span class="sub" style="margin:0">\u6703\u9644\u4E0A\u66B1\u7A31\u300C${esc(app.S.player.name || "\u533F\u540D")}\u300D\u8207\u76EE\u524D\u9032\u5EA6</span><button class="btn main" data-act="sendfb" style="margin-left:auto">\u9001\u51FA</button></div></div>` : "") + `<h2 style="font-size:18px">\u5B58\u6A94</h2><div class="row"><button class="btn" data-act="export">\u532F\u51FA\u5B58\u6A94\u78BC</button><button class="btn" data-act="import">\u532F\u5165</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">\u91CD\u65B0\u958B\u59CB</button></div>
+    <div class="row" style="align-items:center"><span class="sub" style="margin:0">\u6703\u9644\u4E0A\u66B1\u7A31\u300C${esc(app.S.player.name || "\u533F\u540D")}\u300D\u8207\u76EE\u524D\u9032\u5EA6</span><button class="btn main" data-act="sendfb" style="margin-left:auto">\u9001\u51FA</button></div></div>` : "") + `<h2 style="font-size:18px">\u66B1\u7A31</h2><div class="settings"><div class="set"><span>\u5929\u68AF\u4E0A\u986F\u793A\u70BA <b>${esc(app.S.player.name || "\u533F\u540D")}</b></span><button class="btn sm" data-act="nick">\u4FEE\u6539</button></div></div>
+    <h2 style="font-size:18px">\u5B58\u6A94</h2><div class="row"><button class="btn" data-act="export">\u532F\u51FA\u5B58\u6A94\u78BC</button><button class="btn" data-act="import">\u532F\u5165</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">\u91CD\u65B0\u958B\u59CB</button></div>
     <p class="sub" style="margin-top:8px">\u5171\u6311\u6230 ${app.S.stats.runs} \u6B21\u30FB\u901A\u95DC ${app.S.stats.wins} \u6B21</p>`;
     return h;
   }
@@ -2296,8 +2297,10 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
         app.S.player.asked = true;
         app.modal = null;
         save();
-        toast(v ? `\u66B1\u7A31\u8A2D\u70BA\u300C${v}\u300D` : "\u4EE5\u533F\u540D\u53C3\u52A0");
-        sendSnapshot();
+        toast(v ? `\u66B1\u7A31\u8A2D\u70BA\u300C${v}\u300D\uFF0C\u5929\u68AF\u7D04 1 \u5206\u9418\u5167\u66F4\u65B0` : "\u4EE5\u533F\u540D\u53C3\u52A0");
+        sendSnapshot(true).then((r) => {
+          if (r && r.error === "too fast") setTimeout(() => sendSnapshot(), 25e3);
+        });
         break;
       }
       case "skipnick":
@@ -2368,7 +2371,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     if (e.target.id === "fbText") app.fbDraft = e.target.value;
   });
   function openNick() {
-    openModal({ type: "text", html: `<h3>\u4F60\u7684\u66B1\u7A31</h3><p class="sub" style="margin:0">\u7528\u65BC\u540C\u4E8B\u6392\u884C\u699C\u3002\u904A\u6232\u6703\u8A18\u9304\u66B1\u7A31\u3001\u9032\u5EA6\u8207\u904A\u73A9\u6642\u9593\uFF0C\u9001\u5230\u958B\u767C\u8005\u7684\u8A66\u7B97\u8868\uFF0C\u4E0D\u6703\u6536\u96C6\u5E33\u865F\u6216\u500B\u4EBA\u8CC7\u6599\u3002</p>
+    openModal({ type: "text", html: `<h3>\u4F60\u7684\u66B1\u7A31</h3><p class="sub" style="margin:0">\u986F\u793A\u5728\u5929\u68AF\u4E0A\uFF0C\u4E4B\u5F8C\u96A8\u6642\u53EF\u4EE5\u4FEE\u6539\u3002\u904A\u6232\u6703\u8A18\u9304\u66B1\u7A31\u3001\u9032\u5EA6\u8207\u904A\u73A9\u6642\u9593\uFF0C\u4E0D\u6703\u6536\u96C6\u5E33\u865F\u6216\u500B\u4EBA\u8CC7\u6599\u3002</p>
     <input id="nickInp" class="inp" maxlength="16" placeholder="\u4F8B\u5982\uFF1AYomi" value="${esc(app.S.player.name)}" autocomplete="off">
     <div class="row"><button class="btn main grow" data-act="savenick">\u78BA\u5B9A</button><button class="btn" data-act="skipnick">\u533F\u540D\u53C3\u52A0</button></div>` });
   }

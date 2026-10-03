@@ -41,5 +41,8 @@ out.push('切頁後草稿保留：' + (await page.locator('#fbText').inputValue(
 await page.click('[data-act="sendfb"]'); await page.waitForTimeout(500);
 out.push('回饋：' + JSON.stringify(posts.find(p => p.type === 'feedback')));
 out.push('送出後清空：' + ((await page.locator('#fbText').inputValue()) === ''));
+await page.click('[data-tab="team"]'); await page.click('.settings [data-act="nick"]');
+await page.fill('#nickInp', '改名後'); await page.click('[data-act="savenick"]'); await page.waitForTimeout(500);
+out.push('改名後送出：' + posts.filter(p => p.type === 'snapshot').map(p => p.name).join(' → ') + '｜團隊頁顯示：' + (await page.locator('.set b').first().innerText()));
 console.log(out.join('\n') + '\nERRORS: ' + JSON.stringify(errs));
 await browser.close();

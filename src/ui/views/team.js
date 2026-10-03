@@ -22,7 +22,8 @@ export function viewTeam() {
   for (const x of sorted) h += heroCard(x);
   h += `</div>` + (enabled() ? `<h2 style="font-size:18px">意見回饋</h2><div class="settings">
     <textarea id="fbText" class="fb" maxlength="1000" placeholder="哪裡好玩、哪裡卡住、想要什麼功能都可以寫">${esc(app.fbDraft || '')}</textarea>
-    <div class="row" style="align-items:center"><span class="sub" style="margin:0">會附上暱稱「${esc(app.S.player.name || '匿名')}」與目前進度</span><button class="btn main" data-act="sendfb" style="margin-left:auto">送出</button></div></div>` : '') + `<h2 style="font-size:18px">存檔</h2><div class="row"><button class="btn" data-act="export">匯出存檔碼</button><button class="btn" data-act="import">匯入</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">重新開始</button></div>
+    <div class="row" style="align-items:center"><span class="sub" style="margin:0">會附上暱稱「${esc(app.S.player.name || '匿名')}」與目前進度</span><button class="btn main" data-act="sendfb" style="margin-left:auto">送出</button></div></div>` : '') + `<h2 style="font-size:18px">暱稱</h2><div class="settings"><div class="set"><span>天梯上顯示為 <b>${esc(app.S.player.name || '匿名')}</b></span><button class="btn sm" data-act="nick">修改</button></div></div>
+    <h2 style="font-size:18px">存檔</h2><div class="row"><button class="btn" data-act="export">匯出存檔碼</button><button class="btn" data-act="import">匯入</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">重新開始</button></div>
     <p class="sub" style="margin-top:8px">共挑戰 ${app.S.stats.runs} 次・通關 ${app.S.stats.wins} 次</p>`;
   return h;
 }
