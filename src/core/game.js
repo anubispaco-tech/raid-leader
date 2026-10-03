@@ -134,12 +134,30 @@ export function refreshTavern(s) {
 export const partyLocked = s => s.idle != null;
 export function joinParty(s, id) { if (partyLocked(s)) return false; if (s.party.length < ECONOMY.partyMax && !s.party.includes(id)) s.party.push(id); }
 export function benchHero(s, id) { if (partyLocked(s)) return false; s.party = s.party.filter(x => x !== id); }
-export function fireHero(s, id) {
+// 解雇：身上裝備自動卸下 → 背包 → 背包滿放戰利品箱 → 都滿就分解成金幣（不會弄丟裝備）
+export function fireHero(s, id, gear = { bag: 0, stash: 0, salvaged: 0, gold: 0 }) {
   const h = s.heroes.find(x => x.id === id); if (!h || (partyLocked(s) && s.party.includes(id))) return null;
-  for (const sl in h.gear) if (h.gear[sl]) s.bag.push(h.gear[sl]);
+  for (const sl in h.gear) {
+    const iid = h.gear[sl]; if (!iid) continue; h.gear[sl] = null;
+    if (s.bag.length < bagMax(s)) { s.bag.push(iid); gear.bag++; }
+    else if (s.stash.length < ECONOMY.stashMax) { s.stash.push(iid); gear.stash++; }
+    else { s.bag.push(iid); gear.gold += salvage(s, iid); gear.salvaged++; }
+  }
   s.heroes = s.heroes.filter(x => x.id !== id); s.party = s.party.filter(x => x !== id);
   const refund = Math.round(hireCost(h) * RECRUIT.fireRefund); s.gold += refund;
-  return { ...h, refund };
+  return { ...h, refund, gear };
+}
+// 一鍵解雇：只動待命英雄，品質 ≤ maxRarity，傳說永遠不會被一鍵解雇；dry = 只試算
+export function fireTargets(s, maxRarity) {
+  const list = s.heroes.filter(h => !s.party.includes(h.id) && !h.legend && (h.rarity || 0) <= Math.min(maxRarity, 3));
+  return list.length >= s.heroes.length ? list.slice(0, s.heroes.length - 1) : list; // 至少留一位英雄
+}
+export function fireMany(s, maxRarity, dry = false) {
+  const list = fireTargets(s, maxRarity);
+  if (dry) return { count: list.length, refund: list.reduce((g, h) => g + Math.round(hireCost(h) * RECRUIT.fireRefund), 0) };
+  const gear = { bag: 0, stash: 0, salvaged: 0, gold: 0 }; let refund = 0;
+  for (const h of list) refund += fireHero(s, h.id, gear).refund;
+  return { count: list.length, refund, gear };
 }
 
 // ---------- 戰鬥結算 ----------

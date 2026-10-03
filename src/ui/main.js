@@ -50,6 +50,7 @@ document.addEventListener('click', e => {
   if (t.dataset.tab) { app.tab = t.dataset.tab; app.modal = null; render(); window.scrollTo(0, 0); return; }
   const a = t.dataset.act, id = t.dataset.id;
   if (a !== 'salvageupto') app.salvConfirm = false;
+  if (a !== 'firemany') app.fireConfirm = false;
   switch (a) {
     case 'fight': stopIdleFor(+t.dataset.d); startBattle(+t.dataset.d); app.tab = 'battle'; break;
     case 'mythic': stopIdleFor(-1); startMythic(+t.dataset.d); app.tab = 'battle'; window.scrollTo(0, 0); break;
@@ -98,7 +99,13 @@ document.addEventListener('click', e => {
     case 'fire': {
       if (G.partyLocked(app.S) && app.S.party.includes(id)) { toast('掛機中不能更換隊員，請先停止掛機'); break; }
       if (!app.modal.confirmFire) { app.modal.confirmFire = true; break; }
-      const x = G.fireHero(app.S, id); app.modal = null; if (x) toast(`${x.name} 離開了團隊，退還 ${x.refund} 金`); save(); break;
+      const x = G.fireHero(app.S, id); app.modal = null; if (x) toast(`${x.name} 離開了團隊，退還 ${x.refund} 金${gearMsg(x.gear)}`); save(); break;
+    }
+    case 'firemany': {
+      const n = G.fireMany(app.S, app.fireSel ?? 0, true).count; if (!n) break;
+      if (!app.fireConfirm) { app.fireConfirm = true; break; }
+      app.fireConfirm = false;
+      const r = G.fireMany(app.S, app.fireSel ?? 0); toast(`解雇 ${r.count} 位英雄，退還 ${fmt(r.refund)} 金${gearMsg(r.gear)}`); save(); break;
     }
     case 'hire': {
       const x = G.hire(app.S, id);
@@ -181,7 +188,10 @@ document.addEventListener('visibilitychange', () => {
 });
 setInterval(() => { if (!document.hidden) { T.tick(5); save(); } }, 5000);
 document.addEventListener('input', e => { if (e.target.id === 'fbText') app.fbDraft = e.target.value; });
-document.addEventListener('change', e => { if (e.target.id === 'salvSel') { app.salvSel = +e.target.value; app.salvConfirm = false; render(); } }); // 回饋草稿：畫面重畫時不會消失
+document.addEventListener('change', e => {
+  if (e.target.id === 'salvSel') { app.salvSel = +e.target.value; app.salvConfirm = false; render(); }
+  if (e.target.id === 'fireSel') { app.fireSel = +e.target.value; app.fireConfirm = false; render(); }
+}); // 回饋草稿：畫面重畫時不會消失
 // 抽卡結果：依稀有度由高到低排列，傳說與史詩特別標示
 function showDraw(list, cost) {
   const sorted = [...list].sort((a, b) => (b.rarity || 0) - (a.rarity || 0)), best = sorted[0].rarity || 0;
@@ -220,4 +230,10 @@ function stopIdleFor(d) {
 function prepMsg(r, what) {
   const roles = `坦 ${r.roles.tank}・補 ${r.roles.heal}・輸出 ${r.roles.dps}`, gear = r.swapped ? `，換上 ${r.swapped} 件裝備` : '';
   return r.locked ? `掛機中不換陣容，已依${what}調整天賦${gear}` : `已依${what}備戰：${roles}${gear}`;
+}
+
+function gearMsg(g) {
+  if (!g) return '';
+  const n = g.bag + g.stash + g.salvaged; if (!n) return '';
+  return `；卸下 ${n} 件裝備${g.stash ? `（${g.stash} 件進戰利品箱）` : ''}${g.salvaged ? `（${g.salvaged} 件放不下已分解 +${fmt(g.gold)} 金）` : ''}`;
 }

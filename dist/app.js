@@ -1,4 +1,4 @@
-/* 副本團長 v0.7.2 */
+/* 副本團長 v0.7.3 */
 (() => {
   // src/core/config.js
   var CLASSES = {
@@ -261,7 +261,7 @@
     hirePerLevel: 25,
     refreshCost: 10,
     partyMax: 5,
-    rosterMax: 15,
+    rosterMax: 30,
     bagMax: 50,
     // bagMax = 起始格數，達成里程碑再擴充（見 BAG_MILESTONES）
     stashMax: 100,
@@ -1193,15 +1193,42 @@
     if (partyLocked(s)) return false;
     s.party = s.party.filter((x) => x !== id);
   }
-  function fireHero(s, id) {
+  function fireHero(s, id, gear = { bag: 0, stash: 0, salvaged: 0, gold: 0 }) {
     const h = s.heroes.find((x) => x.id === id);
     if (!h || partyLocked(s) && s.party.includes(id)) return null;
-    for (const sl in h.gear) if (h.gear[sl]) s.bag.push(h.gear[sl]);
+    for (const sl in h.gear) {
+      const iid = h.gear[sl];
+      if (!iid) continue;
+      h.gear[sl] = null;
+      if (s.bag.length < bagMax(s)) {
+        s.bag.push(iid);
+        gear.bag++;
+      } else if (s.stash.length < ECONOMY.stashMax) {
+        s.stash.push(iid);
+        gear.stash++;
+      } else {
+        s.bag.push(iid);
+        gear.gold += salvage(s, iid);
+        gear.salvaged++;
+      }
+    }
     s.heroes = s.heroes.filter((x) => x.id !== id);
     s.party = s.party.filter((x) => x !== id);
     const refund = Math.round(hireCost(h) * RECRUIT.fireRefund);
     s.gold += refund;
-    return { ...h, refund };
+    return { ...h, refund, gear };
+  }
+  function fireTargets(s, maxRarity) {
+    const list = s.heroes.filter((h) => !s.party.includes(h.id) && !h.legend && (h.rarity || 0) <= Math.min(maxRarity, 3));
+    return list.length >= s.heroes.length ? list.slice(0, s.heroes.length - 1) : list;
+  }
+  function fireMany(s, maxRarity, dry = false) {
+    const list = fireTargets(s, maxRarity);
+    if (dry) return { count: list.length, refund: list.reduce((g, h) => g + Math.round(hireCost(h) * RECRUIT.fireRefund), 0) };
+    const gear = { bag: 0, stash: 0, salvaged: 0, gold: 0 };
+    let refund = 0;
+    for (const h of list) refund += fireHero(s, h.id, gear).refund;
+    return { count: list.length, refund, gear };
   }
   var bagMax = (s) => ECONOMY.bagMax + BAG_PER_MILESTONE * BAG_MILESTONES.filter((m) => m.test(s)).length;
   function newBagMilestones(s) {
@@ -1599,7 +1626,7 @@
   }
 
   // src/core/version.js
-  var VERSION = "0.7.2";
+  var VERSION = "0.7.3";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -1836,7 +1863,7 @@
     }).join("")}</div>
     <div class="comp"><span><b style="color:var(--tank)">\u5766\u514B</b> ${c.tank}</span><span><b style="color:var(--heal)">\u6CBB\u7642</b> ${c.heal}</span><span><b style="color:var(--dps)">\u8F38\u51FA</b> ${c.dps}</span><span>\u6230\u529B <b class="num" style="color:var(--fg)">${fmt(partyPower())}</b></span>
     ${!c.tank ? '<span style="color:var(--warn)">\u7F3A\u5766\u514B</span>' : ""}${!c.heal ? '<span style="color:var(--warn)">\u7F3A\u6CBB\u7642</span>' : ""}</div>
-    <h2 style="font-size:18px">\u540D\u518A <span class="sub num">${app.S.heroes.length}/${ECONOMY.rosterMax}</span></h2><div class="stack">`;
+    <h2 style="font-size:18px">\u540D\u518A <span class="sub num">${app.S.heroes.length}/${ECONOMY.rosterMax}</span></h2>${fireBar()}<div class="stack">`;
     const sorted = [...app.S.heroes].sort((a, b) => inParty(b) - inParty(a) || (b.rarity || 0) - (a.rarity || 0) || b.level - a.level);
     for (const x of sorted) h += heroCard(x);
     h += `</div>` + (enabled() ? `<h2 style="font-size:18px">\u610F\u898B\u56DE\u994B</h2><div class="settings">
@@ -1854,6 +1881,12 @@
     <span class="tag ${inParty(x) ? "in" : ""}">${inParty(x) ? "\u51FA\u6230\u4E2D" : "\u5F85\u547D"}</span>
     <div class="st num"><span>\u751F\u547D ${fmt(st.hp)}</span><span>\u5A01\u529B ${st.pow}</span><span>\u66B4\u64CA ${Math.round(st.crit * 100)}%</span><span>\u88DD\u7B49 ${heroIlvl(x, app.S.items)}</span></div>
     <div class="xpbar"><i style="width:${x.level >= HERO.maxLevel ? 100 : pct(x.xp, need)}%"></i></div></button>`;
+  }
+  function fireBar() {
+    const sel = app.fireSel ?? 0, d = fireMany(app.S, sel, true);
+    return `<div class="toolbar"><label class="selwrap"><span>\u89E3\u96C7\u5F85\u547D</span><select id="fireSel" aria-label="\u89E3\u96C7\u54C1\u8CEA">${[0, 1, 2, 3].map((r) => `<option value="${r}" ${sel === r ? "selected" : ""}>${HERO_RARITY[r].name}${r ? "\u4EE5\u4E0B" : ""}</option>`).join("")}</select></label>
+    <button class="btn sm ${app.fireConfirm ? "danger" : ""}" data-act="firemany" ${d.count ? "" : "disabled"}>${!d.count ? "\u6C92\u6709\u7B26\u5408\u7684\u82F1\u96C4" : app.fireConfirm ? `\u78BA\u5B9A\u89E3\u96C7 ${d.count} \u4EBA\uFF1F\u9000 ${fmt(d.refund)} \u91D1` : `\u4E00\u9375\u89E3\u96C7\uFF08${d.count} \u4EBA\uFF09`}</button></div>
+    <p class="sub" style="margin:4px 0 8px">\u53EA\u89E3\u96C7\u5F85\u547D\u4E2D\u7684\u82F1\u96C4\uFF0C\u50B3\u8AAA\u4E0D\u6703\u88AB\u9078\u5230\uFF1B\u8EAB\u4E0A\u88DD\u5099\u81EA\u52D5\u5378\u56DE\u80CC\u5305\u3002</p>`;
   }
 
   // src/ui/views/bag.js
@@ -2159,6 +2192,7 @@
     }
     const a = t.dataset.act, id = t.dataset.id;
     if (a !== "salvageupto") app.salvConfirm = false;
+    if (a !== "firemany") app.fireConfirm = false;
     switch (a) {
       case "fight":
         stopIdleFor(+t.dataset.d);
@@ -2328,7 +2362,20 @@
         }
         const x = fireHero(app.S, id);
         app.modal = null;
-        if (x) toast(`${x.name} \u96E2\u958B\u4E86\u5718\u968A\uFF0C\u9000\u9084 ${x.refund} \u91D1`);
+        if (x) toast(`${x.name} \u96E2\u958B\u4E86\u5718\u968A\uFF0C\u9000\u9084 ${x.refund} \u91D1${gearMsg(x.gear)}`);
+        save();
+        break;
+      }
+      case "firemany": {
+        const n = fireMany(app.S, app.fireSel ?? 0, true).count;
+        if (!n) break;
+        if (!app.fireConfirm) {
+          app.fireConfirm = true;
+          break;
+        }
+        app.fireConfirm = false;
+        const r = fireMany(app.S, app.fireSel ?? 0);
+        toast(`\u89E3\u96C7 ${r.count} \u4F4D\u82F1\u96C4\uFF0C\u9000\u9084 ${fmt(r.refund)} \u91D1${gearMsg(r.gear)}`);
         save();
         break;
       }
@@ -2537,6 +2584,11 @@
       app.salvConfirm = false;
       render();
     }
+    if (e.target.id === "fireSel") {
+      app.fireSel = +e.target.value;
+      app.fireConfirm = false;
+      render();
+    }
   });
   function showDraw(list, cost) {
     const sorted = [...list].sort((a, b) => (b.rarity || 0) - (a.rarity || 0)), best = sorted[0].rarity || 0;
@@ -2575,5 +2627,11 @@
   function prepMsg(r, what) {
     const roles = `\u5766 ${r.roles.tank}\u30FB\u88DC ${r.roles.heal}\u30FB\u8F38\u51FA ${r.roles.dps}`, gear = r.swapped ? `\uFF0C\u63DB\u4E0A ${r.swapped} \u4EF6\u88DD\u5099` : "";
     return r.locked ? `\u639B\u6A5F\u4E2D\u4E0D\u63DB\u9663\u5BB9\uFF0C\u5DF2\u4F9D${what}\u8ABF\u6574\u5929\u8CE6${gear}` : `\u5DF2\u4F9D${what}\u5099\u6230\uFF1A${roles}${gear}`;
+  }
+  function gearMsg(g) {
+    if (!g) return "";
+    const n = g.bag + g.stash + g.salvaged;
+    if (!n) return "";
+    return `\uFF1B\u5378\u4E0B ${n} \u4EF6\u88DD\u5099${g.stash ? `\uFF08${g.stash} \u4EF6\u9032\u6230\u5229\u54C1\u7BB1\uFF09` : ""}${g.salvaged ? `\uFF08${g.salvaged} \u4EF6\u653E\u4E0D\u4E0B\u5DF2\u5206\u89E3 +${fmt(g.gold)} \u91D1\uFF09` : ""}`;
   }
 })();

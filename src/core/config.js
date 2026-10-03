@@ -171,7 +171,7 @@ export const ECONOMY = {
   startGold: 60,
   hireBase: 30, hirePerLevel: 25,
   refreshCost: 10,
-  partyMax: 5, rosterMax: 15, bagMax: 50, // bagMax = 起始格數，達成里程碑再擴充（見 BAG_MILESTONES）
+  partyMax: 5, rosterMax: 30, bagMax: 50, // bagMax = 起始格數，達成里程碑再擴充（見 BAG_MILESTONES）
   stashMax: 100,                    // 戰利品箱：背包滿時暫存，需手動取出
   defaultKeepRarity: 2,             // 背包滿後只保留此品質以上（2 = 稀有）
   offlineCapHours: 8,

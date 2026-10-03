@@ -17,7 +17,7 @@ export function viewTeam() {
     }).join('')}</div>
     <div class="comp"><span><b style="color:var(--tank)">坦克</b> ${c.tank}</span><span><b style="color:var(--heal)">治療</b> ${c.heal}</span><span><b style="color:var(--dps)">輸出</b> ${c.dps}</span><span>戰力 <b class="num" style="color:var(--fg)">${fmt(partyPower())}</b></span>
     ${!c.tank ? '<span style="color:var(--warn)">缺坦克</span>' : ''}${!c.heal ? '<span style="color:var(--warn)">缺治療</span>' : ''}</div>
-    <h2 style="font-size:18px">名冊 <span class="sub num">${app.S.heroes.length}/${G.ECONOMY.rosterMax}</span></h2><div class="stack">`;
+    <h2 style="font-size:18px">名冊 <span class="sub num">${app.S.heroes.length}/${G.ECONOMY.rosterMax}</span></h2>${fireBar()}<div class="stack">`;
   const sorted = [...app.S.heroes].sort((a, b) => (inParty(b) - inParty(a)) || (b.rarity || 0) - (a.rarity || 0) || b.level - a.level);
   for (const x of sorted) h += heroCard(x);
   h += `</div>` + (enabled() ? `<h2 style="font-size:18px">意見回饋</h2><div class="settings">
@@ -35,4 +35,11 @@ function heroCard(x) {
     <span class="tag ${inParty(x) ? 'in' : ''}">${inParty(x) ? '出戰中' : '待命'}</span>
     <div class="st num"><span>生命 ${fmt(st.hp)}</span><span>威力 ${st.pow}</span><span>暴擊 ${Math.round(st.crit * 100)}%</span><span>裝等 ${G.heroIlvl(x, app.S.items)}</span></div>
     <div class="xpbar"><i style="width:${x.level >= G.HERO.maxLevel ? 100 : pct(x.xp, need)}%"></i></div></button>`;
+}
+// 一鍵解雇：只解雇待命英雄（出戰中、傳說不會被選到），裝備自動卸下
+function fireBar() {
+  const sel = app.fireSel ?? 0, d = G.fireMany(app.S, sel, true);
+  return `<div class="toolbar"><label class="selwrap"><span>解雇待命</span><select id="fireSel" aria-label="解雇品質">${[0, 1, 2, 3].map(r => `<option value="${r}" ${sel === r ? 'selected' : ''}>${G.HERO_RARITY[r].name}${r ? '以下' : ''}</option>`).join('')}</select></label>
+    <button class="btn sm ${app.fireConfirm ? 'danger' : ''}" data-act="firemany" ${d.count ? '' : 'disabled'}>${!d.count ? '沒有符合的英雄' : app.fireConfirm ? `確定解雇 ${d.count} 人？退 ${fmt(d.refund)} 金` : `一鍵解雇（${d.count} 人）`}</button></div>
+    <p class="sub" style="margin:4px 0 8px">只解雇待命中的英雄，傳說不會被選到；身上裝備自動卸回背包。</p>`;
 }
