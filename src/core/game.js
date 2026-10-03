@@ -5,9 +5,10 @@ import { R, rnd, rint, pick } from './rng.js';
 import { makeItem, rollRarity, itemScore, salvageValue, upgradeCost } from './items.js';
 import { makeHero, gainXp } from './heroes.js';
 import { dungeonInfo } from './dungeons.js';
+import { SPECS, TALENT_ROWS, SPEC_LEVEL } from './talents.js';
 import { Battle } from './battle.js';
 
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 export const hireCost = h => ECONOMY.hireBase + ECONOMY.hirePerLevel * h.level;
 
 // ---------- 獎勵 ----------
@@ -46,6 +47,8 @@ export function migrate(s) {
   delete s.autoSalvageCommon;
   if (s.keepRarity == null) s.keepRarity = ECONOMY.defaultKeepRarity;
   s.stash = s.stash || [];
+  // v2 → v3：英雄加入專精與天賦（舊英雄先留空，等玩家自己選）
+  for (const h of [...s.heroes, ...(s.tavern || [])]) { if (h.spec === undefined) h.spec = null; h.talents = h.talents || {}; }
   s.v = SAVE_VERSION;
   return s;
 }
@@ -56,7 +59,13 @@ const avgLevel = list => list.length ? list.reduce((a, h) => a + h.level, 0) / l
 
 export function rollTavern(s) {
   const L = Math.max(1, Math.round(avgLevel(s.heroes)) - 1);
-  s.tavern = Array.from({ length: 3 }, () => makeHero(pick(Object.keys(CLASSES)), Math.max(1, L + rint(-1, 0))));
+  s.tavern = Array.from({ length: 3 }, () => {
+    const h = makeHero(pick(Object.keys(CLASSES)), Math.max(1, L + rint(-1, 0)));
+    // 高等級的新英雄自帶隨機專精與天賦（招募後可以自己改）
+    if (h.level >= SPEC_LEVEL) h.spec = pick(Object.keys(SPECS[h.cls]));
+    for (const lv of TALENT_ROWS) if (h.level >= lv) h.talents[lv] = pick(['a', 'b']);
+    return h;
+  });
 }
 export function hire(s, heroId) {
   const h = s.tavern.find(x => x.id === heroId), cost = h && hireCost(h);
@@ -170,7 +179,7 @@ export function offlineProgress(s, now = Date.now()) {
   if (sec < 60 || !partyHeroes(s).length) return null;
   let t = 0, runs = 0, wins = 0, gold = 0, items = 0, stashed = 0, lv = 0;
   while (runs < 400) {
-    const b = new Battle(partyHeroes(s), s.items, s.idle).runToEnd();
+    const b = new Battle(partyHeroes(s), s.items, s.idle, { autoHorn: true }).runToEnd();
     t += b.tick + 5; if (t > sec) break;
     const r = applyResult(s, s.idle, b);
     runs++; if (b.win) wins++; gold += r.gold; items += r.kept.length; stashed += r.stashed.length; lv += r.lvUps.length;

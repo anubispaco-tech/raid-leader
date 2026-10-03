@@ -71,15 +71,18 @@ export const DUNGEONS = [
   { name: '龍眠高塔', boss: '遠古紅龍', trash: '龍人衛士', mech: [{ t: 'pulse', every: 7, dmg: 1.0 }, { t: 'buster', every: 9, mult: 3.2 }, { t: 'enrage', at: 70, mult: 3 }], tip: '全機制 → 全隊綜合考驗' },
 ];
 export const DUNGEON = {
-  hpGrowth: 1.9, atkGrowth: 1.7,    // 每層敵人生命 / 攻擊倍率
+  hpGrowth: 2.15, atkGrowth: 1.82,  // 每層敵人生命 / 攻擊倍率（v0.3 天賦上線後調高）
   difficulty: [1, 1.1, 1, 1.4, 1, 1.35, 1], // 個別層加難
-  recLevel: [1, 2, 4, 6, 10, 13, 17],       // 建議等級（模擬首通時的等級）
+  recLevel: [1, 2, 3, 5, 10, 14, 19],       // 建議等級（v0.3 模擬首通時的等級）
   dropBase: 6, dropGrowth: 1.5,     // 掉落裝等 = base × growth^層
   trash: { count: 3, hp: 85, atk: 6.5 },
   boss: { hp: 850, atk: 13, addHp: 70, addAtk: 5 },
   maxTicks: 240,                    // 超過即失敗（秒）
   waveHeal: 0.5,                    // 波與波之間回血比例
 };
+
+// ---------- 團長指令 ----------
+export const RAID_HORN = { name: '英勇號角', dur: 15, bonus: 0.3 }; // 每場一次，全隊傷害與治療 +30%
 
 // ---------- 獎勵與經濟 ----------
 export const REWARD = {
