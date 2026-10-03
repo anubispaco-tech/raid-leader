@@ -1,4 +1,4 @@
-const G=require('../src/core.js');
+import * as G from '../src/core/index.js';
 function party(classes, lv, ilvl){ const items={}; return {heroes:classes.map(c=>{const h=G.makeHero(c,lv); for(const sl of ['weapon','armor','trinket']){const it=G.makeItem(sl,ilvl,1); items[it.id]=it; h.gear[sl]=it.id;} return h;}), items}; }
 const comps={'標準':['guardian','cleric','rogue','mage','mage'],'無坦':['cleric','rogue','rogue','mage','mage'],'無補':['guardian','rogue','rogue','mage','mage'],'3盜':['guardian','cleric','rogue','rogue','rogue'],'3法':['guardian','cleric','mage','mage','mage'],'雙補':['guardian','cleric','cleric','rogue','mage'],'雙坦':['guardian','guardian','cleric','rogue','mage']};
 const wr=(c,d,lv,il,n=150)=>{let w=0;for(let i=0;i<n;i++){const p=party(c,lv,il); if(new G.Battle(p.heroes,p.items,d).runToEnd().win) w++;} return Math.round(100*w/n);};

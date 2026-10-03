@@ -1,11 +1,11 @@
-const G = require('../src/core.js');
+import * as G from '../src/core/index.js';
 function playthrough(maxRuns=1500){
   const s = G.newGame(); let log=[]; let firstClearRun={};
   for(let run=0; run<maxRuns; run++){
     const want = s.party.length<5 ? (s.heroes.some(h=>h.cls==='mage')?'rogue':'mage') : null;
     if(want){ const t=s.tavern.find(h=>h.cls===want)||null;
       if(t && s.gold>=G.hireCost(t)){ s.gold-=G.hireCost(t); s.heroes.push(t); s.party.push(t.id); s.tavern=s.tavern.filter(x=>x!==t); G.rollTavern(s);}
-      else if(!t && s.gold>=G.REFRESH_COST+80){ s.gold-=G.REFRESH_COST; G.rollTavern(s);} }
+      else if(!t && s.gold>=G.ECONOMY.refreshCost+80){ s.gold-=G.ECONOMY.refreshCost; G.rollTavern(s);} }
     for(const h of G.partyHeroes(s)) for(const sl of ['weapon','armor','trinket']){ const id=h.gear[sl]; if(id && s.gold>300) G.upgrade(s,id); }
     G.autoEquip(s);
     for(const id of [...s.bag]) if(s.bag.length>20) G.salvage(s,id);

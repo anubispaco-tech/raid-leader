@@ -1,0 +1,1406 @@
+<title>副本團長</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: 手機優先的「公會作戰桌」——頂部資源列、單欄內容、底部分頁列；刻意單一深色主題（夜間火把下的石板＋黃銅） */
+:root{
+  color-scheme: dark;
+  --bg:#12161d; --panel:#1b212b; --panel2:#222a36; --line:#2e3846; --fg:#e8e2d2; --muted:#8e97a6; --dim:#5d6676;
+  --brass:#d0a44c; --brass-d:#8a6a2a; --ink:#12161d;
+  --tank:#5d8ff0; --heal:#4fc17f; --dps:#e3664f; --warn:#f0b54a; --bad:#e5534b; --good:#57c78a;
+  --r0:#9ca3af; --r1:#38c172; --r2:#4b8df5; --r3:#b46cf2;
+  --f-display:"Noto Serif TC","Songti TC",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-num:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  background-image:radial-gradient(120% 60% at 50% -10%, #2a2416 0%, transparent 60%);background-attachment:fixed}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.app{max-width:560px;margin:0 auto;padding-inline:16px;padding-block:0 96px}
+
+/* 頂部資源列 */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);
+  margin-inline:-16px;padding:12px 16px 10px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:900;font-size:20px;letter-spacing:.08em;color:var(--brass);white-space:nowrap}
+.res{margin-left:auto;display:flex;gap:10px;align-items:center;font-size:13px}
+.res .pill{display:flex;gap:6px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.coin{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe39a,var(--brass) 60%,var(--brass-d))}
+.idlechip{font-size:12px;color:var(--good);border:1px solid color-mix(in srgb,var(--good) 50%,transparent);border-radius:999px;padding:2px 8px;white-space:nowrap}
+.idlechip::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--good);margin-right:6px;vertical-align:middle;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.25}}
+
+h2{font-family:var(--f-display);font-weight:700;font-size:22px;margin:22px 0 4px;letter-spacing:.04em;text-wrap:balance}
+.sub{color:var(--muted);font-size:13px;margin:0 0 14px}
+.label{font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+
+/* 副本卡 */
+.dlist{display:grid;gap:10px}
+.dg{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;grid-template-columns:44px 1fr;gap:4px 12px}
+.dg.locked{opacity:.45}
+.dg .tier{grid-row:span 3;font-family:var(--f-display);font-weight:900;font-size:26px;color:var(--brass);text-align:center;line-height:1;padding-top:4px;border-right:1px solid var(--line)}
+.dg .tier small{display:block;font-family:var(--f-body);font-size:10px;letter-spacing:.1em;color:var(--muted);font-weight:500;margin-top:4px}
+.dg h3{margin:0;font-size:17px;font-weight:700;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.dg h3 .boss{font-size:13px;color:var(--muted);font-weight:500}
+.dg .tip{font-size:13px;color:var(--fg);opacity:.85}
+.meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted)}
+.meta b{color:var(--fg);font-weight:500}
+.meta .ok{color:var(--good)} .meta .low{color:var(--warn)}
+.dg .acts{grid-column:1/-1;display:flex;gap:8px;margin-top:8px}
+.btn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-size:14px;font-weight:500}
+.btn:hover{border-color:var(--dim)}
+.btn.main{background:var(--brass);border-color:var(--brass);color:var(--ink);font-weight:700}
+.btn.main:hover{filter:brightness(1.08)}
+.btn.on{border-color:var(--good);color:var(--good)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn.sm{padding:5px 10px;font-size:13px}
+.btn.grow{flex:1}
+
+/* 戰鬥 */
+.bhead{display:flex;align-items:center;gap:10px;margin-top:16px}
+.bhead h2{margin:0;font-size:19px}
+.waves{display:flex;gap:4px;margin-left:auto}
+.waves i{width:22px;height:6px;border-radius:3px;background:var(--line)}
+.waves i.done{background:var(--brass-d)} .waves i.cur{background:var(--brass)}
+.arena{display:grid;gap:14px;margin-top:12px}
+.side{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:8px}
+.unit{display:grid;grid-template-columns:26px 1fr auto;gap:2px 8px;align-items:center}
+.unit .ic{grid-row:span 2;font-size:18px;text-align:center}
+.unit .nm{font-size:13px;display:flex;gap:6px;align-items:baseline}
+.unit .nm small{color:var(--muted);font-size:11px}
+.unit .hpn{font-size:11px;color:var(--muted)}
+.bar{grid-column:2/-1;height:8px;background:#0d1015;border-radius:4px;overflow:hidden;position:relative}
+.bar i{position:absolute;inset:0 auto 0 0;border-radius:4px;transition:width .25s}
+.unit.dead{opacity:.35}
+.unit.boss .bar{height:12px}
+.role-tank{background:var(--tank)} .role-heal{background:var(--heal)} .role-dps{background:var(--dps)}
+.enemy-bar{background:linear-gradient(90deg,#9b3a2e,var(--bad))}
+.log{margin-top:12px;background:#0e1117;border:1px solid var(--line);border-radius:10px;padding:10px 12px;height:150px;overflow-y:auto;font-size:12.5px;display:flex;flex-direction:column;gap:2px}
+.log p{margin:0;color:var(--muted)} .log .t{font-family:var(--f-num);color:var(--dim);margin-right:6px}
+.log .good{color:var(--good)} .log .bad{color:var(--bad)} .log .warn{color:var(--warn)} .log .info{color:var(--brass)}
+.ctrl{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{padding:6px 12px;font-size:13px;font-family:var(--f-num)}
+.seg button.sel{background:var(--brass);color:var(--ink);font-weight:700}
+
+.result{background:var(--panel);border:1px solid var(--brass-d);border-radius:12px;padding:16px;margin-top:14px;display:grid;gap:12px}
+.result h3{margin:0;font-family:var(--f-display);font-size:24px}
+.result.win h3{color:var(--brass)} .result.lose h3{color:var(--bad)}
+.rew{display:flex;gap:16px;flex-wrap:wrap;font-size:14px}
+.meter{display:grid;gap:5px}
+.mrow{display:grid;grid-template-columns:72px 1fr 64px;gap:8px;align-items:center;font-size:12px}
+.mrow .mb{height:14px;background:#0d1015;border-radius:3px;overflow:hidden}
+.mrow .mb i{display:block;height:100%}
+.empty{color:var(--muted);text-align:center;padding:40px 10px;border:1px dashed var(--line);border-radius:10px;margin-top:16px}
+
+/* 團隊 */
+.party{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.slot{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 4px;text-align:center;min-width:0}
+.slot.emptyslot{border-style:dashed;color:var(--dim);display:grid;place-items:center;font-size:12px}
+.slot .ic{font-size:22px}
+.slot .n{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slot .lv{font-size:11px;color:var(--muted)}
+.slot .rl{height:3px;border-radius:2px;margin:6px 8px 0}
+.comp{display:flex;gap:12px;font-size:12px;color:var(--muted);margin:8px 0 0;flex-wrap:wrap}
+.comp b{font-weight:500}
+.hero{display:grid;grid-template-columns:36px 1fr auto;gap:2px 10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;text-align:left;width:100%}
+.hero .ic{grid-row:span 2;font-size:22px;text-align:center}
+.hero .nm{font-weight:700;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.hero .nm small{font-weight:400;color:var(--muted);font-size:12px}
+.hero .st{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.hero .tag{grid-row:span 2;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.hero .tag.in{border-color:var(--brass-d);color:var(--brass)}
+.stack{display:grid;gap:8px}
+.xpbar{height:3px;background:#0d1015;border-radius:2px;overflow:hidden;grid-column:2/-1;margin-top:4px}
+.xpbar i{display:block;height:100%;background:var(--brass-d)}
+
+/* 背包 */
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.item{display:grid;grid-template-columns:1fr auto;gap:2px 10px;background:var(--panel);border:1px solid var(--line);border-left-width:3px;border-radius:8px;padding:9px 12px;text-align:left;width:100%}
+.item .in{font-weight:500;font-size:14px}
+.item .is{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.item .il{grid-row:span 2;align-self:center;font-size:12px;color:var(--muted);text-align:right}
+.item .il b{display:block;font-size:16px;color:var(--fg)}
+.rar0{border-left-color:var(--r0)} .rar1{border-left-color:var(--r1)} .rar2{border-left-color:var(--r2)} .rar3{border-left-color:var(--r3)}
+.c0{color:var(--r0)} .c1{color:var(--r1)} .c2{color:var(--r2)} .c3{color:var(--r3)}
+.up{color:var(--brass);font-family:var(--f-num);font-size:12px;margin-left:4px}
+.better{color:var(--good);font-size:11px;font-weight:700;margin-left:6px}
+
+/* 底部分頁 */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs nav{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.tabs button{padding:9px 0 8px;font-size:12px;color:var(--muted);display:grid;justify-items:center;gap:2px;position:relative}
+.tabs button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6}
+.tabs button.sel{color:var(--brass)}
+.tabs button .dot{position:absolute;top:6px;left:calc(50% + 8px);width:7px;height:7px;border-radius:50%;background:var(--good)}
+
+/* 底部抽屜 */
+.scrim{position:fixed;inset:0;background:rgba(5,7,10,.6);z-index:10;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--panel);border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0;width:100%;max-width:560px;max-height:86%;overflow-y:auto;
+  padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));display:grid;gap:12px;animation:rise .22s ease-out}
+@keyframes rise{from{transform:translateY(30px);opacity:.4}}
+.sheet h3{margin:0;font-family:var(--f-display);font-size:21px}
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.statgrid div{background:var(--panel2);border-radius:8px;padding:8px;text-align:center}
+.statgrid b{display:block;font-size:16px}
+.statgrid span{font-size:11px;color:var(--muted)}
+.gearrow{display:grid;grid-template-columns:44px 1fr auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.gearrow .sl{font-size:12px;color:var(--muted)}
+.choices{display:grid;gap:6px;max-height:260px;overflow-y:auto}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--brass-d);padding:8px 16px;border-radius:999px;font-size:13px;z-index:20;white-space:nowrap;animation:rise .2s}
+textarea{width:100%;min-height:90px;background:#0e1117;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:8px;font-family:var(--f-num);font-size:11px}
+.howto{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--muted);margin-top:4px}
+.howto b{color:var(--fg);font-weight:500}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<div class="app">
+  <header class="top">
+    <div class="brand">副本團長</div>
+    <div class="res">
+      <span id="idleChip" class="idlechip" hidden>掛機中</span>
+      <span class="pill num"><i class="coin"></i><span id="gold">0</span></span>
+    </div>
+  </header>
+  <main id="view"></main>
+</div>
+<div class="tabs"><nav id="tabs"></nav></div>
+<div id="modal"></div>
+<div id="toast"></div>
+<script>
+/* 副本團長 v0.2.0 */
+(() => {
+  // src/core/config.js
+  var CLASSES = {
+    guardian: {
+      name: "\u5B88\u8B77\u9A0E\u58EB",
+      role: "tank",
+      icon: "\u{1F6E1}\uFE0F",
+      hp: 230,
+      hpL: 42,
+      pow: 6,
+      powL: 1.5,
+      armor: 0.45,
+      crit: 0.05,
+      desc: "\u5632\u8AF7\u6240\u6709\u6575\u4EBA\uFF0C\u627F\u53D7\u50B7\u5BB3\u3002\u8B77\u7532\u6E1B\u50B7 45%\u3002"
+    },
+    cleric: {
+      name: "\u8056\u5149\u7267\u5E2B",
+      role: "heal",
+      icon: "\u2728",
+      hp: 130,
+      hpL: 22,
+      pow: 9,
+      powL: 2,
+      armor: 0.15,
+      crit: 0.05,
+      desc: "\u6CBB\u7642\u8840\u91CF\u6700\u4F4E\u7684\u968A\u53CB\uFF0C\u6BCF 5 \u79D2\u7FA4\u9AD4\u6CBB\u7642\u3002"
+    },
+    rogue: {
+      name: "\u6697\u5F71\u76DC\u8CCA",
+      role: "dps",
+      icon: "\u{1F5E1}\uFE0F",
+      hp: 140,
+      hpL: 24,
+      pow: 10,
+      powL: 2.3,
+      armor: 0.2,
+      crit: 0.15,
+      desc: "\u55AE\u9AD4\u7206\u767C\uFF0C\u66B4\u64CA\u7387\u9AD8\u3002\u64C5\u9577\u6253\u738B\u3002"
+    },
+    mage: {
+      name: "\u5967\u8853\u6CD5\u5E2B",
+      role: "dps",
+      icon: "\u{1F525}",
+      hp: 115,
+      hpL: 19,
+      pow: 9,
+      powL: 2.1,
+      armor: 0.1,
+      crit: 0.08,
+      desc: "\u7BC4\u570D\u50B7\u5BB3\uFF0C\u540C\u6642\u653B\u64CA\u6240\u6709\u6575\u4EBA\u3002\u64C5\u9577\u6E05\u5C0F\u602A\u3002"
+    }
+  };
+  var ROLE_NAME = { tank: "\u5766\u514B", heal: "\u6CBB\u7642", dps: "\u8F38\u51FA" };
+  var CLASS_AI = {
+    tank: { hit: 0.8 },
+    heal: { single: 1.9, critMult: 1.5, groupEvery: 5, group: 0.75, groupBelow: 0.9, idleHit: 0.5 },
+    rogue: { hit: 1.3 },
+    mage: { aoe: 0.72, single: 1 }
+  };
+  var HERO = {
+    maxLevel: 40,
+    xpBase: 60,
+    xpExp: 1.8,
+    // 升級所需經驗 = xpBase × 等級^xpExp
+    names: [
+      "\u827E\u502B",
+      "\u51F1\u8389",
+      "\u96F7\u6069",
+      "\u7C73\u62C9",
+      "\u7D22\u6069",
+      "\u4F0A\u8587",
+      "\u5DF4\u9813",
+      "\u59AE\u96C5",
+      "\u6258\u723E",
+      "\u83F2\u6B50",
+      "\u9054\u514B",
+      "\u9732\u5A1C",
+      "\u845B\u96F7",
+      "\u5E0C\u62C9",
+      "\u5967\u5FB7",
+      "\u8587\u7D72",
+      "\u5E03\u862D",
+      "\u5361\u73CA",
+      "\u6D1B\u514B",
+      "\u827E\u7433",
+      "\u8CBB\u6069",
+      "\u8309\u5152",
+      "\u8CFD\u52D2",
+      "\u6735\u62C9"
+    ],
+    starters: ["guardian", "cleric", "rogue"]
+  };
+  var RARITY = [
+    { name: "\u666E\u901A", mult: 1, color: "#9ca3af", weight: 0.55 },
+    { name: "\u7CBE\u826F", mult: 1.2, color: "#22c55e", weight: 0.3 },
+    { name: "\u7A00\u6709", mult: 1.45, color: "#3b82f6", weight: 0.12 },
+    { name: "\u53F2\u8A69", mult: 1.75, color: "#a855f7", weight: 0.03 }
+  ];
+  var SLOTS = { weapon: "\u6B66\u5668", armor: "\u8B77\u7532", trinket: "\u98FE\u54C1" };
+  var SLOT_STATS = {
+    weapon: { pow: 0.6, sta: 1 },
+    armor: { pow: 0.15, sta: 3 },
+    trinket: { pow: 0.35, sta: 1 }
+  };
+  var SLOT_NAMES = {
+    weapon: ["\u9577\u528D", "\u6CD5\u6756", "\u5315\u9996", "\u6230\u9318", "\u6B0A\u6756", "\u77ED\u5F13"],
+    armor: ["\u9396\u7532", "\u6CD5\u888D", "\u76AE\u7532", "\u677F\u7532", "\u6597\u7BF7"],
+    trinket: ["\u8B77\u7B26", "\u6212\u6307", "\u5FBD\u8A18", "\u5BF6\u73E0", "\u9805\u934A"]
+  };
+  var PREFIX = ["", "\u5805\u6BC5\u7684", "\u92B3\u5229\u7684", "\u707C\u71B1\u7684", "\u5BD2\u971C\u7684", "\u865B\u7A7A\u7684", "\u9060\u53E4\u7684", "\u9F8D\u9C57\u7684"];
+  var GEAR = {
+    maxUp: 5,
+    upBonus: 0.08,
+    // 每級強化屬性 +8%
+    upCostBase: 15,
+    // 強化費用 = base × (等級+1) × (1 + 裝等/10)
+    salvageMult: 1.5,
+    // 分解金幣 = 裝等 × 稀有度倍率 × salvageMult
+    staToHp: 2
+    // 1 耐力 = 2 生命
+  };
+  var DUNGEONS = [
+    { name: "\u8150\u6839\u6D1E\u7A9F", boss: "\u8611\u83C7\u9818\u4E3B", trash: "\u5B62\u5B50\u83C7", mech: [{ t: "pulse", every: 7, dmg: 0.9 }], tip: "\u5B9A\u671F\u5674\u767C\u5B62\u5B50\u50B7\u5BB3\u5168\u968A \u2192 \u8003\u9A57\u6CBB\u7642" },
+    { name: "\u93FD\u8755\u7926\u5751", boss: "\u7926\u5751\u5DE8\u50CF", trash: "\u7926\u5751\u72D7\u982D\u4EBA", mech: [{ t: "buster", every: 8, mult: 3.2 }], tip: "\u91CD\u64CA\u5766\u514B \u2192 \u8003\u9A57\u5766\u514B\u8840\u91CF\u8207\u8B77\u7532" },
+    { name: "\u6C89\u6C92\u795E\u6BBF", boss: "\u6F6E\u6C50\u796D\u53F8", trash: "\u6DF1\u6DF5\u9B5A\u4EBA", mech: [{ t: "summon", every: 10, n: 2 }], tip: "\u4E0D\u65B7\u53EC\u559A\u5C0F\u602A \u2192 \u8003\u9A57\u7BC4\u570D\u8F38\u51FA" },
+    { name: "\u7070\u71FC\u8981\u585E", boss: "\u7194\u706B\u7763\u8ECD", trash: "\u7194\u5CA9\u885B\u5175", mech: [{ t: "enrage", at: 55, mult: 3 }], tip: "55 \u79D2\u5F8C\u72C2\u66B4 \u2192 \u8003\u9A57\u8F38\u51FA" },
+    { name: "\u971C\u8A9E\u5893\u7A74", boss: "\u5BD2\u971C\u5DEB\u5996", trash: "\u9AB7\u9ACF\u6230\u58EB", mech: [{ t: "pulse", every: 6, dmg: 1 }, { t: "summon", every: 12, n: 2 }], tip: "\u5BD2\u51B0\u8108\u885D\uFF0B\u53EC\u559A\u9AB7\u9ACF \u2192 \u6CBB\u7642\u8207\u7BC4\u570D" },
+    { name: "\u865B\u7A7A\u88C2\u9699", boss: "\u865B\u7A7A\u541E\u566C\u8005", trash: "\u865B\u7A7A\u884C\u8005", mech: [{ t: "buster", every: 7, mult: 3.5 }, { t: "enrage", at: 60, mult: 3 }], tip: "\u91CD\u64CA\uFF0B\u72C2\u66B4 \u2192 \u5766\u514B\u8207\u8F38\u51FA" },
+    { name: "\u9F8D\u7720\u9AD8\u5854", boss: "\u9060\u53E4\u7D05\u9F8D", trash: "\u9F8D\u4EBA\u885B\u58EB", mech: [{ t: "pulse", every: 7, dmg: 1 }, { t: "buster", every: 9, mult: 3.2 }, { t: "enrage", at: 70, mult: 3 }], tip: "\u5168\u6A5F\u5236 \u2192 \u5168\u968A\u7D9C\u5408\u8003\u9A57" }
+  ];
+  var DUNGEON = {
+    hpGrowth: 1.9,
+    atkGrowth: 1.7,
+    // 每層敵人生命 / 攻擊倍率
+    difficulty: [1, 1.1, 1, 1.4, 1, 1.35, 1],
+    // 個別層加難
+    recLevel: [1, 2, 4, 6, 10, 13, 17],
+    // 建議等級（模擬首通時的等級）
+    dropBase: 6,
+    dropGrowth: 1.5,
+    // 掉落裝等 = base × growth^層
+    trash: { count: 3, hp: 85, atk: 6.5 },
+    boss: { hp: 850, atk: 13, addHp: 70, addAtk: 5 },
+    maxTicks: 240,
+    // 超過即失敗（秒）
+    waveHeal: 0.5
+    // 波與波之間回血比例
+  };
+  var REWARD = {
+    goldBase: 25,
+    goldPerTier: 18,
+    xpBase: 35,
+    xpExp: 1.7,
+    loseMult: 0.3,
+    // 失敗時金幣經驗比例
+    doubleDropChance: 0.35,
+    firstClearMinRarity: 2,
+    // 首通保底稀有
+    decayGrace: 4,
+    decayPerLevel: 0.25,
+    decayFloor: 0.05
+    // 等級壓制
+  };
+  var ECONOMY = {
+    startGold: 60,
+    hireBase: 30,
+    hirePerLevel: 25,
+    refreshCost: 10,
+    partyMax: 5,
+    rosterMax: 10,
+    bagMax: 40,
+    offlineCapHours: 8
+  };
+
+  // src/core/rng.js
+  var R = Math.random;
+  var rnd = (a, b) => a + R() * (b - a);
+  var rint = (a, b) => Math.floor(rnd(a, b + 1));
+  var pick = (arr) => arr[Math.floor(R() * arr.length)];
+  var uid = () => Math.random().toString(36).slice(2, 9);
+
+  // src/core/items.js
+  function makeItem(slot, ilvl, rarity) {
+    const B = ilvl * RARITY[rarity].mult, w = SLOT_STATS[slot];
+    const v = () => rnd(0.9, 1.1);
+    const crit = slot === "trinket" && rarity >= 2 ? 0.01 * rarity + 0.01 : 0;
+    const pre = PREFIX[Math.min(PREFIX.length - 1, Math.floor(ilvl / 6))];
+    return {
+      id: uid(),
+      slot,
+      ilvl,
+      rarity,
+      up: 0,
+      pow: Math.round(B * w.pow * v()),
+      sta: Math.round(B * w.sta * v()),
+      crit,
+      name: pre + pick(SLOT_NAMES[slot])
+    };
+  }
+  function rollRarity(minR = 0) {
+    let x = R(), r = 0;
+    for (let i = RARITY.length - 1; i >= 0; i--) {
+      x -= RARITY[i].weight;
+      if (x < 0) {
+        r = i;
+        break;
+      }
+    }
+    return Math.max(r, minR);
+  }
+  var upMult = (it) => 1 + GEAR.upBonus * (it.up || 0);
+  var itemPow = (it) => Math.round(it.pow * upMult(it));
+  var itemSta = (it) => Math.round(it.sta * upMult(it));
+  var itemScore = (it) => it.ilvl * RARITY[it.rarity].mult * upMult(it);
+  var salvageValue = (it) => Math.round(it.ilvl * RARITY[it.rarity].mult * GEAR.salvageMult);
+  var upgradeCost = (it) => Math.round(GEAR.upCostBase * (it.up + 1) * (1 + it.ilvl / 10));
+
+  // src/core/heroes.js
+  var xpNeed = (L) => Math.round(HERO.xpBase * Math.pow(L, HERO.xpExp));
+  function makeHero(cls2, level = 1) {
+    return { id: uid(), cls: cls2, name: pick(HERO.names), level, xp: 0, gear: { weapon: null, armor: null, trinket: null } };
+  }
+  var gearOf = (h, items) => Object.keys(SLOTS).map((s) => h.gear[s] && items[h.gear[s]]).filter(Boolean);
+  function heroStats(h, items) {
+    const c = CLASSES[h.cls];
+    let pow = c.pow + c.powL * (h.level - 1), hp = c.hp + c.hpL * (h.level - 1), crit = c.crit;
+    for (const it of gearOf(h, items)) {
+      pow += itemPow(it);
+      hp += itemSta(it) * GEAR.staToHp;
+      crit += it.crit;
+    }
+    return { pow: Math.round(pow), hp: Math.round(hp), crit: Math.min(0.5, crit), armor: c.armor };
+  }
+  function heroIlvl(h, items) {
+    return Math.round(gearOf(h, items).reduce((a, it) => a + it.ilvl, 0) / Object.keys(SLOTS).length);
+  }
+  function heroPower(h, items) {
+    const s = heroStats(h, items);
+    return Math.round(s.pow * 10 * (1 + s.crit) + s.hp * 0.5);
+  }
+  function gainXp(h, xp) {
+    if (h.level >= HERO.maxLevel) return 0;
+    let ups = 0;
+    h.xp += xp;
+    while (h.level < HERO.maxLevel && h.xp >= xpNeed(h.level)) {
+      h.xp -= xpNeed(h.level);
+      h.level++;
+      ups++;
+    }
+    if (h.level >= HERO.maxLevel) h.xp = 0;
+    return ups;
+  }
+
+  // src/core/dungeons.js
+  var dropIlvl = (i) => Math.round(DUNGEON.dropBase * Math.pow(DUNGEON.dropGrowth, i));
+  function dungeonInfo(i) {
+    return { ...DUNGEONS[i], tier: i + 1, dropIlvl: dropIlvl(i), recIlvl: i === 0 ? 0 : dropIlvl(i - 1), recLevel: DUNGEON.recLevel[i] };
+  }
+  function buildWaves(i) {
+    const d = DUNGEONS[i], diff = DUNGEON.difficulty[i];
+    const sh = Math.pow(DUNGEON.hpGrowth, i) * diff, sa = Math.pow(DUNGEON.atkGrowth, i) * Math.sqrt(diff);
+    const T = DUNGEON.trash, B = DUNGEON.boss;
+    const trash = () => Array.from({ length: T.count }, () => ({ name: d.trash, hp: Math.round(T.hp * sh), atk: T.atk * sa, boss: false }));
+    return [trash(), trash(), [{
+      name: d.boss,
+      hp: Math.round(B.hp * sh),
+      atk: B.atk * sa,
+      boss: true,
+      mech: d.mech,
+      addHp: Math.round(B.addHp * sh),
+      addAtk: B.addAtk * sa
+    }]];
+  }
+
+  // src/core/battle.js
+  var HERO_ACTIONS = {
+    guardian(b, u, foes, focus) {
+      b.hitEnemy(u, focus, u.pow * CLASS_AI.tank.hit);
+    },
+    cleric(b, u, foes, focus) {
+      const A = CLASS_AI.heal, team = b.alive();
+      if (b.tick % A.groupEvery === 0 && team.some((x) => x.hp < x.max * A.groupBelow)) {
+        for (const x of team) b.heal(u, x, u.pow * A.group);
+        return;
+      }
+      const low = team.reduce((m, x) => x.hp / x.max < m.hp / m.max ? x : m);
+      if (low.hp < low.max) b.heal(u, low, u.pow * A.single * (R() < u.crit ? A.critMult : 1));
+      else b.hitEnemy(u, focus, u.pow * A.idleHit);
+    },
+    rogue(b, u, foes, focus) {
+      b.hitEnemy(u, foes.find((e) => e.boss) || focus, u.pow * CLASS_AI.rogue.hit);
+    },
+    mage(b, u, foes) {
+      const per = foes.length > 1 ? CLASS_AI.mage.aoe : CLASS_AI.mage.single;
+      for (const e of foes) b.hitEnemy(u, e, u.pow * per);
+    }
+  };
+  var BOSS_MECHS = {
+    enrage(b, e, m) {
+      if (b.waveTick < m.at) return 1;
+      if (b.waveTick === m.at) b.push(`\u{1F525} ${e.name} \u72C2\u66B4\u4E86\uFF01\u50B7\u5BB3\u5927\u589E`, "warn");
+      return m.mult;
+    },
+    pulse(b, e, m) {
+      if (b.waveTick % m.every) return 1;
+      b.push(`\u{1F4A5} ${e.name} \u65BD\u653E\u7BC4\u570D\u653B\u64CA`, "warn");
+      for (const u of b.alive()) b.hitHero(u, e.atk * m.dmg, true);
+      return 1;
+    },
+    buster(b, e, m, tgt) {
+      if (b.waveTick % m.every) return 1;
+      b.push(`\u26A1 ${e.name} \u5C0D ${tgt.name} \u91CD\u64CA`, "warn");
+      return m.mult;
+    },
+    summon(b, e, m) {
+      if (b.waveTick % m.every) return 1;
+      for (let k = 0; k < m.n; k++) b.enemies.push({ name: "\u53EC\u559A\u7269", hp: e.addHp, max: e.addHp, atk: e.addAtk, boss: false, id: uid() });
+      b.push(`\u{1F300} ${e.name} \u53EC\u559A\u4E86 ${m.n} \u96BB\u5C0F\u602A`, "warn");
+      return 1;
+    }
+  };
+  var Battle = class {
+    constructor(party, items, dIdx) {
+      this.dIdx = dIdx;
+      this.units = party.map((h) => {
+        const s = heroStats(h, items), c = CLASSES[h.cls];
+        return {
+          id: h.id,
+          name: h.name,
+          cls: h.cls,
+          role: c.role,
+          icon: c.icon,
+          max: s.hp,
+          hp: s.hp,
+          pow: s.pow,
+          crit: s.crit,
+          armor: s.armor,
+          dmgDone: 0,
+          healDone: 0,
+          taken: 0
+        };
+      });
+      this.waves = buildWaves(dIdx);
+      this.waveIdx = 0;
+      this.tick = 0;
+      this.waveTick = 0;
+      this.over = false;
+      this.win = false;
+      this.log = [];
+      this.loadWave();
+    }
+    loadWave() {
+      this.enemies = this.waves[this.waveIdx].map((e) => ({ ...e, max: e.hp, id: uid() }));
+      this.waveTick = 0;
+    }
+    alive() {
+      return this.units.filter((u) => u.hp > 0);
+    }
+    foes() {
+      return this.enemies.filter((e) => e.hp > 0);
+    }
+    push(msg, cls2 = "") {
+      this.log.push({ t: this.tick, msg, cls: cls2 });
+      if (this.log.length > 80) this.log.shift();
+    }
+    hitEnemy(u, e, amt) {
+      const crit = R() < u.crit;
+      if (crit) amt *= 2;
+      amt = Math.round(amt * rnd(0.92, 1.08));
+      e.hp = Math.max(0, e.hp - amt);
+      u.dmgDone += amt;
+      if (e.hp === 0) this.push(`${e.name} \u88AB\u64CA\u6BBA`, e.boss ? "good" : "");
+      return crit;
+    }
+    hitHero(u, amt, ignoreArmor = false) {
+      amt = Math.round(amt * (ignoreArmor ? 1 : 1 - u.armor) * rnd(0.9, 1.1));
+      u.hp = Math.max(0, u.hp - amt);
+      u.taken += amt;
+      if (u.hp === 0) this.push(`\u{1F480} ${u.name}\uFF08${CLASSES[u.cls].name}\uFF09\u9663\u4EA1`, "bad");
+    }
+    heal(src, tgt, amt) {
+      const h = Math.min(tgt.max - tgt.hp, Math.round(amt));
+      tgt.hp += h;
+      src.healDone += h;
+    }
+    enemyTarget() {
+      const a = this.alive();
+      if (!a.length) return null;
+      return a.find((u) => u.role === "tank") || pick(a);
+    }
+    step() {
+      if (this.over) return;
+      this.tick++;
+      this.waveTick++;
+      for (const u of this.alive()) {
+        const foes = this.foes();
+        if (!foes.length) break;
+        HERO_ACTIONS[u.cls](this, u, foes, foes.find((e) => !e.boss) || foes[0]);
+      }
+      for (const e of this.foes()) {
+        const tgt = this.enemyTarget();
+        if (!tgt) break;
+        let atk = e.atk;
+        if (e.boss) for (const m of e.mech || []) atk *= BOSS_MECHS[m.t](this, e, m, tgt);
+        if (tgt.hp > 0) this.hitHero(tgt, atk);
+      }
+      this.checkEnd();
+    }
+    checkEnd() {
+      if (!this.alive().length) {
+        this.over = true;
+        this.win = false;
+        this.push("\u2620\uFE0F \u5718\u6EC5\u2026", "bad");
+        return;
+      }
+      if (!this.foes().length) {
+        if (this.waveIdx < this.waves.length - 1) {
+          this.waveIdx++;
+          for (const u of this.alive()) u.hp = Math.min(u.max, u.hp + Math.round(u.max * DUNGEON.waveHeal));
+          this.loadWave();
+          this.push(this.waveIdx === this.waves.length - 1 ? `\u{1F451} \u9996\u9818 ${this.enemies[0].name} \u73FE\u8EAB\uFF01` : `\u7B2C ${this.waveIdx + 1} \u6CE2\u6575\u4EBA\u4F86\u8972`, "info");
+        } else {
+          this.over = true;
+          this.win = true;
+          this.push("\u{1F3C6} \u526F\u672C\u901A\u95DC\uFF01", "good");
+        }
+      }
+      if (this.tick >= DUNGEON.maxTicks && !this.over) {
+        this.over = true;
+        this.win = false;
+        this.push("\u231B \u6642\u9593\u8017\u76E1\uFF0C\u64A4\u9000", "bad");
+      }
+    }
+    runToEnd() {
+      while (!this.over) this.step();
+      return this;
+    }
+  };
+
+  // src/core/game.js
+  var SAVE_VERSION = 1;
+  var hireCost = (h) => ECONOMY.hireBase + ECONOMY.hirePerLevel * h.level;
+  function rewards(dIdx, win, firstClear) {
+    const info = dungeonInfo(dIdx), m = win ? 1 : REWARD.loseMult;
+    const gold = Math.round((REWARD.goldBase + REWARD.goldPerTier * dIdx) * m * rnd(0.9, 1.1));
+    const xp = Math.round(REWARD.xpBase * Math.pow(dIdx + 1, REWARD.xpExp) * m);
+    const loot = [];
+    if (win) {
+      const n = R() < REWARD.doubleDropChance ? 2 : 1;
+      for (let k = 0; k < n; k++) {
+        loot.push(makeItem(pick(Object.keys(SLOTS)), info.dropIlvl + rint(-1, 2), rollRarity(firstClear && k === 0 ? REWARD.firstClearMinRarity : 0)));
+      }
+    }
+    return { gold, xp, loot };
+  }
+  function decayFor(dIdx) {
+    const rec = dungeonInfo(dIdx).recLevel;
+    return (L) => Math.max(REWARD.decayFloor, Math.min(1, 1 - REWARD.decayPerLevel * (L - (rec + REWARD.decayGrace))));
+  }
+  function newGame() {
+    const s = {
+      v: SAVE_VERSION,
+      gold: ECONOMY.startGold,
+      heroes: [],
+      items: {},
+      bag: [],
+      party: [],
+      unlocked: 1,
+      clears: {},
+      tavern: [],
+      idle: null,
+      lastSeen: Date.now(),
+      stats: { runs: 0, wins: 0 },
+      autoSalvageCommon: false,
+      created: Date.now()
+    };
+    for (const c of HERO.starters) {
+      const h = makeHero(c);
+      s.heroes.push(h);
+      s.party.push(h.id);
+    }
+    rollTavern(s);
+    return s;
+  }
+  function migrate(s) {
+    s.stats = s.stats || { runs: 0, wins: 0 };
+    s.v = SAVE_VERSION;
+    return s;
+  }
+  var partyHeroes = (s) => s.party.map((id) => s.heroes.find((h) => h.id === id)).filter(Boolean);
+  var avgLevel = (list) => list.length ? list.reduce((a, h) => a + h.level, 0) / list.length : 1;
+  function rollTavern(s) {
+    const L = Math.max(1, Math.round(avgLevel(s.heroes)) - 1);
+    s.tavern = Array.from({ length: 3 }, () => makeHero(pick(Object.keys(CLASSES)), Math.max(1, L + rint(-1, 0))));
+  }
+  function hire(s, heroId) {
+    const h = s.tavern.find((x) => x.id === heroId), cost = h && hireCost(h);
+    if (!h || s.gold < cost || s.heroes.length >= ECONOMY.rosterMax) return null;
+    s.gold -= cost;
+    s.heroes.push(h);
+    s.tavern = s.tavern.filter((x) => x.id !== heroId);
+    if (s.party.length < ECONOMY.partyMax) s.party.push(h.id);
+    if (!s.tavern.length) rollTavern(s);
+    return h;
+  }
+  function refreshTavern(s) {
+    if (s.gold < ECONOMY.refreshCost) return false;
+    s.gold -= ECONOMY.refreshCost;
+    rollTavern(s);
+    return true;
+  }
+  function joinParty(s, id) {
+    if (s.party.length < ECONOMY.partyMax && !s.party.includes(id)) s.party.push(id);
+  }
+  function benchHero(s, id) {
+    s.party = s.party.filter((x) => x !== id);
+  }
+  function fireHero(s, id) {
+    const h = s.heroes.find((x) => x.id === id);
+    if (!h) return null;
+    for (const sl in h.gear) if (h.gear[sl]) s.bag.push(h.gear[sl]);
+    s.heroes = s.heroes.filter((x) => x.id !== id);
+    benchHero(s, id);
+    return h;
+  }
+  function addLoot(s, it) {
+    if (s.autoSalvageCommon && it.rarity === 0 || s.bag.length >= ECONOMY.bagMax) {
+      s.gold += salvageValue(it);
+      return false;
+    }
+    s.items[it.id] = it;
+    s.bag.push(it.id);
+    return true;
+  }
+  function applyResult(s, dIdx, battle) {
+    const first = battle.win && !s.clears[dIdx];
+    const rw = rewards(dIdx, battle.win, first);
+    const party = partyHeroes(s), decay = decayFor(dIdx), avgL = avgLevel(party);
+    s.stats.runs++;
+    rw.gold = Math.max(1, Math.round(rw.gold * decay(avgL)));
+    s.gold += rw.gold;
+    rw.decayed = decay(avgL) < 1;
+    const baseXp = rw.xp;
+    rw.xp = Math.round(baseXp * decay(avgL));
+    const lvUps = [];
+    for (const h of party) {
+      if (gainXp(h, Math.round(baseXp * decay(h.level)))) lvUps.push({ name: h.name, level: h.level });
+    }
+    if (battle.win) {
+      s.stats.wins++;
+      s.clears[dIdx] = (s.clears[dIdx] || 0) + 1;
+      if (dIdx + 1 >= s.unlocked && dIdx + 1 < DUNGEONS.length) s.unlocked = dIdx + 2;
+    }
+    const kept = rw.loot.filter((it) => addLoot(s, it));
+    return { ...rw, first, lvUps, kept, salvaged: rw.loot.length - kept.length };
+  }
+  function equip(s, heroId, itemId) {
+    const h = s.heroes.find((x) => x.id === heroId), it = s.items[itemId];
+    if (!h || !it) return;
+    const prev = h.gear[it.slot];
+    for (const o of s.heroes) if (o.gear[it.slot] === itemId) o.gear[it.slot] = null;
+    s.bag = s.bag.filter((id) => id !== itemId);
+    h.gear[it.slot] = itemId;
+    if (prev && prev !== itemId) s.bag.push(prev);
+  }
+  function unequip(s, heroId, slot) {
+    const h = s.heroes.find((x) => x.id === heroId);
+    if (!h || !h.gear[slot]) return;
+    s.bag.push(h.gear[slot]);
+    h.gear[slot] = null;
+  }
+  function salvage(s, itemId) {
+    const it = s.items[itemId];
+    if (!it) return 0;
+    s.bag = s.bag.filter((id) => id !== itemId);
+    delete s.items[itemId];
+    const v = salvageValue(it);
+    s.gold += v;
+    return v;
+  }
+  function salvageCommon(s) {
+    const ids = s.bag.filter((i) => s.items[i].rarity === 0);
+    return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
+  }
+  function upgrade(s, itemId) {
+    const it = s.items[itemId];
+    if (!it || it.up >= GEAR.maxUp) return false;
+    const c = upgradeCost(it);
+    if (s.gold < c) return false;
+    s.gold -= c;
+    it.up++;
+    return true;
+  }
+  function autoEquip(s) {
+    let changed = 0;
+    for (const h of partyHeroes(s)) {
+      for (const slot of Object.keys(SLOTS)) {
+        const cur = h.gear[slot] && s.items[h.gear[slot]];
+        let best = null;
+        for (const id of s.bag) {
+          const it = s.items[id];
+          if (it.slot === slot && (!best || itemScore(it) > itemScore(best))) best = it;
+        }
+        if (best && (!cur || itemScore(best) > itemScore(cur))) {
+          equip(s, h.id, best.id);
+          changed++;
+        }
+      }
+    }
+    return changed;
+  }
+  function offlineProgress(s, now = Date.now()) {
+    if (s.idle == null || !s.clears[s.idle]) {
+      s.lastSeen = now;
+      return null;
+    }
+    const sec = Math.min(ECONOMY.offlineCapHours * 3600, Math.max(0, (now - s.lastSeen) / 1e3));
+    s.lastSeen = now;
+    if (sec < 60 || !partyHeroes(s).length) return null;
+    let t = 0, runs = 0, wins = 0, gold = 0, items = 0, lv = 0;
+    while (runs < 400) {
+      const b = new Battle(partyHeroes(s), s.items, s.idle).runToEnd();
+      t += b.tick + 5;
+      if (t > sec) break;
+      const r = applyResult(s, s.idle, b);
+      runs++;
+      if (b.win) wins++;
+      gold += r.gold;
+      items += r.kept.length;
+      lv += r.lvUps.length;
+    }
+    return { sec: Math.round(sec), runs, wins, gold, items, lv };
+  }
+
+  // src/ui/state.js
+  var KEY = "raid-leader-save-v1";
+  var TICK_MS = 1e3;
+  var app = {
+    S: null,
+    // 存檔
+    tab: "dungeon",
+    // 目前分頁
+    battle: null,
+    // 進行中的戰鬥
+    bTimer: null,
+    speed: 1,
+    lastResult: null,
+    pendingRepeat: null,
+    invFilter: "all",
+    // 背包篩選
+    modal: null,
+    // 目前開啟的抽屜
+    render: () => {
+    }
+    // 由 main.js 指定
+  };
+
+  // src/ui/save.js
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {
+    }
+    return null;
+  }
+  function save() {
+    app.S.lastSeen = Date.now();
+    try {
+      localStorage.setItem(KEY, JSON.stringify(app.S));
+    } catch (e) {
+    }
+  }
+  function exportCode() {
+    return btoa(unescape(encodeURIComponent(JSON.stringify(app.S))));
+  }
+  function importCode(code) {
+    const s = JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
+    if (!s || !Array.isArray(s.heroes) || !s.items) throw new Error("\u683C\u5F0F\u4E0D\u7B26");
+    return s;
+  }
+
+  // src/ui/helpers.js
+  var $ = (s) => document.querySelector(s);
+  var fmt = (n) => Math.round(n).toLocaleString("zh-TW");
+  var pct = (a, b) => Math.max(0, Math.min(100, 100 * a / b));
+  function toast(msg) {
+    const el = $("#toast");
+    el.innerHTML = `<div class="toast">${msg}</div>`;
+    clearTimeout(toast.t);
+    toast.t = setTimeout(() => el.innerHTML = "", 2200);
+  }
+  var hero = (id) => app.S.heroes.find((h) => h.id === id);
+  var cls = (h) => CLASSES[h.cls];
+  var inParty = (h) => app.S.party.includes(h.id);
+  function itemStatText(it) {
+    const p = [`\u5A01\u529B ${itemPow(it)}`, `\u8010\u529B ${itemSta(it)}`];
+    if (it.crit) p.push(`\u66B4\u64CA +${Math.round(it.crit * 100)}%`);
+    return p.join(" \xB7 ");
+  }
+  function itemName(it) {
+    return `<span class="c${it.rarity}">${it.name}</span>${it.up ? `<span class="up">+${it.up}</span>` : ""}`;
+  }
+  function partyPower() {
+    return partyHeroes(app.S).reduce((a, h) => a + heroPower(h, app.S.items), 0);
+  }
+  function avgPartyIlvl() {
+    const p = partyHeroes(app.S);
+    return p.length ? Math.round(p.reduce((a, h) => a + heroIlvl(h, app.S.items), 0) / p.length) : 0;
+  }
+  function avgPartyLv() {
+    const p = partyHeroes(app.S);
+    return p.length ? Math.round(p.reduce((a, h) => a + h.level, 0) / p.length) : 0;
+  }
+
+  // src/ui/views/dungeon.js
+  function viewDungeons() {
+    const lv = avgPartyLv(), il = avgPartyIlvl();
+    let h = `<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv${lv}</b>\u30FB\u88DD\u7B49 <b class="num">${il}</b>\u30FB\u6230\u529B <b class="num">${fmt(partyPower())}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u8003\u9A57\u4E00\u7A2E\u8077\u8CAC\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\u6216\u56DE\u982D\u5237\u88DD\u3002</p><div class="dlist">`;
+    DUNGEONS.forEach((_, i) => {
+      const d = dungeonInfo(i), locked = i >= app.S.unlocked, clears = app.S.clears[i] || 0;
+      const idleHere = app.S.idle === i;
+      h += `<div class="dg ${locked ? "locked" : ""}">
+      <div class="tier">${["\u58F9", "\u8CB3", "\u53C3", "\u8086", "\u4F0D", "\u9678", "\u67D2"][i]}<small>\u7B2C ${i + 1} \u5C64</small></div>
+      <h3>${d.name}<span class="boss">\u9996\u9818\u30FB${d.boss}</span></h3>
+      <div class="tip">${d.tip}</div>
+      <div class="meta">
+        <span>\u5EFA\u8B70 <b class="num ${lv >= d.recLevel ? "ok" : "low"}">Lv${d.recLevel}</b></span>
+        <span>\u88DD\u7B49 <b class="num ${il >= d.recIlvl ? "ok" : "low"}">${d.recIlvl}</b></span>
+        <span>\u6389\u843D <b class="num">${d.dropIlvl}</b></span>
+        <span>\u901A\u95DC <b class="num">${clears}</b> \u6B21</span>
+      </div>
+      <div class="acts">${locked ? `<span class="sub" style="margin:0">\u5148\u901A\u95DC\u4E0A\u4E00\u5C64</span>` : `<button class="btn main grow" data-act="fight" data-d="${i}">\u6311\u6230</button>
+         <button class="btn ${idleHere ? "on" : ""}" data-act="idle" data-d="${i}" ${clears ? "" : 'disabled title="\u901A\u95DC\u4E00\u6B21\u5F8C\u624D\u80FD\u639B\u6A5F"'}>${idleHere ? "\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62" : "\u639B\u6A5F\u5237"}</button>`}
+      </div></div>`;
+    });
+    h += `</div><div class="howto" style="margin-top:16px"><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A ${ECONOMY.offlineCapHours} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\u5B58\u5728\u9019\u53F0\u88DD\u7F6E\u7684\u700F\u89BD\u5668\uFF0C\u63DB\u88DD\u7F6E\u8ACB\u5230\u300C\u5718\u968A\u300D\u6700\u4E0B\u65B9\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>`;
+    return h;
+  }
+
+  // src/ui/views/battle.js
+  function unitRow(u, enemy) {
+    const dead = u.hp <= 0;
+    const bar = enemy ? "enemy-bar" : "role-" + u.role;
+    return `<div class="unit ${dead ? "dead" : ""} ${u.boss ? "boss" : ""}">
+    <div class="ic">${enemy ? u.boss ? "\u{1F451}" : "\u{1F47E}" : u.icon}</div>
+    <div class="nm">${u.name}${enemy ? "" : `<small>${CLASSES[u.cls].name}</small>`}</div>
+    <div class="hpn num">${fmt(u.hp)} / ${fmt(u.max)}</div>
+    <div class="bar"><i class="${bar}" style="width:${pct(u.hp, u.max)}%"></i></div></div>`;
+  }
+  function viewBattle() {
+    if (!app.battle) return `<h2>\u6230\u9B25</h2><div class="empty">\u76EE\u524D\u6C92\u6709\u9032\u884C\u4E2D\u7684\u6230\u9B25\u3002<br>\u5230\u300C\u526F\u672C\u300D\u9078\u4E00\u5C64\u958B\u59CB\u6311\u6230\u3002<br><br><button class="btn main" data-tab="dungeon">\u524D\u5F80\u526F\u672C</button></div>`;
+    const d = dungeonInfo(app.battle.dIdx), b = app.battle;
+    let h = `<div class="bhead"><h2>${d.name}</h2><span class="sub num" style="margin:0">${b.tick}s</span>
+    <div class="waves">${b.waves.map((_, i) => `<i class="${i < b.waveIdx || b.over && b.win ? "done" : i === b.waveIdx ? "cur" : ""}"></i>`).join("")}</div></div>
+    <div class="arena">
+      <div class="side"><span class="label">\u6575\u65B9\u30FB${b.waveIdx === b.waves.length - 1 ? "\u9996\u9818\u6230" : `\u7B2C ${b.waveIdx + 1} \u6CE2`}</span>${b.enemies.filter((e) => e.hp > 0 || e.boss).slice(0, 7).map((e) => unitRow(e, true)).join("")}</div>
+      <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>${b.units.map((u) => unitRow(u, false)).join("")}</div>
+    </div>
+    <div class="log" aria-live="polite">${b.log.map((l) => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, " ")}</span>${l.msg}</p>`).join("")}</div>`;
+    if (!b.over) {
+      h += `<div class="ctrl"><div class="seg">${[1, 2, 4].map((x) => `<button data-act="speed" data-x="${x}" class="${app.speed === x ? "sel" : ""}">${x}\xD7</button>`).join("")}</div>
+      <button class="btn" data-act="skip">\u76F4\u63A5\u7D50\u7B97</button>
+      <button class="btn" data-act="retreat">\u64A4\u9000</button></div>`;
+    }
+    if (b.over && app.lastResult) h += viewResult();
+    return h;
+  }
+  function viewResult() {
+    const r = app.lastResult, b = app.battle;
+    const dmgMax = Math.max(1, ...b.units.map((u) => Math.max(u.dmgDone, u.healDone)));
+    const sec = Math.max(1, b.tick);
+    let h = `<div class="result ${b.win ? "win" : "lose"}"><h3>${b.win ? "\u901A\u95DC" : "\u5931\u6557"}</h3>
+    <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+${fmt(r.gold)}</b> \u91D1\u5E63</span><span><b class="num">+${fmt(r.xp)}</b> \u7D93\u9A57</span>${r.first ? '<span style="color:var(--brass)">\u9996\u901A\u734E\u52F5\uFF1A\u4FDD\u5E95\u7A00\u6709</span>' : ""}${r.decayed ? '<span style="color:var(--warn)">\u7B49\u7D1A\u58D3\u5236\uFF1A\u7D93\u9A57\u8207\u91D1\u5E63\u905E\u6E1B\uFF0C\u8A72\u5F80\u4E0B\u4E00\u5C64\u4E86</span>' : ""}</div>`;
+    if (r.lvUps.length) h += `<div style="color:var(--good);font-size:14px">\u2B06 ${r.lvUps.map((x) => `${x.name} \u5347\u5230 Lv${x.level}`).join("\u3001")}</div>`;
+    if (r.kept.length || r.salvaged) h += `<div class="stack">${r.kept.map((it) => `<div class="item rar${it.rarity}"><div class="in">${itemName(it)}</div><div class="il">${SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div><div class="is">${itemStatText(it)}</div></div>`).join("")}${r.salvaged ? `<div class="sub" style="margin:0">${r.salvaged} \u4EF6\u81EA\u52D5\u5206\u89E3\u70BA\u91D1\u5E63</div>` : ""}</div>`;
+    h += `<div class="meter"><span class="label">\u50B7\u5BB3 / \u6CBB\u7642\u7D71\u8A08\uFF08\u6BCF\u79D2\uFF09</span>${b.units.map((u) => {
+      const v = u.role === "heal" ? u.healDone : u.dmgDone;
+      return `<div class="mrow"><span>${u.icon} ${u.name}</span><span class="mb"><i class="role-${u.role}" style="width:${pct(v, dmgMax)}%"></i></span><span class="num" style="text-align:right">${fmt(v / sec)}${u.role === "heal" ? " HPS" : " DPS"}</span></div>`;
+    }).join("")}</div>`;
+    if (!b.win) h += `<div class="sub" style="margin:0">${failHint(b)}</div>`;
+    h += `<div class="row">${app.pendingRepeat ? `<span class="sub" style="margin:0;align-self:center">\u639B\u6A5F\u4E2D\uFF0C3 \u79D2\u5F8C\u81EA\u52D5\u518D\u6230\u2026</span>` : ""}
+    <button class="btn main grow" data-act="fight" data-d="${b.dIdx}">\u518D\u6253\u4E00\u6B21</button>
+    ${r.kept.length ? `<button class="btn" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button>` : ""}
+    <button class="btn" data-tab="dungeon">\u8FD4\u56DE\u526F\u672C</button></div></div>`;
+    return h;
+  }
+  function failHint(b) {
+    const tank = b.units.find((u) => u.role === "tank"), heal = b.units.find((u) => u.role === "heal");
+    if (b.tick >= DUNGEON.maxTicks) return "\u63D0\u793A\uFF1A\u6642\u9593\u8017\u76E1\uFF0C\u8F38\u51FA\u4E0D\u8DB3\u3002\u88DC\u5F37\u8F38\u51FA\u6216\u5F37\u5316\u6B66\u5668\u3002";
+    if (!tank) return "\u63D0\u793A\uFF1A\u968A\u4F0D\u6C92\u6709\u5766\u514B\uFF0C\u6575\u4EBA\u6703\u96A8\u6A5F\u653B\u64CA\u8106\u76AE\u968A\u54E1\u3002";
+    if (!heal) return "\u63D0\u793A\uFF1A\u968A\u4F0D\u6C92\u6709\u6CBB\u7642\uFF0C\u9577\u6642\u9593\u6230\u9B25\u6490\u4E0D\u4F4F\u3002";
+    if (tank.hp <= 0 && b.units.filter((u) => u.hp > 0).length === 0 && tank.taken > tank.max) return "\u63D0\u793A\uFF1A\u5766\u514B\u5148\u5012\uFF0C\u8A66\u8457\u5F37\u5316\u5766\u514B\u7684\u8B77\u7532\u8207\u8010\u529B\uFF0C\u6216\u591A\u5E36\u4E00\u4F4D\u6CBB\u7642\u3002";
+    return "\u63D0\u793A\uFF1A\u56DE\u524D\u4E00\u5C64\u5237\u88DD\u5099\u8207\u7B49\u7D1A\uFF0C\u6216\u8ABF\u6574\u9663\u5BB9\uFF08\u6CD5\u5E2B\u6E05\u5C0F\u602A\u3001\u76DC\u8CCA\u6253\u9996\u9818\uFF09\u3002";
+  }
+
+  // src/ui/views/team.js
+  function roleCount() {
+    const c = { tank: 0, heal: 0, dps: 0 };
+    partyHeroes(app.S).forEach((h) => c[cls(h).role]++);
+    return c;
+  }
+  function viewTeam() {
+    const party = partyHeroes(app.S), c = roleCount();
+    let h = `<h2>\u5718\u968A</h2><p class="sub">\u51FA\u6230\u6700\u591A ${ECONOMY.partyMax} \u4EBA\u3002\u9EDE\u82F1\u96C4\u67E5\u770B\u88DD\u5099\u8207\u8ABF\u6574\u9663\u5BB9\u3002</p>
+    <div class="party">${Array.from({ length: ECONOMY.partyMax }, (_, i) => {
+      const x = party[i];
+      if (!x) return `<div class="slot emptyslot">\u7A7A\u4F4D</div>`;
+      return `<button class="slot" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div><div class="n">${x.name}</div><div class="lv num">Lv${x.level}</div><div class="rl role-${cls(x).role}"></div></button>`;
+    }).join("")}</div>
+    <div class="comp"><span><b style="color:var(--tank)">\u5766\u514B</b> ${c.tank}</span><span><b style="color:var(--heal)">\u6CBB\u7642</b> ${c.heal}</span><span><b style="color:var(--dps)">\u8F38\u51FA</b> ${c.dps}</span><span>\u6230\u529B <b class="num" style="color:var(--fg)">${fmt(partyPower())}</b></span>
+    ${!c.tank ? '<span style="color:var(--warn)">\u7F3A\u5766\u514B</span>' : ""}${!c.heal ? '<span style="color:var(--warn)">\u7F3A\u6CBB\u7642</span>' : ""}</div>
+    <h2 style="font-size:18px">\u540D\u518A <span class="sub num">${app.S.heroes.length}/${ECONOMY.rosterMax}</span></h2><div class="stack">`;
+    const sorted = [...app.S.heroes].sort((a, b) => inParty(b) - inParty(a) || b.level - a.level);
+    for (const x of sorted) h += heroCard(x);
+    h += `</div><h2 style="font-size:18px">\u5B58\u6A94</h2><div class="row"><button class="btn" data-act="export">\u532F\u51FA\u5B58\u6A94\u78BC</button><button class="btn" data-act="import">\u532F\u5165</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">\u91CD\u65B0\u958B\u59CB</button></div>
+    <p class="sub" style="margin-top:8px">\u5171\u6311\u6230 ${app.S.stats.runs} \u6B21\u30FB\u901A\u95DC ${app.S.stats.wins} \u6B21</p>`;
+    return h;
+  }
+  function heroCard(x) {
+    const st = heroStats(x, app.S.items);
+    const need = xpNeed(x.level);
+    return `<button class="hero" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div>
+    <div class="nm">${x.name}<small>${cls(x).name}\u30FB<span class="num">Lv${x.level}</span></small></div>
+    <span class="tag ${inParty(x) ? "in" : ""}">${inParty(x) ? "\u51FA\u6230\u4E2D" : "\u5F85\u547D"}</span>
+    <div class="st num"><span>\u751F\u547D ${fmt(st.hp)}</span><span>\u5A01\u529B ${st.pow}</span><span>\u66B4\u64CA ${Math.round(st.crit * 100)}%</span><span>\u88DD\u7B49 ${heroIlvl(x, app.S.items)}</span></div>
+    <div class="xpbar"><i style="width:${x.level >= HERO.maxLevel ? 100 : pct(x.xp, need)}%"></i></div></button>`;
+  }
+
+  // src/ui/views/bag.js
+  function bestUpgradeFor(it) {
+    return partyHeroes(app.S).some((h) => {
+      const cur = h.gear[it.slot] && app.S.items[h.gear[it.slot]];
+      return !cur || itemScore(it) > itemScore(cur);
+    });
+  }
+  function viewBag() {
+    const items = app.S.bag.map((id) => app.S.items[id]).filter(Boolean).filter((it) => app.invFilter === "all" || it.slot === app.invFilter).sort((a, b) => itemScore(b) - itemScore(a));
+    let h = `<h2>\u80CC\u5305 <span class="sub num">${app.S.bag.length}/${ECONOMY.bagMax}</span></h2><p class="sub">\u80CC\u5305\u6EFF\u4E86\uFF0C\u65B0\u6389\u843D\u6703\u81EA\u52D5\u5206\u89E3\u6210\u91D1\u5E63\u3002</p>
+    <div class="toolbar"><div class="seg">${[["all", "\u5168\u90E8"], ["weapon", "\u6B66\u5668"], ["armor", "\u8B77\u7532"], ["trinket", "\u98FE\u54C1"]].map(([k, n]) => `<button data-act="filter" data-f="${k}" class="${app.invFilter === k ? "sel" : ""}">${n}</button>`).join("")}</div>
+    <button class="btn sm main" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button></div>
+    <div class="toolbar"><button class="btn sm" data-act="salvagecommon">\u5206\u89E3\u5168\u90E8\u666E\u901A</button>
+    <button class="btn sm ${app.S.autoSalvageCommon ? "on" : ""}" data-act="autosalv">${app.S.autoSalvageCommon ? "\u2713 " : ""}\u81EA\u52D5\u5206\u89E3\u666E\u901A</button></div>`;
+    if (!items.length) return h + `<div class="empty">\u80CC\u5305\u662F\u7A7A\u7684\u3002\u901A\u95DC\u526F\u672C\u6703\u6389\u843D\u88DD\u5099\u3002</div>`;
+    h += `<div class="stack">${items.map((it) => `<button class="item rar${it.rarity}" data-act="item" data-id="${it.id}">
+    <div class="in">${itemName(it)}${bestUpgradeFor(it) ? '<span class="better">\u25B2 \u53EF\u63D0\u5347</span>' : ""}</div>
+    <div class="il">${SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div>
+    <div class="is num">${RARITY[it.rarity].name}\u30FB${itemStatText(it)}</div></button>`).join("")}</div>`;
+    return h;
+  }
+
+  // src/ui/views/tavern.js
+  function viewTavern() {
+    let h = `<h2>\u9152\u9928</h2><p class="sub">\u62DB\u52DF\u65B0\u82F1\u96C4\u3002\u7B49\u7D1A\u6703\u8DDF\u8457\u5718\u968A\u5E73\u5747\u6210\u9577\u3002\u540D\u518A\u4E0A\u9650 ${ECONOMY.rosterMax} \u4EBA\u3002</p><div class="stack">`;
+    for (const x of app.S.tavern) {
+      const c = cls(x), cost = hireCost(x);
+      h += `<div class="hero"><div class="ic">${c.icon}</div><div class="nm">${x.name}<small>${c.name}\u30FB${ROLE_NAME[c.role]}\u30FB<span class="num">Lv${x.level}</span></small></div>
+      <button class="btn sm main" data-act="hire" data-id="${x.id}" ${app.S.gold < cost || app.S.heroes.length >= ECONOMY.rosterMax ? "disabled" : ""} style="grid-row:span 2"><span class="num">${cost}</span> \u91D1</button>
+      <div class="st">${c.desc}</div></div>`;
+    }
+    h += `</div><div class="row" style="margin-top:12px"><button class="btn" data-act="reroll" ${app.S.gold < ECONOMY.refreshCost ? "disabled" : ""}>\u63DB\u4E00\u6279\uFF08<span class="num">${ECONOMY.refreshCost}</span> \u91D1\uFF09</button></div>
+    <h2 style="font-size:18px">\u8077\u696D\u5716\u9451</h2><div class="stack">${Object.values(CLASSES).map((c) => `<div class="hero"><div class="ic">${c.icon}</div><div class="nm">${c.name}<small>${ROLE_NAME[c.role]}</small></div><span></span><div class="st">${c.desc}</div></div>`).join("")}</div>`;
+    return h;
+  }
+
+  // src/ui/views/sheets.js
+  function openModal(m) {
+    app.modal = m;
+    renderModal();
+  }
+  function closeModal() {
+    app.modal = null;
+    renderModal();
+  }
+  function renderModal() {
+    const el = $("#modal");
+    if (!app.modal) {
+      el.innerHTML = "";
+      return;
+    }
+    let body = "";
+    if (app.modal.type === "hero") body = sheetHero(hero(app.modal.id));
+    if (app.modal.type === "item") body = sheetItem(app.S.items[app.modal.id]);
+    if (app.modal.type === "pick") body = sheetPick();
+    if (app.modal.type === "text") body = app.modal.html;
+    if (!body) {
+      app.modal = null;
+      el.innerHTML = "";
+      return;
+    }
+    el.innerHTML = `<div class="scrim" data-act="close"><div class="sheet" role="dialog" aria-modal="true">${body}</div></div>`;
+  }
+  function sheetHero(x) {
+    if (!x) return "";
+    const c = cls(x), st = heroStats(x, app.S.items);
+    let h = `<h3>${c.icon} ${x.name}</h3><div class="sub" style="margin:0">${c.name}\u30FB${ROLE_NAME[c.role]}\u3000${c.desc}</div>
+    <div class="statgrid num"><div><b>${x.level}</b><span>\u7B49\u7D1A</span></div><div><b>${fmt(st.hp)}</b><span>\u751F\u547D</span></div><div><b>${st.pow}</b><span>\u5A01\u529B</span></div><div><b>${Math.round(st.crit * 100)}%</b><span>\u66B4\u64CA</span></div></div>
+    <div class="sub" style="margin:0">\u7D93\u9A57 <span class="num">${fmt(x.xp)} / ${fmt(xpNeed(x.level))}</span>\u30FB\u8B77\u7532\u6E1B\u50B7 ${Math.round(st.armor * 100)}%</div><div>`;
+    for (const [slot, sn] of Object.entries(SLOTS)) {
+      const it = x.gear[slot] && app.S.items[x.gear[slot]];
+      const n = app.S.bag.filter((id) => app.S.items[id].slot === slot).length;
+      h += `<div class="gearrow"><span class="sl">${sn}</span><span>${it ? `${itemName(it)} <span class="sub num">${it.ilvl}</span><br><span class="sub num" style="font-size:12px">${itemStatText(it)}</span>` : '<span class="sub">\uFF08\u7A7A\uFF09</span>'}</span>
+      <span class="row">${it ? `<button class="btn sm" data-act="up" data-id="${it.id}" ${it.up >= GEAR.maxUp ? "disabled" : ""}>\u5F37\u5316 <span class="num">${it.up >= GEAR.maxUp ? "MAX" : upgradeCost(it)}</span></button>` : ""}
+      <button class="btn sm" data-act="pick" data-id="${x.id}" data-slot="${slot}" ${n ? "" : "disabled"}>\u66F4\u63DB</button></span></div>`;
+    }
+    h += `</div><div class="row">${inParty(x) ? `<button class="btn grow" data-act="bench" data-id="${x.id}">\u79FB\u51FA\u968A\u4F0D</button>` : `<button class="btn main grow" data-act="join" data-id="${x.id}" ${app.S.party.length >= ECONOMY.partyMax ? "disabled" : ""}>${app.S.party.length >= ECONOMY.partyMax ? "\u968A\u4F0D\u5DF2\u6EFF" : "\u52A0\u5165\u968A\u4F0D"}</button>`}
+    ${app.S.heroes.length > 1 ? `<button class="btn" data-act="fire" data-id="${x.id}" style="color:var(--bad)">${app.modal.confirmFire ? "\u78BA\u5B9A\u89E3\u96C7\uFF1F" : "\u89E3\u96C7"}</button>` : ""}</div>`;
+    return h;
+  }
+  function sheetPick() {
+    const x = hero(app.modal.id), slot = app.modal.slot, cur = x.gear[slot] && app.S.items[x.gear[slot]];
+    const list = app.S.bag.map((id) => app.S.items[id]).filter((it) => it.slot === slot).sort((a, b) => itemScore(b) - itemScore(a));
+    return `<h3>\u70BA ${x.name} \u9078\u64C7${SLOTS[slot]}</h3><div class="sub" style="margin:0">\u76EE\u524D\uFF1A${cur ? itemName(cur) + "\u30FB" + itemStatText(cur) : "\u7121"}</div>
+    <div class="choices">${list.map((it) => `<button class="item rar${it.rarity}" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="in">${itemName(it)}${!cur || itemScore(it) > itemScore(cur) ? '<span class="better">\u25B2</span>' : ""}</div><div class="il"><b class="num">${it.ilvl}</b></div><div class="is num">${itemStatText(it)}</div></button>`).join("")}</div>
+    <div class="row">${cur ? `<button class="btn" data-act="unequip" data-hero="${x.id}" data-slot="${slot}">\u5378\u4E0B</button>` : ""}<button class="btn" data-act="hero" data-id="${x.id}">\u8FD4\u56DE</button></div>`;
+  }
+  function sheetItem(it) {
+    if (!it) return "";
+    const party = partyHeroes(app.S);
+    return `<h3>${itemName(it)}</h3><div class="sub num" style="margin:0">${RARITY[it.rarity].name}${SLOTS[it.slot]}\u30FB\u88DD\u7B49 ${it.ilvl}\u30FB\u5F37\u5316 +${it.up}/${GEAR.maxUp}<br>${itemStatText(it)}</div>
+    <span class="label">\u88DD\u5099\u7D66</span><div class="stack">${party.map((x) => {
+      const cur = x.gear[it.slot] && app.S.items[x.gear[it.slot]];
+      const better = !cur || itemScore(it) > itemScore(cur);
+      return `<button class="hero" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="ic">${cls(x).icon}</div><div class="nm">${x.name}<small>${cls(x).name}</small></div><span class="tag ${better ? "in" : ""}">${better ? "\u25B2 \u63D0\u5347" : "\u8F03\u5DEE"}</span><div class="st">\u76EE\u524D\uFF1A${cur ? `${cur.name}\uFF08${cur.ilvl}\uFF09` : "\u7A7A"}</div></button>`;
+    }).join("")}</div>
+    <div class="row"><button class="btn" data-act="up" data-id="${it.id}" ${it.up >= GEAR.maxUp || app.S.gold < upgradeCost(it) ? "disabled" : ""}>\u5F37\u5316\uFF08<span class="num">${it.up >= GEAR.maxUp ? "MAX" : upgradeCost(it)}</span> \u91D1\uFF09</button>
+    <button class="btn" data-act="salvage" data-id="${it.id}">\u5206\u89E3 +<span class="num">${salvageValue(it)}</span> \u91D1</button></div>`;
+  }
+
+  // src/ui/battle-runner.js
+  function startBattle(dIdx) {
+    const p = partyHeroes(app.S);
+    if (!p.length) {
+      toast("\u968A\u4F0D\u6C92\u6709\u6210\u54E1");
+      app.tab = "team";
+      app.render();
+      return;
+    }
+    clearTimeout(app.pendingRepeat);
+    app.pendingRepeat = null;
+    app.battle = new Battle(p, app.S.items, dIdx);
+    app.lastResult = null;
+    app.battle.push(`\u9032\u5165 ${DUNGEONS[dIdx].name}\uFF0C\u7B2C 1 \u6CE2\u6575\u4EBA\u51FA\u73FE`, "info");
+    runTimer();
+  }
+  function runTimer() {
+    clearInterval(app.bTimer);
+    app.bTimer = setInterval(stepBattle, TICK_MS / app.speed);
+  }
+  function stepBattle() {
+    if (!app.battle || app.battle.over) {
+      clearInterval(app.bTimer);
+      return;
+    }
+    app.battle.step();
+    if (app.battle.over) finishBattle();
+    else if (app.tab === "battle") app.render(true);
+    else app.renderTabs();
+  }
+  function finishBattle() {
+    clearInterval(app.bTimer);
+    app.lastResult = applyResult(app.S, app.battle.dIdx, app.battle);
+    save();
+    if (app.S.idle === app.battle.dIdx) {
+      const d = app.battle.dIdx;
+      app.pendingRepeat = setTimeout(() => {
+        app.pendingRepeat = null;
+        if (app.S.idle === d) startBattle(d);
+      }, 3e3);
+    }
+    app.render(true);
+  }
+
+  // src/ui/main.js
+  var ICONS = {
+    dungeon: '<path d="M4 20V9l8-5 8 5v11"/><path d="M9 20v-6a3 3 0 0 1 6 0v6"/>',
+    battle: '<path d="M5 19 19 5M14 5h5v5M5 14l5 5M4 20l3-3"/>',
+    team: '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 19c.6-3.4 3-5 6-5s5.4 1.6 6 5M15 14.5c2.6-.3 4.8 1.2 5.5 4.5"/>',
+    bag: '<path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+    tavern: '<path d="M6 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M16 5h2a2 2 0 0 1 0 4h-2M11 13v4M7 20h8"/>'
+  };
+  var TABS = [["dungeon", "\u526F\u672C"], ["battle", "\u6230\u9B25"], ["team", "\u5718\u968A"], ["bag", "\u80CC\u5305"], ["tavern", "\u9152\u9928"]];
+  function renderTabs() {
+    $("#tabs").innerHTML = TABS.map(([k, n]) => `<button data-tab="${k}" class="${app.tab === k ? "sel" : ""}" aria-label="${n}"><svg viewBox="0 0 24 24">${ICONS[k]}</svg>${n}${k === "battle" && app.battle && !app.battle.over && app.tab !== "battle" ? '<span class="dot"></span>' : ""}</button>`).join("");
+  }
+  function render(skipModal) {
+    $("#gold").textContent = fmt(app.S.gold);
+    $("#idleChip").hidden = app.S.idle == null;
+    renderTabs();
+    const v = $("#view");
+    if (app.tab === "dungeon") v.innerHTML = viewDungeons();
+    if (app.tab === "battle") v.innerHTML = viewBattle();
+    if (app.tab === "team") v.innerHTML = viewTeam();
+    if (app.tab === "bag") v.innerHTML = viewBag();
+    if (app.tab === "tavern") v.innerHTML = viewTavern();
+    if (app.tab === "battle") {
+      const lg = $(".log");
+      if (lg) lg.scrollTop = lg.scrollHeight;
+    }
+    if (!skipModal) renderModal();
+  }
+  app.render = render;
+  app.renderTabs = renderTabs;
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest("[data-tab],[data-act]");
+    if (!t) return;
+    if (t.dataset.act === "close") {
+      if (e.target === t) closeModal();
+      return;
+    }
+    if (t.dataset.tab) {
+      app.tab = t.dataset.tab;
+      app.modal = null;
+      render();
+      window.scrollTo(0, 0);
+      return;
+    }
+    const a = t.dataset.act, id = t.dataset.id;
+    switch (a) {
+      case "fight":
+        startBattle(+t.dataset.d);
+        app.tab = "battle";
+        break;
+      case "idle": {
+        const d = +t.dataset.d;
+        if (app.S.idle === d) {
+          app.S.idle = null;
+          clearTimeout(app.pendingRepeat);
+          app.pendingRepeat = null;
+          toast("\u5DF2\u505C\u6B62\u639B\u6A5F");
+        } else {
+          app.S.idle = d;
+          toast(`\u958B\u59CB\u639B\u6A5F\uFF1A${DUNGEONS[d].name}`);
+          if (!app.battle || app.battle.over) {
+            startBattle(d);
+          }
+        }
+        save();
+        break;
+      }
+      case "speed":
+        app.speed = +t.dataset.x;
+        runTimer();
+        break;
+      case "skip":
+        if (app.battle && !app.battle.over) {
+          app.battle.runToEnd();
+          finishBattle();
+        }
+        break;
+      case "retreat":
+        if (app.battle && !app.battle.over) {
+          clearInterval(app.bTimer);
+          app.battle.over = true;
+          app.battle.win = false;
+          app.battle.push("\u{1F3F3} \u4E3B\u52D5\u64A4\u9000", "bad");
+          app.lastResult = applyResult(app.S, app.battle.dIdx, app.battle);
+          if (app.S.idle === app.battle.dIdx) app.S.idle = null;
+          save();
+        }
+        break;
+      case "hero":
+        openModal({ type: "hero", id });
+        return;
+      case "item":
+        openModal({ type: "item", id });
+        return;
+      case "pick":
+        openModal({ type: "pick", id, slot: t.dataset.slot });
+        return;
+      case "equip":
+        equip(app.S, t.dataset.hero, id);
+        toast("\u5DF2\u88DD\u5099");
+        save();
+        app.modal = { type: "hero", id: t.dataset.hero };
+        break;
+      case "unequip":
+        unequip(app.S, t.dataset.hero, t.dataset.slot);
+        save();
+        app.modal = { type: "hero", id: t.dataset.hero };
+        break;
+      case "up":
+        if (upgrade(app.S, id)) {
+          toast("\u5F37\u5316\u6210\u529F");
+          save();
+        } else toast("\u91D1\u5E63\u4E0D\u8DB3");
+        break;
+      case "salvage":
+        toast(`\u5206\u89E3\u7372\u5F97 ${salvage(app.S, id)} \u91D1`);
+        save();
+        app.modal = null;
+        break;
+      case "join":
+        joinParty(app.S, id);
+        save();
+        break;
+      case "bench":
+        benchHero(app.S, id);
+        save();
+        break;
+      case "fire": {
+        if (!app.modal.confirmFire) {
+          app.modal.confirmFire = true;
+          break;
+        }
+        const x = fireHero(app.S, id);
+        app.modal = null;
+        if (x) toast(`${x.name} \u96E2\u958B\u4E86\u5718\u968A`);
+        save();
+        break;
+      }
+      case "hire": {
+        const x = hire(app.S, id);
+        if (x) {
+          toast(`${x.name} \u52A0\u5165\u4E86${app.S.party.includes(x.id) ? "\u968A\u4F0D" : "\u540D\u518A"}`);
+          save();
+        }
+        break;
+      }
+      case "reroll":
+        if (refreshTavern(app.S)) save();
+        break;
+      case "filter":
+        app.invFilter = t.dataset.f;
+        break;
+      case "autoequip": {
+        const n = autoEquip(app.S);
+        toast(n ? `\u66F4\u63DB\u4E86 ${n} \u4EF6\u88DD\u5099` : "\u76EE\u524D\u5DF2\u662F\u6700\u4F73\u914D\u88DD");
+        save();
+        break;
+      }
+      case "salvagecommon": {
+        const r = salvageCommon(app.S);
+        toast(r.count ? `\u5206\u89E3 ${r.count} \u4EF6\uFF0C\u7372\u5F97 ${r.gold} \u91D1` : "\u6C92\u6709\u666E\u901A\u88DD\u5099");
+        save();
+        break;
+      }
+      case "autosalv":
+        app.S.autoSalvageCommon = !app.S.autoSalvageCommon;
+        save();
+        break;
+      case "export":
+        openModal({ type: "text", html: `<h3>\u532F\u51FA\u5B58\u6A94\u78BC</h3><p class="sub" style="margin:0">\u8907\u88FD\u9019\u6BB5\u6587\u5B57\uFF0C\u5230\u53E6\u4E00\u53F0\u88DD\u7F6E\u7684\u300C\u532F\u5165\u300D\u8CBC\u4E0A\u3002</p><textarea id="expTxt" readonly>${exportCode()}</textarea><div class="row"><button class="btn main" data-act="copy">\u8907\u88FD</button><button class="btn" data-act="closebtn">\u95DC\u9589</button></div>` });
+        return;
+      case "copy": {
+        const ta = $("#expTxt");
+        navigator.clipboard?.writeText(ta.value).then(() => toast("\u5DF2\u8907\u88FD"), () => {
+          ta.select();
+          toast("\u8ACB\u624B\u52D5\u8907\u88FD");
+        }) ?? (ta.select(), toast("\u8ACB\u624B\u52D5\u8907\u88FD"));
+        return;
+      }
+      case "import":
+        openModal({ type: "text", html: `<h3>\u532F\u5165\u5B58\u6A94\u78BC</h3><p class="sub" style="margin:0">\u6703\u8986\u84CB\u76EE\u524D\u9032\u5EA6\u3002</p><textarea id="impTxt" placeholder="\u8CBC\u4E0A\u5B58\u6A94\u78BC"></textarea><div class="row"><button class="btn main" data-act="doimport">\u532F\u5165</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>` });
+        return;
+      case "doimport":
+        try {
+          app.S = importCode($("#impTxt").value);
+          app.battle = null;
+          save();
+          app.modal = null;
+          toast("\u532F\u5165\u5B8C\u6210");
+        } catch (err) {
+          toast("\u5B58\u6A94\u78BC\u7121\u6CD5\u8B80\u53D6\uFF0C\u8ACB\u78BA\u8A8D\u662F\u5426\u5B8C\u6574\u8907\u88FD");
+          return;
+        }
+        break;
+      case "reset":
+        openModal({ type: "text", html: `<h3>\u91CD\u65B0\u958B\u59CB\uFF1F</h3><p class="sub" style="margin:0">\u76EE\u524D\u7684\u82F1\u96C4\u3001\u88DD\u5099\u8207\u9032\u5EA6\u90FD\u6703\u6E05\u9664\uFF0C\u7121\u6CD5\u5FA9\u539F\u3002</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">\u6E05\u9664\u4E26\u91CD\u4F86</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>` });
+        return;
+      case "doreset":
+        clearInterval(app.bTimer);
+        clearTimeout(app.pendingRepeat);
+        app.S = newGame();
+        app.battle = null;
+        app.lastResult = null;
+        app.modal = null;
+        app.tab = "dungeon";
+        save();
+        break;
+      case "closebtn":
+        app.modal = null;
+        break;
+    }
+    render();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && app.modal) closeModal();
+  });
+  function settleOffline() {
+    const r = offlineProgress(app.S);
+    if (!r || !r.runs) return;
+    save();
+    const hrs = r.sec >= 3600 ? `${(r.sec / 3600).toFixed(1)} \u5C0F\u6642` : `${Math.round(r.sec / 60)} \u5206\u9418`;
+    openModal({ type: "text", html: `<h3>\u96E2\u7DDA\u6536\u76CA</h3><p class="sub" style="margin:0">\u4F60\u96E2\u958B\u4E86 ${hrs}\uFF0C\u968A\u4F0D\u5728 ${DUNGEONS[app.S.idle].name} \u6301\u7E8C\u4F5C\u6230\u3002</p>
+    <div class="statgrid num"><div><b>${r.runs}</b><span>\u6311\u6230</span></div><div><b>${r.wins}</b><span>\u901A\u95DC</span></div><div><b>+${fmt(r.gold)}</b><span>\u91D1\u5E63</span></div><div><b>${r.items}</b><span>\u88DD\u5099</span></div></div>
+    ${r.lv ? `<div style="color:var(--good)">\u671F\u9593\u5171\u5347\u7D1A ${r.lv} \u6B21</div>` : ""}
+    <div class="row"><button class="btn main grow" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button><button class="btn" data-act="closebtn">\u597D</button></div>` });
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      clearInterval(app.bTimer);
+      clearTimeout(app.pendingRepeat);
+      app.pendingRepeat = null;
+      save();
+      return;
+    }
+    if (app.S.idle != null && Date.now() - app.S.lastSeen > 6e4) {
+      app.battle = null;
+      app.lastResult = null;
+      settleOffline();
+      startBattle(app.S.idle);
+      render();
+    } else if (app.battle && !app.battle.over) runTimer();
+    else if (app.S.idle != null) startBattle(app.S.idle);
+  });
+  setInterval(() => {
+    if (!document.hidden) save();
+  }, 5e3);
+  function start(data) {
+    app.S = migrate(data && data.S || load() || newGame());
+    settleOffline();
+    if (app.S.idle != null && app.S.clears[app.S.idle]) startBattle(app.S.idle);
+    render();
+  }
+  window.claude?.hot?.snapshot?.(() => ({ S: app.S }));
+  window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>

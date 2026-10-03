@@ -1,0 +1,36 @@
+// 補充測試：解雇、分解普通、匯出 / 匯入存檔、重新開始
+import { createRequire } from 'module';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+const require = createRequire(import.meta.url);
+const { chromium } = require(process.env.PLAYWRIGHT_PATH || '/opt/npm-tools/node_modules/playwright');
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const entry = process.argv[2] || 'index.html';
+const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
+const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 400, height: 820 } });
+const errs = []; page.on('pageerror', e => errs.push(e.message));
+await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'app.test') return r.abort();
+  const f = path.join(root, u.pathname === '/' ? entry : u.pathname.slice(1));
+  return r.fulfill({ body: fs.readFileSync(f), contentType: types[path.extname(f)] }); });
+await page.goto('https://app.test/'); await page.waitForTimeout(400);
+const out = [], gold = async () => +(await page.locator('#gold').innerText()).replace(/,/g, '');
+for (let i = 0; i < 6; i++) { await page.click('[data-act="fight"][data-d="0"]').catch(() => page.click('.result [data-act="fight"]')); await page.click('[data-act="skip"]'); }
+await page.click('[data-tab="bag"]');
+const before = await page.locator('.item').count(), g0 = await gold();
+await page.click('[data-act="salvagecommon"]');
+out.push(`分解普通：背包 ${before} → ${await page.locator('.item').count()}，金幣 ${g0} → ${await gold()}`);
+await page.click('[data-tab="team"]');
+const n0 = await page.locator('.stack .hero').count();
+await page.locator('.stack .hero').last().click();
+await page.click('.sheet [data-act="fire"]'); out.push('解雇確認文字：' + await page.locator('.sheet [data-act="fire"]').innerText());
+await page.click('.sheet [data-act="fire"]');
+out.push(`解雇：名冊 ${n0} → ${await page.locator('.stack .hero').count()}`);
+await page.click('[data-act="export"]'); const code = await page.locator('#expTxt').inputValue();
+await page.click('[data-act="closebtn"]'); out.push('匯出存檔碼長度：' + code.length);
+await page.click('[data-act="reset"]'); await page.click('[data-act="doreset"]');
+await page.click('[data-tab="team"]'); out.push('重新開始後名冊：' + await page.locator('.stack .hero').count());
+await page.click('[data-act="import"]'); await page.fill('#impTxt', code); await page.click('[data-act="doimport"]');
+out.push('匯入後名冊：' + await page.locator('.stack .hero').count());
+console.log(out.join('\n') + '\nERRORS: ' + JSON.stringify(errs));
+await browser.close();
