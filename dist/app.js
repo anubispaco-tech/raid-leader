@@ -1,4 +1,4 @@
-/* 副本團長 v0.5.1 */
+/* 副本團長 v0.6.0 */
 (() => {
   // src/core/config.js
   var CLASSES = {
@@ -175,6 +175,16 @@
     xpMult: 1.2
     // 相對第 7 層的獎勵
   };
+  var BAG_MILESTONES = [
+    { id: "clear3", name: "\u9996\u6B21\u901A\u95DC\u7B2C 3 \u5C64", test: (s) => !!s.clears[2] },
+    { id: "clear5", name: "\u9996\u6B21\u901A\u95DC\u7B2C 5 \u5C64", test: (s) => !!s.clears[4] },
+    { id: "clear7", name: "\u9996\u6B21\u901A\u95DC\u7B2C 7 \u5C64", test: (s) => !!s.clears[6] },
+    { id: "mythic5", name: "\u79D8\u5883 +5 \u9650\u6642\u901A\u95DC", test: (s) => mythicBestLevel(s) >= 5 },
+    { id: "mythic10", name: "\u79D8\u5883 +10 \u9650\u6642\u901A\u95DC", test: (s) => mythicBestLevel(s) >= 10 },
+    { id: "mythic15", name: "\u79D8\u5883 +15 \u9650\u6642\u901A\u95DC", test: (s) => mythicBestLevel(s) >= 15 }
+  ];
+  var BAG_PER_MILESTONE = 5;
+  var mythicBestLevel = (s) => Math.max(0, ...Object.values(s.mythic && s.mythic.best || {}).map((b) => b.level));
   var TELEMETRY = {
     url: "https://script.google.com/macros/s/AKfycbwytKL7OhbuCd2WavlIopA49-vLdfLZXGQFPoUdnpmigJEWq3B4zuvSdoZqHX47Hhk0mg/exec",
     snapshotMin: 5,
@@ -206,6 +216,7 @@
     partyMax: 5,
     rosterMax: 10,
     bagMax: 50,
+    // bagMax = 起始格數，達成里程碑再擴充（見 BAG_MILESTONES）
     stashMax: 100,
     // 戰利品箱：背包滿時暫存，需手動取出
     defaultKeepRarity: 2,
@@ -968,7 +979,8 @@
       created: Date.now(),
       mythic: { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 },
       failStreak: 0,
-      player: newPlayer()
+      player: newPlayer(),
+      bagSeen: []
     };
     for (const c of HERO.starters) {
       const h = makeHero(c);
@@ -991,6 +1003,10 @@
     s.mythic = s.mythic || { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 };
     s.failStreak = s.failStreak || 0;
     s.player = s.player || newPlayer();
+    if (!s.bagSeen) {
+      s.bagSeen = [];
+      newBagMilestones(s);
+    }
     s.v = SAVE_VERSION;
     return s;
   }
@@ -1035,12 +1051,19 @@
     benchHero(s, id);
     return h;
   }
+  var bagMax = (s) => ECONOMY.bagMax + BAG_PER_MILESTONE * BAG_MILESTONES.filter((m) => m.test(s)).length;
+  function newBagMilestones(s) {
+    s.bagSeen = s.bagSeen || [];
+    const fresh = BAG_MILESTONES.filter((m) => m.test(s) && !s.bagSeen.includes(m.id));
+    s.bagSeen.push(...fresh.map((m) => m.id));
+    return fresh;
+  }
   function addLoot(s, it) {
     if (it.rarity < s.autoSalvageBelow) {
       s.gold += salvageValue(it);
       return "salvaged";
     }
-    if (s.bag.length < ECONOMY.bagMax) {
+    if (s.bag.length < bagMax(s)) {
       s.items[it.id] = it;
       s.bag.push(it.id);
       return "bag";
@@ -1125,6 +1148,48 @@
     s.bag.push(h.gear[slot]);
     h.gear[slot] = null;
   }
+  function unequipAll(s, heroId) {
+    const h = s.heroes.find((x) => x.id === heroId);
+    if (!h) return { moved: 0, stashed: 0, left: 0 };
+    let moved = 0, stashed = 0, left = 0;
+    for (const slot of Object.keys(SLOTS)) {
+      const id = h.gear[slot];
+      if (!id) continue;
+      if (s.bag.length < bagMax(s)) {
+        s.bag.push(id);
+        moved++;
+      } else if (s.stash.length < ECONOMY.stashMax) {
+        s.stash.push(id);
+        stashed++;
+      } else {
+        left++;
+        continue;
+      }
+      h.gear[slot] = null;
+    }
+    return { moved, stashed, left };
+  }
+  function upgradeAll(s, heroId, dry = false) {
+    const h = s.heroes.find((x) => x.id === heroId);
+    if (!h) return { count: 0, spent: 0, maxed: true };
+    const items = Object.keys(SLOTS).map((sl) => h.gear[sl] && s.items[h.gear[sl]]).filter(Boolean);
+    const ups = new Map(items.map((it) => [it, it.up]));
+    let gold = s.gold, count = 0, spent = 0;
+    for (; ; ) {
+      const cand = items.filter((it) => ups.get(it) < GEAR.maxUp).map((it) => ({ it, cost: upgradeCost({ ...it, up: ups.get(it) }) })).sort((a, b) => a.cost - b.cost)[0];
+      if (!cand || cand.cost > gold) break;
+      gold -= cand.cost;
+      spent += cand.cost;
+      count++;
+      ups.set(cand.it, ups.get(cand.it) + 1);
+    }
+    const maxed = items.length > 0 && items.every((it) => ups.get(it) >= GEAR.maxUp);
+    if (!dry) {
+      s.gold = gold;
+      for (const [it, up] of ups) it.up = up;
+    }
+    return { count, spent, maxed, empty: !items.length };
+  }
   function salvage(s, itemId) {
     const it = s.items[itemId];
     if (!it) return 0;
@@ -1139,8 +1204,26 @@
     const ids = s.bag.filter((i) => s.items[i].rarity <= maxRarity);
     return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
   }
+  function recommendParty(s, hints) {
+    const has = (t) => hints.includes(t), pw = (h) => heroPower(h, s.items);
+    const byRole = (r) => s.heroes.filter((h) => CLASSES[h.cls].role === r).sort((a, b) => pw(b) - pw(a));
+    const pick2 = [...byRole("tank").slice(0, 1), ...byRole("heal").slice(0, has("pulse") ? 2 : 1)];
+    const pref = (h) => (has("summon") && h.cls === "mage" ? 1.25 : 1) * (has("enrage") && h.cls === "rogue" ? 1.25 : 1);
+    const rest = s.heroes.filter((h) => !pick2.includes(h)).sort((a, b) => (CLASSES[b.cls].role === "dps") - (CLASSES[a.cls].role === "dps") || pw(b) * pref(b) - pw(a) * pref(a));
+    pick2.push(...rest.slice(0, Math.max(0, ECONOMY.partyMax - pick2.length)));
+    s.party = pick2.slice(0, ECONOMY.partyMax).map((h) => h.id);
+    return partyHeroes(s);
+  }
+  function prepare(s, hints) {
+    const party = recommendParty(s, hints);
+    for (const h of party) applyRecommend(h, hints);
+    const swapped = autoEquip(s);
+    const roles = { tank: 0, heal: 0, dps: 0 };
+    party.forEach((h) => roles[CLASSES[h.cls].role]++);
+    return { roles, swapped };
+  }
   function takeFromStash(s) {
-    const room = ECONOMY.bagMax - s.bag.length;
+    const room = bagMax(s) - s.bag.length;
     const ids = [...s.stash].sort((a, b) => itemScore(s.items[b]) - itemScore(s.items[a])).slice(0, Math.max(0, room));
     s.stash = s.stash.filter((id) => !ids.includes(id));
     s.bag.push(...ids);
@@ -1221,17 +1304,17 @@
   var ROLE_NAME2 = { tank: "\u5766\u514B", heal: "\u6CBB\u7642", dps: "\u8F38\u51FA" };
   function nextStep(s) {
     const party = partyHeroes(s), top = s.unlocked - 1;
-    if (!s.stats.runs) return { text: "\u958B\u59CB\u7B2C\u4E00\u5834\u6230\u9B25", sub: "\u6309\u4E0B\u300C\u8150\u6839\u6D1E\u7A9F\u300D\u7684\u6311\u6230\uFF0C\u968A\u4F0D\u6703\u81EA\u52D5\u4F5C\u6230\u3002", btn: { label: "\u6311\u6230", act: "fight", d: 0 } };
+    if (!s.stats.runs) return { text: "\u958B\u59CB\u7B2C\u4E00\u5834\u6230\u9B25", sub: "\u6309\u4E0B\u300C\u8150\u6839\u6D1E\u7A9F\u300D\u7684\u6311\u6230\uFF0C\u968A\u4F0D\u6703\u81EA\u5DF1\u6253\u3002", btn: { label: "\u6311\u6230", act: "fight", d: 0 } };
     if (hasUpgrade(s)) return { text: "\u80CC\u5305\u6709\u66F4\u597D\u7684\u88DD\u5099", sub: "\u4E00\u9375\u66FF\u51FA\u6230\u968A\u54E1\u63DB\u4E0A\u5206\u6578\u66F4\u9AD8\u7684\u88DD\u5099\u3002", btn: { label: "\u4E00\u9375\u914D\u88DD", act: "autoequip" } };
     if (party.length < ECONOMY.partyMax && s.heroes.length < ECONOMY.rosterMax && s.tavern.some((h) => s.gold >= hireCost(h))) {
       const have = new Set(party.map((h) => CLASSES[h.cls].role));
       const need = ["tank", "heal"].find((r) => !have.has(r)) || "dps";
       return { text: `\u968A\u4F0D\u9084\u6709 ${ECONOMY.partyMax - party.length} \u500B\u7A7A\u4F4D`, sub: `\u53BB\u9152\u9928\u62DB\u52DF\uFF0C\u5EFA\u8B70\u88DC${ROLE_NAME2[need]}\u3002`, btn: { label: "\u524D\u5F80\u9152\u9928", tab: "tavern" } };
     }
-    if (party.some((h) => pendingPicks(h))) return { text: "\u6709\u5929\u8CE6\u53EF\u4EE5\u9078", sub: `\u4F9D\u300C${DUNGEONS[top].name}\u300D\u7684\u9996\u9818\u6A5F\u5236\u4E00\u9375\u914D\u597D\u5168\u968A\u3002`, btn: { label: "\u63A8\u85A6\u5929\u8CE6", act: "recommend-party", d: top } };
+    if (party.some((h) => pendingPicks(h))) return { text: "\u6709\u5929\u8CE6\u9084\u6C92\u9078", sub: `\u4E00\u9375\u4F9D\u300C${DUNGEONS[top].name}\u300D\u914D\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\u3002`, btn: { label: "\u4E00\u9375\u5099\u6230", act: "prepare", d: top } };
     if ((s.failStreak || 0) >= 2 && top > 0) return { text: `\u300C${DUNGEONS[top].name}\u300D\u9023\u8F38 ${s.failStreak} \u5834`, sub: "\u56DE\u524D\u4E00\u5C64\u639B\u6A5F\u5237\u88DD\u5099\u8207\u7B49\u7D1A\uFF0C\u6216\u8ABF\u6574\u9663\u5BB9\u3002", btn: { label: `\u639B\u6A5F\u5237\u300C${DUNGEONS[top - 1].name}\u300D`, act: "idle", d: top - 1 } };
-    if (s.stash && s.stash.length) return { text: `\u6230\u5229\u54C1\u7BB1\u6709 ${s.stash.length} \u4EF6\u88DD\u5099`, sub: "\u80CC\u5305\u6EFF\u6642\u6389\u843D\u7684\u88DD\u5099\u66AB\u5B58\u5728\u9019\u88E1\u3002", btn: { label: "\u524D\u5F80\u80CC\u5305", tab: "bag" } };
-    if (mythicUnlocked(s) && !s.mythic.runs) return { text: "\u50B3\u5947\u79D8\u5883\u5DF2\u89E3\u9396", sub: "\u7121\u9650\u5C64\u6578\u3001\u9650\u6642\u6311\u6230\u3001\u6BCF\u65E5\u8A5E\u7DB4\uFF0C\u5C31\u5728\u4E0B\u65B9\u3002", btn: null };
+    if (s.stash && s.stash.length) return { text: `\u6230\u5229\u54C1\u7BB1\u6709 ${s.stash.length} \u4EF6\u88DD\u5099`, sub: "\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\u6389\u7684\u88DD\u5099\u653E\u5728\u9019\u88E1\uFF0C\u8A18\u5F97\u53D6\u51FA\u3002", btn: { label: "\u524D\u5F80\u80CC\u5305", tab: "bag" } };
+    if (mythicUnlocked(s) && !s.mythic.runs) return { text: "\u50B3\u5947\u79D8\u5883\u5DF2\u89E3\u9396", sub: "\u5C31\u5728\u4E0B\u65B9\uFF1A\u5C64\u6578\u7121\u4E0A\u9650\uFF0C\u6BCF\u5929\u8A5E\u7DB4\u4E0D\u540C\u3002", btn: null };
     return null;
   }
 
@@ -1319,7 +1402,7 @@
   }
 
   // src/core/version.js
-  var VERSION = "0.5.1";
+  var VERSION = "0.6.0";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -1397,12 +1480,12 @@
     const key = S.mythic.key, today = dailyAffixes(), active = activeAffixes(key);
     let h = `<div class="mythic"><div class="mhead"><div><span class="label">\u50B3\u5947\u79D8\u5883</span><b>\u76EE\u524D\u9470\u77F3</b></div><span class="keystone num">+${key}</span></div>
     <div class="affixes">${today.map((a, i) => `<div class="affix ${active.includes(a) ? "on" : ""}"><b>${AFFIXES[a].name}</b><span>${AFFIXES[a].desc}</span><small>${active.includes(a) ? `\u8003\u9A57${AFFIXES[a].test}` : `+${MYTHIC.affixAt[i]} \u8D77\u751F\u6548`}</small></div>`).join("")}</div>
-    <p class="sub" style="margin:0">\u4ECA\u5929\u7684\u8A5E\u7DB4\uFF0C\u6240\u6709\u4EBA\u76F8\u540C\uFF1B\u660E\u5929\u63DB\u4E00\u7D44\u3002\u9650\u6642\u5167\u901A\u95DC\u9470\u77F3 +1\uFF0C\u7528\u4E0D\u5230 80% \u6642\u9593 +2\uFF1B\u8D85\u6642\u6216\u5931\u6557 \u22121\u3002\u79D8\u5883\u4E0D\u80FD\u639B\u6A5F\u3002</p>
+    <p class="sub" style="margin:0">\u4ECA\u65E5\u8A5E\u7DB4\uFF0C\u6BCF\u5929 00:00 \u66F4\u63DB\u3002\u9650\u6642\u5167\u901A\u95DC\uFF0C\u9470\u77F3 +1\uFF0C\u6253\u5F97\u5920\u5FEB +2\uFF1B\u8D85\u6642\u6216\u5931\u6557\uFF0C\u9470\u77F3 \u22121\u3002\u79D8\u5883\u8981\u89AA\u81EA\u6311\u6230\uFF0C\u4E0D\u80FD\u639B\u6A5F\u3002</p>
     <div class="mlist">`;
     DUNGEONS.forEach((d, i) => {
       const best = S.mythic.best[i];
-      h += `<div class="mrow2"><div class="mname"><b>${d.name}</b><span class="sub num" style="margin:0">\u9650\u6642 ${mmss(mythicTimer(i))}\u30FB${best ? `\u6700\u4F73 +${best.level}\uFF08${mmss(best.time)}\uFF09` : "\u5C1A\u672A\u9650\u6642"}</span></div>
-      <button class="btn sm" data-act="recommend-mythic" data-d="${i}" aria-label="\u5957\u7528\u63A8\u85A6\u5929\u8CE6">\u5929\u8CE6</button>
+      h += `<div class="mrow2"><div class="mname"><b>${d.name}</b><span class="sub num" style="margin:0">\u9650\u6642 ${mmss(mythicTimer(i))}\u30FB${best ? `\u6700\u4F73 +${best.level}\uFF08${mmss(best.time)}\uFF09` : "\u9084\u6C92\u9650\u6642\u901A\u95DC"}</span></div>
+      <button class="btn sm" data-act="recommend-mythic" data-d="${i}" aria-label="\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099">\u5099\u6230</button>
       <button class="btn sm main" data-act="mythic" data-d="${i}">\u6311\u6230 +${key}</button></div>`;
     });
     return h + `</div></div>`;
@@ -1412,18 +1495,17 @@
     if (!lb2) return "";
     const me = app.S.player.name;
     let body;
-    if (!lb2.data) body = `<p class="sub" style="margin:0">${lb2.error ? "\u6392\u884C\u699C\u66AB\u6642\u8B80\u4E0D\u5230\uFF0C\u7A0D\u5F8C\u518D\u8A66\u3002" : "\u8B80\u53D6\u4E2D\u2026"}</p>`;
-    else if (!lb2.data.length) body = `<p class="sub" style="margin:0">\u9084\u6C92\u6709\u4EBA\u4E0A\u699C\uFF0C\u4F60\u53EF\u4EE5\u7576\u7B2C\u4E00\u500B\u3002</p>`;
+    if (!lb2.data) body = `<p class="sub" style="margin:0">${lb2.error ? "\u5929\u68AF\u66AB\u6642\u8B80\u4E0D\u5230\uFF0C\u7A0D\u5F8C\u518D\u8A66\u3002" : "\u8B80\u53D6\u4E2D\u2026"}</p>`;
+    else if (!lb2.data.length) body = `<p class="sub" style="margin:0">\u9084\u6C92\u6709\u4EBA\u4E0A\u699C\uFF0C\u6436\u7B2C\u4E00\u5427\u3002</p>`;
     else body = `<ol class="board">${lb2.data.map((p, i) => `<li class="${me && p.name === me ? "me" : ""}"><span class="rk num">${i + 1}</span><b>${esc(p.name)}</b>
       <span class="num">${p.best ? `\u79D8\u5883 +${p.best}` : `\u7B2C ${p.top} \u5C64`}</span><span class="sub num" style="margin:0">Lv${p.level}</span></li>`).join("")}</ol>`;
     return `<div class="boardcard"><div class="row" style="align-items:baseline"><b>\u5929\u68AF</b><span class="sub" style="margin:0 0 0 auto">${me ? `\u4F60\u662F\u300C${esc(me)}\u300D` : "\u533F\u540D"}\u30FB<button class="linkbtn" data-act="nick">${me ? "\u6539\u66B1\u7A31" : "\u8A2D\u5B9A\u66B1\u7A31"}</button></span></div>${body}
-    <p class="sub" style="margin:0">\u4F9D\u79D8\u5883\u6700\u9AD8\u9650\u6642\u7B49\u7D1A\u6392\u540D\uFF0C\u540C\u7B49\u7D1A\u6BD4\u6700\u9AD8\u5C64\u8207\u7B49\u7D1A\u3002\u9032\u5EA6\u6BCF 5 \u5206\u9418\u66F4\u65B0\u4E00\u6B21\u3002</p></div>`;
+    <p class="sub" style="margin:0">\u4F9D\u79D8\u5883\u6700\u9AD8\u9650\u6642\u7B49\u7D1A\u6392\u540D\u3002\u4F60\u7684\u6210\u7E3E\u6BCF 5 \u5206\u9418\u4E0A\u50B3\u4E00\u6B21\u3002</p></div>`;
   }
   function viewDungeons() {
     const lv = avgPartyLv(), il = avgPartyIlvl();
-    let h = nextStepCard() + `<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv${lv}</b>\u30FB\u88DD\u7B49 <b class="num">${il}</b>\u30FB\u6230\u529B <b class="num">${fmt(partyPower())}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u8003\u9A57\u4E00\u7A2E\u8077\u8CAC\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\u6216\u56DE\u982D\u5237\u88DD\u3002</p>`;
+    let h = nextStepCard() + `<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv${lv}</b>\u30FB\u88DD\u7B49 <b class="num">${il}</b>\u30FB\u6230\u529B <b class="num">${fmt(partyPower())}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u90FD\u6709\u5F31\u9EDE\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\uFF0C\u6216\u56DE\u982D\u5237\u88DD\u5099\u3002</p>`;
     h += mythicSection() + `<div class="dlist">`;
-    const talentsOpen = partyHeroes(app.S).some((x) => x.level >= TALENT_ROWS[0]);
     DUNGEONS.forEach((_, i) => {
       const d = dungeonInfo(i), locked = i >= app.S.unlocked, clears = app.S.clears[i] || 0;
       const idleHere = app.S.idle === i;
@@ -1439,10 +1521,10 @@
       </div>
       <div class="acts">${locked ? `<span class="sub" style="margin:0">\u5148\u901A\u95DC\u4E0A\u4E00\u5C64</span>` : `<button class="btn main grow" data-act="fight" data-d="${i}">\u6311\u6230</button>
          <button class="btn ${idleHere ? "on" : ""}" data-act="idle" data-d="${i}" ${clears ? "" : 'disabled title="\u901A\u95DC\u4E00\u6B21\u5F8C\u624D\u80FD\u639B\u6A5F"'}>${idleHere ? "\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62" : "\u639B\u6A5F\u5237"}</button>
-         ${talentsOpen ? `<button class="btn" data-act="recommend-party" data-d="${i}" aria-label="\u5168\u968A\u5957\u7528\u63A8\u85A6\u5929\u8CE6">\u63A8\u85A6\u5929\u8CE6</button>` : ""}`}
+         <button class="btn" data-act="prepare" data-d="${i}" aria-label="\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099">\u5099\u6230</button>`}
       </div></div>`;
     });
-    h += `</div>` + boardCard() + `<div class="howto" style="margin-top:16px"><b>\u63A8\u85A6\u5929\u8CE6</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u6A5F\u5236\uFF0C\u66FF\u51FA\u6230\u968A\u54E1\u4E00\u9375\u914D\u597D\u5C08\u7CBE\u8207\u5929\u8CE6\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A ${ECONOMY.offlineCapHours} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\u5B58\u5728\u9019\u53F0\u88DD\u7F6E\u7684\u700F\u89BD\u5668\uFF0C\u63DB\u88DD\u7F6E\u8ACB\u5230\u300C\u5718\u968A\u300D\u6700\u4E0B\u65B9\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>`;
+    h += `</div>` + boardCard() + `<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A ${ECONOMY.offlineCapHours} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u5230\u300C\u5718\u968A\u300D\u6700\u4E0B\u65B9\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>`;
     return h;
   }
 
@@ -1500,7 +1582,7 @@
     let h = `<div class="result ${(r.mythic ? r.inTime : b.win) ? "win" : "lose"}"><h3>${title}</h3>
     ${r.mythic ? `<div class="keychange"><span class="keystone num">+${r.prevKey}</span><span class="arrow">\u2192</span><span class="keystone num ${r.nextKey > r.prevKey ? "up" : r.nextKey < r.prevKey ? "down" : ""}">+${r.nextKey}</span>
       <span class="sub" style="margin:0">\u7528\u6642 <b class="num">${mmss(b.tick)}</b> / \u9650\u6642 ${mmss(b.mythic.timer)}</span>${r.record ? '<span class="newrec">\u65B0\u7D00\u9304</span>' : ""}</div>` : ""}
-    <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+${fmt(r.gold)}</b> \u91D1\u5E63</span><span><b class="num">+${fmt(r.xp)}</b> \u7D93\u9A57</span>${r.first ? '<span style="color:var(--brass)">\u9996\u901A\u734E\u52F5\uFF1A\u4FDD\u5E95\u7A00\u6709</span>' : ""}${r.decayed ? '<span style="color:var(--warn)">\u7B49\u7D1A\u58D3\u5236\uFF1A\u7D93\u9A57\u8207\u91D1\u5E63\u905E\u6E1B\uFF0C\u8A72\u5F80\u4E0B\u4E00\u5C64\u4E86</span>' : ""}</div>`;
+    <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+${fmt(r.gold)}</b> \u91D1\u5E63</span><span><b class="num">+${fmt(r.xp)}</b> \u7D93\u9A57</span>${r.first ? '<span style="color:var(--brass)">\u9996\u6B21\u901A\u95DC\uFF1A\u5FC5\u6389\u7A00\u6709\u4EE5\u4E0A</span>' : ""}${r.decayed ? '<span style="color:var(--warn)">\u9019\u5C64\u5C0D\u4F60\u592A\u7C21\u55AE\u4E86\uFF0C\u7D93\u9A57\u8207\u91D1\u5E63\u8B8A\u5C11\uFF0C\u5F80\u4E0B\u4E00\u5C64\u5427</span>' : ""}</div>`;
     if (r.lvUps.length) h += `<div style="color:var(--good);font-size:14px">\u2B06 ${r.lvUps.map((x) => `${x.name} \u5347\u5230 Lv${x.level}`).join("\u3001")}</div>`;
     if (r.kept.length || r.stashed.length || r.salvaged) h += `<div class="stack">${r.kept.map((it) => `<div class="item rar${it.rarity}"><div class="in">${itemName(it)}</div><div class="il">${SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div><div class="is">${itemStatText(it)}</div></div>`).join("")}${r.stashed.length ? `<div style="color:var(--brass);font-size:13px">\u80CC\u5305\u5DF2\u6EFF\uFF0C${r.stashed.length} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1</div>` : ""}${r.salvaged ? `<div class="sub" style="margin:0">${r.salvaged} \u4EF6\u81EA\u52D5\u5206\u89E3\u70BA\u91D1\u5E63</div>` : ""}</div>`;
     h += `<div class="meter"><span class="label">\u50B7\u5BB3 / \u6CBB\u7642\u7D71\u8A08\uFF08\u6BCF\u79D2\uFF09</span>${b.units.map((u) => {
@@ -1518,10 +1600,10 @@
   function failHint(b) {
     const tank = b.units.find((u) => u.role === "tank"), heal = b.units.find((u) => u.role === "heal");
     if (b.tick >= DUNGEON.maxTicks) return "\u63D0\u793A\uFF1A\u6642\u9593\u8017\u76E1\uFF0C\u8F38\u51FA\u4E0D\u8DB3\u3002\u88DC\u5F37\u8F38\u51FA\u6216\u5F37\u5316\u6B66\u5668\u3002";
-    if (!tank) return "\u63D0\u793A\uFF1A\u968A\u4F0D\u6C92\u6709\u5766\u514B\uFF0C\u6575\u4EBA\u6703\u96A8\u6A5F\u653B\u64CA\u8106\u76AE\u968A\u54E1\u3002";
+    if (!tank) return "\u63D0\u793A\uFF1A\u968A\u4F0D\u6C92\u6709\u5766\u514B\uFF0C\u6575\u4EBA\u6703\u5230\u8655\u4E82\u6253\u8106\u76AE\u968A\u54E1\u3002";
     if (!heal) return "\u63D0\u793A\uFF1A\u968A\u4F0D\u6C92\u6709\u6CBB\u7642\uFF0C\u9577\u6642\u9593\u6230\u9B25\u6490\u4E0D\u4F4F\u3002";
     if (tank.hp <= 0 && b.units.filter((u) => u.hp > 0).length === 0 && tank.taken > tank.max) return "\u63D0\u793A\uFF1A\u5766\u514B\u5148\u5012\uFF0C\u8A66\u8457\u5F37\u5316\u5766\u514B\u7684\u8B77\u7532\u8207\u8010\u529B\uFF0C\u6216\u591A\u5E36\u4E00\u4F4D\u6CBB\u7642\u3002";
-    return "\u63D0\u793A\uFF1A\u56DE\u524D\u4E00\u5C64\u5237\u88DD\u5099\u8207\u7B49\u7D1A\uFF0C\u6216\u8ABF\u6574\u9663\u5BB9\uFF08\u6CD5\u5E2B\u6E05\u5C0F\u602A\u3001\u76DC\u8CCA\u6253\u9996\u9818\uFF09\u3002";
+    return "\u63D0\u793A\uFF1A\u56DE\u524D\u4E00\u5C64\u5237\u88DD\u5099\u8207\u7B49\u7D1A\uFF0C\u6216\u6309\u300C\u5099\u6230\u300D\u63DB\u500B\u9663\u5BB9\u3002";
   }
 
   // src/ui/views/team.js
@@ -1572,33 +1654,37 @@
     <div class="in">${itemName(it)}${bestUpgradeFor(it) ? '<span class="better">\u25B2 \u53EF\u63D0\u5347</span>' : ""}</div>
     <div class="il">${SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div>
     <div class="is num">${RARITY[it.rarity].name}\u30FB${itemStatText(it)}</div></button>`;
+  var salvCount = () => app.S.bag.filter((id) => app.S.items[id].rarity <= (app.salvSel ?? 0)).length;
   function viewBag() {
     const S = app.S, E = ECONOMY;
     const items = S.bag.map((id) => S.items[id]).filter(Boolean).filter((it) => app.invFilter === "all" || it.slot === app.invFilter).sort((a, b) => itemScore(b) - itemScore(a));
-    const full = S.bag.length >= E.bagMax;
-    let h = `<h2>\u80CC\u5305 <span class="sub num ${full ? "warnc" : ""}">${S.bag.length}/${E.bagMax}</span></h2>`;
+    const cap = bagMax(S), full = S.bag.length >= cap;
+    let h = `<h2>\u80CC\u5305 <span class="sub num ${full ? "warnc" : ""}">${S.bag.length}/${cap}</span></h2>`;
     if (S.stash.length) {
       h += `<div class="stashbox"><div class="row" style="align-items:center"><b>\u6230\u5229\u54C1\u7BB1</b><span class="sub num" style="margin:0">${S.stash.length}/${E.stashMax}</span>
-      <span class="sub" style="margin:0 0 0 auto">\u80CC\u5305\u6EFF\u6642\u66AB\u5B58\u5728\u9019\u88E1</span></div>
+      <span class="sub" style="margin:0 0 0 auto">\u80CC\u5305\u6EFF\u6642\u6389\u843D\u7684\u88DD\u5099</span></div>
       <div class="stack">${S.stash.map((id) => S.items[id]).sort((a, b) => itemScore(b) - itemScore(a)).slice(0, 5).map((it) => itemRow(it)).join("")}
       ${S.stash.length > 5 ? `<div class="sub" style="margin:0">\u9084\u6709 ${S.stash.length - 5} \u4EF6</div>` : ""}</div>
-      <div class="row"><button class="btn sm main grow" data-act="takestash" ${full ? "disabled" : ""}>${full ? "\u80CC\u5305\u5DF2\u6EFF" : `\u53D6\u51FA\u5230\u80CC\u5305\uFF08\u53EF\u653E ${E.bagMax - S.bag.length} \u4EF6\uFF09`}</button>
+      <div class="row"><button class="btn sm main grow" data-act="takestash" ${full ? "disabled" : ""}>${full ? "\u80CC\u5305\u5DF2\u6EFF" : `\u53D6\u51FA\u5230\u80CC\u5305\uFF08\u9084\u80FD\u653E ${cap - S.bag.length} \u4EF6\uFF09`}</button>
       <button class="btn sm" data-act="salvagestash">\u5168\u90E8\u5206\u89E3</button></div></div>`;
     }
     h += `<div class="toolbar">${seg("filter", app.invFilter, [["all", "\u5168\u90E8"], ["weapon", "\u6B66\u5668"], ["armor", "\u8B77\u7532"], ["trinket", "\u98FE\u54C1"]])}
     <button class="btn sm main" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button></div>
-    <div class="toolbar"><button class="btn sm" data-act="salvageupto" data-v="0">\u5206\u89E3\u666E\u901A</button><button class="btn sm" data-act="salvageupto" data-v="1">\u5206\u89E3\u7CBE\u826F\u4EE5\u4E0B</button></div>`;
+    <div class="toolbar"><label class="selwrap"><span>\u5206\u89E3</span><select id="salvSel" aria-label="\u5206\u89E3\u54C1\u8CEA">${[0, 1, 2, 3].map((r) => `<option value="${r}" ${app.salvSel === r ? "selected" : ""}>${RARITY[r].name}${r ? "\u4EE5\u4E0B" : ""}</option>`).join("")}</select></label>
+    <button class="btn sm ${app.salvConfirm ? "danger" : ""}" data-act="salvageupto">${app.salvConfirm ? `\u78BA\u5B9A\u5206\u89E3 ${salvCount()} \u4EF6\uFF1F` : `\u5206\u89E3\uFF08${salvCount()} \u4EF6\uFF09`}</button></div>`;
     h += items.length ? `<div class="stack">${items.map((it) => itemRow(it)).join("")}</div>` : `<div class="empty">\u80CC\u5305\u662F\u7A7A\u7684\u3002\u901A\u95DC\u526F\u672C\u6703\u6389\u843D\u88DD\u5099\u3002</div>`;
     h += `<h2 style="font-size:18px">\u6230\u5229\u54C1\u8A2D\u5B9A</h2><div class="settings">
     <div class="set"><span>\u6389\u843D\u6642\u81EA\u52D5\u5206\u89E3</span>${seg("autosalv", S.autoSalvageBelow, [[0, "\u95DC\u9589"], [1, "\u666E\u901A"], [2, "\u7CBE\u826F\u4EE5\u4E0B"]])}</div>
     <div class="set"><span>\u80CC\u5305\u6EFF\u5F8C\u53EA\u4FDD\u7559</span>${seg("keeprar", S.keepRarity, [[1, "\u7CBE\u826F\u4EE5\u4E0A"], [2, "\u7A00\u6709\u4EE5\u4E0A"], [3, "\u53F2\u8A69"]])}</div>
-    <p class="sub" style="margin:0">\u80CC\u5305\u6EFF\u5F8C\uFF0C\u7B26\u5408\u54C1\u8CEA\u7684\u88DD\u5099\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF08\u4E0A\u9650 ${E.stashMax} \u4EF6\uFF09\uFF0C\u5176\u9918\u81EA\u52D5\u5206\u89E3\u6210\u91D1\u5E63\u3002</p></div>`;
+    <p class="sub" style="margin:0">\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\uFF0C\u7B26\u5408\u54C1\u8CEA\u7684\u88DD\u5099\u6703\u5148\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF08\u6700\u591A ${E.stashMax} \u4EF6\uFF09\uFF0C\u5176\u4ED6\u81EA\u52D5\u63DB\u6210\u91D1\u5E63\u3002</p></div>
+    <h2 style="font-size:18px">\u80CC\u5305\u64F4\u5145 <span class="sub num">${cap}/${E.bagMax + BAG_PER_MILESTONE * BAG_MILESTONES.length}</span></h2>
+    <div class="settings">${BAG_MILESTONES.map((m) => `<div class="set"><span class="${m.test(S) ? "" : "sub"}" style="margin:0">${m.test(S) ? "\u2713 " : ""}${m.name}</span><span class="num ${m.test(S) ? "okc" : "sub"}" style="margin:0">+${BAG_PER_MILESTONE} \u683C</span></div>`).join("")}</div>`;
     return h;
   }
 
   // src/ui/views/tavern.js
   function viewTavern() {
-    let h = `<h2>\u9152\u9928</h2><p class="sub">\u62DB\u52DF\u65B0\u82F1\u96C4\u3002\u7B49\u7D1A\u6703\u8DDF\u8457\u5718\u968A\u5E73\u5747\u6210\u9577\u3002\u540D\u518A\u4E0A\u9650 ${ECONOMY.rosterMax} \u4EBA\u3002</p><div class="stack">`;
+    let h = `<h2>\u9152\u9928</h2><p class="sub">\u62DB\u52DF\u65B0\u82F1\u96C4\uFF0C\u7B49\u7D1A\u6703\u63A5\u8FD1\u4F60\u968A\u4F0D\u7684\u5E73\u5747\u3002\u540D\u518A\u6700\u591A ${ECONOMY.rosterMax} \u4EBA\u3002</p><div class="stack">`;
     for (const x of app.S.tavern) {
       const c = cls(x), cost = hireCost(x);
       h += `<div class="hero"><div class="ic">${c.icon}</div><div class="nm">${x.name}<small>${c.name}${x.spec ? `\u30FB${SPECS[x.cls][x.spec].name}` : ""}\u30FB${ROLE_NAME[c.role]}\u30FB<span class="num">Lv${x.level}</span></small></div>
@@ -1659,7 +1745,11 @@
       <span class="row">${it ? `<button class="btn sm" data-act="up" data-id="${it.id}" ${it.up >= GEAR.maxUp ? "disabled" : ""}>\u5F37\u5316 <span class="num">${it.up >= GEAR.maxUp ? "MAX" : upgradeCost(it)}</span></button>` : ""}
       <button class="btn sm" data-act="pick" data-id="${x.id}" data-slot="${slot}" ${n ? "" : "disabled"}>\u66F4\u63DB</button></span></div>`;
     }
-    return h + `</div>` + heroActions(x);
+    const plan = upgradeAll(app.S, x.id, true), hasGear = Object.values(x.gear).some(Boolean);
+    h += `</div><div class="row">
+    <button class="btn grow" data-act="upall" data-id="${x.id}" ${plan.count ? "" : "disabled"}>${plan.empty ? "\u6C92\u6709\u88DD\u5099" : plan.count ? `\u4E00\u9375\u5F37\u5316 ${plan.count} \u6B21\uFF08${fmt(plan.spent)} \u91D1\uFF09` : plan.maxed ? "\u5DF2\u5168\u90E8\u5F37\u5316\u5230 +5" : "\u91D1\u5E63\u4E0D\u5920\u5F37\u5316"}</button>
+    <button class="btn" data-act="unequipall" data-id="${x.id}" ${hasGear ? "" : "disabled"}>\u5168\u90E8\u5378\u4E0B</button></div>`;
+    return h + heroActions(x);
   }
   function heroActions(x) {
     return `<div class="row">${inParty(x) ? `<button class="btn grow" data-act="bench" data-id="${x.id}">\u79FB\u51FA\u968A\u4F0D</button>` : `<button class="btn main grow" data-act="join" data-id="${x.id}" ${app.S.party.length >= ECONOMY.partyMax ? "disabled" : ""}>${app.S.party.length >= ECONOMY.partyMax ? "\u968A\u4F0D\u5DF2\u6EFF" : "\u52A0\u5165\u968A\u4F0D"}</button>`}
@@ -1753,6 +1843,7 @@
     app.lastResult = app.battle.mythic ? applyMythicResult(app.S, app.battle) : applyResult(app.S, app.battle.dIdx, app.battle);
     save();
     const r = app.lastResult, b = app.battle;
+    for (const m of newBagMilestones(app.S)) setTimeout(() => toast(`\u{1F392} ${m.name}\uFF1A\u80CC\u5305 +${BAG_PER_MILESTONE} \u683C`), 400);
     if (b.mythic) sendEvent("\u79D8\u5883", `${DUNGEONS[b.dIdx].name} +${b.mythic.level} ${r.inTime ? "\u9650\u6642" : b.win ? "\u8D85\u6642" : "\u5931\u6557"} ${mmss(b.tick)}${r.record ? "\uFF08\u65B0\u7D00\u9304\uFF09" : ""}`);
     else if (r.first) sendEvent("\u9996\u901A", `\u7B2C ${b.dIdx + 1} \u5C64 ${DUNGEONS[b.dIdx].name}`);
     if (!app.battle.mythic && app.S.idle === app.battle.dIdx) {
@@ -1810,6 +1901,7 @@
       return;
     }
     const a = t.dataset.act, id = t.dataset.id;
+    if (a !== "salvageupto") app.salvConfirm = false;
     switch (a) {
       case "fight":
         startBattle(+t.dataset.d);
@@ -1821,9 +1913,8 @@
         window.scrollTo(0, 0);
         break;
       case "recommend-mythic": {
-        const d = +t.dataset.d, hints = [...DUNGEONS[d].mech.map((m) => m.t), ...affixHints(activeAffixes(app.S.mythic.key))];
-        for (const x of partyHeroes(app.S)) applyRecommend(x, hints);
-        toast(`\u5168\u968A\u5DF2\u4F9D\u300C${DUNGEONS[d].name}\u300D\u8207\u4ECA\u65E5\u8A5E\u7DB4\u5957\u7528\u63A8\u85A6\u5929\u8CE6`);
+        const d = +t.dataset.d, r = prepare(app.S, [...DUNGEONS[d].mech.map((m) => m.t), ...affixHints(activeAffixes(app.S.mythic.key))]);
+        toast(`\u5DF2\u4F9D\u300C${DUNGEONS[d].name}\u300D\u8207\u4ECA\u65E5\u8A5E\u7DB4\u5099\u6230\uFF1A\u5766 ${r.roles.tank}\u30FB\u88DC ${r.roles.heal}\u30FB\u8F38\u51FA ${r.roles.dps}`);
         save();
         break;
       }
@@ -1887,10 +1978,10 @@
         toast("\u5DF2\u5957\u7528\u63A8\u85A6\u914D\u7F6E");
         save();
         break;
-      case "recommend-party": {
-        const d = +t.dataset.d;
-        for (const x of partyHeroes(app.S)) applyRecommend(x, DUNGEONS[d].mech.map((m) => m.t));
-        toast(`\u5168\u968A\u5DF2\u5957\u7528\u300C${DUNGEONS[d].name}\u300D\u63A8\u85A6\u5929\u8CE6`);
+      case "recommend-party":
+      case "prepare": {
+        const d = +t.dataset.d, r = prepare(app.S, DUNGEONS[d].mech.map((m) => m.t));
+        toast(`\u5DF2\u5099\u6230\u300C${DUNGEONS[d].name}\u300D\uFF1A\u5766 ${r.roles.tank}\u30FB\u88DC ${r.roles.heal}\u30FB\u8F38\u51FA ${r.roles.dps}${r.swapped ? `\uFF0C\u63DB\u4E0A ${r.swapped} \u4EF6\u88DD\u5099` : ""}`);
         save();
         break;
       }
@@ -1965,8 +2056,26 @@
         break;
       }
       case "salvageupto": {
-        const r = salvageUpTo(app.S, +t.dataset.v);
-        toast(r.count ? `\u5206\u89E3 ${r.count} \u4EF6\uFF0C\u7372\u5F97 ${r.gold} \u91D1` : "\u6C92\u6709\u53EF\u5206\u89E3\u7684\u88DD\u5099");
+        const lv = app.salvSel ?? 0;
+        if (lv >= 2 && !app.salvConfirm) {
+          app.salvConfirm = true;
+          break;
+        }
+        app.salvConfirm = false;
+        const r = salvageUpTo(app.S, lv);
+        toast(r.count ? `\u5206\u89E3 ${r.count} \u4EF6\uFF0C\u7372\u5F97 ${r.gold} \u91D1` : "\u6C92\u6709\u7B26\u5408\u7684\u88DD\u5099");
+        save();
+        break;
+      }
+      case "upall": {
+        const r = upgradeAll(app.S, id);
+        toast(r.count ? `\u5F37\u5316 ${r.count} \u6B21\uFF0C\u82B1\u8CBB ${fmt(r.spent)} \u91D1` : "\u91D1\u5E63\u4E0D\u5920");
+        save();
+        break;
+      }
+      case "unequipall": {
+        const r = unequipAll(app.S, id);
+        toast(r.left ? `\u80CC\u5305\u548C\u6230\u5229\u54C1\u7BB1\u90FD\u6EFF\u4E86\uFF0C\u9084\u6709 ${r.left} \u4EF6\u6C92\u5378\u4E0B` : `\u5DF2\u5378\u4E0B ${r.moved + r.stashed} \u4EF6${r.stashed ? `\uFF08${r.stashed} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF09` : ""}`);
         save();
         break;
       }
@@ -2113,6 +2222,13 @@
   }, 5e3);
   document.addEventListener("input", (e) => {
     if (e.target.id === "fbText") app.fbDraft = e.target.value;
+  });
+  document.addEventListener("change", (e) => {
+    if (e.target.id === "salvSel") {
+      app.salvSel = +e.target.value;
+      app.salvConfirm = false;
+      render();
+    }
   });
   function openNick() {
     openModal({ type: "text", html: `<h3>\u4F60\u7684\u66B1\u7A31</h3><p class="sub" style="margin:0">\u986F\u793A\u5728\u5929\u68AF\u4E0A\uFF0C\u4E4B\u5F8C\u96A8\u6642\u53EF\u4EE5\u4FEE\u6539\u3002\u904A\u6232\u6703\u8A18\u9304\u66B1\u7A31\u3001\u9032\u5EA6\u8207\u904A\u73A9\u6642\u9593\uFF0C\u4E0D\u6703\u6536\u96C6\u5E33\u865F\u6216\u500B\u4EBA\u8CC7\u6599\u3002</p>

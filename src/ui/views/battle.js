@@ -57,7 +57,7 @@ function viewResult() {
   let h = `<div class="result ${(r.mythic ? r.inTime : b.win) ? 'win' : 'lose'}"><h3>${title}</h3>
     ${r.mythic ? `<div class="keychange"><span class="keystone num">+${r.prevKey}</span><span class="arrow">→</span><span class="keystone num ${r.nextKey > r.prevKey ? 'up' : r.nextKey < r.prevKey ? 'down' : ''}">+${r.nextKey}</span>
       <span class="sub" style="margin:0">用時 <b class="num">${mmss(b.tick)}</b> / 限時 ${mmss(b.mythic.timer)}</span>${r.record ? '<span class="newrec">新紀錄</span>' : ''}</div>` : ''}
-    <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+${fmt(r.gold)}</b> 金幣</span><span><b class="num">+${fmt(r.xp)}</b> 經驗</span>${r.first ? '<span style="color:var(--brass)">首通獎勵：保底稀有</span>' : ''}${r.decayed ? '<span style="color:var(--warn)">等級壓制：經驗與金幣遞減，該往下一層了</span>' : ''}</div>`;
+    <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+${fmt(r.gold)}</b> 金幣</span><span><b class="num">+${fmt(r.xp)}</b> 經驗</span>${r.first ? '<span style="color:var(--brass)">首次通關：必掉稀有以上</span>' : ''}${r.decayed ? '<span style="color:var(--warn)">這層對你太簡單了，經驗與金幣變少，往下一層吧</span>' : ''}</div>`;
   if (r.lvUps.length) h += `<div style="color:var(--good);font-size:14px">⬆ ${r.lvUps.map(x => `${x.name} 升到 Lv${x.level}`).join('、')}</div>`;
   if (r.kept.length || r.stashed.length || r.salvaged) h += `<div class="stack">${r.kept.map(it => `<div class="item rar${it.rarity}"><div class="in">${itemName(it)}</div><div class="il">${G.SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div><div class="is">${itemStatText(it)}</div></div>`).join('')}${r.stashed.length ? `<div style="color:var(--brass);font-size:13px">背包已滿，${r.stashed.length} 件放進戰利品箱</div>` : ''}${r.salvaged ? `<div class="sub" style="margin:0">${r.salvaged} 件自動分解為金幣</div>` : ''}</div>`;
   h += `<div class="meter"><span class="label">傷害 / 治療統計（每秒）</span>${b.units.map(u => {
@@ -75,8 +75,8 @@ function viewResult() {
 function failHint(b) {
   const tank = b.units.find(u => u.role === 'tank'), heal = b.units.find(u => u.role === 'heal');
   if (b.tick >= G.DUNGEON.maxTicks) return '提示：時間耗盡，輸出不足。補強輸出或強化武器。';
-  if (!tank) return '提示：隊伍沒有坦克，敵人會隨機攻擊脆皮隊員。';
+  if (!tank) return '提示：隊伍沒有坦克，敵人會到處亂打脆皮隊員。';
   if (!heal) return '提示：隊伍沒有治療，長時間戰鬥撐不住。';
   if (tank.hp <= 0 && b.units.filter(u => u.hp > 0).length === 0 && tank.taken > tank.max) return '提示：坦克先倒，試著強化坦克的護甲與耐力，或多帶一位治療。';
-  return '提示：回前一層刷裝備與等級，或調整陣容（法師清小怪、盜賊打首領）。';
+  return '提示：回前一層刷裝備與等級，或按「備戰」換個陣容。';
 }

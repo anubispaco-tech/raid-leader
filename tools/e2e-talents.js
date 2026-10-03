@@ -37,8 +37,8 @@ out.push('Lv15 列鎖住：' + await page.locator('[data-act="talent"][data-lv="
 await page.screenshot({ path: '/tmp/claude-0/m-talent.png' });
 await page.keyboard.press('Escape');
 await page.click('[data-tab="dungeon"]');
-await page.click('[data-act="recommend-party"][data-d="4"]');
-s = await saved(); out.push('全隊推薦（第 5 層）：' + s.heroes.map(h => `${h.cls}:${h.spec}/${Object.values(h.talents).join('')}`).join(' '));
+await page.click('[data-act="prepare"][data-d="4"]');
+s = await saved(); out.push('一鍵備戰（第 5 層）：' + s.heroes.map(h => `${h.cls}:${h.spec}/${Object.values(h.talents).join('')}`).join(' '));
 out.push('推薦後紅點：' + await page.locator('[data-tab="team"] .dot').count());
 await page.click('[data-act="fight"][data-d="4"]'); await page.waitForTimeout(1500);
 await page.click('[data-act="horn"]'); await page.waitForTimeout(300);

@@ -4,7 +4,7 @@ import { app } from '../state.js';
 import { $, fmt, pct, toast, hero, cls, inParty, itemStatText, itemName, partyPower, avgPartyIlvl, avgPartyLv } from '../helpers.js';
 
 export function viewTavern() {
-  let h = `<h2>酒館</h2><p class="sub">招募新英雄。等級會跟著團隊平均成長。名冊上限 ${G.ECONOMY.rosterMax} 人。</p><div class="stack">`;
+  let h = `<h2>酒館</h2><p class="sub">招募新英雄，等級會接近你隊伍的平均。名冊最多 ${G.ECONOMY.rosterMax} 人。</p><div class="stack">`;
   for (const x of app.S.tavern) {
     const c = cls(x), cost = G.hireCost(x);
     h += `<div class="hero"><div class="ic">${c.icon}</div><div class="nm">${x.name}<small>${c.name}${x.spec ? `・${G.SPECS[x.cls][x.spec].name}` : ''}・${G.ROLE_NAME[c.role]}・<span class="num">Lv${x.level}</span></small></div>

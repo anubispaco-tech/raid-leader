@@ -49,13 +49,13 @@ document.addEventListener('click', e => {
   if (t.dataset.act === 'close') { if (e.target === t) closeModal(); return; }
   if (t.dataset.tab) { app.tab = t.dataset.tab; app.modal = null; render(); window.scrollTo(0, 0); return; }
   const a = t.dataset.act, id = t.dataset.id;
+  if (a !== 'salvageupto') app.salvConfirm = false;
   switch (a) {
     case 'fight': startBattle(+t.dataset.d); app.tab = 'battle'; break;
     case 'mythic': startMythic(+t.dataset.d); app.tab = 'battle'; window.scrollTo(0, 0); break;
     case 'recommend-mythic': {
-      const d = +t.dataset.d, hints = [...G.DUNGEONS[d].mech.map(m => m.t), ...G.affixHints(G.activeAffixes(app.S.mythic.key))];
-      for (const x of G.partyHeroes(app.S)) G.applyRecommend(x, hints);
-      toast(`全隊已依「${G.DUNGEONS[d].name}」與今日詞綴套用推薦天賦`); save(); break;
+      const d = +t.dataset.d, r = G.prepare(app.S, [...G.DUNGEONS[d].mech.map(m => m.t), ...G.affixHints(G.activeAffixes(app.S.mythic.key))]);
+      toast(`已依「${G.DUNGEONS[d].name}」與今日詞綴備戰：坦 ${r.roles.tank}・補 ${r.roles.heal}・輸出 ${r.roles.dps}`); save(); break;
     }
     case 'idle': {
       const d = +t.dataset.d;
@@ -74,9 +74,9 @@ document.addEventListener('click', e => {
     case 'spec': G.setSpec(hero(id), t.dataset.v); save(); break;
     case 'talent': G.setTalent(hero(id), +t.dataset.lv, t.dataset.v); save(); break;
     case 'recommend': G.applyRecommend(hero(id), G.DUNGEONS[+t.dataset.d].mech.map(m => m.t)); toast('已套用推薦配置'); save(); break;
-    case 'recommend-party': {
-      const d = +t.dataset.d; for (const x of G.partyHeroes(app.S)) G.applyRecommend(x, G.DUNGEONS[d].mech.map(m => m.t));
-      toast(`全隊已套用「${G.DUNGEONS[d].name}」推薦天賦`); save(); break;
+    case 'recommend-party': case 'prepare': {
+      const d = +t.dataset.d, r = G.prepare(app.S, G.DUNGEONS[d].mech.map(m => m.t));
+      toast(`已備戰「${G.DUNGEONS[d].name}」：坦 ${r.roles.tank}・補 ${r.roles.heal}・輸出 ${r.roles.dps}${r.swapped ? `，換上 ${r.swapped} 件裝備` : ''}`); save(); break;
     }
     case 'horn': if (app.battle && app.battle.useHorn()) app.render(true); return;
     case 'item': openModal({ type: 'item', id }); return;
@@ -100,8 +100,19 @@ document.addEventListener('click', e => {
     case 'filter': app.invFilter = t.dataset.v; break;
     case 'autoequip': { const n = G.autoEquip(app.S); toast(n ? `更換了 ${n} 件裝備` : '目前已是最佳配裝'); save(); break; }
     case 'salvageupto': {
-      const r = G.salvageUpTo(app.S, +t.dataset.v);
-      toast(r.count ? `分解 ${r.count} 件，獲得 ${r.gold} 金` : '沒有可分解的裝備'); save(); break;
+      const lv = app.salvSel ?? 0;
+      if (lv >= 2 && !app.salvConfirm) { app.salvConfirm = true; break; } // 分解稀有以上要再按一次確認
+      app.salvConfirm = false;
+      const r = G.salvageUpTo(app.S, lv);
+      toast(r.count ? `分解 ${r.count} 件，獲得 ${r.gold} 金` : '沒有符合的裝備'); save(); break;
+    }
+    case 'upall': {
+      const r = G.upgradeAll(app.S, id);
+      toast(r.count ? `強化 ${r.count} 次，花費 ${fmt(r.spent)} 金` : '金幣不夠'); save(); break;
+    }
+    case 'unequipall': {
+      const r = G.unequipAll(app.S, id);
+      toast(r.left ? `背包和戰利品箱都滿了，還有 ${r.left} 件沒卸下` : `已卸下 ${r.moved + r.stashed} 件${r.stashed ? `（${r.stashed} 件放進戰利品箱）` : ''}`); save(); break;
     }
     case 'autosalv': app.S.autoSalvageBelow = +t.dataset.v; save(); break;
     case 'keeprar': app.S.keepRarity = +t.dataset.v; save(); break;
@@ -158,7 +169,8 @@ document.addEventListener('visibilitychange', () => {
   else if (app.S.idle != null) startBattle(app.S.idle);
 });
 setInterval(() => { if (!document.hidden) { T.tick(5); save(); } }, 5000);
-document.addEventListener('input', e => { if (e.target.id === 'fbText') app.fbDraft = e.target.value; }); // 回饋草稿：畫面重畫時不會消失
+document.addEventListener('input', e => { if (e.target.id === 'fbText') app.fbDraft = e.target.value; });
+document.addEventListener('change', e => { if (e.target.id === 'salvSel') { app.salvSel = +e.target.value; app.salvConfirm = false; render(); } }); // 回饋草稿：畫面重畫時不會消失
 // 暱稱：第一次開遊戲時詢問（可跳過），之後可在團隊分頁修改
 function openNick() {
   openModal({ type: 'text', html: `<h3>你的暱稱</h3><p class="sub" style="margin:0">顯示在天梯上，之後隨時可以修改。遊戲會記錄暱稱、進度與遊玩時間，不會收集帳號或個人資料。</p>

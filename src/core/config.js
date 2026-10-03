@@ -96,6 +96,19 @@ export const MYTHIC = {
   goldMult: 1.5, xpMult: 1.2,       // 相對第 7 層的獎勵
 };
 
+// ---------- 背包擴充：每達成一項 +5 格 ----------
+// test(s) 回傳是否達成；best = 秘境任一副本的最高限時等級
+export const BAG_MILESTONES = [
+  { id: 'clear3', name: '首次通關第 3 層', test: s => !!s.clears[2] },
+  { id: 'clear5', name: '首次通關第 5 層', test: s => !!s.clears[4] },
+  { id: 'clear7', name: '首次通關第 7 層', test: s => !!s.clears[6] },
+  { id: 'mythic5', name: '秘境 +5 限時通關', test: s => mythicBestLevel(s) >= 5 },
+  { id: 'mythic10', name: '秘境 +10 限時通關', test: s => mythicBestLevel(s) >= 10 },
+  { id: 'mythic15', name: '秘境 +15 限時通關', test: s => mythicBestLevel(s) >= 15 },
+];
+export const BAG_PER_MILESTONE = 5;
+export const mythicBestLevel = s => Math.max(0, ...Object.values((s.mythic && s.mythic.best) || {}).map(b => b.level));
+
 // ---------- 遊玩數據與排行榜（GAS 網頁應用程式；留空就完全不連線）----------
 export const TELEMETRY = {
   url: 'https://script.google.com/macros/s/AKfycbwytKL7OhbuCd2WavlIopA49-vLdfLZXGQFPoUdnpmigJEWq3B4zuvSdoZqHX47Hhk0mg/exec',
@@ -119,7 +132,7 @@ export const ECONOMY = {
   startGold: 60,
   hireBase: 30, hirePerLevel: 25,
   refreshCost: 10,
-  partyMax: 5, rosterMax: 10, bagMax: 50,
+  partyMax: 5, rosterMax: 10, bagMax: 50, // bagMax = 起始格數，達成里程碑再擴充（見 BAG_MILESTONES）
   stashMax: 100,                    // 戰利品箱：背包滿時暫存，需手動取出
   defaultKeepRarity: 2,             // 背包滿後只保留此品質以上（2 = 稀有）
   offlineCapHours: 8,

@@ -18,7 +18,7 @@ const out = [], gold = async () => +(await page.locator('#gold').innerText()).re
 for (let i = 0; i < 6; i++) { await page.click('[data-act="fight"][data-d="0"]').catch(() => page.click('.result [data-act="fight"]')); await page.click('[data-act="skip"]'); }
 await page.click('[data-tab="bag"]');
 const before = await page.locator('.item').count(), g0 = await gold();
-await page.click('[data-act="salvageupto"][data-v="1"]');
+await page.selectOption('#salvSel', '1'); await page.click('[data-act="salvageupto"]');
 out.push(`分解精良以下：背包 ${before} → ${await page.locator('.item').count()}，金幣 ${g0} → ${await gold()}`);
 await page.click('[data-act="autosalv"][data-v="2"]'); await page.click('[data-act="keeprar"][data-v="1"]');
 out.push('設定：' + JSON.stringify(await page.evaluate(() => { const s = JSON.parse(localStorage.getItem('raid-leader-save-v1')); return [s.autoSalvageBelow, s.keepRarity]; })));
@@ -28,9 +28,21 @@ await page.evaluate(() => { const k = 'raid-leader-save-v1', s = JSON.parse(loca
   localStorage.setItem(k, JSON.stringify(s)); Storage.prototype.setItem = () => {}; }); // 擋住離開頁面時的自動存檔
 await page.reload(); await page.waitForTimeout(400); await page.click('[data-tab="bag"]');
 out.push('戰利品箱：' + (await page.locator('.stashbox').innerText()).split('\n').slice(0, 2).join(' '));
-await page.click('[data-act="salvageupto"][data-v="0"]'); await page.click('[data-act="takestash"]');
+await page.selectOption('#salvSel', '0'); await page.click('[data-act="salvageupto"]'); await page.click('[data-act="takestash"]');
 out.push('取出後背包：' + await page.locator('h2 .sub').first().innerText() + '，箱內剩 ' + await page.evaluate(() => JSON.parse(localStorage.getItem('raid-leader-save-v1')).stash.length));
 await page.click('[data-act="salvagestash"]').catch(() => {}); out.push('分解箱後還有箱子：' + await page.locator('.stashbox').count());
+// 分解稀有以下需要確認
+await page.selectOption('#salvSel', '2'); const nItems = await page.locator('.item').count();
+await page.click('[data-act="salvageupto"]'); out.push('第一次按：' + await page.locator('[data-act="salvageupto"]').innerText() + '｜數量不變：' + (nItems === await page.locator('.item').count()));
+await page.click('[data-act="salvageupto"]'); out.push('確認後背包：' + await page.locator('.item').count());
+// 英雄一鍵強化與卸下
+await page.evaluate(() => { const k = 'raid-leader-save-v1', s = JSON.parse(localStorage.getItem(k)); s.gold = 99999; const h = s.heroes.find(x => x.id === s.party[0]); for (const sl of ['weapon', 'armor', 'trinket']) { const id = 'g' + sl; s.items[id] = { id, slot: sl, ilvl: 20, rarity: 2, up: 0, pow: 9, sta: 20, crit: 0, name: '測試裝' }; h.gear[sl] = id; } localStorage.setItem(k, JSON.stringify(s)); Storage.prototype.setItem = () => {}; });
+await page.reload(); await page.waitForTimeout(400); await page.click('[data-act="skipnick"]', { timeout: 1500 }).catch(() => {});
+await page.click('[data-tab="team"]'); await page.locator('.party .slot').first().click();
+out.push('強化按鈕：' + await page.locator('[data-act="upall"]').innerText());
+await page.click('[data-act="upall"]'); out.push('強化後：' + await page.locator('[data-act="upall"]').innerText());
+await page.click('[data-act="unequipall"]'); out.push('卸下後按鈕停用：' + await page.locator('[data-act="unequipall"]').isDisabled());
+await page.keyboard.press('Escape'); await page.reload(); await page.waitForTimeout(400); await page.click('[data-act="skipnick"]', { timeout: 1500 }).catch(() => {});
 await page.click('[data-tab="team"]');
 const n0 = await page.locator('.stack .hero').count();
 await page.locator('.stack .hero').last().click();

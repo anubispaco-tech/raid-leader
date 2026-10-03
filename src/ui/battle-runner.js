@@ -39,6 +39,7 @@ export function finishBattle() {
   app.lastResult = app.battle.mythic ? G.applyMythicResult(app.S, app.battle) : G.applyResult(app.S, app.battle.dIdx, app.battle);
   save();
   const r = app.lastResult, b = app.battle;
+  for (const m of G.newBagMilestones(app.S)) setTimeout(() => toast(`🎒 ${m.name}：背包 +${G.BAG_PER_MILESTONE} 格`), 400);
   if (b.mythic) sendEvent('秘境', `${G.DUNGEONS[b.dIdx].name} +${b.mythic.level} ${r.inTime ? '限時' : b.win ? '超時' : '失敗'} ${mmss(b.tick)}${r.record ? '（新紀錄）' : ''}`);
   else if (r.first) sendEvent('首通', `第 ${b.dIdx + 1} 層 ${G.DUNGEONS[b.dIdx].name}`);
   if (!app.battle.mythic && app.S.idle === app.battle.dIdx) {

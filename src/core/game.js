@@ -1,11 +1,11 @@
 // ===== 遊戲狀態操作：獎勵、隊伍、背包、掛機 =====
 // 所有函式都接收存檔物件 s 並直接修改它；畫面層只呼叫這裡，不自己改存檔。
-import { CLASSES, HERO, SLOTS, DUNGEONS, REWARD, ECONOMY, GEAR } from './config.js';
+import { CLASSES, HERO, SLOTS, DUNGEONS, REWARD, ECONOMY, GEAR, BAG_MILESTONES, BAG_PER_MILESTONE } from './config.js';
 import { R, rnd, rint, pick } from './rng.js';
 import { makeItem, rollRarity, itemScore, salvageValue, upgradeCost } from './items.js';
-import { makeHero, gainXp } from './heroes.js';
+import { makeHero, gainXp, heroPower } from './heroes.js';
 import { dungeonInfo } from './dungeons.js';
-import { SPECS, TALENT_ROWS, SPEC_LEVEL } from './talents.js';
+import { SPECS, TALENT_ROWS, SPEC_LEVEL, applyRecommend } from './talents.js';
 import { MYTHIC } from './config.js';
 import { mythicRewards, keyChange } from './mythic.js';
 import { Battle } from './battle.js';
@@ -38,7 +38,7 @@ function decayFor(dIdx) {
 export function newGame() {
   const s = { v: SAVE_VERSION, gold: ECONOMY.startGold, heroes: [], items: {}, bag: [], party: [], unlocked: 1, clears: {},
     tavern: [], idle: null, lastSeen: Date.now(), stats: { runs: 0, wins: 0 }, autoSalvageBelow: 0, keepRarity: ECONOMY.defaultKeepRarity, stash: [], created: Date.now(),
-    mythic: { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 }, failStreak: 0, player: newPlayer() };
+    mythic: { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 }, failStreak: 0, player: newPlayer(), bagSeen: [] };
   for (const c of HERO.starters) { const h = makeHero(c); s.heroes.push(h); s.party.push(h.id); }
   rollTavern(s);
   return s;
@@ -58,6 +58,8 @@ export function migrate(s) {
   s.failStreak = s.failStreak || 0;
   // v4 → v5：玩家識別（隨機 ID、暱稱、累計遊玩秒數），用於遊玩數據與排行榜
   s.player = s.player || newPlayer();
+  // v0.6：背包擴充里程碑（已通知過的清單；舊存檔把已達成的視為已通知，避免一次跳一堆提示）
+  if (!s.bagSeen) { s.bagSeen = []; newBagMilestones(s); }
   s.v = SAVE_VERSION;
   return s;
 }
@@ -98,10 +100,19 @@ export function fireHero(s, id) {
 }
 
 // ---------- 戰鬥結算 ----------
+// ---------- 背包容量 ----------
+export const bagMax = s => ECONOMY.bagMax + BAG_PER_MILESTONE * BAG_MILESTONES.filter(m => m.test(s)).length;
+// 回傳新達成（還沒通知過）的里程碑，並記錄為已通知
+export function newBagMilestones(s) {
+  s.bagSeen = s.bagSeen || [];
+  const fresh = BAG_MILESTONES.filter(m => m.test(s) && !s.bagSeen.includes(m.id));
+  s.bagSeen.push(...fresh.map(m => m.id));
+  return fresh;
+}
 // 新掉落的去向：自動分解 → 背包 → 戰利品箱（只收 keepRarity 以上）→ 分解成金幣
 function addLoot(s, it) {
   if (it.rarity < s.autoSalvageBelow) { s.gold += salvageValue(it); return 'salvaged'; }
-  if (s.bag.length < ECONOMY.bagMax) { s.items[it.id] = it; s.bag.push(it.id); return 'bag'; }
+  if (s.bag.length < bagMax(s)) { s.items[it.id] = it; s.bag.push(it.id); return 'bag'; }
   if (it.rarity >= s.keepRarity && s.stash.length < ECONOMY.stashMax) { s.items[it.id] = it; s.stash.push(it.id); return 'stash'; }
   s.gold += salvageValue(it); return 'salvaged';
 }
@@ -159,6 +170,35 @@ export function unequip(s, heroId, slot) {
   const h = s.heroes.find(x => x.id === heroId); if (!h || !h.gear[slot]) return;
   s.bag.push(h.gear[slot]); h.gear[slot] = null;
 }
+// 一鍵卸下：放回背包；背包放不下的放進戰利品箱；兩邊都滿就停
+export function unequipAll(s, heroId) {
+  const h = s.heroes.find(x => x.id === heroId); if (!h) return { moved: 0, stashed: 0, left: 0 };
+  let moved = 0, stashed = 0, left = 0;
+  for (const slot of Object.keys(SLOTS)) {
+    const id = h.gear[slot]; if (!id) continue;
+    if (s.bag.length < bagMax(s)) { s.bag.push(id); moved++; }
+    else if (s.stash.length < ECONOMY.stashMax) { s.stash.push(id); stashed++; }
+    else { left++; continue; }
+    h.gear[slot] = null;
+  }
+  return { moved, stashed, left };
+}
+// 一鍵強化：每次挑最便宜的一件強化，直到金幣不夠或全部滿級；dry=true 只試算不扣錢
+export function upgradeAll(s, heroId, dry = false) {
+  const h = s.heroes.find(x => x.id === heroId); if (!h) return { count: 0, spent: 0, maxed: true };
+  const items = Object.keys(SLOTS).map(sl => h.gear[sl] && s.items[h.gear[sl]]).filter(Boolean);
+  const ups = new Map(items.map(it => [it, it.up]));
+  let gold = s.gold, count = 0, spent = 0;
+  for (;;) {
+    const cand = items.filter(it => ups.get(it) < GEAR.maxUp)
+      .map(it => ({ it, cost: upgradeCost({ ...it, up: ups.get(it) }) })).sort((a, b) => a.cost - b.cost)[0];
+    if (!cand || cand.cost > gold) break;
+    gold -= cand.cost; spent += cand.cost; count++; ups.set(cand.it, ups.get(cand.it) + 1);
+  }
+  const maxed = items.length > 0 && items.every(it => ups.get(it) >= GEAR.maxUp);
+  if (!dry) { s.gold = gold; for (const [it, up] of ups) it.up = up; }
+  return { count, spent, maxed, empty: !items.length };
+}
 export function salvage(s, itemId) {
   const it = s.items[itemId]; if (!it) return 0;
   s.bag = s.bag.filter(id => id !== itemId); s.stash = (s.stash || []).filter(id => id !== itemId); delete s.items[itemId];
@@ -169,9 +209,30 @@ export function salvageUpTo(s, maxRarity) {
   const ids = s.bag.filter(i => s.items[i].rarity <= maxRarity);
   return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
 }
+// ---------- 推薦陣容 ----------
+// 依副本機制（hints：pulse / buster / summon / enrage）從名冊挑 5 人：
+// 坦克 1；有脈衝（全隊傷害）帶 2 補，否則 1 補；其餘輸出依機制偏好（召喚 → 法師、狂暴 → 盜賊）再比戰力
+export function recommendParty(s, hints) {
+  const has = t => hints.includes(t), pw = h => heroPower(h, s.items);
+  const byRole = r => s.heroes.filter(h => CLASSES[h.cls].role === r).sort((a, b) => pw(b) - pw(a));
+  const pick = [...byRole('tank').slice(0, 1), ...byRole('heal').slice(0, has('pulse') ? 2 : 1)];
+  const pref = h => (has('summon') && h.cls === 'mage' ? 1.25 : 1) * (has('enrage') && h.cls === 'rogue' ? 1.25 : 1);
+  const rest = s.heroes.filter(h => !pick.includes(h)).sort((a, b) => (CLASSES[b.cls].role === 'dps') - (CLASSES[a.cls].role === 'dps') || pw(b) * pref(b) - pw(a) * pref(a));
+  pick.push(...rest.slice(0, Math.max(0, ECONOMY.partyMax - pick.length)));
+  s.party = pick.slice(0, ECONOMY.partyMax).map(h => h.id);
+  return partyHeroes(s);
+}
+// 一鍵備戰：推薦陣容 → 推薦天賦 → 一鍵配裝
+export function prepare(s, hints) {
+  const party = recommendParty(s, hints);
+  for (const h of party) applyRecommend(h, hints);
+  const swapped = autoEquip(s);
+  const roles = { tank: 0, heal: 0, dps: 0 }; party.forEach(h => roles[CLASSES[h.cls].role]++);
+  return { roles, swapped };
+}
 // ---------- 戰利品箱 ----------
 export function takeFromStash(s) {
-  const room = ECONOMY.bagMax - s.bag.length;
+  const room = bagMax(s) - s.bag.length;
   const ids = [...s.stash].sort((a, b) => itemScore(s.items[b]) - itemScore(s.items[a])).slice(0, Math.max(0, room));
   s.stash = s.stash.filter(id => !ids.includes(id)); s.bag.push(...ids);
   return ids.length;

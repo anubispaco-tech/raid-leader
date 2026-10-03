@@ -234,3 +234,9 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 .board li.me{outline:1px solid var(--brass)}
 .board b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .linkbtn{color:var(--brass);text-decoration:underline;font-size:13px;padding:0}
+
+/* v0.6 */
+.selwrap{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.selwrap select{background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;font-size:14px}
+.btn.danger{border-color:var(--bad);color:var(--bad)}
+.okc{color:var(--good)}
