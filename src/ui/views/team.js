@@ -9,7 +9,7 @@ function roleCount() {
 }
 export function viewTeam() {
   const party = G.partyHeroes(app.S), c = roleCount();
-  let h = `<h2>團隊</h2><p class="sub">出戰最多 ${G.ECONOMY.partyMax} 人。點英雄查看裝備與調整陣容。</p>
+  let h = `<h2>團隊</h2><p class="sub">出戰最多 ${G.ECONOMY.partyMax} 人。${G.partyLocked(app.S) ? '<b style="color:var(--warn)">掛機中，陣容已鎖定</b>，停止掛機後才能換人。' : '點英雄查看裝備與調整陣容。'}</p>
     <div class="party">${Array.from({ length: G.ECONOMY.partyMax }, (_, i) => {
       const x = party[i];
       if (!x) return `<div class="slot emptyslot">空位</div>`;

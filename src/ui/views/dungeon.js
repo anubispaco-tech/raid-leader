@@ -73,9 +73,9 @@ export function viewDungeons() {
       <div class="acts">${locked ? `<span class="sub" style="margin:0">先通關上一層</span>` :
         `<button class="btn main grow" data-act="fight" data-d="${i}">挑戰</button>
          <button class="btn ${idleHere ? 'on' : ''}" data-act="idle" data-d="${i}" ${clears ? '' : 'disabled title="通關一次後才能掛機"'}>${idleHere ? '掛機中・停止' : '掛機刷'}</button>
-         <button class="btn" data-act="prepare" data-d="${i}" aria-label="一鍵備戰：陣容、天賦、裝備">備戰</button>`}
+         <button class="btn" data-act="prepare" data-d="${i}" aria-label="${app.S.idle != null ? '一鍵備戰：掛機中只調天賦、裝備' : '一鍵備戰：陣容、天賦、裝備'}">備戰</button>`}
       </div></div>`;
   });
-  h += `</div>` + boardCard() + `<div class="howto" style="margin-top:16px"><b>備戰</b>：依這層首領的弱點，自動排好陣容、天賦與裝備。<br><b>掛機刷</b>：自動重複挑戰，關掉頁面也會累積（最多 ${G.ECONOMY.offlineCapHours} 小時），回來時一次結算。<br><b>存檔</b>：進度存在這支手機的瀏覽器。要換手機玩，到「團隊」最下方匯出存檔碼。</div>`;
+  h += `</div>` + boardCard() + `<div class="howto" style="margin-top:16px"><b>備戰</b>：依這層首領的弱點，自動排好陣容、天賦與裝備（掛機中陣容鎖定，只調天賦與裝備）。<br><b>掛機刷</b>：自動重複挑戰，關掉頁面也會累積（最多 ${G.ECONOMY.offlineCapHours} 小時），回來時一次結算。<br><b>存檔</b>：進度存在這支手機的瀏覽器。要換手機玩，到「團隊」最下方匯出存檔碼。</div>`;
   return h;
 }

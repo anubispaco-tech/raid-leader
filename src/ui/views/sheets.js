@@ -47,6 +47,8 @@ function sheetHero(x) {
   return h + heroActions(x);
 }
 function heroActions(x) {
+  const locked = G.partyLocked(app.S);
+  if (locked) return `<div class="row"><button class="btn grow" disabled>${inParty(x) ? '出戰中' : '待命中'}・掛機時無法更換隊員</button></div>`;
   return `<div class="row">${inParty(x)
     ? `<button class="btn grow" data-act="bench" data-id="${x.id}">移出隊伍</button>`
     : `<button class="btn main grow" data-act="join" data-id="${x.id}" ${app.S.party.length >= G.ECONOMY.partyMax ? 'disabled' : ''}>${app.S.party.length >= G.ECONOMY.partyMax ? '隊伍已滿' : '加入隊伍'}</button>`}

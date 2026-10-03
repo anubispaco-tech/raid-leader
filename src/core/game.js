@@ -113,14 +113,14 @@ export function recruitScroll(s, n = 1) {
   if (s.gold < cost) return { error: 'gold' };
   s.gold -= cost;
   const got = Array.from({ length: n }, () => newRecruit(s, recruitLevel(s)));
-  for (const h of got) { s.heroes.push(h); if (s.party.length < ECONOMY.partyMax) s.party.push(h.id); }
+  for (const h of got) { s.heroes.push(h); if (!partyLocked(s) && s.party.length < ECONOMY.partyMax) s.party.push(h.id); }
   return { heroes: got, cost };
 }
 export function hire(s, heroId) {
   const h = s.tavern.find(x => x.id === heroId), cost = h && hireCost(h);
   if (!h || s.gold < cost || s.heroes.length >= ECONOMY.rosterMax) return null;
   s.gold -= cost; s.heroes.push(h); s.tavern = s.tavern.filter(x => x.id !== heroId);
-  if (s.party.length < ECONOMY.partyMax) s.party.push(h.id);
+  if (!partyLocked(s) && s.party.length < ECONOMY.partyMax) s.party.push(h.id);
   if (!s.tavern.length) rollTavern(s);
   return h;
 }
@@ -130,12 +130,14 @@ export function refreshTavern(s) {
   const c = refreshCost(s); if (s.gold < c) return false;
   s.gold -= c; rollTavern(s); return true;
 }
-export function joinParty(s, id) { if (s.party.length < ECONOMY.partyMax && !s.party.includes(id)) s.party.push(id); }
-export function benchHero(s, id) { s.party = s.party.filter(x => x !== id); }
+// 掛機中鎖定陣容：不能加入、移出、解雇出戰中的英雄，備戰只調天賦與裝備
+export const partyLocked = s => s.idle != null;
+export function joinParty(s, id) { if (partyLocked(s)) return false; if (s.party.length < ECONOMY.partyMax && !s.party.includes(id)) s.party.push(id); }
+export function benchHero(s, id) { if (partyLocked(s)) return false; s.party = s.party.filter(x => x !== id); }
 export function fireHero(s, id) {
-  const h = s.heroes.find(x => x.id === id); if (!h) return null;
+  const h = s.heroes.find(x => x.id === id); if (!h || (partyLocked(s) && s.party.includes(id))) return null;
   for (const sl in h.gear) if (h.gear[sl]) s.bag.push(h.gear[sl]);
-  s.heroes = s.heroes.filter(x => x.id !== id); benchHero(s, id);
+  s.heroes = s.heroes.filter(x => x.id !== id); s.party = s.party.filter(x => x !== id);
   const refund = Math.round(hireCost(h) * RECRUIT.fireRefund); s.gold += refund;
   return { ...h, refund };
 }
@@ -264,12 +266,13 @@ export function recommendParty(s, hints) {
   return partyHeroes(s);
 }
 // 一鍵備戰：推薦陣容 → 推薦天賦 → 一鍵配裝
+// 掛機中（partyLocked）保留目前陣容，只套用天賦與裝備
 export function prepare(s, hints) {
-  const party = recommendParty(s, hints);
+  const locked = partyLocked(s), party = locked ? partyHeroes(s) : recommendParty(s, hints);
   for (const h of party) applyRecommend(h, hints);
   const swapped = autoEquip(s);
   const roles = { tank: 0, heal: 0, dps: 0 }; party.forEach(h => roles[CLASSES[h.cls].role]++);
-  return { roles, swapped };
+  return { roles, swapped, locked };
 }
 // ---------- 戰利品箱 ----------
 export function takeFromStash(s) {

@@ -283,7 +283,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.7.0 */
+/* 副本團長 v0.7.1 */
 (() => {
   // src/core/config.js
   var CLASSES = {
@@ -1447,7 +1447,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     const got = Array.from({ length: n }, () => newRecruit(s, recruitLevel(s)));
     for (const h of got) {
       s.heroes.push(h);
-      if (s.party.length < ECONOMY.partyMax) s.party.push(h.id);
+      if (!partyLocked(s) && s.party.length < ECONOMY.partyMax) s.party.push(h.id);
     }
     return { heroes: got, cost };
   }
@@ -1457,7 +1457,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     s.gold -= cost;
     s.heroes.push(h);
     s.tavern = s.tavern.filter((x) => x.id !== heroId);
-    if (s.party.length < ECONOMY.partyMax) s.party.push(h.id);
+    if (!partyLocked(s) && s.party.length < ECONOMY.partyMax) s.party.push(h.id);
     if (!s.tavern.length) rollTavern(s);
     return h;
   }
@@ -1469,18 +1469,21 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     rollTavern(s);
     return true;
   }
+  var partyLocked = (s) => s.idle != null;
   function joinParty(s, id) {
+    if (partyLocked(s)) return false;
     if (s.party.length < ECONOMY.partyMax && !s.party.includes(id)) s.party.push(id);
   }
   function benchHero(s, id) {
+    if (partyLocked(s)) return false;
     s.party = s.party.filter((x) => x !== id);
   }
   function fireHero(s, id) {
     const h = s.heroes.find((x) => x.id === id);
-    if (!h) return null;
+    if (!h || partyLocked(s) && s.party.includes(id)) return null;
     for (const sl in h.gear) if (h.gear[sl]) s.bag.push(h.gear[sl]);
     s.heroes = s.heroes.filter((x) => x.id !== id);
-    benchHero(s, id);
+    s.party = s.party.filter((x) => x !== id);
     const refund = Math.round(hireCost(h) * RECRUIT.fireRefund);
     s.gold += refund;
     return { ...h, refund };
@@ -1649,12 +1652,12 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     return partyHeroes(s);
   }
   function prepare(s, hints) {
-    const party = recommendParty(s, hints);
+    const locked = partyLocked(s), party = locked ? partyHeroes(s) : recommendParty(s, hints);
     for (const h of party) applyRecommend(h, hints);
     const swapped = autoEquip(s);
     const roles = { tank: 0, heal: 0, dps: 0 };
     party.forEach((h) => roles[CLASSES[h.cls].role]++);
-    return { roles, swapped };
+    return { roles, swapped, locked };
   }
   function takeFromStash(s) {
     const room = bagMax(s) - s.bag.length;
@@ -1781,12 +1784,12 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     const party = partyHeroes(s), top = s.unlocked - 1;
     if (!s.stats.runs) return { text: "\u958B\u59CB\u7B2C\u4E00\u5834\u6230\u9B25", sub: "\u6309\u4E0B\u300C\u8150\u6839\u6D1E\u7A9F\u300D\u7684\u6311\u6230\uFF0C\u968A\u4F0D\u6703\u81EA\u5DF1\u6253\u3002", btn: { label: "\u6311\u6230", act: "fight", d: 0 } };
     if (hasUpgrade(s)) return { text: "\u80CC\u5305\u6709\u66F4\u597D\u7684\u88DD\u5099", sub: "\u4E00\u9375\u66FF\u51FA\u6230\u968A\u54E1\u63DB\u4E0A\u5206\u6578\u66F4\u9AD8\u7684\u88DD\u5099\u3002", btn: { label: "\u4E00\u9375\u914D\u88DD", act: "autoequip" } };
-    if (party.length < ECONOMY.partyMax && s.heroes.length < ECONOMY.rosterMax && s.tavern.some((h) => s.gold >= hireCost(h))) {
+    if (s.idle == null && party.length < ECONOMY.partyMax && s.heroes.length < ECONOMY.rosterMax && s.tavern.some((h) => s.gold >= hireCost(h))) {
       const have = new Set(party.map((h) => CLASSES[h.cls].role));
       const need = ["tank", "heal"].find((r) => !have.has(r)) || "dps";
       return { text: `\u968A\u4F0D\u9084\u6709 ${ECONOMY.partyMax - party.length} \u500B\u7A7A\u4F4D`, sub: `\u53BB\u9152\u9928\u62DB\u52DF\uFF0C\u5EFA\u8B70\u88DC${ROLE_NAME2[need]}\u3002`, btn: { label: "\u524D\u5F80\u9152\u9928", tab: "tavern" } };
     }
-    if (party.some((h) => pendingPicks(h))) return { text: "\u6709\u5929\u8CE6\u9084\u6C92\u9078", sub: `\u4E00\u9375\u4F9D\u300C${DUNGEONS[top].name}\u300D\u914D\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\u3002`, btn: { label: "\u4E00\u9375\u5099\u6230", act: "prepare", d: top } };
+    if (party.some((h) => pendingPicks(h))) return { text: "\u6709\u5929\u8CE6\u9084\u6C92\u9078", sub: s.idle != null ? `\u639B\u6A5F\u4E2D\u9663\u5BB9\u4E0D\u8B8A\uFF0C\u4E00\u9375\u4F9D\u300C${DUNGEONS[top].name}\u300D\u914D\u597D\u5929\u8CE6\u8207\u88DD\u5099\u3002` : `\u4E00\u9375\u4F9D\u300C${DUNGEONS[top].name}\u300D\u914D\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\u3002`, btn: { label: "\u4E00\u9375\u5099\u6230", act: "prepare", d: top } };
     if ((s.failStreak || 0) >= 2 && top > 0) return { text: `\u300C${DUNGEONS[top].name}\u300D\u9023\u8F38 ${s.failStreak} \u5834`, sub: "\u56DE\u524D\u4E00\u5C64\u639B\u6A5F\u5237\u88DD\u5099\u8207\u7B49\u7D1A\uFF0C\u6216\u8ABF\u6574\u9663\u5BB9\u3002", btn: { label: `\u639B\u6A5F\u5237\u300C${DUNGEONS[top - 1].name}\u300D`, act: "idle", d: top - 1 } };
     if (s.stash && s.stash.length) return { text: `\u6230\u5229\u54C1\u7BB1\u6709 ${s.stash.length} \u4EF6\u88DD\u5099`, sub: "\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\u6389\u7684\u88DD\u5099\u653E\u5728\u9019\u88E1\uFF0C\u8A18\u5F97\u53D6\u51FA\u3002", btn: { label: "\u524D\u5F80\u80CC\u5305", tab: "bag" } };
     if (vaultUnlocked(s) && vaultLeft(s) && s.stats.runs >= 5) return { text: `\u4ECA\u5929\u5BF6\u5EAB\u9084\u6709 ${vaultLeft(s)} \u6B21`, sub: "60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\uFF0C\u5927\u91CF\u91D1\u5E63\u53EF\u4EE5\u62FF\u53BB\u62DB\u52DF\u82F1\u96C4\u3002", btn: { label: "\u9032\u5165\u5BF6\u5EAB", act: "vault", d: Math.max(...Object.keys(s.clears).filter((k) => s.clears[k]).map(Number)) } };
@@ -1880,7 +1883,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   }
 
   // src/core/version.js
-  var VERSION = "0.7.0";
+  var VERSION = "0.7.1";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -2010,10 +2013,10 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       </div>
       <div class="acts">${locked ? `<span class="sub" style="margin:0">\u5148\u901A\u95DC\u4E0A\u4E00\u5C64</span>` : `<button class="btn main grow" data-act="fight" data-d="${i}">\u6311\u6230</button>
          <button class="btn ${idleHere ? "on" : ""}" data-act="idle" data-d="${i}" ${clears ? "" : 'disabled title="\u901A\u95DC\u4E00\u6B21\u5F8C\u624D\u80FD\u639B\u6A5F"'}>${idleHere ? "\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62" : "\u639B\u6A5F\u5237"}</button>
-         <button class="btn" data-act="prepare" data-d="${i}" aria-label="\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099">\u5099\u6230</button>`}
+         <button class="btn" data-act="prepare" data-d="${i}" aria-label="${app.S.idle != null ? "\u4E00\u9375\u5099\u6230\uFF1A\u639B\u6A5F\u4E2D\u53EA\u8ABF\u5929\u8CE6\u3001\u88DD\u5099" : "\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099"}">\u5099\u6230</button>`}
       </div></div>`;
     });
-    h += `</div>` + boardCard() + `<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A ${ECONOMY.offlineCapHours} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u5230\u300C\u5718\u968A\u300D\u6700\u4E0B\u65B9\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>`;
+    h += `</div>` + boardCard() + `<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A ${ECONOMY.offlineCapHours} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u5230\u300C\u5718\u968A\u300D\u6700\u4E0B\u65B9\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>`;
     return h;
   }
 
@@ -2109,7 +2112,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   }
   function viewTeam() {
     const party = partyHeroes(app.S), c = roleCount();
-    let h = `<h2>\u5718\u968A</h2><p class="sub">\u51FA\u6230\u6700\u591A ${ECONOMY.partyMax} \u4EBA\u3002\u9EDE\u82F1\u96C4\u67E5\u770B\u88DD\u5099\u8207\u8ABF\u6574\u9663\u5BB9\u3002</p>
+    let h = `<h2>\u5718\u968A</h2><p class="sub">\u51FA\u6230\u6700\u591A ${ECONOMY.partyMax} \u4EBA\u3002${partyLocked(app.S) ? '<b style="color:var(--warn)">\u639B\u6A5F\u4E2D\uFF0C\u9663\u5BB9\u5DF2\u9396\u5B9A</b>\uFF0C\u505C\u6B62\u639B\u6A5F\u5F8C\u624D\u80FD\u63DB\u4EBA\u3002' : "\u9EDE\u82F1\u96C4\u67E5\u770B\u88DD\u5099\u8207\u8ABF\u6574\u9663\u5BB9\u3002"}</p>
     <div class="party">${Array.from({ length: ECONOMY.partyMax }, (_, i) => {
       const x = party[i];
       if (!x) return `<div class="slot emptyslot">\u7A7A\u4F4D</div>`;
@@ -2263,6 +2266,8 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     return h + heroActions(x);
   }
   function heroActions(x) {
+    const locked = partyLocked(app.S);
+    if (locked) return `<div class="row"><button class="btn grow" disabled>${inParty(x) ? "\u51FA\u6230\u4E2D" : "\u5F85\u547D\u4E2D"}\u30FB\u639B\u6A5F\u6642\u7121\u6CD5\u66F4\u63DB\u968A\u54E1</button></div>`;
     return `<div class="row">${inParty(x) ? `<button class="btn grow" data-act="bench" data-id="${x.id}">\u79FB\u51FA\u968A\u4F0D</button>` : `<button class="btn main grow" data-act="join" data-id="${x.id}" ${app.S.party.length >= ECONOMY.partyMax ? "disabled" : ""}>${app.S.party.length >= ECONOMY.partyMax ? "\u968A\u4F0D\u5DF2\u6EFF" : "\u52A0\u5165\u968A\u4F0D"}</button>`}
     ${app.S.heroes.length > 1 ? `<button class="btn" data-act="fire" data-id="${x.id}" style="color:var(--bad)">${app.modal.confirmFire ? `\u78BA\u5B9A\u89E3\u96C7\uFF1F\u9000 ${fmt(Math.round(hireCost(x) * RECRUIT.fireRefund))} \u91D1` : "\u89E3\u96C7"}</button>` : ""}</div>`;
   }
@@ -2436,15 +2441,18 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     if (a !== "salvageupto") app.salvConfirm = false;
     switch (a) {
       case "fight":
+        stopIdleFor(+t.dataset.d);
         startBattle(+t.dataset.d);
         app.tab = "battle";
         break;
       case "mythic":
+        stopIdleFor(-1);
         startMythic(+t.dataset.d);
         app.tab = "battle";
         window.scrollTo(0, 0);
         break;
       case "vault":
+        if (vaultLeft(app.S)) stopIdleFor(-1);
         if (startVault(+t.dataset.d)) {
           app.tab = "battle";
           window.scrollTo(0, 0);
@@ -2455,7 +2463,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
         break;
       case "prepare-vault": {
         const r = prepare(app.S, ["summon"]);
-        toast(`\u5DF2\u5099\u6230\u5BF6\u5EAB\uFF08\u504F\u7BC4\u570D\u8F38\u51FA\uFF09\uFF1A\u5766 ${r.roles.tank}\u30FB\u88DC ${r.roles.heal}\u30FB\u8F38\u51FA ${r.roles.dps}`);
+        toast(prepMsg(r, "\u5BF6\u5EAB\uFF08\u504F\u7BC4\u570D\u8F38\u51FA\uFF09"));
         save();
         break;
       }
@@ -2471,7 +2479,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       }
       case "recommend-mythic": {
         const d = +t.dataset.d, r = prepare(app.S, [...DUNGEONS[d].mech.map((m) => m.t), ...affixHints(activeAffixes(app.S.mythic.key))]);
-        toast(`\u5DF2\u4F9D\u300C${DUNGEONS[d].name}\u300D\u8207\u4ECA\u65E5\u8A5E\u7DB4\u5099\u6230\uFF1A\u5766 ${r.roles.tank}\u30FB\u88DC ${r.roles.heal}\u30FB\u8F38\u51FA ${r.roles.dps}`);
+        toast(prepMsg(r, `\u300C${DUNGEONS[d].name}\u300D\u8207\u4ECA\u65E5\u8A5E\u7DB4`));
         save();
         break;
       }
@@ -2538,7 +2546,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       case "recommend-party":
       case "prepare": {
         const d = +t.dataset.d, r = prepare(app.S, DUNGEONS[d].mech.map((m) => m.t));
-        toast(`\u5DF2\u5099\u6230\u300C${DUNGEONS[d].name}\u300D\uFF1A\u5766 ${r.roles.tank}\u30FB\u88DC ${r.roles.heal}\u30FB\u8F38\u51FA ${r.roles.dps}${r.swapped ? `\uFF0C\u63DB\u4E0A ${r.swapped} \u4EF6\u88DD\u5099` : ""}`);
+        toast(prepMsg(r, `\u300C${DUNGEONS[d].name}\u300D`));
         save();
         break;
       }
@@ -2574,14 +2582,26 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
         app.modal = null;
         break;
       case "join":
+        if (partyLocked(app.S)) {
+          toast("\u639B\u6A5F\u4E2D\u4E0D\u80FD\u66F4\u63DB\u968A\u54E1\uFF0C\u8ACB\u5148\u505C\u6B62\u639B\u6A5F");
+          break;
+        }
         joinParty(app.S, id);
         save();
         break;
       case "bench":
+        if (partyLocked(app.S)) {
+          toast("\u639B\u6A5F\u4E2D\u4E0D\u80FD\u66F4\u63DB\u968A\u54E1\uFF0C\u8ACB\u5148\u505C\u6B62\u639B\u6A5F");
+          break;
+        }
         benchHero(app.S, id);
         save();
         break;
       case "fire": {
+        if (partyLocked(app.S) && app.S.party.includes(id)) {
+          toast("\u639B\u6A5F\u4E2D\u4E0D\u80FD\u66F4\u63DB\u968A\u54E1\uFF0C\u8ACB\u5148\u505C\u6B62\u639B\u6A5F");
+          break;
+        }
         if (!app.modal.confirmFire) {
           app.modal.confirmFire = true;
           break;
@@ -2818,5 +2838,17 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   }
   window.claude?.hot?.snapshot?.(() => ({ S: app.S }));
   window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+  function stopIdleFor(d) {
+    if (app.S.idle == null || app.S.idle === d) return;
+    app.S.idle = null;
+    clearTimeout(app.pendingRepeat);
+    app.pendingRepeat = null;
+    toast("\u5DF2\u505C\u6B62\u639B\u6A5F");
+    save();
+  }
+  function prepMsg(r, what) {
+    const roles = `\u5766 ${r.roles.tank}\u30FB\u88DC ${r.roles.heal}\u30FB\u8F38\u51FA ${r.roles.dps}`, gear = r.swapped ? `\uFF0C\u63DB\u4E0A ${r.swapped} \u4EF6\u88DD\u5099` : "";
+    return r.locked ? `\u639B\u6A5F\u4E2D\u4E0D\u63DB\u9663\u5BB9\uFF0C\u5DF2\u4F9D${what}\u8ABF\u6574\u5929\u8CE6${gear}` : `\u5DF2\u4F9D${what}\u5099\u6230\uFF1A${roles}${gear}`;
+  }
 })();
 </script>

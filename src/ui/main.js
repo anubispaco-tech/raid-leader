@@ -51,11 +51,11 @@ document.addEventListener('click', e => {
   const a = t.dataset.act, id = t.dataset.id;
   if (a !== 'salvageupto') app.salvConfirm = false;
   switch (a) {
-    case 'fight': startBattle(+t.dataset.d); app.tab = 'battle'; break;
-    case 'mythic': startMythic(+t.dataset.d); app.tab = 'battle'; window.scrollTo(0, 0); break;
-    case 'vault': if (startVault(+t.dataset.d)) { app.tab = 'battle'; window.scrollTo(0, 0); } break;
+    case 'fight': stopIdleFor(+t.dataset.d); startBattle(+t.dataset.d); app.tab = 'battle'; break;
+    case 'mythic': stopIdleFor(-1); startMythic(+t.dataset.d); app.tab = 'battle'; window.scrollTo(0, 0); break;
+    case 'vault': if (G.vaultLeft(app.S)) stopIdleFor(-1); if (startVault(+t.dataset.d)) { app.tab = 'battle'; window.scrollTo(0, 0); } break;
     case 'vaultfloor': app.vaultFloor = +t.dataset.d; break;
-    case 'prepare-vault': { const r = G.prepare(app.S, ['summon']); toast(`已備戰寶庫（偏範圍輸出）：坦 ${r.roles.tank}・補 ${r.roles.heal}・輸出 ${r.roles.dps}`); save(); break; }
+    case 'prepare-vault': { const r = G.prepare(app.S, ['summon']); toast(prepMsg(r, '寶庫（偏範圍輸出）')); save(); break; }
     case 'scroll': {
       const n = +t.dataset.n, r = G.recruitScroll(app.S, n);
       if (r.error) { toast(r.error === 'gold' ? '金幣不夠' : '名冊空位不夠'); break; }
@@ -63,7 +63,7 @@ document.addEventListener('click', e => {
     }
     case 'recommend-mythic': {
       const d = +t.dataset.d, r = G.prepare(app.S, [...G.DUNGEONS[d].mech.map(m => m.t), ...G.affixHints(G.activeAffixes(app.S.mythic.key))]);
-      toast(`已依「${G.DUNGEONS[d].name}」與今日詞綴備戰：坦 ${r.roles.tank}・補 ${r.roles.heal}・輸出 ${r.roles.dps}`); save(); break;
+      toast(prepMsg(r, `「${G.DUNGEONS[d].name}」與今日詞綴`)); save(); break;
     }
     case 'idle': {
       const d = +t.dataset.d;
@@ -84,7 +84,7 @@ document.addEventListener('click', e => {
     case 'recommend': G.applyRecommend(hero(id), G.DUNGEONS[+t.dataset.d].mech.map(m => m.t)); toast('已套用推薦配置'); save(); break;
     case 'recommend-party': case 'prepare': {
       const d = +t.dataset.d, r = G.prepare(app.S, G.DUNGEONS[d].mech.map(m => m.t));
-      toast(`已備戰「${G.DUNGEONS[d].name}」：坦 ${r.roles.tank}・補 ${r.roles.heal}・輸出 ${r.roles.dps}${r.swapped ? `，換上 ${r.swapped} 件裝備` : ''}`); save(); break;
+      toast(prepMsg(r, `「${G.DUNGEONS[d].name}」`)); save(); break;
     }
     case 'horn': if (app.battle && app.battle.useHorn()) app.render(true); return;
     case 'item': openModal({ type: 'item', id }); return;
@@ -93,9 +93,10 @@ document.addEventListener('click', e => {
     case 'unequip': G.unequip(app.S, t.dataset.hero, t.dataset.slot); save(); app.modal = { type: 'hero', id: t.dataset.hero }; break;
     case 'up': if (G.upgrade(app.S, id)) { toast('強化成功'); save(); } else toast('金幣不足'); break;
     case 'salvage': toast(`分解獲得 ${G.salvage(app.S, id)} 金`); save(); app.modal = null; break;
-    case 'join': G.joinParty(app.S, id); save(); break;
-    case 'bench': G.benchHero(app.S, id); save(); break;
+    case 'join': if (G.partyLocked(app.S)) { toast('掛機中不能更換隊員，請先停止掛機'); break; } G.joinParty(app.S, id); save(); break;
+    case 'bench': if (G.partyLocked(app.S)) { toast('掛機中不能更換隊員，請先停止掛機'); break; } G.benchHero(app.S, id); save(); break;
     case 'fire': {
+      if (G.partyLocked(app.S) && app.S.party.includes(id)) { toast('掛機中不能更換隊員，請先停止掛機'); break; }
       if (!app.modal.confirmFire) { app.modal.confirmFire = true; break; }
       const x = G.fireHero(app.S, id); app.modal = null; if (x) toast(`${x.name} 離開了團隊，退還 ${x.refund} 金`); save(); break;
     }
@@ -209,3 +210,13 @@ function start(data) {
 }
 window.claude?.hot?.snapshot?.(() => ({ S: app.S }));
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+
+// 手動開打其他副本／秘境／寶庫時先停掉掛機，避免掛機迴圈與陣容鎖卡住
+function stopIdleFor(d) {
+  if (app.S.idle == null || app.S.idle === d) return;
+  app.S.idle = null; clearTimeout(app.pendingRepeat); app.pendingRepeat = null; toast('已停止掛機'); save();
+}
+function prepMsg(r, what) {
+  const roles = `坦 ${r.roles.tank}・補 ${r.roles.heal}・輸出 ${r.roles.dps}`, gear = r.swapped ? `，換上 ${r.swapped} 件裝備` : '';
+  return r.locked ? `掛機中不換陣容，已依${what}調整天賦${gear}` : `已依${what}備戰：${roles}${gear}`;
+}
