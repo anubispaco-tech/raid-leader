@@ -7,4 +7,5 @@ export * from './dungeons.js';
 export * from './battle.js';
 export * from './game.js';
 export * from './mythic.js';
+export * from './vault.js';
 export * from './advice.js';

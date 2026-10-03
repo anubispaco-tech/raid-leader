@@ -3,7 +3,7 @@
 // 職業行為在 HERO_ACTIONS，首領機制在 BOSS_MECHS，技能數值在 talents.js。
 import { CLASSES, CLASS_AI, DUNGEON, RAID_HORN } from './config.js';
 import { R, rnd, pick, uid } from './rng.js';
-import { heroStats } from './heroes.js';
+import { heroStats, rarityMods } from './heroes.js';
 import { buildWaves } from './dungeons.js';
 import { BASE_SKILLS, SPECS, heroMods } from './talents.js';
 
@@ -11,6 +11,8 @@ const ready = (b, u, key) => (u.cd[key] || 0) <= b.tick;
 const spec = u => u.spec && SPECS[u.cls][u.spec];
 const specCd = (u, s) => Math.round(s.cd * (u.mods.specCd || 1));
 const fx = u => u.mods.specFx || 1;
+// 基礎技能冷卻：天賦改的秒數 × 史詩/傳說的冷卻倍率 × 星火・莉薇亞的熔熱
+const baseCd = (u, def) => Math.max(1, Math.round((u.mods.baseCd || def) * (u.mods.baseCdMult || 1) * (u.mods.legend === 'molten' ? 0.5 : 1)));
 
 // ---------- 職業行為：(battle, 英雄, 活著的敵人, 優先目標) ----------
 const HERO_ACTIONS = {
@@ -23,7 +25,7 @@ const HERO_ACTIONS = {
       const t = foes.find(e => e.boss) || focus;
       b.hitEnemy(u, t, u.pow * B.mult * (u.mods.baseMult || 1), { skill: true });
       t.weak = Math.max(t.weakUntil > b.tick ? t.weak : 0, B.weaken); t.weakUntil = b.tick + B.weakenDur;
-      u.cd.base = b.tick + B.cd; b.skillLog(u, B.name, t);
+      u.cd.base = b.tick + baseCd(u, B.cd); b.skillLog(u, B.name, t);
       return;
     }
     b.hitEnemy(u, focus, u.pow * CLASS_AI.tank.hit);
@@ -39,7 +41,7 @@ const HERO_ACTIONS = {
     if (ready(b, u, 'base') && low.hp < low.max * 0.85) {
       const tgt = team.find(x => x.role === 'tank' && x.hp < x.max * 0.85) || low;
       tgt.shield += Math.round(u.pow * B.mult * (u.mods.baseMult || 1) * b.healMult(u));
-      u.cd.base = b.tick + B.cd; b.skillLog(u, B.name, tgt);
+      u.cd.base = b.tick + baseCd(u, B.cd); b.skillLog(u, B.name, tgt);
       return;
     }
     if (b.tick % (u.mods.groupEvery || A.groupEvery) === 0 && team.some(x => x.hp < x.max * A.groupBelow)) {
@@ -60,7 +62,7 @@ const HERO_ACTIONS = {
       const t = boss || focus;
       b.hitEnemy(u, t, u.pow * B.mult, { skill: true });
       if (u.mods.bleed) t.bleed = { until: b.tick + 5, amt: u.pow * u.mods.bleed, src: u };
-      u.cd.base = b.tick + (u.mods.baseCd || B.cd); b.skillLog(u, B.name, t);
+      u.cd.base = b.tick + baseCd(u, B.cd); b.skillLog(u, B.name, t);
       return;
     }
     b.hitEnemy(u, boss || focus, u.pow * CLASS_AI.rogue.hit);
@@ -81,7 +83,7 @@ const HERO_ACTIONS = {
     const n = foes.length, chain = 1 + (u.mods.chain || 0) * (n - 1), focusM = n === 1 ? 1 + (u.mods.focus || 0) : 1;
     if (ready(b, u, 'base')) {
       for (const e of b.foes()) b.hitEnemy(u, e, u.pow * B.mult * (u.mods.baseMult || 1) * chain * focusM, { skill: true, aoe: true });
-      u.cd.base = b.tick + (u.mods.baseCd || B.cd); b.skillLog(u, B.name);
+      u.cd.base = b.tick + baseCd(u, B.cd); b.skillLog(u, B.name);
       return;
     }
     const per = n > 1 ? CLASS_AI.mage.aoe : CLASS_AI.mage.single;
@@ -122,10 +124,11 @@ export class Battle {
   constructor(party, items, dIdx, opts = {}) {
     this.dIdx = dIdx; this.opts = opts;
     this.mythic = opts.mythic || null;
+    this.vault = opts.vault || null; this.kills = 0;
     this.maxTicks = opts.maxTicks || DUNGEON.maxTicks;
     this.units = party.map(h => {
       const s = heroStats(h, items), c = CLASSES[h.cls];
-      return { id: h.id, name: h.name, cls: h.cls, role: c.role, icon: c.icon, spec: h.spec || null, mods: heroMods(h),
+      return { id: h.id, name: h.name, cls: h.cls, role: c.role, icon: c.icon, spec: h.spec || null, mods: { ...heroMods(h), ...rarityMods(h) },
         max: s.hp, hp: s.hp, pow: s.pow, crit: s.crit, armor: s.armor, shield: 0, hots: [], cd: {}, buf: {}, used: {},
         dmgDone: 0, skillDmg: 0, healDone: 0, taken: 0 };
     });
@@ -143,7 +146,7 @@ export class Battle {
     this.enemies = this.waves[this.waveIdx].map(e => ({ ...e, max: e.hp, id: uid(), weak: 0, weakUntil: -1, poison: 0 }));
     this.waveTick = 0;
     for (const u of this.units) { u.cold = !!u.mods.coldBlood; u.necro = 0; }
-    if (this.opts.autoHorn && this.waveIdx === this.waves.length - 1) this.useHorn();
+    if (this.opts.autoHorn && (this.waveIdx === this.waves.length - 1 || (this.vault && this.waveIdx === 0))) this.useHorn();
   }
   has(affix) { return !!this.mythic && this.mythic.affixes.includes(affix); }
   alive() { return this.units.filter(u => u.hp > 0); }
@@ -172,7 +175,10 @@ export class Battle {
     if (m.sweep && !e.boss) amt *= 1 + m.sweep;
     let critC = u.crit + (u.buf.combust > this.tick ? SPECS.mage.fire.crit * fx(u) : 0);
     if (u.cold) { critC = 1; u.cold = false; }
-    if (R() < critC) amt *= m.critDmg || 2;
+    if (u.chainCrit) { critC = 1; u.chainCrit = false; } // 影刃・卡西恩：連鎖暴擊
+    const crit = R() < critC;
+    if (crit) amt *= m.critDmg || 2;
+    if (crit && m.legend === 'chain' && !o.dot && (u.chainReady || 0) <= this.tick) { u.chainCrit = true; u.chainReady = this.tick + 6; }
     amt = Math.min(e.hp, Math.round(amt * rnd(0.92, 1.08)));
     e.hp -= amt; u.dmgDone += amt; if (o.skill || o.dot) u.skillDmg += amt;
     if (u.buf.wrath > this.tick && amt > 0) this.heal(u, u, amt * SPECS.guardian.ret.leech * fx(u), true);
@@ -181,6 +187,8 @@ export class Battle {
       for (const x of this.foes().filter(x => x !== e).slice(0, SPECS.rogue.combat.extra)) this.hitEnemy(u, x, amt, { extra: true, skill: true });
     }
     if (e.hp === 0) {
+      if (e.goblin) this.kills = (this.kills || 0) + 1;
+      if (m.legend === 'molten' && u.cd.base) u.cd.base -= 1; // 星火・莉薇亞：擊殺減冷卻
       this.push(`${e.name} 被擊殺`, e.boss ? 'good' : '');
       if (!e.boss && this.has('bolstering')) { // 繁盛：其他小怪變強
         const rest = this.foes().filter(x => !x.boss);
@@ -202,6 +210,7 @@ export class Battle {
       if (disc) { const S = SPECS.cleric.disc; red *= 1 - Math.min(0.9, S.reduce * fx(disc)); disc.cd.spec = this.tick + specCd(disc, S); this.skillLog(disc, S.skill, u); }
     }
     red *= 1 - (m.allReduce || 0);
+    if (this.alive().some(x => x.mods.legend === 'undying')) red *= 0.92; // 鐵壁・巴洛斯在場：全隊 −8%
     if (m.lowHpReduce && u.hp < u.max * 0.5) red *= 1 - m.lowHpReduce;
     amt = Math.round(amt * Math.max(0.05, red) * rnd(0.9, 1.1));
     const absorbed = Math.min(u.shield, amt); u.shield -= absorbed; amt -= absorbed;
@@ -221,6 +230,9 @@ export class Battle {
     };
     if (u.spec === 'prot') save('divine', P.below, Math.round(P.dur * fx(u)), P.skill);
     if (u.mods.iceBlock) save('ice', 0.3, u.mods.iceBlock, '寒冰屏障');
+    if (u.mods.legend === 'undying' && u.hp === 0 && !u.used.undying) { // 鐵壁・巴洛斯：不屈
+      u.used.undying = true; u.hp = 1; u.buf.immune = this.tick + 3; this.skillLog(u, '不屈');
+    }
   }
   onDeath(u) {
     const priest = this.alive().find(x => x.mods.redemption && !x.used.redemption);
@@ -231,7 +243,12 @@ export class Battle {
     if (tgt.hp <= 0) return 0;
     const necro = tgt.necro ? Math.max(0.2, 1 - 0.02 * tgt.necro) : 1; // 壞疽
     const h = Math.min(tgt.max - tgt.hp, Math.round(amt * (raw ? 1 : this.healMult(src)) * necro));
-    tgt.hp += h; src.healDone += h; return h;
+    tgt.hp += h; src.healDone += h;
+    if (src.mods.legend === 'overflow' && !raw) { // 晨曦・艾蕾娜：溢出的治療轉成護盾
+      const over = Math.round(amt * this.healMult(src)) - h;
+      if (over > 0) tgt.shield = Math.min(Math.round(tgt.max * 0.2), tgt.shield + over);
+    }
+    return h;
   }
   enemyTarget() {
     const a = this.alive(); if (!a.length) return null;
@@ -284,7 +301,10 @@ export class Battle {
         this.loadWave();
       } else { this.over = true; this.win = true; this.push('🏆 副本通關！', 'good'); }
     }
-    if (this.tick >= this.maxTicks && !this.over) { this.over = true; this.win = false; this.push('⌛ 時間耗盡，撤退', 'bad'); }
+    if (this.tick >= this.maxTicks && !this.over) {
+      if (this.vault) { this.over = true; this.win = true; this.push(`⏰ 時間到！共打倒 ${this.kills || 0} 隻寶藏哥布林`, 'good'); }
+      else { this.over = true; this.win = false; this.push('⌛ 時間耗盡，撤退', 'bad'); }
+    }
   }
   runToEnd() { while (!this.over) this.step(); return this; }
 }

@@ -1,6 +1,6 @@
 // ===== 遊戲狀態操作：獎勵、隊伍、背包、掛機 =====
 // 所有函式都接收存檔物件 s 並直接修改它；畫面層只呼叫這裡，不自己改存檔。
-import { CLASSES, HERO, SLOTS, DUNGEONS, REWARD, ECONOMY, GEAR, BAG_MILESTONES, BAG_PER_MILESTONE } from './config.js';
+import { CLASSES, HERO, SLOTS, DUNGEONS, REWARD, ECONOMY, GEAR, BAG_MILESTONES, BAG_PER_MILESTONE, HERO_RARITY, LEGENDS, RECRUIT } from './config.js';
 import { R, rnd, rint, pick } from './rng.js';
 import { makeItem, rollRarity, itemScore, salvageValue, upgradeCost } from './items.js';
 import { makeHero, gainXp, heroPower } from './heroes.js';
@@ -10,9 +10,9 @@ import { MYTHIC } from './config.js';
 import { mythicRewards, keyChange } from './mythic.js';
 import { Battle } from './battle.js';
 
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 const newPlayer = () => ({ pid: Array.from({ length: 12 }, () => 'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)]).join(''), name: '', asked: false, playSec: 0 });
-export const hireCost = h => ECONOMY.hireBase + ECONOMY.hirePerLevel * h.level;
+export const hireCost = h => Math.round((ECONOMY.hireBase + ECONOMY.hirePerLevel * h.level) * HERO_RARITY[h.rarity || 0].hire);
 
 // ---------- 獎勵 ----------
 export function rewards(dIdx, win, firstClear) {
@@ -38,7 +38,8 @@ function decayFor(dIdx) {
 export function newGame() {
   const s = { v: SAVE_VERSION, gold: ECONOMY.startGold, heroes: [], items: {}, bag: [], party: [], unlocked: 1, clears: {},
     tavern: [], idle: null, lastSeen: Date.now(), stats: { runs: 0, wins: 0 }, autoSalvageBelow: 0, keepRarity: ECONOMY.defaultKeepRarity, stash: [], created: Date.now(),
-    mythic: { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 }, failStreak: 0, player: newPlayer(), bagSeen: [] };
+    mythic: { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 }, failStreak: 0, player: newPlayer(), bagSeen: [],
+    recruit: { sinceEpic: 0, sinceLegend: 0, total: 0 }, vault: { day: '', used: 0, runs: 0, best: {} } };
   for (const c of HERO.starters) { const h = makeHero(c); s.heroes.push(h); s.party.push(h.id); }
   rollTavern(s);
   return s;
@@ -60,6 +61,10 @@ export function migrate(s) {
   s.player = s.player || newPlayer();
   // v0.6：背包擴充里程碑（已通知過的清單；舊存檔把已達成的視為已通知，避免一次跳一堆提示）
   if (!s.bagSeen) { s.bagSeen = []; newBagMilestones(s); }
+  // v5 → v6：英雄稀有度（舊英雄一律普通）、招募保底計數、寶庫
+  for (const h of [...s.heroes, ...(s.tavern || [])]) { if (h.rarity == null) h.rarity = 0; if (h.legend == null) h.legend = false; }
+  s.recruit = s.recruit || { sinceEpic: 0, sinceLegend: 0, total: 0 };
+  s.vault = s.vault || { day: '', used: 0, runs: 0, best: {} };
   s.v = SAVE_VERSION;
   return s;
 }
@@ -68,15 +73,48 @@ export function migrate(s) {
 export const partyHeroes = s => s.party.map(id => s.heroes.find(h => h.id === id)).filter(Boolean);
 const avgLevel = list => list.length ? list.reduce((a, h) => a + h.level, 0) / list.length : 1;
 
+// ---------- 招募：稀有度與保底 ----------
+const ownsLegend = (s, cls) => [...s.heroes, ...(s.tavern || [])].some(h => h.legend && h.cls === cls);
+export const legendsAvailable = s => Object.keys(LEGENDS).filter(c => !ownsLegend(s, c));
+// 抽一次稀有度（酒館名單與招募令共用，都算進保底）
+function rollHeroRarity(s) {
+  const P = s.recruit || (s.recruit = { sinceEpic: 0, sinceLegend: 0, total: 0 });
+  const canLegend = legendsAvailable(s).length > 0;
+  let r;
+  if (P.sinceLegend >= RECRUIT.pityLegend && canLegend) r = 4;
+  else if (P.sinceEpic >= RECRUIT.pityEpic) r = 3;
+  else { let x = R(), i = HERO_RARITY.length - 1; for (; i > 0; i--) { x -= HERO_RARITY[i].weight; if (x < 0) break; } r = Math.max(0, i); }
+  if (r === 4 && !canLegend) r = 3;
+  P.total++;
+  P.sinceEpic = r >= 3 ? 0 : P.sinceEpic + 1;
+  P.sinceLegend = r === 4 ? 0 : P.sinceLegend + 1;
+  return r;
+}
+function newRecruit(s, level) {
+  const r = rollHeroRarity(s);
+  const cls = r === 4 ? pick(legendsAvailable(s)) : pick(Object.keys(CLASSES));
+  const h = makeHero(cls, level, r);
+  // 高等級的新英雄自帶隨機專精與天賦（招募後可以自己改）
+  if (h.level >= SPEC_LEVEL) h.spec = pick(Object.keys(SPECS[h.cls]));
+  for (const lv of TALENT_ROWS) if (h.level >= lv) h.talents[lv] = pick(['a', 'b']);
+  return h;
+}
+const recruitLevel = s => Math.max(1, Math.round(avgLevel(s.heroes)) - 1);
 export function rollTavern(s) {
-  const L = Math.max(1, Math.round(avgLevel(s.heroes)) - 1);
-  s.tavern = Array.from({ length: 3 }, () => {
-    const h = makeHero(pick(Object.keys(CLASSES)), Math.max(1, L + rint(-1, 0)));
-    // 高等級的新英雄自帶隨機專精與天賦（招募後可以自己改）
-    if (h.level >= SPEC_LEVEL) h.spec = pick(Object.keys(SPECS[h.cls]));
-    for (const lv of TALENT_ROWS) if (h.level >= lv) h.talents[lv] = pick(['a', 'b']);
-    return h;
-  });
+  const L = recruitLevel(s);
+  s.tavern = [];
+  for (let i = 0; i < 3; i++) s.tavern.push(newRecruit(s, Math.max(1, L + rint(-1, 0))));
+}
+// 招募令：直接抽進名冊；十連 9 折
+export const scrollCost = (s, n = 1) => Math.round((RECRUIT.scrollBase + RECRUIT.scrollPerLevel * avgLevel(s.heroes)) * n * (n >= 10 ? RECRUIT.tenDiscount : 1));
+export function recruitScroll(s, n = 1) {
+  const cost = scrollCost(s, n);
+  if (s.heroes.length + n > ECONOMY.rosterMax) return { error: 'roster' };
+  if (s.gold < cost) return { error: 'gold' };
+  s.gold -= cost;
+  const got = Array.from({ length: n }, () => newRecruit(s, recruitLevel(s)));
+  for (const h of got) { s.heroes.push(h); if (s.party.length < ECONOMY.partyMax) s.party.push(h.id); }
+  return { heroes: got, cost };
 }
 export function hire(s, heroId) {
   const h = s.tavern.find(x => x.id === heroId), cost = h && hireCost(h);
@@ -86,9 +124,11 @@ export function hire(s, heroId) {
   if (!s.tavern.length) rollTavern(s);
   return h;
 }
+// 換一批 = 招募令單抽價的一半（一次 3 位、也算保底；避免便宜刷保底）
+export const refreshCost = s => Math.round(scrollCost(s, 1) / 2);
 export function refreshTavern(s) {
-  if (s.gold < ECONOMY.refreshCost) return false;
-  s.gold -= ECONOMY.refreshCost; rollTavern(s); return true;
+  const c = refreshCost(s); if (s.gold < c) return false;
+  s.gold -= c; rollTavern(s); return true;
 }
 export function joinParty(s, id) { if (s.party.length < ECONOMY.partyMax && !s.party.includes(id)) s.party.push(id); }
 export function benchHero(s, id) { s.party = s.party.filter(x => x !== id); }
@@ -96,7 +136,8 @@ export function fireHero(s, id) {
   const h = s.heroes.find(x => x.id === id); if (!h) return null;
   for (const sl in h.gear) if (h.gear[sl]) s.bag.push(h.gear[sl]);
   s.heroes = s.heroes.filter(x => x.id !== id); benchHero(s, id);
-  return h;
+  const refund = Math.round(hireCost(h) * RECRUIT.fireRefund); s.gold += refund;
+  return { ...h, refund };
 }
 
 // ---------- 戰鬥結算 ----------
