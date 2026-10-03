@@ -1,0 +1,43 @@
+const { chromium } = require('/opt/npm-tools/node_modules/playwright');
+(async () => {
+  const browser = await chromium.launch(); let page = await browser.newPage({ viewport: { width: 400, height: 820 } });
+  const errs = []; page.on('pageerror', e => errs.push(e.message)); page.on('console', m => { if (m.type()==='error') errs.push(m.text()); });
+  await page.route('**/*', r => r.request().url().startsWith('https://app.test/') ? r.fulfill({ body: require('fs').readFileSync(require('path').join(__dirname,'..','index.html'),'utf8'), contentType:'text/html; charset=utf-8' }) : r.abort());
+  await page.goto('https://app.test/'); await page.waitForTimeout(500);
+  const out = [];
+  await page.screenshot({ path: 'shot-dungeon.png' });
+  await page.click('[data-act="fight"][data-d="0"]'); await page.waitForTimeout(2300);
+  out.push('tick log: ' + (await page.locator('.log p').count()));
+  await page.screenshot({ path: 'shot-battle.png' });
+  await page.click('[data-act="skip"]'); await page.waitForTimeout(300);
+  out.push('result: ' + (await page.locator('.result h3').innerText()));
+  for (let i=0;i<4;i++){ await page.click('.result [data-act="fight"]'); await page.click('[data-act="skip"]'); }
+  await page.screenshot({ path: 'shot-result.png', fullPage: true });
+  await page.click('.result [data-act="autoequip"]').catch(()=>out.push('no autoequip btn'));
+  await page.click('[data-tab="bag"]'); out.push('bag items: ' + await page.locator('.item').count());
+  if (await page.locator('.item').count()) { await page.locator('.item').first().click(); out.push('item sheet: ' + await page.locator('.sheet h3').innerText()); await page.keyboard.press('Escape'); }
+  await page.click('[data-tab="team"]'); await page.locator('.hero').first().click();
+  out.push('hero sheet: ' + await page.locator('.sheet h3').innerText());
+  await page.locator('.sheet [data-act="up"]').first().click().catch(()=>out.push('no up btn'));
+  await page.screenshot({ path: 'shot-hero.png' });
+  await page.keyboard.press('Escape');
+  await page.click('[data-tab="tavern"]'); const hb = page.locator('[data-act="hire"]:not([disabled])'); out.push('hireable: ' + await hb.count());
+  if (await hb.count()) await hb.first().click();
+  await page.click('[data-tab="team"]'); out.push('party slots filled: ' + await page.locator('.party .slot:not(.emptyslot)').count());
+  await page.click('[data-tab="dungeon"]');
+  await page.click('[data-act="idle"][data-d="0"]'); await page.waitForTimeout(400);
+  out.push('idle chip visible: ' + await page.locator('#idleChip').isVisible());
+  const saved = await page.evaluate(() => localStorage.getItem('raid-leader-save-v1'));
+  const p2 = await browser.newPage({ viewport: { width: 400, height: 820 } });
+  await p2.route('**/*', r => r.request().url().startsWith('https://app.test/') ? r.fulfill({ body: require('fs').readFileSync(require('path').join(__dirname,'..','index.html'),'utf8'), contentType:'text/html; charset=utf-8' }) : r.abort());
+  await p2.addInitScript(v => { const s=JSON.parse(v); s.lastSeen=Date.now()-2*3600e3; localStorage.setItem('raid-leader-save-v1', JSON.stringify(s)); }, saved);
+  await page.close(); page = p2; page.on('pageerror', e => errs.push(e.message));
+  await page.goto('https://app.test/'); await page.waitForTimeout(1500);
+  out.push('offline modal: ' + ((await page.locator('.sheet').count()) ? (await page.locator('.sheet').innerText()).replace(/\n/g,' ') : 'NONE'));
+  await page.screenshot({ path: 'shot-offline.png' });
+  out.push('gold: ' + await page.locator('#gold').innerText());
+  out.push('wide: ' + JSON.stringify(await page.evaluate(() => [...document.querySelectorAll('*')].filter(e => e.getBoundingClientRect().right > 401).slice(0,6).map(e => e.tagName + '.' + e.className + ' ' + Math.round(e.getBoundingClientRect().right)))));
+  out.push('scrollWidth: ' + await page.evaluate(() => document.documentElement.scrollWidth));
+  console.log(out.join('\n') + '\nERRORS: ' + JSON.stringify(errs));
+  await browser.close();
+})();

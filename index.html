@@ -1,0 +1,924 @@
+<title>副本團長</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: 手機優先的「公會作戰桌」——頂部資源列、單欄內容、底部分頁列；刻意單一深色主題（夜間火把下的石板＋黃銅） */
+:root{
+  color-scheme: dark;
+  --bg:#12161d; --panel:#1b212b; --panel2:#222a36; --line:#2e3846; --fg:#e8e2d2; --muted:#8e97a6; --dim:#5d6676;
+  --brass:#d0a44c; --brass-d:#8a6a2a; --ink:#12161d;
+  --tank:#5d8ff0; --heal:#4fc17f; --dps:#e3664f; --warn:#f0b54a; --bad:#e5534b; --good:#57c78a;
+  --r0:#9ca3af; --r1:#38c172; --r2:#4b8df5; --r3:#b46cf2;
+  --f-display:"Noto Serif TC","Songti TC",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-num:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  background-image:radial-gradient(120% 60% at 50% -10%, #2a2416 0%, transparent 60%);background-attachment:fixed}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.app{max-width:560px;margin:0 auto;padding-inline:16px;padding-block:0 96px}
+
+/* 頂部資源列 */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);
+  margin-inline:-16px;padding:12px 16px 10px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:900;font-size:20px;letter-spacing:.08em;color:var(--brass);white-space:nowrap}
+.res{margin-left:auto;display:flex;gap:10px;align-items:center;font-size:13px}
+.res .pill{display:flex;gap:6px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.coin{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe39a,var(--brass) 60%,var(--brass-d))}
+.idlechip{font-size:12px;color:var(--good);border:1px solid color-mix(in srgb,var(--good) 50%,transparent);border-radius:999px;padding:2px 8px;white-space:nowrap}
+.idlechip::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--good);margin-right:6px;vertical-align:middle;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.25}}
+
+h2{font-family:var(--f-display);font-weight:700;font-size:22px;margin:22px 0 4px;letter-spacing:.04em;text-wrap:balance}
+.sub{color:var(--muted);font-size:13px;margin:0 0 14px}
+.label{font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+
+/* 副本卡 */
+.dlist{display:grid;gap:10px}
+.dg{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;grid-template-columns:44px 1fr;gap:4px 12px}
+.dg.locked{opacity:.45}
+.dg .tier{grid-row:span 3;font-family:var(--f-display);font-weight:900;font-size:26px;color:var(--brass);text-align:center;line-height:1;padding-top:4px;border-right:1px solid var(--line)}
+.dg .tier small{display:block;font-family:var(--f-body);font-size:10px;letter-spacing:.1em;color:var(--muted);font-weight:500;margin-top:4px}
+.dg h3{margin:0;font-size:17px;font-weight:700;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.dg h3 .boss{font-size:13px;color:var(--muted);font-weight:500}
+.dg .tip{font-size:13px;color:var(--fg);opacity:.85}
+.meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted)}
+.meta b{color:var(--fg);font-weight:500}
+.meta .ok{color:var(--good)} .meta .low{color:var(--warn)}
+.dg .acts{grid-column:1/-1;display:flex;gap:8px;margin-top:8px}
+.btn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-size:14px;font-weight:500}
+.btn:hover{border-color:var(--dim)}
+.btn.main{background:var(--brass);border-color:var(--brass);color:var(--ink);font-weight:700}
+.btn.main:hover{filter:brightness(1.08)}
+.btn.on{border-color:var(--good);color:var(--good)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn.sm{padding:5px 10px;font-size:13px}
+.btn.grow{flex:1}
+
+/* 戰鬥 */
+.bhead{display:flex;align-items:center;gap:10px;margin-top:16px}
+.bhead h2{margin:0;font-size:19px}
+.waves{display:flex;gap:4px;margin-left:auto}
+.waves i{width:22px;height:6px;border-radius:3px;background:var(--line)}
+.waves i.done{background:var(--brass-d)} .waves i.cur{background:var(--brass)}
+.arena{display:grid;gap:14px;margin-top:12px}
+.side{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:8px}
+.unit{display:grid;grid-template-columns:26px 1fr auto;gap:2px 8px;align-items:center}
+.unit .ic{grid-row:span 2;font-size:18px;text-align:center}
+.unit .nm{font-size:13px;display:flex;gap:6px;align-items:baseline}
+.unit .nm small{color:var(--muted);font-size:11px}
+.unit .hpn{font-size:11px;color:var(--muted)}
+.bar{grid-column:2/-1;height:8px;background:#0d1015;border-radius:4px;overflow:hidden;position:relative}
+.bar i{position:absolute;inset:0 auto 0 0;border-radius:4px;transition:width .25s}
+.unit.dead{opacity:.35}
+.unit.boss .bar{height:12px}
+.role-tank{background:var(--tank)} .role-heal{background:var(--heal)} .role-dps{background:var(--dps)}
+.enemy-bar{background:linear-gradient(90deg,#9b3a2e,var(--bad))}
+.log{margin-top:12px;background:#0e1117;border:1px solid var(--line);border-radius:10px;padding:10px 12px;height:150px;overflow-y:auto;font-size:12.5px;display:flex;flex-direction:column;gap:2px}
+.log p{margin:0;color:var(--muted)} .log .t{font-family:var(--f-num);color:var(--dim);margin-right:6px}
+.log .good{color:var(--good)} .log .bad{color:var(--bad)} .log .warn{color:var(--warn)} .log .info{color:var(--brass)}
+.ctrl{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{padding:6px 12px;font-size:13px;font-family:var(--f-num)}
+.seg button.sel{background:var(--brass);color:var(--ink);font-weight:700}
+
+.result{background:var(--panel);border:1px solid var(--brass-d);border-radius:12px;padding:16px;margin-top:14px;display:grid;gap:12px}
+.result h3{margin:0;font-family:var(--f-display);font-size:24px}
+.result.win h3{color:var(--brass)} .result.lose h3{color:var(--bad)}
+.rew{display:flex;gap:16px;flex-wrap:wrap;font-size:14px}
+.meter{display:grid;gap:5px}
+.mrow{display:grid;grid-template-columns:72px 1fr 64px;gap:8px;align-items:center;font-size:12px}
+.mrow .mb{height:14px;background:#0d1015;border-radius:3px;overflow:hidden}
+.mrow .mb i{display:block;height:100%}
+.empty{color:var(--muted);text-align:center;padding:40px 10px;border:1px dashed var(--line);border-radius:10px;margin-top:16px}
+
+/* 團隊 */
+.party{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.slot{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 4px;text-align:center;min-width:0}
+.slot.emptyslot{border-style:dashed;color:var(--dim);display:grid;place-items:center;font-size:12px}
+.slot .ic{font-size:22px}
+.slot .n{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slot .lv{font-size:11px;color:var(--muted)}
+.slot .rl{height:3px;border-radius:2px;margin:6px 8px 0}
+.comp{display:flex;gap:12px;font-size:12px;color:var(--muted);margin:8px 0 0;flex-wrap:wrap}
+.comp b{font-weight:500}
+.hero{display:grid;grid-template-columns:36px 1fr auto;gap:2px 10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;text-align:left;width:100%}
+.hero .ic{grid-row:span 2;font-size:22px;text-align:center}
+.hero .nm{font-weight:700;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.hero .nm small{font-weight:400;color:var(--muted);font-size:12px}
+.hero .st{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.hero .tag{grid-row:span 2;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.hero .tag.in{border-color:var(--brass-d);color:var(--brass)}
+.stack{display:grid;gap:8px}
+.xpbar{height:3px;background:#0d1015;border-radius:2px;overflow:hidden;grid-column:2/-1;margin-top:4px}
+.xpbar i{display:block;height:100%;background:var(--brass-d)}
+
+/* 背包 */
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.item{display:grid;grid-template-columns:1fr auto;gap:2px 10px;background:var(--panel);border:1px solid var(--line);border-left-width:3px;border-radius:8px;padding:9px 12px;text-align:left;width:100%}
+.item .in{font-weight:500;font-size:14px}
+.item .is{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.item .il{grid-row:span 2;align-self:center;font-size:12px;color:var(--muted);text-align:right}
+.item .il b{display:block;font-size:16px;color:var(--fg)}
+.rar0{border-left-color:var(--r0)} .rar1{border-left-color:var(--r1)} .rar2{border-left-color:var(--r2)} .rar3{border-left-color:var(--r3)}
+.c0{color:var(--r0)} .c1{color:var(--r1)} .c2{color:var(--r2)} .c3{color:var(--r3)}
+.up{color:var(--brass);font-family:var(--f-num);font-size:12px;margin-left:4px}
+.better{color:var(--good);font-size:11px;font-weight:700;margin-left:6px}
+
+/* 底部分頁 */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs nav{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.tabs button{padding:9px 0 8px;font-size:12px;color:var(--muted);display:grid;justify-items:center;gap:2px;position:relative}
+.tabs button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6}
+.tabs button.sel{color:var(--brass)}
+.tabs button .dot{position:absolute;top:6px;left:calc(50% + 8px);width:7px;height:7px;border-radius:50%;background:var(--good)}
+
+/* 底部抽屜 */
+.scrim{position:fixed;inset:0;background:rgba(5,7,10,.6);z-index:10;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--panel);border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0;width:100%;max-width:560px;max-height:86%;overflow-y:auto;
+  padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));display:grid;gap:12px;animation:rise .22s ease-out}
+@keyframes rise{from{transform:translateY(30px);opacity:.4}}
+.sheet h3{margin:0;font-family:var(--f-display);font-size:21px}
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.statgrid div{background:var(--panel2);border-radius:8px;padding:8px;text-align:center}
+.statgrid b{display:block;font-size:16px}
+.statgrid span{font-size:11px;color:var(--muted)}
+.gearrow{display:grid;grid-template-columns:44px 1fr auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.gearrow .sl{font-size:12px;color:var(--muted)}
+.choices{display:grid;gap:6px;max-height:260px;overflow-y:auto}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--brass-d);padding:8px 16px;border-radius:999px;font-size:13px;z-index:20;white-space:nowrap;animation:rise .2s}
+textarea{width:100%;min-height:90px;background:#0e1117;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:8px;font-family:var(--f-num);font-size:11px}
+.howto{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--muted);margin-top:4px}
+.howto b{color:var(--fg);font-weight:500}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">副本團長</div>
+    <div class="res">
+      <span id="idleChip" class="idlechip" hidden>掛機中</span>
+      <span class="pill num"><i class="coin"></i><span id="gold">0</span></span>
+    </div>
+  </header>
+  <main id="view"></main>
+</div>
+<div class="tabs"><nav id="tabs"></nav></div>
+<div id="modal"></div>
+<div id="toast"></div>
+
+<script>
+// ===== 副本團長 Raid Leader — 核心邏輯（無 DOM，可在 Node 測試）=====
+const RAID = (() => {
+  const R = Math.random;
+  const rnd = (a, b) => a + R() * (b - a);
+  const rint = (a, b) => Math.floor(rnd(a, b + 1));
+  const pick = arr => arr[Math.floor(R() * arr.length)];
+  const uid = () => Math.random().toString(36).slice(2, 9);
+
+  // ---------- 職業 ----------
+  const CLASSES = {
+    guardian: { name: '守護騎士', role: 'tank', icon: '🛡️', hp: 230, hpL: 42, pow: 6, powL: 1.5, armor: 0.45, crit: 0.05,
+      desc: '嘲諷所有敵人，承受傷害。護甲減傷 45%。' },
+    cleric:   { name: '聖光牧師', role: 'heal', icon: '✨', hp: 130, hpL: 22, pow: 9, powL: 2.0, armor: 0.15, crit: 0.05,
+      desc: '治療血量最低的隊友，每 5 秒群體治療。' },
+    rogue:    { name: '暗影盜賊', role: 'dps',  icon: '🗡️', hp: 140, hpL: 24, pow: 10, powL: 2.3, armor: 0.2, crit: 0.15,
+      desc: '單體爆發，暴擊率高。擅長打王。' },
+    mage:     { name: '奧術法師', role: 'dps',  icon: '🔥', hp: 115, hpL: 19, pow: 9, powL: 2.1, armor: 0.1, crit: 0.08,
+      desc: '範圍傷害，同時攻擊所有敵人。擅長清小怪。' },
+  };
+  const ROLE_NAME = { tank: '坦克', heal: '治療', dps: '輸出' };
+
+  // ---------- 裝備 ----------
+  const RARITY = [
+    { name: '普通', mult: 1.0,  color: '#9ca3af' },
+    { name: '精良', mult: 1.2,  color: '#22c55e' },
+    { name: '稀有', mult: 1.45, color: '#3b82f6' },
+    { name: '史詩', mult: 1.75, color: '#a855f7' },
+  ];
+  const SLOTS = { weapon: '武器', armor: '護甲', trinket: '飾品' };
+  const SLOT_NAMES = {
+    weapon: ['長劍', '法杖', '匕首', '戰錘', '權杖', '短弓'],
+    armor: ['鎖甲', '法袍', '皮甲', '板甲', '斗篷'],
+    trinket: ['護符', '戒指', '徽記', '寶珠', '項鍊'],
+  };
+  const PREFIX = ['', '堅毅的', '銳利的', '灼熱的', '寒霜的', '虛空的', '遠古的', '龍鱗的'];
+
+  function makeItem(slot, ilvl, rarity) {
+    const B = ilvl * RARITY[rarity].mult;
+    const v = () => rnd(0.9, 1.1);
+    let pow = 0, sta = 0, crit = 0;
+    if (slot === 'weapon') { pow = B * 0.6 * v(); sta = B * 1.0 * v(); }
+    if (slot === 'armor') { pow = B * 0.15 * v(); sta = B * 3.0 * v(); }
+    if (slot === 'trinket') { pow = B * 0.35 * v(); sta = B * 1.0 * v(); crit = rarity >= 2 ? 0.01 * rarity + 0.01 : 0; }
+    const pre = PREFIX[Math.min(PREFIX.length - 1, Math.floor(ilvl / 6))];
+    return { id: uid(), slot, ilvl, rarity, up: 0, pow: Math.round(pow), sta: Math.round(sta), crit,
+      name: pre + pick(SLOT_NAMES[slot]) };
+  }
+  const upMult = it => 1 + 0.08 * (it.up || 0);
+  const itemPow = it => Math.round(it.pow * upMult(it));
+  const itemSta = it => Math.round(it.sta * upMult(it));
+  const itemScore = it => it.ilvl * RARITY[it.rarity].mult * upMult(it);
+  const salvageValue = it => Math.round(it.ilvl * RARITY[it.rarity].mult * 1.5);
+  const upgradeCost = it => Math.round(15 * (it.up + 1) * (1 + it.ilvl / 10));
+  const MAX_UP = 5;
+
+  function rollRarity(minR = 0) {
+    const x = R();
+    let r = x < 0.03 ? 3 : x < 0.15 ? 2 : x < 0.45 ? 1 : 0;
+    return Math.max(r, minR);
+  }
+
+  // ---------- 英雄 ----------
+  const NAMES = ['艾倫', '凱莉', '雷恩', '米拉', '索恩', '伊薇', '巴頓', '妮雅', '托爾', '菲歐', '達克', '露娜',
+    '葛雷', '希拉', '奧德', '薇絲', '布蘭', '卡珊', '洛克', '艾琳', '費恩', '茉兒', '賽勒', '朵拉'];
+  const xpNeed = L => Math.round(60 * Math.pow(L, 1.8));
+  const MAX_LV = 40;
+
+  function makeHero(cls, level = 1) {
+    return { id: uid(), cls, name: pick(NAMES), level, xp: 0, gear: { weapon: null, armor: null, trinket: null } };
+  }
+  function heroStats(h, items) {
+    const c = CLASSES[h.cls];
+    let pow = c.pow + c.powL * (h.level - 1);
+    let hp = c.hp + c.hpL * (h.level - 1);
+    let crit = c.crit;
+    for (const s of Object.keys(SLOTS)) {
+      const it = h.gear[s] && items[h.gear[s]];
+      if (!it) continue;
+      pow += itemPow(it); hp += itemSta(it) * 2; crit += it.crit;
+    }
+    return { pow: Math.round(pow), hp: Math.round(hp), crit: Math.min(0.5, crit), armor: c.armor };
+  }
+  function heroIlvl(h, items) {
+    let sum = 0;
+    for (const s of Object.keys(SLOTS)) { const it = h.gear[s] && items[h.gear[s]]; sum += it ? it.ilvl : 0; }
+    return Math.round(sum / 3);
+  }
+  function heroPower(h, items) { // 戰力（顯示用）
+    const s = heroStats(h, items);
+    return Math.round(s.pow * 10 * (1 + s.crit) + s.hp * 0.5);
+  }
+  function gainXp(h, xp) {
+    let ups = 0;
+    if (h.level >= MAX_LV) return 0;
+    h.xp += xp;
+    while (h.level < MAX_LV && h.xp >= xpNeed(h.level)) { h.xp -= xpNeed(h.level); h.level++; ups++; }
+    if (h.level >= MAX_LV) h.xp = 0;
+    return ups;
+  }
+
+  // ---------- 副本 ----------
+  // 每隻王考驗一個職責：脈衝=治療、重擊=坦克、召喚=範圍、狂暴=輸出
+  const DUNGEONS = [
+    { name: '腐根洞窟', boss: '蘑菇領主', trash: '孢子菇', mech: [{ t: 'pulse', every: 7, dmg: 0.9 }], tip: '定期噴發孢子傷害全隊 → 考驗治療' },
+    { name: '鏽蝕礦坑', boss: '礦坑巨像', trash: '礦坑狗頭人', mech: [{ t: 'buster', every: 8, mult: 3.2 }], tip: '重擊坦克 → 考驗坦克血量與護甲' },
+    { name: '沉沒神殿', boss: '潮汐祭司', trash: '深淵魚人', mech: [{ t: 'summon', every: 10, n: 2 }], tip: '不斷召喚小怪 → 考驗範圍輸出' },
+    { name: '灰燼要塞', boss: '熔火督軍', trash: '熔岩衛兵', mech: [{ t: 'enrage', at: 55, mult: 3 }], tip: '55 秒後狂暴 → 考驗輸出' },
+    { name: '霜語墓穴', boss: '寒霜巫妖', trash: '骷髏戰士', mech: [{ t: 'pulse', every: 6, dmg: 1.0 }, { t: 'summon', every: 12, n: 2 }], tip: '寒冰脈衝＋召喚骷髏 → 治療與範圍' },
+    { name: '虛空裂隙', boss: '虛空吞噬者', trash: '虛空行者', mech: [{ t: 'buster', every: 7, mult: 3.5 }, { t: 'enrage', at: 60, mult: 3 }], tip: '重擊＋狂暴 → 坦克與輸出' },
+    { name: '龍眠高塔', boss: '遠古紅龍', trash: '龍人衛士', mech: [{ t: 'pulse', every: 7, dmg: 1.0 }, { t: 'buster', every: 9, mult: 3.2 }, { t: 'enrage', at: 70, mult: 3 }], tip: '全機制 → 全隊綜合考驗' },
+  ];
+  const T_HP = 1.9, T_ATK = 1.7; // 每階成長
+  const dropIlvl = i => Math.round(6 * Math.pow(1.5, i));
+  function dungeonInfo(i) {
+    const t = i + 1;
+    return { ...DUNGEONS[i], tier: t, dropIlvl: dropIlvl(i), recIlvl: i === 0 ? 0 : dropIlvl(i - 1), recLevel: [1, 2, 4, 6, 10, 13, 17][i] };
+  }
+  function buildWaves(i) {
+    const d = DUNGEONS[i];
+    const DIFF = [1, 1.1, 1, 1.4, 1, 1.35, 1][i];
+    const sh = Math.pow(T_HP, i) * DIFF, sa = Math.pow(T_ATK, i) * Math.sqrt(DIFF);
+    const trash = (n) => Array.from({ length: n }, (_, k) => ({ name: d.trash, hp: Math.round(85 * sh), atk: 6.5 * sa, boss: false }));
+    return [trash(3), trash(3), [{ name: d.boss, hp: Math.round(850 * sh), atk: 13 * sa, boss: true, mech: d.mech, addHp: Math.round(70 * sh), addAtk: 5 * sa }]];
+  }
+
+  // ---------- 戰鬥 ----------
+  const MAX_TICKS = 240;
+  class Battle {
+    constructor(party, items, dIdx) {
+      this.dIdx = dIdx;
+      this.units = party.map(h => {
+        const s = heroStats(h, items);
+        return { id: h.id, name: h.name, cls: h.cls, role: CLASSES[h.cls].role, icon: CLASSES[h.cls].icon,
+          max: s.hp, hp: s.hp, pow: s.pow, crit: s.crit, armor: s.armor, dmgDone: 0, healDone: 0, taken: 0 };
+      });
+      this.waves = buildWaves(dIdx);
+      this.waveIdx = 0; this.tick = 0; this.waveTick = 0; this.over = false; this.win = false;
+      this.log = [];
+      this.loadWave();
+    }
+    loadWave() {
+      this.enemies = this.waves[this.waveIdx].map(e => ({ ...e, max: e.hp, id: uid() }));
+      this.waveTick = 0;
+    }
+    alive() { return this.units.filter(u => u.hp > 0); }
+    foes() { return this.enemies.filter(e => e.hp > 0); }
+    push(msg, cls = '') { this.log.push({ t: this.tick, msg, cls }); if (this.log.length > 80) this.log.shift(); }
+    hitEnemy(u, e, amt) {
+      let crit = R() < u.crit; if (crit) amt *= 2;
+      amt = Math.round(amt * rnd(0.92, 1.08));
+      e.hp = Math.max(0, e.hp - amt); u.dmgDone += amt;
+      if (e.hp === 0) this.push(`${e.name} 被擊殺`, e.boss ? 'good' : '');
+      return crit;
+    }
+    hitHero(u, amt, src) {
+      amt = Math.round(amt * (1 - u.armor) * rnd(0.9, 1.1));
+      u.hp = Math.max(0, u.hp - amt); u.taken += amt;
+      if (u.hp === 0) this.push(`💀 ${u.name}（${CLASSES[u.cls].name}）陣亡`, 'bad');
+    }
+    enemyTarget() {
+      const a = this.alive(); if (!a.length) return null;
+      const tank = a.find(u => u.role === 'tank');
+      return tank || pick(a);
+    }
+    step() {
+      if (this.over) return;
+      this.tick++; this.waveTick++;
+      // 英雄行動
+      for (const u of this.alive()) {
+        const foes = this.foes(); if (!foes.length) break;
+        const focus = foes.find(e => !e.boss) || foes[0];
+        if (u.role === 'tank') this.hitEnemy(u, focus, u.pow * 0.8);
+        else if (u.role === 'heal') {
+          const team = this.alive();
+          if (this.tick % 5 === 0 && team.some(x => x.hp < x.max * 0.9)) {
+            for (const x of team) { const h = Math.min(x.max - x.hp, Math.round(u.pow * 0.75)); x.hp += h; u.healDone += h; }
+          } else {
+            const low = team.reduce((m, x) => (x.hp / x.max < m.hp / m.max ? x : m));
+            if (low.hp < low.max) {
+              let h = u.pow * 1.9 * (R() < u.crit ? 1.5 : 1);
+              h = Math.min(low.max - low.hp, Math.round(h)); low.hp += h; u.healDone += h;
+            } else this.hitEnemy(u, focus, u.pow * 0.5);
+          }
+        } else if (u.cls === 'mage') {
+          const n = foes.length; const per = n > 1 ? 0.72 : 1.0;
+          for (const e of foes) this.hitEnemy(u, e, u.pow * per);
+        } else { // rogue：優先打王
+          const t = foes.find(e => e.boss) || focus;
+          this.hitEnemy(u, t, u.pow * 1.3);
+        }
+      }
+      // 敵人行動
+      for (const e of this.foes()) {
+        const tgt = this.enemyTarget(); if (!tgt) break;
+        let atk = e.atk;
+        if (e.boss) {
+          for (const m of e.mech || []) {
+            if (m.t === 'enrage' && this.waveTick >= m.at) { atk *= m.mult; if (this.waveTick === m.at) this.push(`🔥 ${e.name} 狂暴了！傷害大增`, 'warn'); }
+            if (m.t === 'pulse' && this.waveTick % m.every === 0) {
+              this.push(`💥 ${e.name} 施放範圍攻擊`, 'warn');
+              for (const u of this.alive()) this.hitHero(u, e.atk * m.dmg / (1 - u.armor), e.name); // 魔法傷害：無視護甲
+            }
+            if (m.t === 'buster' && this.waveTick % m.every === 0) {
+              this.push(`⚡ ${e.name} 對 ${tgt.name} 重擊`, 'warn'); atk *= m.mult;
+            }
+            if (m.t === 'summon' && this.waveTick % m.every === 0) {
+              for (let k = 0; k < m.n; k++) this.enemies.push({ name: '召喚物', hp: e.addHp, max: e.addHp, atk: e.addAtk, boss: false, id: uid() });
+              this.push(`🌀 ${e.name} 召喚了 ${m.n} 隻小怪`, 'warn');
+            }
+          }
+        }
+        if (tgt.hp > 0) this.hitHero(tgt, atk, e.name);
+      }
+      // 判定
+      if (!this.alive().length) { this.over = true; this.win = false; this.push('☠️ 團滅…', 'bad'); return; }
+      if (!this.foes().length) {
+        if (this.waveIdx < this.waves.length - 1) {
+          this.waveIdx++;
+          for (const u of this.alive()) u.hp = Math.min(u.max, u.hp + Math.round(u.max * 0.5));
+          this.loadWave();
+          this.push(this.waveIdx === this.waves.length - 1 ? `👑 首領 ${this.enemies[0].name} 現身！` : `第 ${this.waveIdx + 1} 波敵人來襲`, 'info');
+        } else { this.over = true; this.win = true; this.push('🏆 副本通關！', 'good'); }
+      }
+      if (this.tick >= MAX_TICKS && !this.over) { this.over = true; this.win = false; this.push('⌛ 時間耗盡，撤退', 'bad'); }
+    }
+    runToEnd() { while (!this.over) this.step(); return this; }
+  }
+
+  // ---------- 獎勵 ----------
+  function rewards(dIdx, win, firstClear) {
+    const info = dungeonInfo(dIdx);
+    const gold = Math.round((25 + 18 * dIdx) * (win ? 1 : 0.3) * rnd(0.9, 1.1));
+    const xp = Math.round(35 * Math.pow(dIdx + 1, 1.7) * (win ? 1 : 0.3));
+    const loot = [];
+    if (win) {
+      const n = R() < 0.35 ? 2 : 1;
+      for (let k = 0; k < n; k++) {
+        const slot = pick(Object.keys(SLOTS));
+        loot.push(makeItem(slot, info.dropIlvl + rint(-1, 2), rollRarity(firstClear && k === 0 ? 2 : 0)));
+      }
+    }
+    return { gold, xp, loot };
+  }
+
+  // ---------- 遊戲狀態 ----------
+  const PARTY_MAX = 5, ROSTER_MAX = 10, BAG_MAX = 40, OFFLINE_CAP_H = 8;
+  const hireCost = h => 30 + 25 * h.level;
+  const REFRESH_COST = 10;
+
+  function newGame() {
+    const s = { v: 1, gold: 60, heroes: [], items: {}, bag: [], party: [], unlocked: 1, clears: {},
+      tavern: [], idle: null, lastSeen: Date.now(), stats: { runs: 0, wins: 0 }, autoSalvageCommon: false, created: Date.now() };
+    for (const c of ['guardian', 'cleric', 'rogue']) { const h = makeHero(c); s.heroes.push(h); s.party.push(h.id); }
+    rollTavern(s);
+    return s;
+  }
+  function avgLevel(s) { const p = s.heroes; return p.length ? Math.round(p.reduce((a, h) => a + h.level, 0) / p.length) : 1; }
+  function rollTavern(s) {
+    const L = Math.max(1, avgLevel(s) - 1);
+    s.tavern = Array.from({ length: 3 }, () => makeHero(pick(Object.keys(CLASSES)), Math.max(1, L + rint(-1, 0))));
+  }
+  function partyHeroes(s) { return s.party.map(id => s.heroes.find(h => h.id === id)).filter(Boolean); }
+  function addLoot(s, it) {
+    if ((s.autoSalvageCommon && it.rarity === 0) || s.bag.length >= BAG_MAX) { s.gold += salvageValue(it); return false; }
+    s.items[it.id] = it; s.bag.push(it.id); return true;
+  }
+  function applyResult(s, dIdx, battle) {
+    const first = battle.win && !s.clears[dIdx];
+    const rw = rewards(dIdx, battle.win, first);
+    s.stats.runs++;
+    // 等級壓制：等級遠高於副本建議時，經驗與金幣遞減（避免掛低層無限練功）
+    const rec = dungeonInfo(dIdx).recLevel;
+    const decay = L => Math.max(0.05, Math.min(1, 1 - 0.25 * (L - (rec + 4))));
+    const party = partyHeroes(s);
+    const avgL = party.length ? party.reduce((a, h) => a + h.level, 0) / party.length : 1;
+    rw.gold = Math.max(1, Math.round(rw.gold * decay(avgL)));
+    s.gold += rw.gold;
+    rw.decayed = decay(avgL) < 1;
+    const baseXp = rw.xp; rw.xp = Math.round(baseXp * decay(avgL));
+    const lvUps = [];
+    for (const h of party) { const n = gainXp(h, Math.round(baseXp * decay(h.level))); if (n) lvUps.push({ name: h.name, level: h.level }); }
+    if (battle.win) {
+      s.stats.wins++;
+      s.clears[dIdx] = (s.clears[dIdx] || 0) + 1;
+      if (dIdx + 1 >= s.unlocked && dIdx + 1 < DUNGEONS.length) s.unlocked = dIdx + 2;
+    }
+    const kept = rw.loot.filter(it => addLoot(s, it));
+    return { ...rw, first, lvUps, kept, salvaged: rw.loot.length - kept.length };
+  }
+  function equip(s, heroId, itemId) {
+    const h = s.heroes.find(x => x.id === heroId), it = s.items[itemId]; if (!h || !it) return;
+    const prev = h.gear[it.slot];
+    // 若此裝備在別人身上，先卸下
+    for (const o of s.heroes) if (o.gear[it.slot] === itemId) o.gear[it.slot] = null;
+    s.bag = s.bag.filter(id => id !== itemId);
+    h.gear[it.slot] = itemId;
+    if (prev) s.bag.push(prev);
+  }
+  function unequip(s, heroId, slot) {
+    const h = s.heroes.find(x => x.id === heroId); if (!h || !h.gear[slot]) return;
+    s.bag.push(h.gear[slot]); h.gear[slot] = null;
+  }
+  function salvage(s, itemId) {
+    const it = s.items[itemId]; if (!it) return 0;
+    s.bag = s.bag.filter(id => id !== itemId); delete s.items[itemId];
+    const v = salvageValue(it); s.gold += v; return v;
+  }
+  function upgrade(s, itemId) {
+    const it = s.items[itemId]; if (!it || it.up >= MAX_UP) return false;
+    const c = upgradeCost(it); if (s.gold < c) return false;
+    s.gold -= c; it.up++; return true;
+  }
+  // 一鍵配裝：依裝備分數，替出戰隊員從背包挑最好的
+  function autoEquip(s) {
+    let changed = 0;
+    for (const h of partyHeroes(s)) {
+      for (const slot of Object.keys(SLOTS)) {
+        const cur = h.gear[slot] && s.items[h.gear[slot]];
+        let best = null;
+        for (const id of s.bag) { const it = s.items[id]; if (it.slot === slot && (!best || itemScore(it) > itemScore(best))) best = it; }
+        if (best && (!cur || itemScore(best) > itemScore(cur))) { equip(s, h.id, best.id); changed++; }
+      }
+    }
+    return changed;
+  }
+  // 離線收益：以掛機副本模擬
+  function offlineProgress(s, now = Date.now()) {
+    if (s.idle == null || !s.clears[s.idle]) { s.lastSeen = now; return null; }
+    const sec = Math.min(OFFLINE_CAP_H * 3600, Math.max(0, (now - s.lastSeen) / 1000));
+    s.lastSeen = now;
+    if (sec < 60) return null;
+    const party = partyHeroes(s); if (!party.length) return null;
+    let t = 0, runs = 0, wins = 0, gold = 0, items = 0, lv = 0;
+    while (runs < 400) {
+      const b = new Battle(partyHeroes(s), s.items, s.idle).runToEnd();
+      t += b.tick + 5; if (t > sec) break;
+      const r = applyResult(s, s.idle, b);
+      runs++; if (b.win) wins++; gold += r.gold; items += r.kept.length; lv += r.lvUps.length;
+    }
+    return { sec: Math.round(sec), runs, wins, gold, items, lv };
+  }
+
+  return { CLASSES, ROLE_NAME, RARITY, SLOTS, DUNGEONS, dungeonInfo, buildWaves, Battle, makeHero, makeItem, heroStats, heroIlvl, heroPower,
+    xpNeed, MAX_LV, gainXp, rewards, newGame, rollTavern, partyHeroes, applyResult, equip, unequip, salvage, upgrade, upgradeCost,
+    salvageValue, itemPow, itemSta, itemScore, autoEquip, offlineProgress, hireCost, REFRESH_COST, PARTY_MAX, ROSTER_MAX, BAG_MAX, MAX_UP,
+    OFFLINE_CAP_H, MAX_TICKS };
+})();
+if (typeof module !== 'undefined') module.exports = RAID;
+
+</script>
+<script>
+(() => {
+const G = RAID;
+const KEY = 'raid-leader-save-v1';
+const TICK_MS = 1000;
+let S, tab = 'dungeon', battle = null, bTimer = null, speed = 1, lastResult = null, invFilter = 'all', modal = null, pendingRepeat = null;
+const $ = s => document.querySelector(s);
+const fmt = n => Math.round(n).toLocaleString('zh-TW');
+const pct = (a, b) => Math.max(0, Math.min(100, 100 * a / b));
+
+// ---------- 存檔 ----------
+function load() {
+  try { const raw = localStorage.getItem(KEY); if (raw) return JSON.parse(raw); } catch (e) {}
+  return null;
+}
+function save() {
+  S.lastSeen = Date.now();
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
+}
+function exportCode() { return btoa(unescape(encodeURIComponent(JSON.stringify(S)))); }
+function importCode(code) {
+  const s = JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
+  if (!s || !Array.isArray(s.heroes) || !s.items) throw new Error('格式不符');
+  return s;
+}
+
+// ---------- 小工具 ----------
+function toast(msg) {
+  const el = $('#toast'); el.innerHTML = `<div class="toast">${msg}</div>`;
+  clearTimeout(toast.t); toast.t = setTimeout(() => el.innerHTML = '', 2200);
+}
+const hero = id => S.heroes.find(h => h.id === id);
+const cls = h => G.CLASSES[h.cls];
+const inParty = h => S.party.includes(h.id);
+function itemStatText(it) {
+  const p = [`威力 ${G.itemPow(it)}`, `耐力 ${G.itemSta(it)}`];
+  if (it.crit) p.push(`暴擊 +${Math.round(it.crit * 100)}%`);
+  return p.join(' · ');
+}
+function itemName(it) {
+  return `<span class="c${it.rarity}">${it.name}</span>${it.up ? `<span class="up">+${it.up}</span>` : ''}`;
+}
+function partyPower() { return G.partyHeroes(S).reduce((a, h) => a + G.heroPower(h, S.items), 0); }
+function avgPartyIlvl() { const p = G.partyHeroes(S); return p.length ? Math.round(p.reduce((a, h) => a + G.heroIlvl(h, S.items), 0) / p.length) : 0; }
+function avgPartyLv() { const p = G.partyHeroes(S); return p.length ? Math.round(p.reduce((a, h) => a + h.level, 0) / p.length) : 0; }
+
+// ---------- 分頁 ----------
+const ICONS = {
+  dungeon: '<path d="M4 20V9l8-5 8 5v11"/><path d="M9 20v-6a3 3 0 0 1 6 0v6"/>',
+  battle: '<path d="M5 19 19 5M14 5h5v5M5 14l5 5M4 20l3-3"/>',
+  team: '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 19c.6-3.4 3-5 6-5s5.4 1.6 6 5M15 14.5c2.6-.3 4.8 1.2 5.5 4.5"/>',
+  bag: '<path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+  tavern: '<path d="M6 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M16 5h2a2 2 0 0 1 0 4h-2M11 13v4M7 20h8"/>',
+};
+const TABS = [['dungeon', '副本'], ['battle', '戰鬥'], ['team', '團隊'], ['bag', '背包'], ['tavern', '酒館']];
+function renderTabs() {
+  $('#tabs').innerHTML = TABS.map(([k, n]) =>
+    `<button data-tab="${k}" class="${tab === k ? 'sel' : ''}" aria-label="${n}"><svg viewBox="0 0 24 24">${ICONS[k]}</svg>${n}${k === 'battle' && battle && !battle.over && tab !== 'battle' ? '<span class="dot"></span>' : ''}</button>`).join('');
+}
+function render(skipModal) {
+  $('#gold').textContent = fmt(S.gold);
+  $('#idleChip').hidden = S.idle == null;
+  renderTabs();
+  const v = $('#view');
+  if (tab === 'dungeon') v.innerHTML = viewDungeons();
+  if (tab === 'battle') v.innerHTML = viewBattle();
+  if (tab === 'team') v.innerHTML = viewTeam();
+  if (tab === 'bag') v.innerHTML = viewBag();
+  if (tab === 'tavern') v.innerHTML = viewTavern();
+  if (tab === 'battle') { const lg = $('.log'); if (lg) lg.scrollTop = lg.scrollHeight; }
+  if (!skipModal) renderModal();
+}
+
+// ---------- 副本 ----------
+function viewDungeons() {
+  const lv = avgPartyLv(), il = avgPartyIlvl();
+  let h = `<h2>副本</h2><p class="sub">隊伍平均 <b class="num">Lv${lv}</b>・裝等 <b class="num">${il}</b>・戰力 <b class="num">${fmt(partyPower())}</b>　｜　每隻首領考驗一種職責，打不過就換陣容或回頭刷裝。</p><div class="dlist">`;
+  G.DUNGEONS.forEach((_, i) => {
+    const d = G.dungeonInfo(i), locked = i >= S.unlocked, clears = S.clears[i] || 0;
+    const idleHere = S.idle === i;
+    h += `<div class="dg ${locked ? 'locked' : ''}">
+      <div class="tier">${['壹','貳','參','肆','伍','陸','柒'][i]}<small>第 ${i + 1} 層</small></div>
+      <h3>${d.name}<span class="boss">首領・${d.boss}</span></h3>
+      <div class="tip">${d.tip}</div>
+      <div class="meta">
+        <span>建議 <b class="num ${lv >= d.recLevel ? 'ok' : 'low'}">Lv${d.recLevel}</b></span>
+        <span>裝等 <b class="num ${il >= d.recIlvl ? 'ok' : 'low'}">${d.recIlvl}</b></span>
+        <span>掉落 <b class="num">${d.dropIlvl}</b></span>
+        <span>通關 <b class="num">${clears}</b> 次</span>
+      </div>
+      <div class="acts">${locked ? `<span class="sub" style="margin:0">先通關上一層</span>` :
+        `<button class="btn main grow" data-act="fight" data-d="${i}">挑戰</button>
+         <button class="btn ${idleHere ? 'on' : ''}" data-act="idle" data-d="${i}" ${clears ? '' : 'disabled title="通關一次後才能掛機"'}>${idleHere ? '掛機中・停止' : '掛機刷'}</button>`}
+      </div></div>`;
+  });
+  h += `</div><div class="howto" style="margin-top:16px"><b>掛機刷</b>：自動重複挑戰，關掉頁面也會累積（最多 ${G.OFFLINE_CAP_H} 小時），回來時一次結算。<br><b>存檔</b>存在這台裝置的瀏覽器，換裝置請到「團隊」最下方匯出存檔碼。</div>`;
+  return h;
+}
+
+// ---------- 戰鬥 ----------
+function unitRow(u, enemy) {
+  const dead = u.hp <= 0;
+  const bar = enemy ? 'enemy-bar' : 'role-' + u.role;
+  return `<div class="unit ${dead ? 'dead' : ''} ${u.boss ? 'boss' : ''}">
+    <div class="ic">${enemy ? (u.boss ? '👑' : '👾') : u.icon}</div>
+    <div class="nm">${u.name}${enemy ? '' : `<small>${G.CLASSES[u.cls].name}</small>`}</div>
+    <div class="hpn num">${fmt(u.hp)} / ${fmt(u.max)}</div>
+    <div class="bar"><i class="${bar}" style="width:${pct(u.hp, u.max)}%"></i></div></div>`;
+}
+function viewBattle() {
+  if (!battle) return `<h2>戰鬥</h2><div class="empty">目前沒有進行中的戰鬥。<br>到「副本」選一層開始挑戰。<br><br><button class="btn main" data-tab="dungeon">前往副本</button></div>`;
+  const d = G.dungeonInfo(battle.dIdx), b = battle;
+  let h = `<div class="bhead"><h2>${d.name}</h2><span class="sub num" style="margin:0">${b.tick}s</span>
+    <div class="waves">${b.waves.map((_, i) => `<i class="${i < b.waveIdx || (b.over && b.win) ? 'done' : i === b.waveIdx ? 'cur' : ''}"></i>`).join('')}</div></div>
+    <div class="arena">
+      <div class="side"><span class="label">敵方・${b.waveIdx === b.waves.length - 1 ? '首領戰' : `第 ${b.waveIdx + 1} 波`}</span>${b.enemies.filter(e => e.hp > 0 || e.boss).slice(0, 7).map(e => unitRow(e, true)).join('')}</div>
+      <div class="side"><span class="label">我方隊伍</span>${b.units.map(u => unitRow(u, false)).join('')}</div>
+    </div>
+    <div class="log" aria-live="polite">${b.log.map(l => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, ' ')}</span>${l.msg}</p>`).join('')}</div>`;
+  if (!b.over) {
+    h += `<div class="ctrl"><div class="seg">${[1, 2, 4].map(x => `<button data-act="speed" data-x="${x}" class="${speed === x ? 'sel' : ''}">${x}×</button>`).join('')}</div>
+      <button class="btn" data-act="skip">直接結算</button>
+      <button class="btn" data-act="retreat">撤退</button></div>`;
+  }
+  if (b.over && lastResult) h += viewResult();
+  return h;
+}
+function viewResult() {
+  const r = lastResult, b = battle;
+  const dmgMax = Math.max(1, ...b.units.map(u => Math.max(u.dmgDone, u.healDone)));
+  const sec = Math.max(1, b.tick);
+  let h = `<div class="result ${b.win ? 'win' : 'lose'}"><h3>${b.win ? '通關' : '失敗'}</h3>
+    <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+${fmt(r.gold)}</b> 金幣</span><span><b class="num">+${fmt(r.xp)}</b> 經驗</span>${r.first ? '<span style="color:var(--brass)">首通獎勵：保底稀有</span>' : ''}${r.decayed ? '<span style="color:var(--warn)">等級壓制：經驗與金幣遞減，該往下一層了</span>' : ''}</div>`;
+  if (r.lvUps.length) h += `<div style="color:var(--good);font-size:14px">⬆ ${r.lvUps.map(x => `${x.name} 升到 Lv${x.level}`).join('、')}</div>`;
+  if (r.kept.length || r.salvaged) h += `<div class="stack">${r.kept.map(it => `<div class="item rar${it.rarity}"><div class="in">${itemName(it)}</div><div class="il">${G.SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div><div class="is">${itemStatText(it)}</div></div>`).join('')}${r.salvaged ? `<div class="sub" style="margin:0">${r.salvaged} 件自動分解為金幣</div>` : ''}</div>`;
+  h += `<div class="meter"><span class="label">傷害 / 治療統計（每秒）</span>${b.units.map(u => {
+    const v = u.role === 'heal' ? u.healDone : u.dmgDone;
+    return `<div class="mrow"><span>${u.icon} ${u.name}</span><span class="mb"><i class="role-${u.role}" style="width:${pct(v, dmgMax)}%"></i></span><span class="num" style="text-align:right">${fmt(v / sec)}${u.role === 'heal' ? ' HPS' : ' DPS'}</span></div>`;
+  }).join('')}</div>`;
+  if (!b.win) h += `<div class="sub" style="margin:0">${failHint(b)}</div>`;
+  h += `<div class="row">${pendingRepeat ? `<span class="sub" style="margin:0;align-self:center">掛機中，3 秒後自動再戰…</span>` : ''}
+    <button class="btn main grow" data-act="fight" data-d="${b.dIdx}">再打一次</button>
+    ${r.kept.length ? `<button class="btn" data-act="autoequip">一鍵配裝</button>` : ''}
+    <button class="btn" data-tab="dungeon">返回副本</button></div></div>`;
+  return h;
+}
+function failHint(b) {
+  const tank = b.units.find(u => u.role === 'tank'), heal = b.units.find(u => u.role === 'heal');
+  if (b.tick >= G.MAX_TICKS) return '提示：時間耗盡，輸出不足。補強輸出或強化武器。';
+  if (!tank) return '提示：隊伍沒有坦克，敵人會隨機攻擊脆皮隊員。';
+  if (!heal) return '提示：隊伍沒有治療，長時間戰鬥撐不住。';
+  if (tank.hp <= 0 && b.units.filter(u => u.hp > 0).length === 0 && tank.taken > tank.max) return '提示：坦克先倒，試著強化坦克的護甲與耐力，或多帶一位治療。';
+  return '提示：回前一層刷裝備與等級，或調整陣容（法師清小怪、盜賊打首領）。';
+}
+function startBattle(dIdx) {
+  const p = G.partyHeroes(S);
+  if (!p.length) { toast('隊伍沒有成員'); tab = 'team'; render(); return; }
+  clearTimeout(pendingRepeat); pendingRepeat = null;
+  battle = new G.Battle(p, S.items, dIdx); lastResult = null;
+  battle.push(`進入 ${G.DUNGEONS[dIdx].name}，第 1 波敵人出現`, 'info');
+  runTimer();
+}
+function runTimer() {
+  clearInterval(bTimer);
+  bTimer = setInterval(stepBattle, TICK_MS / speed);
+}
+function stepBattle() {
+  if (!battle || battle.over) { clearInterval(bTimer); return; }
+  battle.step();
+  if (battle.over) finishBattle();
+  else if (tab === 'battle') render(true);
+  else renderTabs();
+}
+function finishBattle() {
+  clearInterval(bTimer);
+  lastResult = G.applyResult(S, battle.dIdx, battle);
+  save();
+  if (S.idle === battle.dIdx) {
+    const d = battle.dIdx;
+    pendingRepeat = setTimeout(() => { pendingRepeat = null; if (S.idle === d) startBattle(d); }, 3000);
+  }
+  render(true);
+}
+
+// ---------- 團隊 ----------
+function roleCount() {
+  const c = { tank: 0, heal: 0, dps: 0 }; G.partyHeroes(S).forEach(h => c[cls(h).role]++); return c;
+}
+function viewTeam() {
+  const party = G.partyHeroes(S), c = roleCount();
+  let h = `<h2>團隊</h2><p class="sub">出戰最多 ${G.PARTY_MAX} 人。點英雄查看裝備與調整陣容。</p>
+    <div class="party">${Array.from({ length: G.PARTY_MAX }, (_, i) => {
+      const x = party[i];
+      if (!x) return `<div class="slot emptyslot">空位</div>`;
+      return `<button class="slot" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div><div class="n">${x.name}</div><div class="lv num">Lv${x.level}</div><div class="rl role-${cls(x).role}"></div></button>`;
+    }).join('')}</div>
+    <div class="comp"><span><b style="color:var(--tank)">坦克</b> ${c.tank}</span><span><b style="color:var(--heal)">治療</b> ${c.heal}</span><span><b style="color:var(--dps)">輸出</b> ${c.dps}</span><span>戰力 <b class="num" style="color:var(--fg)">${fmt(partyPower())}</b></span>
+    ${!c.tank ? '<span style="color:var(--warn)">缺坦克</span>' : ''}${!c.heal ? '<span style="color:var(--warn)">缺治療</span>' : ''}</div>
+    <h2 style="font-size:18px">名冊 <span class="sub num">${S.heroes.length}/${G.ROSTER_MAX}</span></h2><div class="stack">`;
+  const sorted = [...S.heroes].sort((a, b) => (inParty(b) - inParty(a)) || b.level - a.level);
+  for (const x of sorted) h += heroCard(x);
+  h += `</div><h2 style="font-size:18px">存檔</h2><div class="row"><button class="btn" data-act="export">匯出存檔碼</button><button class="btn" data-act="import">匯入</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">重新開始</button></div>
+    <p class="sub" style="margin-top:8px">共挑戰 ${S.stats.runs} 次・通關 ${S.stats.wins} 次</p>`;
+  return h;
+}
+function heroCard(x) {
+  const st = G.heroStats(x, S.items);
+  const need = G.xpNeed(x.level);
+  return `<button class="hero" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div>
+    <div class="nm">${x.name}<small>${cls(x).name}・<span class="num">Lv${x.level}</span></small></div>
+    <span class="tag ${inParty(x) ? 'in' : ''}">${inParty(x) ? '出戰中' : '待命'}</span>
+    <div class="st num"><span>生命 ${fmt(st.hp)}</span><span>威力 ${st.pow}</span><span>暴擊 ${Math.round(st.crit * 100)}%</span><span>裝等 ${G.heroIlvl(x, S.items)}</span></div>
+    <div class="xpbar"><i style="width:${x.level >= G.MAX_LV ? 100 : pct(x.xp, need)}%"></i></div></button>`;
+}
+
+// ---------- 背包 ----------
+function bestUpgradeFor(it) { // 是否比某位出戰者身上的更好
+  return G.partyHeroes(S).some(h => { const cur = h.gear[it.slot] && S.items[h.gear[it.slot]]; return !cur || G.itemScore(it) > G.itemScore(cur); });
+}
+function viewBag() {
+  const items = S.bag.map(id => S.items[id]).filter(Boolean)
+    .filter(it => invFilter === 'all' || it.slot === invFilter)
+    .sort((a, b) => G.itemScore(b) - G.itemScore(a));
+  let h = `<h2>背包 <span class="sub num">${S.bag.length}/${G.BAG_MAX}</span></h2><p class="sub">背包滿了，新掉落會自動分解成金幣。</p>
+    <div class="toolbar"><div class="seg">${[['all', '全部'], ['weapon', '武器'], ['armor', '護甲'], ['trinket', '飾品']].map(([k, n]) => `<button data-act="filter" data-f="${k}" class="${invFilter === k ? 'sel' : ''}">${n}</button>`).join('')}</div>
+    <button class="btn sm main" data-act="autoequip">一鍵配裝</button></div>
+    <div class="toolbar"><button class="btn sm" data-act="salvagecommon">分解全部普通</button>
+    <button class="btn sm ${S.autoSalvageCommon ? 'on' : ''}" data-act="autosalv">${S.autoSalvageCommon ? '✓ ' : ''}自動分解普通</button></div>`;
+  if (!items.length) return h + `<div class="empty">背包是空的。通關副本會掉落裝備。</div>`;
+  h += `<div class="stack">${items.map(it => `<button class="item rar${it.rarity}" data-act="item" data-id="${it.id}">
+    <div class="in">${itemName(it)}${bestUpgradeFor(it) ? '<span class="better">▲ 可提升</span>' : ''}</div>
+    <div class="il">${G.SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div>
+    <div class="is num">${G.RARITY[it.rarity].name}・${itemStatText(it)}</div></button>`).join('')}</div>`;
+  return h;
+}
+
+// ---------- 酒館 ----------
+function viewTavern() {
+  let h = `<h2>酒館</h2><p class="sub">招募新英雄。等級會跟著團隊平均成長。名冊上限 ${G.ROSTER_MAX} 人。</p><div class="stack">`;
+  for (const x of S.tavern) {
+    const c = cls(x), cost = G.hireCost(x);
+    h += `<div class="hero"><div class="ic">${c.icon}</div><div class="nm">${x.name}<small>${c.name}・${G.ROLE_NAME[c.role]}・<span class="num">Lv${x.level}</span></small></div>
+      <button class="btn sm main" data-act="hire" data-id="${x.id}" ${S.gold < cost || S.heroes.length >= G.ROSTER_MAX ? 'disabled' : ''} style="grid-row:span 2"><span class="num">${cost}</span> 金</button>
+      <div class="st">${c.desc}</div></div>`;
+  }
+  h += `</div><div class="row" style="margin-top:12px"><button class="btn" data-act="reroll" ${S.gold < G.REFRESH_COST ? 'disabled' : ''}>換一批（<span class="num">${G.REFRESH_COST}</span> 金）</button></div>
+    <h2 style="font-size:18px">職業圖鑑</h2><div class="stack">${Object.values(G.CLASSES).map(c => `<div class="hero"><div class="ic">${c.icon}</div><div class="nm">${c.name}<small>${G.ROLE_NAME[c.role]}</small></div><span></span><div class="st">${c.desc}</div></div>`).join('')}</div>`;
+  return h;
+}
+
+// ---------- 抽屜 ----------
+function openModal(m) { modal = m; renderModal(); }
+function closeModal() { modal = null; renderModal(); }
+function renderModal() {
+  const el = $('#modal');
+  if (!modal) { el.innerHTML = ''; return; }
+  let body = '';
+  if (modal.type === 'hero') body = sheetHero(hero(modal.id));
+  if (modal.type === 'item') body = sheetItem(S.items[modal.id]);
+  if (modal.type === 'pick') body = sheetPick();
+  if (modal.type === 'text') body = modal.html;
+  if (!body) { modal = null; el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="scrim" data-act="close"><div class="sheet" role="dialog" aria-modal="true">${body}</div></div>`;
+}
+function sheetHero(x) {
+  if (!x) return '';
+  const c = cls(x), st = G.heroStats(x, S.items);
+  let h = `<h3>${c.icon} ${x.name}</h3><div class="sub" style="margin:0">${c.name}・${G.ROLE_NAME[c.role]}　${c.desc}</div>
+    <div class="statgrid num"><div><b>${x.level}</b><span>等級</span></div><div><b>${fmt(st.hp)}</b><span>生命</span></div><div><b>${st.pow}</b><span>威力</span></div><div><b>${Math.round(st.crit * 100)}%</b><span>暴擊</span></div></div>
+    <div class="sub" style="margin:0">經驗 <span class="num">${fmt(x.xp)} / ${fmt(G.xpNeed(x.level))}</span>・護甲減傷 ${Math.round(st.armor * 100)}%</div><div>`;
+  for (const [slot, sn] of Object.entries(G.SLOTS)) {
+    const it = x.gear[slot] && S.items[x.gear[slot]];
+    const n = S.bag.filter(id => S.items[id].slot === slot).length;
+    h += `<div class="gearrow"><span class="sl">${sn}</span><span>${it ? `${itemName(it)} <span class="sub num">${it.ilvl}</span><br><span class="sub num" style="font-size:12px">${itemStatText(it)}</span>` : '<span class="sub">（空）</span>'}</span>
+      <span class="row">${it ? `<button class="btn sm" data-act="up" data-id="${it.id}" ${it.up >= G.MAX_UP ? 'disabled' : ''}>強化 <span class="num">${it.up >= G.MAX_UP ? 'MAX' : G.upgradeCost(it)}</span></button>` : ''}
+      <button class="btn sm" data-act="pick" data-id="${x.id}" data-slot="${slot}" ${n ? '' : 'disabled'}>更換</button></span></div>`;
+  }
+  h += `</div><div class="row">${inParty(x)
+    ? `<button class="btn grow" data-act="bench" data-id="${x.id}">移出隊伍</button>`
+    : `<button class="btn main grow" data-act="join" data-id="${x.id}" ${S.party.length >= G.PARTY_MAX ? 'disabled' : ''}>${S.party.length >= G.PARTY_MAX ? '隊伍已滿' : '加入隊伍'}</button>`}
+    ${S.heroes.length > 1 ? `<button class="btn" data-act="fire" data-id="${x.id}" style="color:var(--bad)">${modal.confirmFire ? '確定解雇？' : '解雇'}</button>` : ''}</div>`;
+  return h;
+}
+function sheetPick() {
+  const x = hero(modal.id), slot = modal.slot, cur = x.gear[slot] && S.items[x.gear[slot]];
+  const list = S.bag.map(id => S.items[id]).filter(it => it.slot === slot).sort((a, b) => G.itemScore(b) - G.itemScore(a));
+  return `<h3>為 ${x.name} 選擇${G.SLOTS[slot]}</h3><div class="sub" style="margin:0">目前：${cur ? itemName(cur) + '・' + itemStatText(cur) : '無'}</div>
+    <div class="choices">${list.map(it => `<button class="item rar${it.rarity}" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="in">${itemName(it)}${!cur || G.itemScore(it) > G.itemScore(cur) ? '<span class="better">▲</span>' : ''}</div><div class="il"><b class="num">${it.ilvl}</b></div><div class="is num">${itemStatText(it)}</div></button>`).join('')}</div>
+    <div class="row">${cur ? `<button class="btn" data-act="unequip" data-hero="${x.id}" data-slot="${slot}">卸下</button>` : ''}<button class="btn" data-act="hero" data-id="${x.id}">返回</button></div>`;
+}
+function sheetItem(it) {
+  if (!it) return '';
+  const party = G.partyHeroes(S);
+  return `<h3>${itemName(it)}</h3><div class="sub num" style="margin:0">${G.RARITY[it.rarity].name}${G.SLOTS[it.slot]}・裝等 ${it.ilvl}・強化 +${it.up}/${G.MAX_UP}<br>${itemStatText(it)}</div>
+    <span class="label">裝備給</span><div class="stack">${party.map(x => {
+      const cur = x.gear[it.slot] && S.items[x.gear[it.slot]];
+      const better = !cur || G.itemScore(it) > G.itemScore(cur);
+      return `<button class="hero" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="ic">${cls(x).icon}</div><div class="nm">${x.name}<small>${cls(x).name}</small></div><span class="tag ${better ? 'in' : ''}">${better ? '▲ 提升' : '較差'}</span><div class="st">目前：${cur ? `${cur.name}（${cur.ilvl}）` : '空'}</div></button>`;
+    }).join('')}</div>
+    <div class="row"><button class="btn" data-act="up" data-id="${it.id}" ${it.up >= G.MAX_UP || S.gold < G.upgradeCost(it) ? 'disabled' : ''}>強化（<span class="num">${it.up >= G.MAX_UP ? 'MAX' : G.upgradeCost(it)}</span> 金）</button>
+    <button class="btn" data-act="salvage" data-id="${it.id}">分解 +<span class="num">${G.salvageValue(it)}</span> 金</button></div>`;
+}
+
+// ---------- 事件 ----------
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-tab],[data-act]');
+  if (!t) return;
+  if (t.dataset.act === 'close') { if (e.target === t) closeModal(); return; }
+  if (t.dataset.tab) { tab = t.dataset.tab; modal = null; render(); window.scrollTo(0, 0); return; }
+  const a = t.dataset.act, id = t.dataset.id;
+  switch (a) {
+    case 'fight': startBattle(+t.dataset.d); tab = 'battle'; break;
+    case 'idle': {
+      const d = +t.dataset.d;
+      if (S.idle === d) { S.idle = null; clearTimeout(pendingRepeat); pendingRepeat = null; toast('已停止掛機'); }
+      else { S.idle = d; toast(`開始掛機：${G.DUNGEONS[d].name}`); if (!battle || battle.over) { startBattle(d); } }
+      save(); break;
+    }
+    case 'speed': speed = +t.dataset.x; runTimer(); break;
+    case 'skip': if (battle && !battle.over) { battle.runToEnd(); finishBattle(); } break;
+    case 'retreat': if (battle && !battle.over) { clearInterval(bTimer); battle.over = true; battle.win = false; battle.push('🏳 主動撤退', 'bad'); lastResult = G.applyResult(S, battle.dIdx, battle); if (S.idle === battle.dIdx) S.idle = null; save(); } break;
+    case 'hero': openModal({ type: 'hero', id }); return;
+    case 'item': openModal({ type: 'item', id }); return;
+    case 'pick': openModal({ type: 'pick', id, slot: t.dataset.slot }); return;
+    case 'equip': G.equip(S, t.dataset.hero, id); toast('已裝備'); save(); modal = { type: 'hero', id: t.dataset.hero }; break;
+    case 'unequip': G.unequip(S, t.dataset.hero, t.dataset.slot); save(); modal = { type: 'hero', id: t.dataset.hero }; break;
+    case 'up': if (G.upgrade(S, id)) { toast('強化成功'); save(); } else toast('金幣不足'); break;
+    case 'salvage': toast(`分解獲得 ${G.salvage(S, id)} 金`); save(); modal = null; break;
+    case 'join': if (S.party.length < G.PARTY_MAX) { S.party.push(id); save(); } break;
+    case 'bench': S.party = S.party.filter(x => x !== id); save(); break;
+    case 'fire':
+      if (!modal.confirmFire) { modal.confirmFire = true; break; }
+      { const x = hero(id); for (const sl in x.gear) if (x.gear[sl]) S.bag.push(x.gear[sl]);
+        S.heroes = S.heroes.filter(h => h.id !== id); S.party = S.party.filter(p => p !== id); modal = null; toast(`${x.name} 離開了團隊`); save(); }
+      break;
+    case 'hire': {
+      const x = S.tavern.find(h => h.id === id), cost = G.hireCost(x);
+      if (S.gold >= cost && S.heroes.length < G.ROSTER_MAX) {
+        S.gold -= cost; S.heroes.push(x); S.tavern = S.tavern.filter(h => h.id !== id);
+        if (S.party.length < G.PARTY_MAX) S.party.push(x.id);
+        if (!S.tavern.length) G.rollTavern(S);
+        toast(`${x.name} 加入了${S.party.includes(x.id) ? '隊伍' : '名冊'}`); save();
+      }
+      break;
+    }
+    case 'reroll': if (S.gold >= G.REFRESH_COST) { S.gold -= G.REFRESH_COST; G.rollTavern(S); save(); } break;
+    case 'filter': invFilter = t.dataset.f; break;
+    case 'autoequip': { const n = G.autoEquip(S); toast(n ? `更換了 ${n} 件裝備` : '目前已是最佳配裝'); save(); break; }
+    case 'salvagecommon': {
+      const ids = S.bag.filter(i => S.items[i].rarity === 0); let g = 0; ids.forEach(i => g += G.salvage(S, i));
+      toast(ids.length ? `分解 ${ids.length} 件，獲得 ${g} 金` : '沒有普通裝備'); save(); break;
+    }
+    case 'autosalv': S.autoSalvageCommon = !S.autoSalvageCommon; save(); break;
+    case 'export': openModal({ type: 'text', html: `<h3>匯出存檔碼</h3><p class="sub" style="margin:0">複製這段文字，到另一台裝置的「匯入」貼上。</p><textarea id="expTxt" readonly>${exportCode()}</textarea><div class="row"><button class="btn main" data-act="copy">複製</button><button class="btn" data-act="closebtn">關閉</button></div>` }); return;
+    case 'copy': { const ta = $('#expTxt'); navigator.clipboard?.writeText(ta.value).then(() => toast('已複製'), () => { ta.select(); toast('請手動複製'); }) ?? (ta.select(), toast('請手動複製')); return; }
+    case 'import': openModal({ type: 'text', html: `<h3>匯入存檔碼</h3><p class="sub" style="margin:0">會覆蓋目前進度。</p><textarea id="impTxt" placeholder="貼上存檔碼"></textarea><div class="row"><button class="btn main" data-act="doimport">匯入</button><button class="btn" data-act="closebtn">取消</button></div>` }); return;
+    case 'doimport': try { S = importCode($('#impTxt').value); battle = null; save(); modal = null; toast('匯入完成'); } catch (err) { toast('存檔碼無法讀取，請確認是否完整複製'); return; } break;
+    case 'reset': openModal({ type: 'text', html: `<h3>重新開始？</h3><p class="sub" style="margin:0">目前的英雄、裝備與進度都會清除，無法復原。</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">清除並重來</button><button class="btn" data-act="closebtn">取消</button></div>` }); return;
+    case 'doreset': clearInterval(bTimer); clearTimeout(pendingRepeat); S = G.newGame(); battle = null; lastResult = null; modal = null; tab = 'dungeon'; save(); break;
+    case 'closebtn': modal = null; break;
+  }
+  render();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal) closeModal(); });
+
+// ---------- 離線結算 ----------
+function settleOffline() {
+  const r = G.offlineProgress(S);
+  if (!r || !r.runs) return;
+  save();
+  const hrs = r.sec >= 3600 ? `${(r.sec / 3600).toFixed(1)} 小時` : `${Math.round(r.sec / 60)} 分鐘`;
+  openModal({ type: 'text', html: `<h3>離線收益</h3><p class="sub" style="margin:0">你離開了 ${hrs}，隊伍在 ${G.DUNGEONS[S.idle].name} 持續作戰。</p>
+    <div class="statgrid num"><div><b>${r.runs}</b><span>挑戰</span></div><div><b>${r.wins}</b><span>通關</span></div><div><b>+${fmt(r.gold)}</b><span>金幣</span></div><div><b>${r.items}</b><span>裝備</span></div></div>
+    ${r.lv ? `<div style="color:var(--good)">期間共升級 ${r.lv} 次</div>` : ''}
+    <div class="row"><button class="btn main grow" data-act="autoequip">一鍵配裝</button><button class="btn" data-act="closebtn">好</button></div>` });
+}
+// 切到背景：暫停即時戰鬥並記錄時間；回來時掛機改用離線結算，避免重複計算
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { clearInterval(bTimer); clearTimeout(pendingRepeat); pendingRepeat = null; save(); return; }
+  if (S.idle != null && (Date.now() - S.lastSeen) > 60000) {
+    battle = null; lastResult = null; settleOffline(); startBattle(S.idle); render();
+  } else if (battle && !battle.over) runTimer();
+  else if (S.idle != null) startBattle(S.idle);
+});
+setInterval(() => { if (!document.hidden) save(); }, 5000);
+
+// ---------- 啟動 ----------
+function start(data) {
+  S = (data && data.S) || load() || G.newGame();
+  S.stats = S.stats || { runs: 0, wins: 0 };
+  settleOffline();
+  if (S.idle != null && S.clears[S.idle]) startBattle(S.idle);
+  render();
+}
+window.claude?.hot?.snapshot?.(() => ({ S }));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
