@@ -1,4 +1,4 @@
-/* 副本團長 v0.7.4 */
+/* 副本團長 v0.7.5 */
 (() => {
   // src/core/config.js
   var CLASSES = {
@@ -282,6 +282,7 @@
     // 背包滿後只保留此品質以上（2 = 稀有）
     offlineCapHours: 8
   };
+  var ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV"];
 
   // src/core/rng.js
   var R = Math.random;
@@ -1709,7 +1710,7 @@
   }
 
   // src/core/version.js
-  var VERSION = "0.7.4";
+  var VERSION = "0.7.5";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -1829,7 +1830,7 @@
       const d = dungeonInfo(i), locked = i >= app.S.unlocked, clears = app.S.clears[i] || 0;
       const idleHere = app.S.idle === i;
       h += `<div class="dg ${locked ? "locked" : ""}">
-      <div class="tier">${["\u58F9", "\u8CB3", "\u53C3", "\u8086", "\u4F0D", "\u9678", "\u67D2"][i]}<small>\u7B2C ${i + 1} \u5C64</small></div>
+      <div class="tier">${ROMAN[i]}<small>\u7B2C ${i + 1} \u5C64</small></div>
       <h3>${d.name}<span class="boss">\u9996\u9818\u30FB${d.boss}</span></h3>
       <div class="tip">${d.tip}</div>
       <div class="meta">

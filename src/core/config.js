@@ -181,3 +181,6 @@ export const ECONOMY = {
   defaultKeepRarity: 2,             // 背包滿後只保留此品質以上（2 = 稀有）
   offlineCapHours: 8,
 };
+
+// 樓層編號（羅馬數字，配合西方奇幻風格；第二章接著用 VIII 起）
+export const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV'];

@@ -62,7 +62,7 @@ export function viewDungeons() {
     const d = G.dungeonInfo(i), locked = i >= app.S.unlocked, clears = app.S.clears[i] || 0;
     const idleHere = app.S.idle === i;
     h += `<div class="dg ${locked ? 'locked' : ''}">
-      <div class="tier">${['壹','貳','參','肆','伍','陸','柒'][i]}<small>第 ${i + 1} 層</small></div>
+      <div class="tier">${G.ROMAN[i]}<small>第 ${i + 1} 層</small></div>
       <h3>${d.name}<span class="boss">首領・${d.boss}</span></h3>
       <div class="tip">${d.tip}</div>
       <div class="meta">
