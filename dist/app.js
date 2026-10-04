@@ -1,4 +1,4 @@
-/* 副本團長 v0.9.2 */
+/* 副本團長 v0.9.3 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -412,6 +412,8 @@
     "\u79D8\u5883 +5 \u9650\u6642\u901A\u95DC": "Time a Mythic +5",
     "\u79D8\u5883 +10 \u9650\u6642\u901A\u95DC": "Time a Mythic +10",
     "\u79D8\u5883 +15 \u9650\u6642\u901A\u95DC": "Time a Mythic +15",
+    "\u6DF1\u6DF5\u79D8\u5883 +5 \u9650\u6642\u901A\u95DC": "Time an Abyssal +5",
+    "\u6DF1\u6DF5\u79D8\u5883 +10 \u9650\u6642\u901A\u95DC": "Time an Abyssal +10",
     "\u5BF6\u5EAB\u7D2F\u8A08 10 \u6B21": "10 Vault runs",
     "\u5BF6\u5EAB\u7D2F\u8A08 30 \u6B21": "30 Vault runs",
     "\u5BF6\u5EAB\u7D2F\u8A08 60 \u6B21": "60 Vault runs",
@@ -435,8 +437,10 @@
     "\u5BF6\u85CF\u54E5\u5E03\u6797": "Treasure Goblin",
     "\u968A\u4F0D\u6C92\u6709\u6210\u54E1": "Your party is empty",
     "\u9032\u5165 {0}\uFF0C\u7B2C 1 \u6CE2\u6575\u4EBA\u51FA\u73FE": "Entering {0} \u2014 wave 1 incoming",
-    "\u9032\u5165\u50B3\u5947\u79D8\u5883\uFF1A{0} +{1}\uFF5C\u8A5E\u7DB4\uFF1A{2}": "Mythic: {0} +{1} | Affixes: {2}",
+    "\u9032\u5165{3}\uFF1A{0} +{1}\uFF5C\u8A5E\u7DB4\uFF1A{2}": "{3}: {0} +{1} | Affixes: {2}",
     "\u3001": ", ",
+    "\u6DF1\u6DF5\u79D8\u5883": "Abyssal+",
+    "\u50B3\u5947\u79D8\u5883": "Mythic+",
     "\u79D8\u5883\u639B\u6A5F\uFF1A{0} +{1}\uFF08\u9470\u77F3\u4E0D\u8B8A\uFF0C\u734E\u52F5 {2}%\uFF09": "Mythic idle: {0} +{1} (keystone unchanged, {2}% rewards)",
     "\u4ECA\u5929\u7684\u5BF6\u5EAB\u6B21\u6578\u7528\u5B8C\u4E86\uFF0C\u660E\u5929 00:00 \u91CD\u7F6E": "No Vault runs left today \u2014 resets at 00:00",
     "\u9032\u5165\u5BF6\u5EAB\u7B2C {0} \u5C64\uFF1A60 \u79D2\u5167\u6253\u5012\u8D8A\u591A\u5BF6\u85CF\u54E5\u5E03\u6797\uFF0C\u91D1\u5E63\u8D8A\u591A\uFF01": "Vault floor {0}: slay as many treasure goblins as you can in 60s!",
@@ -456,6 +460,8 @@
     "\u5718\u968A": "Party",
     "\u80CC\u5305": "Bag",
     "\u9152\u9928": "Tavern",
+    "\u79D8\u5883\u6311\u6230\u9032\u884C\u4E2D": "A Mythic run is in progress",
+    "\u79D8\u5883\u9AD4\u529B\u4E0D\u8DB3\uFF0C{0} \u5F8C\u56DE\u5FA9 1 \u9EDE": "Out of Mythic stamina \u2014 +1 in {0}",
     "\u5BF6\u5EAB\uFF08\u504F\u7BC4\u570D\u8F38\u51FA\uFF09": "the Vault (AoE focus)",
     "\u91D1\u5E63\u4E0D\u5920": "Not enough gold",
     "\u540D\u518A\u7A7A\u4F4D\u4E0D\u5920": "Not enough roster space",
@@ -569,6 +575,7 @@
     "\u533F\u540D": "Anonymous",
     "Lv{0}\u30FB\u7B2C {1} \u5C64{2}": "Lv{0} \xB7 Floor {1}{2}",
     "\u30FB\u79D8\u5883 +{0}": " \xB7 Mythic +{0}",
+    "\u30FB\u6DF1\u6DF5 +{0}": " \xB7 Abyssal +{0}",
     '<span class="better">\u25B2 \u53EF\u63D0\u5347</span>': '<span class="better">\u25B2 Upgrade</span>',
     '<h2>\u80CC\u5305 <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">\u7CBE\u83EF <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">\u5206\u89E3\u7CBE\u826F\u4EE5\u4E0A\u7684\u88DD\u5099\u6703\u5F97\u5230\u7CBE\u83EF\u3002\u901A\u95DC\u7B2C 7 \u5C64\u5F8C\uFF0C\u53EF\u7528\u7CBE\u83EF\u628A\u88DD\u5099\u7CBE\u7149\u5230 +6 ~ +{4}\u3002</p>': '<h2>Bag <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">Essence <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">Salvaging Uncommon or better gear yields essence. After clearing Floor 7, use essence to refine gear to +6 ~ +{4}.</p>',
     '<div class="stashbox"><div class="row" style="align-items:center"><b>\u6230\u5229\u54C1\u7BB1</b><span class="sub num" style="margin:0">{0}/{1}</span> <span class="sub" style="margin:0 0 0 auto">\u80CC\u5305\u6EFF\u6642\u6389\u843D\u7684\u88DD\u5099</span></div> <div class="stack">{2} {3}</div> <div class="row"><button class="btn sm main grow" data-act="takestash" {4}>{5}</button> <button class="btn sm" data-act="salvagestash">\u5168\u90E8\u5206\u89E3</button></div></div>': '<div class="stashbox"><div class="row" style="align-items:center"><b>Loot chest</b><span class="sub num" style="margin:0">{0}/{1}</span> <span class="sub" style="margin:0 0 0 auto">Drops received while your bag was full</span></div> <div class="stack">{2} {3}</div> <div class="row"><button class="btn sm main grow" data-act="takestash" {4}>{5}</button> <button class="btn sm" data-act="salvagestash">Salvage all</button></div></div>',
@@ -634,7 +641,7 @@
     '<button class="btn main grow" data-act="vault" data-d="{0}">\u518D\u6253\u4E00\u6B21\uFF08\u4ECA\u5929\u5269 {1} \u6B21\uFF09</button>': '<button class="btn main grow" data-act="vault" data-d="{0}">Run again ({1} left today)</button>',
     '<span class="sub" style="margin:0;align-self:center">\u4ECA\u5929\u7684\u5BF6\u5EAB\u6B21\u6578\u7528\u5B8C\u4E86</span>': '<span class="sub" style="margin:0;align-self:center">No Vault runs left today</span>',
     '<button class="btn grow" data-act="idlemythic" data-d="{0}">\u505C\u6B62\u79D8\u5883\u639B\u6A5F</button>': '<button class="btn grow" data-act="idlemythic" data-d="{0}">Stop Mythic idle</button>',
-    "\u518D\u6311\u6230 +{0}": "Retry +{0}",
+    "\u518D\u6311\u6230 +{0}\uFF08\u9AD4\u529B {1}\uFF09": "Retry +{0} (stamina {1})",
     "\u518D\u6253\u4E00\u6B21": "Run again",
     '<button class="btn" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button>': '<button class="btn" data-act="autoequip">Auto-equip</button>',
     "\u63D0\u793A\uFF1A\u6642\u9593\u8017\u76E1\uFF0C\u8F38\u51FA\u4E0D\u8DB3\u3002\u88DC\u5F37\u8F38\u51FA\u6216\u5F37\u5316\u6B66\u5668\u3002": "Tip: out of time \u2014 not enough damage. Add DPS or upgrade weapons.",
@@ -647,9 +654,14 @@
     '<div class="vault"><div class="mhead"><div><span class="label">\u5BF6\u5EAB</span><b>60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797</b></div><span class="vleft num">\u4ECA\u5929\u5269 {0}/{1}</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">\u7B2C {3} \u5C64\uFF1A\u6BCF\u96BB <b class="num">{4}</b> \u91D1\uFF0C\u6700\u591A\u7B97 {5} \u96BB\u30FB\u6700\u4F73 {6} \u96BB\u3002\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">\u5099\u6230</button></div></div>': '<div class="vault"><div class="mhead"><div><span class="label">Vault</span><b>60s of treasure goblins</b></div><span class="vleft num">{0}/{1} left today</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">Floor {3}:  <b class="num">{4}</b>  gold each, up to {5} \xB7 best {6}. Your highest floor usually pays most.</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">Prep</button></div></div>',
     "\u660E\u5929 00:00 \u518D\u4F86": "Come back at 00:00",
     '<div class="mythic locked"><b>\u50B3\u5947\u79D8\u5883</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 7 \u5C64\u300C\u9F8D\u7720\u9AD8\u5854\u300D\u5F8C\u89E3\u9396\uFF1A\u7121\u9650\u5C64\u6578\u3001\u9650\u6642\u6311\u6230\u3001\u6BCF\u65E5\u8A5E\u7DB4\u3002</span></div>': '<div class="mythic locked"><b>Mythic+</b><span class="sub" style="margin:0">Unlocks after clearing Floor 7, Dragonsleep Spire: endless levels, timed runs, daily affixes.</span></div>',
-    '<div class="mythic"><div class="mhead"><div><span class="label">\u50B3\u5947\u79D8\u5883</span><b>\u76EE\u524D\u9470\u77F3</b></div><span class="keystone num">+{0}</span></div> <div class="affixes">{1}</div> <p class="sub" style="margin:0">\u4ECA\u65E5\u8A5E\u7DB4\uFF0C\u6BCF\u5929 00:00 \u66F4\u63DB\u3002\u9650\u6642\u5167\u901A\u95DC\uFF0C\u9470\u77F3 +1\uFF0C\u6253\u5F97\u5920\u5FEB +2\uFF1B\u8D85\u6642\u6216\u5931\u6557\uFF0C\u9470\u77F3 \u22121\u3002<b>\u79D8\u5883\u639B\u6A5F</b>\uFF1A\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u639B\u6A5F\uFF0C\u56FA\u5B9A\u6253\u8A72\u526F\u672C\u6700\u4F73 \u2212{2}\uFF0C\u9470\u77F3\u4E0D\u8B8A\u3001\u734E\u52F5 {3}%\uFF0C\u96E2\u7DDA\u4E5F\u6703\u7D2F\u7A4D\u3002</p> <div class="mlist">': `<div class="mythic"><div class="mhead"><div><span class="label">Mythic+</span><b>Keystone</b></div><span class="keystone num">+{0}</span></div> <div class="affixes">{1}</div> <p class="sub" style="margin:0">Today's affixes change at 00:00. Beat the timer: keystone +1 (+2 if fast). Over time or failed: \u22121.<b>Mythic idle</b>: dungeons you've timed can be idled at your best \u2212{2}. Keystone unchanged, {3}% rewards, works offline too.</p> <div class="mlist">`,
+    '<div class="stamina"><span class="label">\u79D8\u5883\u9AD4\u529B</span><b class="num">{0}/{1}</b><span class="sub num" style="margin:0">{2}</span></div>': '<div class="stamina"><span class="label">Mythic stamina</span><b class="num">{0}/{1}</b><span class="sub num" style="margin:0">{2}</span></div>',
+    "{0} \u5F8C +1": "+1 in {0}",
+    "\u5DF2\u6EFF": "Full",
+    '<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>\u76EE\u524D\u9470\u77F3</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">\u4ECA\u65E5\u8A5E\u7DB4\uFF0C\u6BCF\u5929 00:00 \u66F4\u63DB\u3002\u9650\u6642\u5167\u901A\u95DC\uFF0C\u9470\u77F3 +1\uFF0C\u6253\u5F97\u5920\u5FEB +2\uFF1B\u8D85\u6642\u6216\u5931\u6557\uFF08\u542B\u64A4\u9000\uFF09\uFF0C\u9470\u77F3 \u22121\u3002\u624B\u52D5\u6311\u6230\u6BCF\u5834\u8017 1 \u9EDE\u9AD4\u529B\uFF0C\u6BCF {6} \u5206\u9418\u56DE 1 \u9EDE\u3001\u4E0A\u9650 {7}\u3002<b>\u79D8\u5883\u639B\u6A5F</b>\uFF1A\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u639B\u6A5F\uFF0C\u56FA\u5B9A\u6253\u8A72\u526F\u672C\u6700\u4F73 \u2212{2}\uFF0C\u4E0D\u8017\u9AD4\u529B\u3001\u9470\u77F3\u4E0D\u8B8A\u3001\u734E\u52F5 {3}%\uFF0C\u96E2\u7DDA\u4E5F\u6703\u7D2F\u7A4D\u3002</p> {8} <div class="mlist">': `<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>Keystone</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">Today's affixes; they change daily at 00:00. Beat the timer: key +1, or +2 if fast enough. Over time or failed (including retreat): key \u22121. Each manual run costs 1 stamina; 1 point regenerates every {6} min, up to {7}. <b>Mythic idle</b>: any dungeon you have timed can be idled at its best \u2212{2}. No stamina cost, key unchanged, {3}% rewards, and it keeps going offline.</p> {8} <div class="mlist">`,
     "\u8003\u9A57{0}": "Tests {0}",
     "+{0} \u8D77\u751F\u6548": "From +{0}",
+    '<p class="sub" style="margin:0">\u6DF1\u6DF5\u79D8\u5883\u4EE5\u7B2C 14 \u5C64\u7684\u5F37\u5EA6\u70BA\u57FA\u6E96\uFF0C\u6389\u843D\u88DD\u7B49\u66F4\u9AD8\uFF0C\u9650\u6642\u901A\u95DC\u6709\u6A5F\u6703\u6389\u8077\u696D\u5957\u88DD\u3002</p>': '<p class="sub" style="margin:0">Abyssal+ is scaled from floor XIV: higher item level, and timed runs can drop class set pieces.</p>',
+    '<p class="sub" style="margin:0">\u901A\u95DC\u7B2C 14 \u5C64\u300C\u6DF1\u6DF5\u4E4B\u5FC3\u300D\u5F8C\u89E3\u9396\u6DF1\u6DF5\u79D8\u5883\u3002</p>': '<p class="sub" style="margin:0">Clear floor XIV "Heart of the Abyss" to unlock Abyssal+.</p>',
     '<div class="mrow2"><div class="mname"><b>{0}</b><span class="sub num" style="margin:0">\u9650\u6642 {1}\u30FB{2}</span></div> {3} <button class="btn sm" data-act="recommend-mythic" data-d="{4}" aria-label="\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099">\u5099\u6230</button> <button class="btn sm main" data-act="mythic" data-d="{5}">\u6311\u6230 +{6}</button></div>': '<div class="mrow2"><div class="mname"><b>{0}</b><span class="sub num" style="margin:0">Limit {1} \xB7 {2}</span></div> {3} <button class="btn sm" data-act="recommend-mythic" data-d="{4}" aria-label="One-tap prep: lineup, talents, gear">Prep</button> <button class="btn sm main" data-act="mythic" data-d="{5}">Start +{6}</button></div>',
     "\u6700\u4F73 +{0}\uFF08{1}\uFF09": "Best +{0} ({1})",
     "\u9084\u6C92\u9650\u6642\u901A\u95DC": "Not timed yet",
@@ -658,9 +670,10 @@
     "\u5929\u68AF\u66AB\u6642\u8B80\u4E0D\u5230\uFF0C\u7A0D\u5F8C\u518D\u8A66\u3002": "Ladder unavailable \u2014 try again later.",
     "\u8B80\u53D6\u4E2D\u2026": "Loading\u2026",
     '<p class="sub" style="margin:0">\u9084\u6C92\u6709\u4EBA\u4E0A\u699C\uFF0C\u6436\u7B2C\u4E00\u5427\u3002</p>': `<p class="sub" style="margin:0">No one's on the board yet \u2014 be the first.</p>`,
+    "\u6DF1\u6DF5 +{0}": "Abyssal +{0}",
     "\u79D8\u5883 +{0}": "Mythic +{0}",
     "\u7B2C {0} \u5C64": "Floor {0}",
-    '<div class="boardcard"><div class="row" style="align-items:baseline"><b>\u5929\u68AF</b><span class="sub" style="margin:0 0 0 auto">{0}\u30FB<button class="linkbtn" data-act="nick">{1}</button></span></div>{2} <p class="sub" style="margin:0">\u4F9D\u79D8\u5883\u6700\u9AD8\u9650\u6642\u7B49\u7D1A\u6392\u540D\u3002\u4F60\u7684\u6210\u7E3E\u6BCF 5 \u5206\u9418\u4E0A\u50B3\u4E00\u6B21\u3002</p></div>': '<div class="boardcard"><div class="row" style="align-items:baseline"><b>Ladder</b><span class="sub" style="margin:0 0 0 auto">{0}\u30FB<button class="linkbtn" data-act="nick">{1}</button></span></div>{2} <p class="sub" style="margin:0">Ranked by highest timed Mythic level. Your score uploads every 5 minutes.</p></div>',
+    '<div class="boardcard"><div class="row" style="align-items:baseline"><b>\u5929\u68AF</b><span class="sub" style="margin:0 0 0 auto">{0}\u30FB<button class="linkbtn" data-act="nick">{1}</button></span></div>{2} <p class="sub" style="margin:0">\u5148\u6BD4\u6DF1\u6DF5\u79D8\u5883\u3001\u518D\u6BD4\u50B3\u5947\u79D8\u5883\u7684\u6700\u9AD8\u9650\u6642\u7B49\u7D1A\u3002\u4F60\u7684\u6210\u7E3E\u6BCF 5 \u5206\u9418\u4E0A\u50B3\u4E00\u6B21\u3002</p></div>': '<div class="boardcard"><div class="row" style="align-items:baseline"><b>Ladder</b><span class="sub" style="margin:0 0 0 auto">{0}\u30FB<button class="linkbtn" data-act="nick">{1}</button></span></div>{2} <p class="sub" style="margin:0">Ranked by best timed Abyssal+ level, then Mythic+. Your score uploads every 5 minutes.</p></div>',
     "\u4F60\u662F\u300C{0}\u300D": 'You are "{0}"',
     "\u6539\u66B1\u7A31": "Rename",
     "\u8A2D\u5B9A\u66B1\u7A31": "Set nickname",
@@ -1617,8 +1630,23 @@
     xpMult: 1.2,
     // 相對第 7 層的獎勵
     idleBelow: 2,
-    idleMult: 0.7
+    idleMult: 0.7,
     // 秘境掛機：打「限時最高 −2」，金幣經驗 7 折、每場 1 件，鑰石不變
+    // v0.9.3 深淵秘境：第二章 7 個副本，以第 14 層（深淵之心）為基準，鑰石另外計算
+    ch2: {
+      unlockAfter: 13,
+      base: 13,
+      hp: 0.6,
+      atk: 0.8,
+      norm: 0.5,
+      dropBase: 150,
+      dropPerLevel: 4,
+      // hp／atk：相對第 14 層的強度；norm：各副本往第 14 層拉齊的程度（1 = 完全拉齊，0 = 保留原本強度）
+      timer: [120, 135, 160, 195, 145, 210, 225]
+    },
+    // 約為 +2 平均通關時間 × 1.3
+    // v0.9.3 秘境體力：手動挑戰每場 1 點（傳奇、深淵共用），掛機不耗
+    stamina: { max: 10, regenMin: 10 }
   };
   var HERO_RARITY = [
     { name: tx("\u666E\u901A"), mult: 1, crit: 0, weight: 0.55, hire: 1 },
@@ -1666,12 +1694,14 @@
     { id: "mythic5", name: tx("\u79D8\u5883 +5 \u9650\u6642\u901A\u95DC"), test: (s) => mythicBestLevel(s) >= 5 },
     { id: "mythic10", name: tx("\u79D8\u5883 +10 \u9650\u6642\u901A\u95DC"), test: (s) => mythicBestLevel(s) >= 10 },
     { id: "mythic15", name: tx("\u79D8\u5883 +15 \u9650\u6642\u901A\u95DC"), test: (s) => mythicBestLevel(s) >= 15 },
+    { id: "abyss5", name: tx("\u6DF1\u6DF5\u79D8\u5883 +5 \u9650\u6642\u901A\u95DC"), test: (s) => mythicBestLevel(s, 2) >= 5 },
+    { id: "abyss10", name: tx("\u6DF1\u6DF5\u79D8\u5883 +10 \u9650\u6642\u901A\u95DC"), test: (s) => mythicBestLevel(s, 2) >= 10 },
     { id: "vault10", name: tx("\u5BF6\u5EAB\u7D2F\u8A08 10 \u6B21"), test: (s) => (s.vault && s.vault.runs || 0) >= 10 },
     { id: "vault30", name: tx("\u5BF6\u5EAB\u7D2F\u8A08 30 \u6B21"), test: (s) => (s.vault && s.vault.runs || 0) >= 30 },
     { id: "vault60", name: tx("\u5BF6\u5EAB\u7D2F\u8A08 60 \u6B21"), test: (s) => (s.vault && s.vault.runs || 0) >= 60 }
   ];
   var BAG_PER_MILESTONE = 5;
-  var mythicBestLevel = (s) => Math.max(0, ...Object.values(s.mythic && s.mythic.best || {}).map((b) => b.level));
+  var mythicBestLevel = (s, tier = 1) => Math.max(0, ...Object.entries(s.mythic && s.mythic.best || {}).filter(([d]) => (+d > CH1_TOP ? 2 : 1) === tier).map(([, b]) => b.level));
   var TELEMETRY = {
     url: "https://script.google.com/macros/s/AKfycbwytKL7OhbuCd2WavlIopA49-vLdfLZXGQFPoUdnpmigJEWq3B4zuvSdoZqHX47Hhk0mg/exec",
     snapshotMin: 5,
@@ -2344,37 +2374,81 @@
   }
   var activeAffixes = (level, date) => dailyAffixes(date).filter((_, i) => level >= MYTHIC.affixAt[i]);
   var affixHints = (list) => list.map((a) => AFFIXES[a].hint);
-  var mythicTimer = (dIdx) => MYTHIC.timer[dIdx];
+  var mythicTier = (dIdx) => dIdx > CH1_TOP ? 2 : 1;
+  var mythicBase = (dIdx) => mythicTier(dIdx) === 2 ? MYTHIC.ch2.base : CH1_TOP;
+  var tierFloors = (tier) => tier === 2 ? [CH1_TOP + 1, MYTHIC.ch2.base] : [0, CH1_TOP];
+  var tierUnlocked = (s, tier) => !!s.clears[tier === 2 ? MYTHIC.ch2.unlockAfter : MYTHIC.unlockAfter];
+  var keyOf = (s, dIdx) => mythicTier(dIdx) === 2 ? s.mythic.key2 : s.mythic.key;
+  var tierKey = (s, tier) => tier === 2 ? s.mythic.key2 : s.mythic.key;
+  function setKey(s, dIdx, k) {
+    if (mythicTier(dIdx) === 2) s.mythic.key2 = k;
+    else s.mythic.key = k;
+  }
+  var STA_MS = () => MYTHIC.stamina.regenMin * 6e4;
+  function stamina(s, now = Date.now()) {
+    const max = MYTHIC.stamina.max;
+    const st = s.mythic.sta || (s.mythic.sta = { pts: max, at: now });
+    if (st.pts >= max) {
+      st.pts = max;
+      st.at = now;
+      return st;
+    }
+    const n = Math.floor((now - st.at) / STA_MS());
+    if (n > 0) {
+      st.pts = Math.min(max, st.pts + n);
+      st.at = st.pts >= max ? now : st.at + n * STA_MS();
+    }
+    return st;
+  }
+  var staminaNext = (s, now = Date.now()) => {
+    const st = stamina(s, now);
+    return st.pts >= MYTHIC.stamina.max ? 0 : Math.max(0, st.at + STA_MS() - now);
+  };
+  function spendStamina(s, now = Date.now()) {
+    const st = stamina(s, now);
+    if (st.pts < 1) return false;
+    st.pts--;
+    return true;
+  }
+  var mythicTimer = (dIdx) => mythicTier(dIdx) === 2 ? MYTHIC.ch2.timer[dIdx - CH1_TOP - 1] : MYTHIC.timer[dIdx];
   function buildMythicWaves(dIdx, level, affixes) {
-    const top = CH1_TOP;
-    const base = buildWaves(top), own = buildWaves(dIdx);
     const sh = Math.pow(MYTHIC.hpGrowth, level), sa = Math.pow(MYTHIC.atkGrowth, level);
     const fort = affixes.includes("fortified"), tyr = affixes.includes("tyrannical");
+    const scale = (e, rh, ra) => {
+      const hp = e.hp * rh * sh * (e.boss ? tyr ? 1.3 : 1 : fort ? 1.3 : 1);
+      const atk = e.atk * ra * sa * (e.boss ? tyr ? 1.15 : 1 : fort ? 1.2 : 1);
+      return { ...e, hp: Math.round(hp), atk, addHp: e.addHp && Math.round(e.addHp * rh * sh), addAtk: e.addAtk && e.addAtk * ra * sa };
+    };
+    if (mythicTier(dIdx) === 2) {
+      const base2 = buildWaves(MYTHIC.ch2.base), own2 = buildWaves(dIdx);
+      const C = MYTHIC.ch2, rh = C.hp * Math.pow(base2[0][0].hp / own2[0][0].hp, C.norm), ra = C.atk * Math.pow(base2[0][0].atk / own2[0][0].atk, C.norm);
+      return own2.map((wave) => wave.map((e) => scale(e, rh, ra)));
+    }
+    const base = buildWaves(CH1_TOP), own = buildWaves(dIdx);
     return base.map((wave, wi) => wave.map((e, ei) => {
       const o = own[wi][ei];
-      const hp = e.hp * sh * (e.boss ? tyr ? 1.3 : 1 : fort ? 1.3 : 1);
-      const atk = e.atk * sa * (e.boss ? tyr ? 1.15 : 1 : fort ? 1.2 : 1);
-      return { ...e, name: o.name, mech: o.mech, hp: Math.round(hp), atk, addHp: e.addHp && Math.round(e.addHp * sh), addAtk: e.addAtk && e.addAtk * sa };
+      return { ...scale(e, 1, 1), name: o.name, mech: o.mech };
     }));
   }
   function mythicBattleOpts(dIdx, level, date) {
     const affixes = activeAffixes(level, date);
-    const top = CH1_TOP;
+    const top = mythicBase(dIdx);
     return {
-      mythic: { dIdx, level, affixes, timer: mythicTimer(dIdx), volcanic: buildWaves(top)[0][0].atk * Math.pow(MYTHIC.atkGrowth, level) * 2.5 },
+      mythic: { dIdx, level, affixes, tier: mythicTier(dIdx), timer: mythicTimer(dIdx), volcanic: buildWaves(top)[0][0].atk * Math.pow(MYTHIC.atkGrowth, level) * 2.5 },
       waves: buildMythicWaves(dIdx, level, affixes),
       maxTicks: mythicTimer(dIdx) + MYTHIC.overtime
     };
   }
-  function mythicRewards(level, inTime) {
-    const top = CH1_TOP;
+  function mythicRewards(level, inTime, dIdx = 0) {
+    const top = mythicBase(dIdx), t2 = mythicTier(dIdx) === 2;
     const gold = Math.round((REWARD.goldBase + REWARD.goldPerTier * top) * MYTHIC.goldMult * (1 + 0.05 * level) * rnd(0.9, 1.1));
     const xp = Math.round(REWARD.xpBase * Math.pow(top + 1, REWARD.xpExp) * MYTHIC.xpMult * (1 + 0.1 * level));
     const n = inTime ? 3 : 2, loot = [];
     const legend = level >= MYTHIC.legendFrom ? Math.min(MYTHIC.legendMax, MYTHIC.legendBase + MYTHIC.legendPerLevel * (level - MYTHIC.legendFrom)) : 0;
+    const ilvl = t2 ? MYTHIC.ch2.dropBase + MYTHIC.ch2.dropPerLevel * level : MYTHIC.dropBase + MYTHIC.dropPerLevel * level;
     for (let k = 0; k < n; k++) {
       const rar = R() < legend ? RARITY.length - 1 : rollRarity(1);
-      loot.push(makeItem(pick(Object.keys(SLOTS)), MYTHIC.dropBase + MYTHIC.dropPerLevel * level + rint(-1, 2), rar));
+      loot.push(makeItem(pick(Object.keys(SLOTS)), ilvl + rint(-1, 2), rar));
     }
     return { gold, xp, loot };
   }
@@ -2424,7 +2498,7 @@
       keepRarity: ECONOMY.defaultKeepRarity,
       stash: [],
       created: Date.now(),
-      mythic: { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 },
+      mythic: { key: MYTHIC.startKey, key2: MYTHIC.startKey, best: {}, runs: 0, timed: 0 },
       failStreak: 0,
       player: newPlayer(),
       bagSeen: [],
@@ -2455,6 +2529,7 @@
       h.talents = h.talents || {};
     }
     s.mythic = s.mythic || { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 };
+    if (s.mythic.key2 == null) s.mythic.key2 = MYTHIC.startKey;
     s.failStreak = s.failStreak || 0;
     s.player = s.player || newPlayer();
     if (!s.bagSeen) {
@@ -2692,7 +2767,10 @@
   var maxUpFor = (s) => mythicUnlocked(s) ? GEAR.maxUp : GEAR.refineFrom;
   function applyMythicResult(s, battle) {
     const M = battle.mythic, kc = keyChange(M.level, battle, M.timer);
-    const rw = mythicRewards(M.level, kc.inTime);
+    const rw = mythicRewards(M.level, kc.inTime, M.dIdx);
+    const party = partyHeroes(s);
+    if (kc.inTime && mythicTier(M.dIdx) === 2 && party.length && R() < SET_DROP.chance)
+      rw.loot.push(makeSetItem(pick(party).cls, randomArmorSlot(), rw.loot[0].ilvl));
     s.stats.runs++;
     if (battle.win) s.stats.wins++;
     s.mythic.runs++;
@@ -2700,11 +2778,11 @@
     s.gold += rw.gold;
     const lvUps = [];
     for (const h of partyHeroes(s)) if (gainXp(h, rw.xp)) lvUps.push({ name: h.name, level: h.level, para: h.para || 0 });
-    const prevKey = s.mythic.key;
-    s.mythic.key = kc.next;
+    const prevKey = keyOf(s, M.dIdx);
+    setKey(s, M.dIdx, kc.next);
     const best = s.mythic.best[M.dIdx], record = kc.inTime && (!best || M.level > best.level || M.level === best.level && battle.tick < best.time);
     if (record) s.mythic.best[M.dIdx] = { level: M.level, time: battle.tick };
-    const dest = rw.loot.map((it) => addLoot(s, it));
+    const dest = rw.loot.map((it) => it.set ? addSetLoot(s, it) : addLoot(s, it));
     const kept = rw.loot.filter((_, i) => dest[i] === "bag"), stashed = rw.loot.filter((_, i) => dest[i] === "stash");
     return {
       ...rw,
@@ -2727,7 +2805,7 @@
   }
   function applyMythicIdleResult(s, battle) {
     const M = battle.mythic, win = battle.win;
-    const rw = mythicRewards(M.level, true), m = win ? MYTHIC.idleMult : MYTHIC.idleMult * REWARD.loseMult;
+    const rw = mythicRewards(M.level, true, M.dIdx), m = win ? MYTHIC.idleMult : MYTHIC.idleMult * REWARD.loseMult;
     rw.gold = Math.round(rw.gold * m);
     rw.xp = Math.round(rw.xp * m);
     rw.loot = win ? rw.loot.slice(0, 2) : [];
@@ -2743,8 +2821,8 @@
       mythic: true,
       mythicIdle: true,
       inTime: win,
-      prevKey: s.mythic.key,
-      nextKey: s.mythic.key,
+      prevKey: keyOf(s, M.dIdx),
+      nextKey: keyOf(s, M.dIdx),
       record: false,
       lvUps,
       kept,
@@ -3078,7 +3156,7 @@
   }
 
   // src/core/version.js
-  var VERSION = "0.9.2";
+  var VERSION = "0.9.3";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -3097,18 +3175,20 @@
   function progress() {
     const S = app.S, party = partyHeroes(S);
     const top = Math.max(0, ...Object.keys(S.clears).filter((k) => S.clears[k]).map((k) => +k + 1));
-    const best = Math.max(0, ...Object.values(S.mythic.best).map((b) => b.level));
+    const best = mythicBestLevel(S, 1), best2 = mythicBestLevel(S, 2);
     return {
       level: party.length ? Math.round(party.reduce((a, h) => a + h.level, 0) / party.length) : 1,
       top,
       key: mythicUnlocked(S) ? S.mythic.key : 0,
       best,
+      key2: tierUnlocked(S, 2) ? S.mythic.key2 : 0,
+      best2,
       playMin: Math.round(S.player.playSec / 60)
     };
   }
   var progressText = () => {
     const p = progress();
-    return tx("Lv{0}\u30FB\u7B2C {1} \u5C64{2}", p.level, p.top, p.best ? tx("\u30FB\u79D8\u5883 +{0}", p.best) : "");
+    return tx("Lv{0}\u30FB\u7B2C {1} \u5C64{2}", p.level, p.top, (p.best ? tx("\u30FB\u79D8\u5883 +{0}", p.best) : "") + (p.best2 ? tx("\u30FB\u6DF1\u6DF5 +{0}", p.best2) : ""));
   };
   var sendSnapshot = (keepalive) => post({ type: "snapshot", ...progress() }, keepalive);
   var sendEvent = (kind, detail) => post({ type: "event", kind, detail });
@@ -3161,12 +3241,28 @@
   function mythicSection() {
     const S = app.S;
     if (!mythicUnlocked(S)) return tx('<div class="mythic locked"><b>\u50B3\u5947\u79D8\u5883</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 7 \u5C64\u300C\u9F8D\u7720\u9AD8\u5854\u300D\u5F8C\u89E3\u9396\uFF1A\u7121\u9650\u5C64\u6578\u3001\u9650\u6642\u6311\u6230\u3001\u6BCF\u65E5\u8A5E\u7DB4\u3002</span></div>');
-    const key = S.mythic.key, today = dailyAffixes(), active = activeAffixes(key);
-    let h = tx('<div class="mythic"><div class="mhead"><div><span class="label">\u50B3\u5947\u79D8\u5883</span><b>\u76EE\u524D\u9470\u77F3</b></div><span class="keystone num">+{0}</span></div> <div class="affixes">{1}</div> <p class="sub" style="margin:0">\u4ECA\u65E5\u8A5E\u7DB4\uFF0C\u6BCF\u5929 00:00 \u66F4\u63DB\u3002\u9650\u6642\u5167\u901A\u95DC\uFF0C\u9470\u77F3 +1\uFF0C\u6253\u5F97\u5920\u5FEB +2\uFF1B\u8D85\u6642\u6216\u5931\u6557\uFF0C\u9470\u77F3 \u22121\u3002<b>\u79D8\u5883\u639B\u6A5F</b>\uFF1A\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u639B\u6A5F\uFF0C\u56FA\u5B9A\u6253\u8A72\u526F\u672C\u6700\u4F73 \u2212{2}\uFF0C\u9470\u77F3\u4E0D\u8B8A\u3001\u734E\u52F5 {3}%\uFF0C\u96E2\u7DDA\u4E5F\u6703\u7D2F\u7A4D\u3002</p> <div class="mlist">', key, today.map((a, i) => `<div class="affix ${active.includes(a) ? "on" : ""}"><b>${AFFIXES[a].name}</b><span>${AFFIXES[a].desc}</span><small>${active.includes(a) ? tx("\u8003\u9A57{0}", AFFIXES[a].test) : tx("+{0} \u8D77\u751F\u6548", MYTHIC.affixAt[i])}</small></div>`).join(""), MYTHIC.idleBelow, Math.round(MYTHIC.idleMult * 100));
-    DUNGEONS.forEach((d, i) => {
-      const best = S.mythic.best[i];
+    const open2 = tierUnlocked(S, 2), tier = open2 && app.mtier !== 1 ? 2 : 1;
+    const tabs = `<div class="seg mtiers"><button data-act="mtier" data-v="1" class="${tier === 1 ? "sel" : ""}">${tx("\u50B3\u5947\u79D8\u5883")}</button><button data-act="mtier" data-v="2" class="${tier === 2 ? "sel" : ""}" ${open2 ? "" : "disabled"}>${tx("\u6DF1\u6DF5\u79D8\u5883")}${open2 ? "" : " \u{1F512}"}</button></div>`;
+    const st = stamina(S), nx = staminaNext(S), max = MYTHIC.stamina.max;
+    const sta = tx('<div class="stamina"><span class="label">\u79D8\u5883\u9AD4\u529B</span><b class="num">{0}/{1}</b><span class="sub num" style="margin:0">{2}</span></div>', st.pts, max, nx ? tx("{0} \u5F8C +1", mmss(Math.ceil(nx / 1e3))) : tx("\u5DF2\u6EFF"));
+    const key = tierKey(S, tier), today = dailyAffixes(), active = activeAffixes(key);
+    let h = tabs + tx(
+      '<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>\u76EE\u524D\u9470\u77F3</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">\u4ECA\u65E5\u8A5E\u7DB4\uFF0C\u6BCF\u5929 00:00 \u66F4\u63DB\u3002\u9650\u6642\u5167\u901A\u95DC\uFF0C\u9470\u77F3 +1\uFF0C\u6253\u5F97\u5920\u5FEB +2\uFF1B\u8D85\u6642\u6216\u5931\u6557\uFF08\u542B\u64A4\u9000\uFF09\uFF0C\u9470\u77F3 \u22121\u3002\u624B\u52D5\u6311\u6230\u6BCF\u5834\u8017 1 \u9EDE\u9AD4\u529B\uFF0C\u6BCF {6} \u5206\u9418\u56DE 1 \u9EDE\u3001\u4E0A\u9650 {7}\u3002<b>\u79D8\u5883\u639B\u6A5F</b>\uFF1A\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u639B\u6A5F\uFF0C\u56FA\u5B9A\u6253\u8A72\u526F\u672C\u6700\u4F73 \u2212{2}\uFF0C\u4E0D\u8017\u9AD4\u529B\u3001\u9470\u77F3\u4E0D\u8B8A\u3001\u734E\u52F5 {3}%\uFF0C\u96E2\u7DDA\u4E5F\u6703\u7D2F\u7A4D\u3002</p> {8} <div class="mlist">',
+      key,
+      today.map((a, i) => `<div class="affix ${active.includes(a) ? "on" : ""}"><b>${AFFIXES[a].name}</b><span>${AFFIXES[a].desc}</span><small>${active.includes(a) ? tx("\u8003\u9A57{0}", AFFIXES[a].test) : tx("+{0} \u8D77\u751F\u6548", MYTHIC.affixAt[i])}</small></div>`).join(""),
+      MYTHIC.idleBelow,
+      Math.round(MYTHIC.idleMult * 100),
+      tier === 2 ? tx("\u6DF1\u6DF5\u79D8\u5883") : tx("\u50B3\u5947\u79D8\u5883"),
+      sta,
+      MYTHIC.stamina.regenMin,
+      max,
+      tier === 2 ? tx('<p class="sub" style="margin:0">\u6DF1\u6DF5\u79D8\u5883\u4EE5\u7B2C 14 \u5C64\u7684\u5F37\u5EA6\u70BA\u57FA\u6E96\uFF0C\u6389\u843D\u88DD\u7B49\u66F4\u9AD8\uFF0C\u9650\u6642\u901A\u95DC\u6709\u6A5F\u6703\u6389\u8077\u696D\u5957\u88DD\u3002</p>') : open2 ? "" : tx('<p class="sub" style="margin:0">\u901A\u95DC\u7B2C 14 \u5C64\u300C\u6DF1\u6DF5\u4E4B\u5FC3\u300D\u5F8C\u89E3\u9396\u6DF1\u6DF5\u79D8\u5883\u3002</p>')
+    );
+    const [f0, f1] = tierFloors(tier);
+    for (let i = f0; i <= f1; i++) {
+      const d = DUNGEONS[i], best = S.mythic.best[i];
       h += tx('<div class="mrow2"><div class="mname"><b>{0}</b><span class="sub num" style="margin:0">\u9650\u6642 {1}\u30FB{2}</span></div> {3} <button class="btn sm" data-act="recommend-mythic" data-d="{4}" aria-label="\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099">\u5099\u6230</button> <button class="btn sm main" data-act="mythic" data-d="{5}">\u6311\u6230 +{6}</button></div>', d.name, mmss(mythicTimer(i)), best ? tx("\u6700\u4F73 +{0}\uFF08{1}\uFF09", best.level, mmss(best.time)) : tx("\u9084\u6C92\u9650\u6642\u901A\u95DC"), mythicIdleLevel(S, i) ? `<button class="btn sm ${S.idleMythic === i ? "on" : ""}" data-act="idlemythic" data-d="${i}">${S.idleMythic === i ? tx("\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62") : tx("\u639B\u6A5F +{0}", mythicIdleLevel(S, i))}</button>` : "", i, i, key);
-    });
+    }
     return h + `</div></div>`;
   }
   function boardCard() {
@@ -3177,8 +3273,8 @@
     if (!lb2.data) body = `<p class="sub" style="margin:0">${lb2.error ? tx("\u5929\u68AF\u66AB\u6642\u8B80\u4E0D\u5230\uFF0C\u7A0D\u5F8C\u518D\u8A66\u3002") : tx("\u8B80\u53D6\u4E2D\u2026")}</p>`;
     else if (!lb2.data.length) body = tx('<p class="sub" style="margin:0">\u9084\u6C92\u6709\u4EBA\u4E0A\u699C\uFF0C\u6436\u7B2C\u4E00\u5427\u3002</p>');
     else body = `<ol class="board">${lb2.data.map((p, i) => `<li class="${me && p.name === me ? "me" : ""}"><span class="rk num">${i + 1}</span><b>${esc(p.name)}</b>
-      <span class="num">${p.best ? tx("\u79D8\u5883 +{0}", p.best) : tx("\u7B2C {0} \u5C64", p.top)}</span><span class="sub num" style="margin:0">Lv${p.level}</span></li>`).join("")}</ol>`;
-    return tx('<div class="boardcard"><div class="row" style="align-items:baseline"><b>\u5929\u68AF</b><span class="sub" style="margin:0 0 0 auto">{0}\u30FB<button class="linkbtn" data-act="nick">{1}</button></span></div>{2} <p class="sub" style="margin:0">\u4F9D\u79D8\u5883\u6700\u9AD8\u9650\u6642\u7B49\u7D1A\u6392\u540D\u3002\u4F60\u7684\u6210\u7E3E\u6BCF 5 \u5206\u9418\u4E0A\u50B3\u4E00\u6B21\u3002</p></div>', me ? tx("\u4F60\u662F\u300C{0}\u300D", esc(me)) : tx("\u533F\u540D"), me ? tx("\u6539\u66B1\u7A31") : tx("\u8A2D\u5B9A\u66B1\u7A31"), body);
+      <span class="num">${p.best2 ? tx("\u6DF1\u6DF5 +{0}", p.best2) : p.best ? tx("\u79D8\u5883 +{0}", p.best) : tx("\u7B2C {0} \u5C64", p.top)}</span><span class="sub num" style="margin:0">Lv${p.level}</span></li>`).join("")}</ol>`;
+    return tx('<div class="boardcard"><div class="row" style="align-items:baseline"><b>\u5929\u68AF</b><span class="sub" style="margin:0 0 0 auto">{0}\u30FB<button class="linkbtn" data-act="nick">{1}</button></span></div>{2} <p class="sub" style="margin:0">\u5148\u6BD4\u6DF1\u6DF5\u79D8\u5883\u3001\u518D\u6BD4\u50B3\u5947\u79D8\u5883\u7684\u6700\u9AD8\u9650\u6642\u7B49\u7D1A\u3002\u4F60\u7684\u6210\u7E3E\u6BCF 5 \u5206\u9418\u4E0A\u50B3\u4E00\u6B21\u3002</p></div>', me ? tx("\u4F60\u662F\u300C{0}\u300D", esc(me)) : tx("\u533F\u540D"), me ? tx("\u6539\u66B1\u7A31") : tx("\u8A2D\u5B9A\u66B1\u7A31"), body);
   }
   function viewDungeons() {
     const lv = avgPartyLv(), il = avgPartyIlvl();
@@ -3249,7 +3345,7 @@
     const dmgMax = Math.max(1, ...b.units.map((u) => Math.max(u.dmgDone, u.healDone)));
     const sec = Math.max(1, b.tick);
     const title = r.vault ? tx("\u6253\u5012 {0} \u96BB\u54E5\u5E03\u6797", r.kills) : r.mythicIdle ? b.win ? tx("\u79D8\u5883\u639B\u6A5F\u30FB\u901A\u95DC") : tx("\u79D8\u5883\u639B\u6A5F\u30FB\u5931\u6557") : r.mythic ? r.inTime ? tx("\u9650\u6642\u901A\u95DC") : b.win ? tx("\u8D85\u6642\u901A\u95DC") : tx("\u5931\u6557") : b.win ? tx("\u901A\u95DC") : tx("\u5931\u6557");
-    let h = tx('<div class="result {0}"><h3>{1}</h3>{2} {3} <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+{4}</b> \u91D1\u5E63</span><span><b class="num">+{5}</b> \u7D93\u9A57</span>{6}{7}</div>', r.vault || (r.mythic ? r.inTime : b.win) ? "win" : "lose", title, r.vault && r.record ? tx('<span class="newrec" style="justify-self:start">\u672C\u5C64\u65B0\u7D00\u9304</span>') : "", r.mythicIdle ? tx('<div class="sub" style="margin:0">\u639B\u6A5F\u7B49\u7D1A +{0}\u30FB\u9470\u77F3\u4E0D\u8B8A\uFF08\u76EE\u524D +{1}\uFF09\u30FB\u734E\u52F5 {2}%</div>', b.mythic.level, app.S.mythic.key, Math.round(MYTHIC.idleMult * 100)) : r.mythic ? tx('<div class="keychange"><span class="keystone num">+{0}</span><span class="arrow">\u2192</span><span class="keystone num {1}">+{2}</span> <span class="sub" style="margin:0">\u7528\u6642 <b class="num">{3}</b> / \u9650\u6642 {4}</span>{5}</div>', r.prevKey, r.nextKey > r.prevKey ? "up" : r.nextKey < r.prevKey ? "down" : "", r.nextKey, mmss(b.tick), mmss(b.mythic.timer), r.record ? tx('<span class="newrec">\u65B0\u7D00\u9304</span>') : "") : "", fmt(r.gold), fmt(r.xp), r.first ? tx('<span style="color:var(--brass)">\u9996\u6B21\u901A\u95DC\uFF1A\u5FC5\u6389\u7A00\u6709\u4EE5\u4E0A</span>') : "", r.decayed ? `<span style="color:var(--warn)">${b.dIdx === DUNGEONS.length - 1 ? tx("\u7B49\u7D1A\u58D3\u5236\uFF1A\u734E\u52F5\u6700\u4F4E\u4FDD\u7559 {0}%\uFF0C\u60F3\u8981\u66F4\u591A\u53EF\u4EE5\u6539\u7528\u79D8\u5883\u639B\u6A5F", Math.round(REWARD.decayFloorTop * 100)) : tx("\u9019\u5C64\u5C0D\u4F60\u592A\u7C21\u55AE\u4E86\uFF0C\u7D93\u9A57\u8207\u91D1\u5E63\u8B8A\u5C11\uFF0C\u5F80\u4E0B\u4E00\u5C64\u5427")}</span>` : "");
+    let h = tx('<div class="result {0}"><h3>{1}</h3>{2} {3} <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+{4}</b> \u91D1\u5E63</span><span><b class="num">+{5}</b> \u7D93\u9A57</span>{6}{7}</div>', r.vault || (r.mythic ? r.inTime : b.win) ? "win" : "lose", title, r.vault && r.record ? tx('<span class="newrec" style="justify-self:start">\u672C\u5C64\u65B0\u7D00\u9304</span>') : "", r.mythicIdle ? tx('<div class="sub" style="margin:0">\u639B\u6A5F\u7B49\u7D1A +{0}\u30FB\u9470\u77F3\u4E0D\u8B8A\uFF08\u76EE\u524D +{1}\uFF09\u30FB\u734E\u52F5 {2}%</div>', b.mythic.level, keyOf(app.S, b.dIdx), Math.round(MYTHIC.idleMult * 100)) : r.mythic ? tx('<div class="keychange"><span class="keystone num">+{0}</span><span class="arrow">\u2192</span><span class="keystone num {1}">+{2}</span> <span class="sub" style="margin:0">\u7528\u6642 <b class="num">{3}</b> / \u9650\u6642 {4}</span>{5}</div>', r.prevKey, r.nextKey > r.prevKey ? "up" : r.nextKey < r.prevKey ? "down" : "", r.nextKey, mmss(b.tick), mmss(b.mythic.timer), r.record ? tx('<span class="newrec">\u65B0\u7D00\u9304</span>') : "") : "", fmt(r.gold), fmt(r.xp), r.first ? tx('<span style="color:var(--brass)">\u9996\u6B21\u901A\u95DC\uFF1A\u5FC5\u6389\u7A00\u6709\u4EE5\u4E0A</span>') : "", r.decayed ? `<span style="color:var(--warn)">${b.dIdx === DUNGEONS.length - 1 ? tx("\u7B49\u7D1A\u58D3\u5236\uFF1A\u734E\u52F5\u6700\u4F4E\u4FDD\u7559 {0}%\uFF0C\u60F3\u8981\u66F4\u591A\u53EF\u4EE5\u6539\u7528\u79D8\u5883\u639B\u6A5F", Math.round(REWARD.decayFloorTop * 100)) : tx("\u9019\u5C64\u5C0D\u4F60\u592A\u7C21\u55AE\u4E86\uFF0C\u7D93\u9A57\u8207\u91D1\u5E63\u8B8A\u5C11\uFF0C\u5F80\u4E0B\u4E00\u5C64\u5427")}</span>` : "");
     if (r.lvUps.length) h += `<div style="color:var(--good);font-size:14px">\u2B06 ${r.lvUps.map((x) => tx("{0} \u5347\u5230 {1}", x.name, x.para ? tx("\u5DD4\u5CF0 {0}", x.para) : `Lv${x.level}`)).join(tx("\u3001"))}</div>`;
     if (r.kept.length || r.stashed.length || r.salvaged) h += `<div class="stack">${r.kept.map((it) => `<div class="item rar${it.rarity}"><div class="in">${itemName(it)}</div><div class="il">${SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div><div class="is">${itemStatText(it)}</div></div>`).join("")}${r.stashed.length ? tx('<div style="color:var(--brass);font-size:13px">\u80CC\u5305\u5DF2\u6EFF\uFF0C{0} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1</div>', r.stashed.length) : ""}${r.salvaged ? tx('<div class="sub" style="margin:0">{0} \u4EF6\u81EA\u52D5\u5206\u89E3\u70BA\u91D1\u5E63\u8207\u7CBE\u83EF</div>', r.salvaged) : ""}</div>`;
     h += tx('<div class="meter"><span class="label">\u50B7\u5BB3 / \u6CBB\u7642\u7D71\u8A08\uFF08\u6BCF\u79D2\uFF09</span>{0}</div>', b.units.map((u) => {
@@ -3258,7 +3354,7 @@
       return `<div class="mrow"><span>${u.icon} ${u.name}${u.role !== "heal" && sk ? tx('<small class="num">\u6280\u80FD {0}%</small>', sk) : ""}</span><span class="mb"><i class="role-${u.role}" style="width:${pct(v, dmgMax)}%"></i></span><span class="num" style="text-align:right">${fmt(v / sec)}${u.role === "heal" ? " HPS" : " DPS"}</span></div>`;
     }).join(""));
     if (!b.win && !r.vault) h += `<div class="sub" style="margin:0">${failHint(b)}</div>`;
-    h += tx('<div class="row">{0} {1} {2} <button class="btn" data-tab="dungeon">\u8FD4\u56DE\u526F\u672C</button></div></div>', app.pendingRepeat ? tx('<span class="sub" style="margin:0;align-self:center">\u639B\u6A5F\u4E2D\uFF0C3 \u79D2\u5F8C\u81EA\u52D5\u518D\u6230\u2026</span>') : "", r.vault ? vaultLeft(app.S) ? tx('<button class="btn main grow" data-act="vault" data-d="{0}">\u518D\u6253\u4E00\u6B21\uFF08\u4ECA\u5929\u5269 {1} \u6B21\uFF09</button>', b.vault.floor, vaultLeft(app.S)) : tx('<span class="sub" style="margin:0;align-self:center">\u4ECA\u5929\u7684\u5BF6\u5EAB\u6B21\u6578\u7528\u5B8C\u4E86</span>') : r.mythicIdle ? app.S.idleMythic != null ? tx('<button class="btn grow" data-act="idlemythic" data-d="{0}">\u505C\u6B62\u79D8\u5883\u639B\u6A5F</button>', b.dIdx) : "" : `<button class="btn main grow" data-act="${r.mythic ? "mythic" : "fight"}" data-d="${b.dIdx}">${r.mythic ? tx("\u518D\u6311\u6230 +{0}", r.nextKey) : tx("\u518D\u6253\u4E00\u6B21")}</button>`, r.kept.length ? tx('<button class="btn" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button>') : "");
+    h += tx('<div class="row">{0} {1} {2} <button class="btn" data-tab="dungeon">\u8FD4\u56DE\u526F\u672C</button></div></div>', app.pendingRepeat ? tx('<span class="sub" style="margin:0;align-self:center">\u639B\u6A5F\u4E2D\uFF0C3 \u79D2\u5F8C\u81EA\u52D5\u518D\u6230\u2026</span>') : "", r.vault ? vaultLeft(app.S) ? tx('<button class="btn main grow" data-act="vault" data-d="{0}">\u518D\u6253\u4E00\u6B21\uFF08\u4ECA\u5929\u5269 {1} \u6B21\uFF09</button>', b.vault.floor, vaultLeft(app.S)) : tx('<span class="sub" style="margin:0;align-self:center">\u4ECA\u5929\u7684\u5BF6\u5EAB\u6B21\u6578\u7528\u5B8C\u4E86</span>') : r.mythicIdle ? app.S.idleMythic != null ? tx('<button class="btn grow" data-act="idlemythic" data-d="{0}">\u505C\u6B62\u79D8\u5883\u639B\u6A5F</button>', b.dIdx) : "" : `<button class="btn main grow" data-act="${r.mythic ? "mythic" : "fight"}" data-d="${b.dIdx}">${r.mythic ? tx("\u518D\u6311\u6230 +{0}\uFF08\u9AD4\u529B {1}\uFF09", r.nextKey, stamina(app.S).pts) : tx("\u518D\u6253\u4E00\u6B21")}</button>`, r.kept.length ? tx('<button class="btn" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button>') : "");
     return h;
   }
   function failHint(b) {
@@ -3580,10 +3676,10 @@
     }
     clearTimeout(app.pendingRepeat);
     app.pendingRepeat = null;
-    const o = mythicBattleOpts(dIdx, app.S.mythic.key);
+    const o = mythicBattleOpts(dIdx, keyOf(app.S, dIdx));
     app.battle = new Battle(p, app.S.items, dIdx, o);
     app.lastResult = null;
-    app.battle.push(tx("\u9032\u5165\u50B3\u5947\u79D8\u5883\uFF1A{0} +{1}\uFF5C\u8A5E\u7DB4\uFF1A{2}", DUNGEONS[dIdx].name, o.mythic.level, o.mythic.affixes.map((a) => AFFIXES[a].name).join(tx("\u3001"))), "info");
+    app.battle.push(tx("\u9032\u5165{3}\uFF1A{0} +{1}\uFF5C\u8A5E\u7DB4\uFF1A{2}", DUNGEONS[dIdx].name, o.mythic.level, o.mythic.affixes.map((a) => AFFIXES[a].name).join(tx("\u3001")), o.mythic.tier === 2 ? tx("\u6DF1\u6DF5\u79D8\u5883") : tx("\u50B3\u5947\u79D8\u5883")), "info");
     runTimer();
   }
   function startMythicIdle(dIdx) {
@@ -3647,7 +3743,7 @@
       else if (!b.win) m.fail++;
       if (r.record) sendEvent(tx("\u79D8\u5883"), `${DUNGEONS[b.dIdx].name} +${b.mythic.level} ${tx("\u9650\u6642")} ${mmss(b.tick)}${tx("\uFF08\u65B0\u7D00\u9304\uFF09")}`);
       if (m.n >= 10) {
-        sendEvent(tx("\u79D8\u5883"), tx("\u8FD1 {0} \u5834\uFF1A\u9650\u6642 {1}\u30FB\u5931\u6557 {2}\u30FB\u76EE\u524D\u9470\u77F3 +{3}", m.n, m.timed, m.fail, app.S.mythic.key));
+        sendEvent(tx("\u79D8\u5883"), tx("\u8FD1 {0} \u5834\uFF1A\u9650\u6642 {1}\u30FB\u5931\u6557 {2}\u30FB\u76EE\u524D\u9470\u77F3 +{3}", m.n, m.timed, m.fail, keyOf(app.S, b.dIdx)));
         app.mBuf = null;
       }
     } else if (r.first) sendEvent(tx("\u9996\u901A"), tx("\u7B2C {0} \u5C64 {1}", b.dIdx + 1, DUNGEONS[b.dIdx].name));
@@ -3728,11 +3824,25 @@
         if (!storyOnce(d === CH1_TOP + 1 ? ["post" + CH1_TOP, "pre" + d] : "pre" + d, go)) go();
         return;
       }
-      case "mythic":
+      case "mythic": {
+        const d = +t.dataset.d;
+        if (app.battle && !app.battle.over && app.battle.mythic && !app.battle.mythicIdle) {
+          toast(tx("\u79D8\u5883\u6311\u6230\u9032\u884C\u4E2D"));
+          break;
+        }
+        if (!spendStamina(app.S)) {
+          toast(tx("\u79D8\u5883\u9AD4\u529B\u4E0D\u8DB3\uFF0C{0} \u5F8C\u56DE\u5FA9 1 \u9EDE", mmss(Math.ceil(staminaNext(app.S) / 1e3))));
+          break;
+        }
         stopIdleFor(-1);
-        startMythic(+t.dataset.d);
+        startMythic(d);
         app.tab = "battle";
         window.scrollTo(0, 0);
+        save();
+        break;
+      }
+      case "mtier":
+        app.mtier = +t.dataset.v;
         break;
       case "vault":
         if (vaultLeft(app.S)) stopIdleFor(-1);
@@ -3761,7 +3871,7 @@
         return;
       }
       case "recommend-mythic": {
-        const d = +t.dataset.d, r = prepare(app.S, [...mechHints(d), ...affixHints(activeAffixes(app.S.mythic.key))]);
+        const d = +t.dataset.d, r = prepare(app.S, [...mechHints(d), ...affixHints(activeAffixes(keyOf(app.S, d)))]);
         toast(prepMsg(r, tx("\u300C{0}\u300D\u8207\u4ECA\u65E5\u8A5E\u7DB4", DUNGEONS[d].name)));
         save();
         break;
@@ -3866,7 +3976,7 @@
           app.battle.over = true;
           app.battle.win = false;
           app.battle.push(tx("\u{1F3F3} \u4E3B\u52D5\u64A4\u9000"), "bad");
-          app.lastResult = app.battle.mythicIdle ? applyMythicIdleResult(app.S, app.battle) : applyResult(app.S, app.battle.dIdx, app.battle);
+          app.lastResult = app.battle.mythicIdle ? applyMythicIdleResult(app.S, app.battle) : app.battle.mythic ? applyMythicResult(app.S, app.battle) : applyResult(app.S, app.battle.dIdx, app.battle);
           if (app.S.idle === app.battle.dIdx) app.S.idle = null;
           if (app.battle.mythicIdle) app.S.idleMythic = null;
           save();

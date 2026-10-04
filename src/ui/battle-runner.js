@@ -19,9 +19,9 @@ export function startMythic(dIdx) {
   const p = G.partyHeroes(app.S);
   if (!p.length) { toast(tx('隊伍沒有成員')); app.tab = 'team'; app.render(); return; }
   clearTimeout(app.pendingRepeat); app.pendingRepeat = null;
-  const o = G.mythicBattleOpts(dIdx, app.S.mythic.key);
+  const o = G.mythicBattleOpts(dIdx, G.keyOf(app.S, dIdx));
   app.battle = new G.Battle(p, app.S.items, dIdx, o); app.lastResult = null;
-  app.battle.push(tx('進入傳奇秘境：{0} +{1}｜詞綴：{2}', G.DUNGEONS[dIdx].name, o.mythic.level, o.mythic.affixes.map(a => G.AFFIXES[a].name).join(tx('、'))), 'info');
+  app.battle.push(tx('進入{3}：{0} +{1}｜詞綴：{2}', G.DUNGEONS[dIdx].name, o.mythic.level, o.mythic.affixes.map(a => G.AFFIXES[a].name).join(tx('、')), o.mythic.tier === 2 ? tx('深淵秘境') : tx('傳奇秘境')), 'info');
   runTimer();
 }
 // 秘境掛機：固定打「限時最高 −2」，結束 3 秒後自動再開
@@ -69,7 +69,7 @@ export function finishBattle() {
     const m = app.mBuf || (app.mBuf = { n: 0, timed: 0, fail: 0 });
     m.n++; if (r.inTime) m.timed++; else if (!b.win) m.fail++;
     if (r.record) sendEvent(tx('秘境'), `${G.DUNGEONS[b.dIdx].name} +${b.mythic.level} ${tx('限時')} ${mmss(b.tick)}${tx('（新紀錄）')}`);
-    if (m.n >= 10) { sendEvent(tx('秘境'), tx('近 {0} 場：限時 {1}・失敗 {2}・目前鑰石 +{3}', m.n, m.timed, m.fail, app.S.mythic.key)); app.mBuf = null; }
+    if (m.n >= 10) { sendEvent(tx('秘境'), tx('近 {0} 場：限時 {1}・失敗 {2}・目前鑰石 +{3}', m.n, m.timed, m.fail, G.keyOf(app.S, b.dIdx))); app.mBuf = null; }
   }
   else if (r.first) sendEvent(tx('首通'), tx('第 {0} 層 {1}', b.dIdx + 1, G.DUNGEONS[b.dIdx].name));
   if (!app.battle.mythic && !app.battle.vault && app.S.idle === app.battle.dIdx) {

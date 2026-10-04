@@ -1,0 +1,19 @@
+{
+"深淵秘境 +5 限時通關": "Time an Abyssal +5",
+"深淵秘境 +10 限時通關": "Time an Abyssal +10",
+"進入{3}：{0} +{1}｜詞綴：{2}": "{3}: {0} +{1} | Affixes: {2}",
+"深淵秘境": "Abyssal+",
+"秘境挑戰進行中": "A Mythic run is in progress",
+"秘境體力不足，{0} 後回復 1 點": "Out of Mythic stamina — +1 in {0}",
+"・深淵 +{0}": " · Abyssal +{0}",
+"再挑戰 +{0}（體力 {1}）": "Retry +{0} (stamina {1})",
+"秘境體力": "Mythic stamina",
+"{0} 後 +1": "+1 in {0}",
+"已滿": "Full",
+"今日詞綴，每天 00:00 更換。限時內通關，鑰石 +1，打得夠快 +2；超時或失敗（含撤退），鑰石 −1。手動挑戰每場耗 1 點體力，每 {6} 分鐘回 1 點、上限 {7}。": "Today's affixes; they change daily at 00:00. Beat the timer: key +1, or +2 if fast enough. Over time or failed (including retreat): key −1. Each manual run costs 1 stamina; 1 point regenerates every {6} min, up to {7}. ",
+"：限時通關過的副本可以掛機，固定打該副本最佳 −{2}，不耗體力、鑰石不變、獎勵 {3}%，離線也會累積。": ": any dungeon you have timed can be idled at its best −{2}. No stamina cost, key unchanged, {3}% rewards, and it keeps going offline.",
+"深淵秘境以第 14 層的強度為基準，掉落裝等更高，限時通關有機會掉職業套裝。": "Abyssal+ is scaled from floor XIV: higher item level, and timed runs can drop class set pieces.",
+"通關第 14 層「深淵之心」後解鎖深淵秘境。": "Clear floor XIV \"Heart of the Abyss\" to unlock Abyssal+.",
+"深淵 +{0}": "Abyssal +{0}",
+"先比深淵秘境、再比傳奇秘境的最高限時等級。你的成績每 5 分鐘上傳一次。": "Ranked by best timed Abyssal+ level, then Mythic+. Your score uploads every 5 minutes."
+}

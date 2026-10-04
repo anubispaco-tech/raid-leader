@@ -19,11 +19,11 @@ function post(body, keepalive = false) {
 export function progress() {
   const S = app.S, party = G.partyHeroes(S);
   const top = Math.max(0, ...Object.keys(S.clears).filter(k => S.clears[k]).map(k => +k + 1));
-  const best = Math.max(0, ...Object.values(S.mythic.best).map(b => b.level));
+  const best = G.mythicBestLevel(S, 1), best2 = G.mythicBestLevel(S, 2);
   return { level: party.length ? Math.round(party.reduce((a, h) => a + h.level, 0) / party.length) : 1,
-    top, key: G.mythicUnlocked(S) ? S.mythic.key : 0, best, playMin: Math.round(S.player.playSec / 60) };
+    top, key: G.mythicUnlocked(S) ? S.mythic.key : 0, best, key2: G.tierUnlocked(S, 2) ? S.mythic.key2 : 0, best2, playMin: Math.round(S.player.playSec / 60) };
 }
-export const progressText = () => { const p = progress(); return tx('Lv{0}・第 {1} 層{2}', p.level, p.top, p.best ? tx('・秘境 +{0}', p.best) : ''); };
+export const progressText = () => { const p = progress(); return tx('Lv{0}・第 {1} 層{2}', p.level, p.top, (p.best ? tx('・秘境 +{0}', p.best) : '') + (p.best2 ? tx('・深淵 +{0}', p.best2) : '')); };
 
 export const sendSnapshot = keepalive => post({ type: 'snapshot', ...progress() }, keepalive);
 export const sendEvent = (kind, detail) => post({ type: 'event', kind, detail });

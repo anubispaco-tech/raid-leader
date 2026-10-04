@@ -8,7 +8,7 @@ import { getLang } from './i18n.js';
 import { dungeonInfo } from './dungeons.js';
 import { SPECS, TALENT_ROWS, SPEC_LEVEL, applyRecommend } from './talents.js';
 import { MYTHIC, CH1_TOP, SET_DROP } from './config.js';
-import { mythicRewards, keyChange, mythicBattleOpts } from './mythic.js';
+import { mythicRewards, keyChange, mythicBattleOpts, keyOf, setKey, mythicTier } from './mythic.js';
 import { Battle } from './battle.js';
 
 export const SAVE_VERSION = 6;
@@ -40,7 +40,7 @@ function decayFor(dIdx) {
 export function newGame() {
   const s = { v: SAVE_VERSION, gold: ECONOMY.startGold, heroes: [], items: {}, bag: [], party: [], unlocked: 1, clears: {},
     tavern: [], idle: null, lastSeen: Date.now(), stats: { runs: 0, wins: 0 }, autoSalvageBelow: 0, keepRarity: ECONOMY.defaultKeepRarity, stash: [], created: Date.now(),
-    mythic: { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 }, failStreak: 0, player: newPlayer(), bagSeen: [],
+    mythic: { key: MYTHIC.startKey, key2: MYTHIC.startKey, best: {}, runs: 0, timed: 0 }, failStreak: 0, player: newPlayer(), bagSeen: [],
     recruit: { sinceEpic: 0, sinceLegend: 0, total: 0 }, vault: { day: '', used: 0, runs: 0, best: {} }, dust: 0, idleMythic: null, salvageIlvlGap: 0, story: { seen: [] } };
   for (const c of HERO.starters) { const h = makeHero(c); h.name = uniqueName(s); s.heroes.push(h); s.party.push(h.id); }
   rollTavern(s);
@@ -58,6 +58,7 @@ export function migrate(s) {
   for (const h of [...s.heroes, ...(s.tavern || [])]) { if (h.spec === undefined) h.spec = null; h.talents = h.talents || {}; }
   // v3 → v4：傳奇秘境、連敗紀錄
   s.mythic = s.mythic || { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 };
+  if (s.mythic.key2 == null) s.mythic.key2 = MYTHIC.startKey; // v0.9.3 深淵秘境
   s.failStreak = s.failStreak || 0;
   // v4 → v5：玩家識別（隨機 ID、暱稱、累計遊玩秒數），用於遊玩數據與排行榜
   s.player = s.player || newPlayer();
@@ -245,16 +246,20 @@ export const mythicUnlocked = s => !!s.clears[MYTHIC.unlockAfter];
 export const maxUpFor = s => mythicUnlocked(s) ? GEAR.maxUp : GEAR.refineFrom;
 export function applyMythicResult(s, battle) {
   const M = battle.mythic, kc = keyChange(M.level, battle, M.timer);
-  const rw = mythicRewards(M.level, kc.inTime);
+  const rw = mythicRewards(M.level, kc.inTime, M.dIdx);
+  // 深淵秘境限時通關：和第二章主線一樣有機會掉職業套裝
+  const party = partyHeroes(s);
+  if (kc.inTime && mythicTier(M.dIdx) === 2 && party.length && R() < SET_DROP.chance)
+    rw.loot.push(makeSetItem(pick(party).cls, randomArmorSlot(), rw.loot[0].ilvl));
   s.stats.runs++; if (battle.win) s.stats.wins++;
   s.mythic.runs++; if (kc.inTime) s.mythic.timed++;
   s.gold += rw.gold;
   const lvUps = [];
   for (const h of partyHeroes(s)) if (gainXp(h, rw.xp)) lvUps.push({ name: h.name, level: h.level, para: h.para || 0 });
-  const prevKey = s.mythic.key; s.mythic.key = kc.next;
+  const prevKey = keyOf(s, M.dIdx); setKey(s, M.dIdx, kc.next);
   const best = s.mythic.best[M.dIdx], record = kc.inTime && (!best || M.level > best.level || (M.level === best.level && battle.tick < best.time));
   if (record) s.mythic.best[M.dIdx] = { level: M.level, time: battle.tick };
-  const dest = rw.loot.map(it => addLoot(s, it));
+  const dest = rw.loot.map(it => (it.set ? addSetLoot(s, it) : addLoot(s, it)));
   const kept = rw.loot.filter((_, i) => dest[i] === 'bag'), stashed = rw.loot.filter((_, i) => dest[i] === 'stash');
   return { ...rw, mythic: true, inTime: kc.inTime, prevKey, nextKey: kc.next, record, lvUps, kept, stashed,
     salvaged: dest.filter(d => d === 'salvaged').length, first: false, decayed: false };
@@ -268,7 +273,7 @@ export function mythicIdleLevel(s, dIdx) {
 export const canMythicIdle = s => Object.keys(s.mythic.best || {}).length > 0;
 export function applyMythicIdleResult(s, battle) {
   const M = battle.mythic, win = battle.win;
-  const rw = mythicRewards(M.level, true), m = win ? MYTHIC.idleMult : MYTHIC.idleMult * REWARD.loseMult;
+  const rw = mythicRewards(M.level, true, M.dIdx), m = win ? MYTHIC.idleMult : MYTHIC.idleMult * REWARD.loseMult;
   rw.gold = Math.round(rw.gold * m); rw.xp = Math.round(rw.xp * m); rw.loot = win ? rw.loot.slice(0, 2) : [];
   s.stats.runs++; if (win) s.stats.wins++;
   s.gold += rw.gold;
@@ -276,7 +281,7 @@ export function applyMythicIdleResult(s, battle) {
   for (const h of partyHeroes(s)) if (gainXp(h, rw.xp)) lvUps.push({ name: h.name, level: h.level, para: h.para || 0 });
   const dest = rw.loot.map(it => addLoot(s, it));
   const kept = rw.loot.filter((_, i) => dest[i] === 'bag'), stashed = rw.loot.filter((_, i) => dest[i] === 'stash');
-  return { ...rw, mythic: true, mythicIdle: true, inTime: win, prevKey: s.mythic.key, nextKey: s.mythic.key, record: false, lvUps, kept, stashed,
+  return { ...rw, mythic: true, mythicIdle: true, inTime: win, prevKey: keyOf(s, M.dIdx), nextKey: keyOf(s, M.dIdx), record: false, lvUps, kept, stashed,
     salvaged: dest.filter(d => d === 'salvaged').length, first: false, decayed: false };
 }
 

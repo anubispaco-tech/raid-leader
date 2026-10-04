@@ -26,12 +26,21 @@ function vaultSection() {
 function mythicSection() {
   const S = app.S;
   if (!G.mythicUnlocked(S)) return tx('<div class="mythic locked"><b>傳奇秘境</b><span class="sub" style="margin:0">通關第 7 層「龍眠高塔」後解鎖：無限層數、限時挑戰、每日詞綴。</span></div>');
-  const key = S.mythic.key, today = G.dailyAffixes(), active = G.activeAffixes(key);
-  let h = tx('<div class="mythic"><div class="mhead"><div><span class="label">傳奇秘境</span><b>目前鑰石</b></div><span class="keystone num">+{0}</span></div> <div class="affixes">{1}</div> <p class="sub" style="margin:0">今日詞綴，每天 00:00 更換。限時內通關，鑰石 +1，打得夠快 +2；超時或失敗，鑰石 −1。<b>秘境掛機</b>：限時通關過的副本可以掛機，固定打該副本最佳 −{2}，鑰石不變、獎勵 {3}%，離線也會累積。</p> <div class="mlist">', key, today.map((a, i) => `<div class="affix ${active.includes(a) ? 'on' : ''}"><b>${G.AFFIXES[a].name}</b><span>${G.AFFIXES[a].desc}</span><small>${active.includes(a) ? tx('考驗{0}', G.AFFIXES[a].test) : tx('+{0} 起生效', G.MYTHIC.affixAt[i])}</small></div>`).join(''), G.MYTHIC.idleBelow, Math.round(G.MYTHIC.idleMult * 100));
-  G.DUNGEONS.forEach((d, i) => {
-    const best = S.mythic.best[i];
+  // 傳奇秘境（第一章副本）／深淵秘境（第二章副本）：各自一顆鑰石，共用體力
+  const open2 = G.tierUnlocked(S, 2), tier = open2 && app.mtier !== 1 ? 2 : 1;
+  const tabs = `<div class="seg mtiers"><button data-act="mtier" data-v="1" class="${tier === 1 ? 'sel' : ''}">${tx('傳奇秘境')}</button><button data-act="mtier" data-v="2" class="${tier === 2 ? 'sel' : ''}" ${open2 ? '' : 'disabled'}>${tx('深淵秘境')}${open2 ? '' : ' 🔒'}</button></div>`;
+  const st = G.stamina(S), nx = G.staminaNext(S), max = G.MYTHIC.stamina.max;
+  const sta = tx('<div class="stamina"><span class="label">秘境體力</span><b class="num">{0}/{1}</b><span class="sub num" style="margin:0">{2}</span></div>', st.pts, max, nx ? tx('{0} 後 +1', mmss(Math.ceil(nx / 1000))) : tx('已滿'));
+  const key = G.tierKey(S, tier), today = G.dailyAffixes(), active = G.activeAffixes(key);
+  let h = tabs + tx('<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>目前鑰石</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">今日詞綴，每天 00:00 更換。限時內通關，鑰石 +1，打得夠快 +2；超時或失敗（含撤退），鑰石 −1。手動挑戰每場耗 1 點體力，每 {6} 分鐘回 1 點、上限 {7}。<b>秘境掛機</b>：限時通關過的副本可以掛機，固定打該副本最佳 −{2}，不耗體力、鑰石不變、獎勵 {3}%，離線也會累積。</p> {8} <div class="mlist">',
+    key, today.map((a, i) => `<div class="affix ${active.includes(a) ? 'on' : ''}"><b>${G.AFFIXES[a].name}</b><span>${G.AFFIXES[a].desc}</span><small>${active.includes(a) ? tx('考驗{0}', G.AFFIXES[a].test) : tx('+{0} 起生效', G.MYTHIC.affixAt[i])}</small></div>`).join(''), G.MYTHIC.idleBelow, Math.round(G.MYTHIC.idleMult * 100),
+    tier === 2 ? tx('深淵秘境') : tx('傳奇秘境'), sta, G.MYTHIC.stamina.regenMin, max,
+    tier === 2 ? tx('<p class="sub" style="margin:0">深淵秘境以第 14 層的強度為基準，掉落裝等更高，限時通關有機會掉職業套裝。</p>') : open2 ? '' : tx('<p class="sub" style="margin:0">通關第 14 層「深淵之心」後解鎖深淵秘境。</p>'));
+  const [f0, f1] = G.tierFloors(tier);
+  for (let i = f0; i <= f1; i++) {
+    const d = G.DUNGEONS[i], best = S.mythic.best[i];
     h += tx('<div class="mrow2"><div class="mname"><b>{0}</b><span class="sub num" style="margin:0">限時 {1}・{2}</span></div> {3} <button class="btn sm" data-act="recommend-mythic" data-d="{4}" aria-label="一鍵備戰：陣容、天賦、裝備">備戰</button> <button class="btn sm main" data-act="mythic" data-d="{5}">挑戰 +{6}</button></div>', d.name, mmss(G.mythicTimer(i)), best ? tx('最佳 +{0}（{1}）', best.level, mmss(best.time)) : tx('還沒限時通關'), G.mythicIdleLevel(S, i) ? `<button class="btn sm ${S.idleMythic === i ? 'on' : ''}" data-act="idlemythic" data-d="${i}">${S.idleMythic === i ? tx('掛機中・停止') : tx('掛機 +{0}', G.mythicIdleLevel(S, i))}</button>` : '', i, i, key);
-  });
+  }
   return h + `</div></div>`;
 }
 // ---------- 天梯（排行榜）----------
@@ -42,8 +51,8 @@ function boardCard() {
   if (!lb.data) body = `<p class="sub" style="margin:0">${lb.error ? tx('天梯暫時讀不到，稍後再試。') : tx('讀取中…')}</p>`;
   else if (!lb.data.length) body = tx('<p class="sub" style="margin:0">還沒有人上榜，搶第一吧。</p>');
   else body = `<ol class="board">${lb.data.map((p, i) => `<li class="${me && p.name === me ? 'me' : ''}"><span class="rk num">${i + 1}</span><b>${esc(p.name)}</b>
-      <span class="num">${p.best ? tx('秘境 +{0}', p.best) : tx('第 {0} 層', p.top)}</span><span class="sub num" style="margin:0">Lv${p.level}</span></li>`).join('')}</ol>`;
-  return tx('<div class="boardcard"><div class="row" style="align-items:baseline"><b>天梯</b><span class="sub" style="margin:0 0 0 auto">{0}・<button class="linkbtn" data-act="nick">{1}</button></span></div>{2} <p class="sub" style="margin:0">依秘境最高限時等級排名。你的成績每 5 分鐘上傳一次。</p></div>', me ? tx('你是「{0}」', esc(me)) : tx('匿名'), me ? tx('改暱稱') : tx('設定暱稱'), body);
+      <span class="num">${p.best2 ? tx('深淵 +{0}', p.best2) : p.best ? tx('秘境 +{0}', p.best) : tx('第 {0} 層', p.top)}</span><span class="sub num" style="margin:0">Lv${p.level}</span></li>`).join('')}</ol>`;
+  return tx('<div class="boardcard"><div class="row" style="align-items:baseline"><b>天梯</b><span class="sub" style="margin:0 0 0 auto">{0}・<button class="linkbtn" data-act="nick">{1}</button></span></div>{2} <p class="sub" style="margin:0">先比深淵秘境、再比傳奇秘境的最高限時等級。你的成績每 5 分鐘上傳一次。</p></div>', me ? tx('你是「{0}」', esc(me)) : tx('匿名'), me ? tx('改暱稱') : tx('設定暱稱'), body);
 }
 export function viewDungeons() {
   const lv = avgPartyLv(), il = avgPartyIlvl();

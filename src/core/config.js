@@ -131,6 +131,11 @@ export const MYTHIC = {
   legendFrom: 7, legendBase: 0.03, legendPerLevel: 0.01, legendMax: 0.15,
   goldMult: 1.5, xpMult: 1.2,       // 相對第 7 層的獎勵
   idleBelow: 2, idleMult: 0.7,      // 秘境掛機：打「限時最高 −2」，金幣經驗 7 折、每場 1 件，鑰石不變
+  // v0.9.3 深淵秘境：第二章 7 個副本，以第 14 層（深淵之心）為基準，鑰石另外計算
+  ch2: { unlockAfter: 13, base: 13, hp: 0.6, atk: 0.8, norm: 0.5, dropBase: 150, dropPerLevel: 4, // hp／atk：相對第 14 層的強度；norm：各副本往第 14 層拉齊的程度（1 = 完全拉齊，0 = 保留原本強度）
+    timer: [120, 135, 160, 195, 145, 210, 225] }, // 約為 +2 平均通關時間 × 1.3
+  // v0.9.3 秘境體力：手動挑戰每場 1 點（傳奇、深淵共用），掛機不耗
+  stamina: { max: 10, regenMin: 10 },
 };
 
 // ---------- 英雄稀有度（v0.7）----------
@@ -173,12 +178,16 @@ export const BAG_MILESTONES = [
   { id: 'mythic5', name: tx('秘境 +5 限時通關'), test: s => mythicBestLevel(s) >= 5 },
   { id: 'mythic10', name: tx('秘境 +10 限時通關'), test: s => mythicBestLevel(s) >= 10 },
   { id: 'mythic15', name: tx('秘境 +15 限時通關'), test: s => mythicBestLevel(s) >= 15 },
+  { id: 'abyss5', name: tx('深淵秘境 +5 限時通關'), test: s => mythicBestLevel(s, 2) >= 5 },
+  { id: 'abyss10', name: tx('深淵秘境 +10 限時通關'), test: s => mythicBestLevel(s, 2) >= 10 },
   { id: 'vault10', name: tx('寶庫累計 10 次'), test: s => ((s.vault && s.vault.runs) || 0) >= 10 },
   { id: 'vault30', name: tx('寶庫累計 30 次'), test: s => ((s.vault && s.vault.runs) || 0) >= 30 },
   { id: 'vault60', name: tx('寶庫累計 60 次'), test: s => ((s.vault && s.vault.runs) || 0) >= 60 },
 ];
 export const BAG_PER_MILESTONE = 5;
-export const mythicBestLevel = s => Math.max(0, ...Object.values((s.mythic && s.mythic.best) || {}).map(b => b.level));
+// tier 1：傳奇秘境（第一章副本）；tier 2：深淵秘境（第二章副本）
+export const mythicBestLevel = (s, tier = 1) => Math.max(0, ...Object.entries((s.mythic && s.mythic.best) || {})
+  .filter(([d]) => (+d > CH1_TOP ? 2 : 1) === tier).map(([, b]) => b.level));
 
 // ---------- 遊玩數據與排行榜（GAS 網頁應用程式；留空就完全不連線）----------
 export const TELEMETRY = {

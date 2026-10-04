@@ -3,7 +3,7 @@ import { tx } from '../core/i18n.js';
 import * as G from '../core/index.js';
 import { app, KEY } from './state.js';
 import { load, save, exportCode, importCode } from './save.js';
-import { $, fmt, toast, hero } from './helpers.js';
+import { $, fmt, toast, hero, mmss } from './helpers.js';
 import { viewDungeons } from './views/dungeon.js';
 import { viewBattle } from './views/battle.js';
 import { viewTeam } from './views/team.js';
@@ -58,7 +58,13 @@ document.addEventListener('click', e => {
   switch (a) {
     case 'fight': { const d = +t.dataset.d; stopIdleFor(d); const go = () => { startBattle(d); app.tab = 'battle'; render(); };
       if (!storyOnce(d === G.CH1_TOP + 1 ? ['post' + G.CH1_TOP, 'pre' + d] : 'pre' + d, go)) go(); return; }
-    case 'mythic': stopIdleFor(-1); startMythic(+t.dataset.d); app.tab = 'battle'; window.scrollTo(0, 0); break;
+    case 'mythic': {
+      const d = +t.dataset.d;
+      if (app.battle && !app.battle.over && app.battle.mythic && !app.battle.mythicIdle) { toast(tx('秘境挑戰進行中')); break; }
+      if (!G.spendStamina(app.S)) { toast(tx('秘境體力不足，{0} 後回復 1 點', mmss(Math.ceil(G.staminaNext(app.S) / 1000)))); break; }
+      stopIdleFor(-1); startMythic(d); app.tab = 'battle'; window.scrollTo(0, 0); save(); break;
+    }
+    case 'mtier': app.mtier = +t.dataset.v; break;
     case 'vault': if (G.vaultLeft(app.S)) stopIdleFor(-1); if (startVault(+t.dataset.d)) { app.tab = 'battle'; window.scrollTo(0, 0); } break;
     case 'vaultfloor': app.vaultFloor = +t.dataset.d; break;
     case 'prepare-vault': { const r = G.prepare(app.S, ['summon']); toast(prepMsg(r, tx('寶庫（偏範圍輸出）'))); save(); break; }
@@ -68,7 +74,7 @@ document.addEventListener('click', e => {
       save(); showDraw(r.heroes, r.cost); return;
     }
     case 'recommend-mythic': {
-      const d = +t.dataset.d, r = G.prepare(app.S, [...G.mechHints(d), ...G.affixHints(G.activeAffixes(app.S.mythic.key))]);
+      const d = +t.dataset.d, r = G.prepare(app.S, [...G.mechHints(d), ...G.affixHints(G.activeAffixes(G.keyOf(app.S, d)))]);
       toast(prepMsg(r, tx('「{0}」與今日詞綴', G.DUNGEONS[d].name))); save(); break;
     }
     case 'idle': {
@@ -103,7 +109,7 @@ document.addEventListener('click', e => {
       const b = app.battle; b.opts.autoHorn = true; // 直接結算視同掛機：首領戰自動吹號角
       if (b.waveIdx === b.waves.length - 1) b.useHorn();
       b.runToEnd(); finishBattle(); } break;
-    case 'retreat': if (app.battle && !app.battle.over) { clearInterval(app.bTimer); app.battle.over = true; app.battle.win = false; app.battle.push(tx('🏳 主動撤退'), 'bad'); app.lastResult = app.battle.mythicIdle ? G.applyMythicIdleResult(app.S, app.battle) : G.applyResult(app.S, app.battle.dIdx, app.battle); if (app.S.idle === app.battle.dIdx) app.S.idle = null; if (app.battle.mythicIdle) app.S.idleMythic = null; save(); } break;
+    case 'retreat': if (app.battle && !app.battle.over) { clearInterval(app.bTimer); app.battle.over = true; app.battle.win = false; app.battle.push(tx('🏳 主動撤退'), 'bad'); app.lastResult = app.battle.mythicIdle ? G.applyMythicIdleResult(app.S, app.battle) : app.battle.mythic ? G.applyMythicResult(app.S, app.battle) : G.applyResult(app.S, app.battle.dIdx, app.battle); if (app.S.idle === app.battle.dIdx) app.S.idle = null; if (app.battle.mythicIdle) app.S.idleMythic = null; save(); } break;
     case 'hero': openModal({ type: 'hero', id, view: app.modal && app.modal.id === id ? app.modal.view : undefined }); return;
     case 'heroview': app.modal = { type: 'hero', id, view: t.dataset.v }; break;
     case 'spec': G.setSpec(hero(id), t.dataset.v); save(); break;

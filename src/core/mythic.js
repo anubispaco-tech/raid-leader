@@ -32,38 +32,78 @@ export function dailyAffixes(date = new Date()) {
 export const activeAffixes = (level, date) => dailyAffixes(date).filter((_, i) => level >= MYTHIC.affixAt[i]);
 export const affixHints = list => list.map(a => AFFIXES[a].hint);
 
+// ---------- 秘境分級 ----------
+// tier 1 傳奇秘境：第一章副本，以第 7 層為基準；tier 2 深淵秘境：第二章副本，以第 14 層為基準
+export const mythicTier = dIdx => (dIdx > CH1_TOP ? 2 : 1);
+export const mythicBase = dIdx => (mythicTier(dIdx) === 2 ? MYTHIC.ch2.base : CH1_TOP);
+export const tierFloors = tier => (tier === 2 ? [CH1_TOP + 1, MYTHIC.ch2.base] : [0, CH1_TOP]);
+export const tierUnlocked = (s, tier) => !!s.clears[tier === 2 ? MYTHIC.ch2.unlockAfter : MYTHIC.unlockAfter];
+// 鑰石：兩種秘境各自一顆
+export const keyOf = (s, dIdx) => (mythicTier(dIdx) === 2 ? s.mythic.key2 : s.mythic.key);
+export const tierKey = (s, tier) => (tier === 2 ? s.mythic.key2 : s.mythic.key);
+export function setKey(s, dIdx, k) { if (mythicTier(dIdx) === 2) s.mythic.key2 = k; else s.mythic.key = k; }
+
+// ---------- 秘境體力 ----------
+// 手動挑戰每場 1 點；每 regenMin 分鐘回 1 點，上限 max。掛機不耗體力
+const STA_MS = () => MYTHIC.stamina.regenMin * 60000;
+export function stamina(s, now = Date.now()) {
+  const max = MYTHIC.stamina.max;
+  const st = s.mythic.sta || (s.mythic.sta = { pts: max, at: now });
+  if (st.pts >= max) { st.pts = max; st.at = now; return st; }
+  const n = Math.floor((now - st.at) / STA_MS());
+  if (n > 0) { st.pts = Math.min(max, st.pts + n); st.at = st.pts >= max ? now : st.at + n * STA_MS(); }
+  return st;
+}
+// 距離下一點還要幾毫秒（滿了回 0）
+export const staminaNext = (s, now = Date.now()) => { const st = stamina(s, now); return st.pts >= MYTHIC.stamina.max ? 0 : Math.max(0, st.at + STA_MS() - now); };
+export function spendStamina(s, now = Date.now()) {
+  const st = stamina(s, now);
+  if (st.pts < 1) return false;
+  st.pts--; // 滿的時候 stamina() 已把計時起點設成現在，不滿則沿用原本的回復進度
+  return true;
+}
+
 // ---------- 敵人 ----------
-export const mythicTimer = dIdx => MYTHIC.timer[dIdx];
+export const mythicTimer = dIdx => (mythicTier(dIdx) === 2 ? MYTHIC.ch2.timer[dIdx - CH1_TOP - 1] : MYTHIC.timer[dIdx]);
 export function buildMythicWaves(dIdx, level, affixes) {
-  // 以第 7 層的強度為基準，套用該副本自己的首領機制，再乘上秘境等級
-  const top = CH1_TOP; // 秘境以第一章第 7 層為基準
-  const base = buildWaves(top), own = buildWaves(dIdx);
   const sh = Math.pow(MYTHIC.hpGrowth, level), sa = Math.pow(MYTHIC.atkGrowth, level);
   const fort = affixes.includes('fortified'), tyr = affixes.includes('tyrannical');
+  const scale = (e, rh, ra) => {
+    const hp = e.hp * rh * sh * (e.boss ? (tyr ? 1.3 : 1) : (fort ? 1.3 : 1));
+    const atk = e.atk * ra * sa * (e.boss ? (tyr ? 1.15 : 1) : (fort ? 1.2 : 1));
+    return { ...e, hp: Math.round(hp), atk, addHp: e.addHp && Math.round(e.addHp * rh * sh), addAtk: e.addAtk && e.addAtk * ra * sa };
+  };
+  if (mythicTier(dIdx) === 2) {
+    // 深淵秘境：保留該副本自己的波次（含雙首領），依 norm 往第 14 層的強度拉近（以小怪生命／攻擊為比例）
+    const base = buildWaves(MYTHIC.ch2.base), own = buildWaves(dIdx);
+    const C = MYTHIC.ch2, rh = C.hp * Math.pow(base[0][0].hp / own[0][0].hp, C.norm), ra = C.atk * Math.pow(base[0][0].atk / own[0][0].atk, C.norm);
+    return own.map(wave => wave.map(e => scale(e, rh, ra)));
+  }
+  // 傳奇秘境：以第 7 層的強度為基準，套用該副本自己的首領機制，再乘上秘境等級
+  const base = buildWaves(CH1_TOP), own = buildWaves(dIdx);
   return base.map((wave, wi) => wave.map((e, ei) => {
     const o = own[wi][ei];
-    const hp = e.hp * sh * (e.boss ? (tyr ? 1.3 : 1) : (fort ? 1.3 : 1));
-    const atk = e.atk * sa * (e.boss ? (tyr ? 1.15 : 1) : (fort ? 1.2 : 1));
-    return { ...e, name: o.name, mech: o.mech, hp: Math.round(hp), atk, addHp: e.addHp && Math.round(e.addHp * sh), addAtk: e.addAtk && e.addAtk * sa };
+    return { ...scale(e, 1, 1), name: o.name, mech: o.mech };
   }));
 }
 export function mythicBattleOpts(dIdx, level, date) {
   const affixes = activeAffixes(level, date);
-  const top = CH1_TOP; // 秘境以第一章第 7 層為基準
-  return { mythic: { dIdx, level, affixes, timer: mythicTimer(dIdx), volcanic: buildWaves(top)[0][0].atk * Math.pow(MYTHIC.atkGrowth, level) * 2.5 },
+  const top = mythicBase(dIdx);
+  return { mythic: { dIdx, level, affixes, tier: mythicTier(dIdx), timer: mythicTimer(dIdx), volcanic: buildWaves(top)[0][0].atk * Math.pow(MYTHIC.atkGrowth, level) * 2.5 },
     waves: buildMythicWaves(dIdx, level, affixes), maxTicks: mythicTimer(dIdx) + MYTHIC.overtime };
 }
 
 // ---------- 結算 ----------
-export function mythicRewards(level, inTime) {
-  const top = CH1_TOP; // 秘境以第一章第 7 層為基準
+export function mythicRewards(level, inTime, dIdx = 0) {
+  const top = mythicBase(dIdx), t2 = mythicTier(dIdx) === 2;
   const gold = Math.round((REWARD.goldBase + REWARD.goldPerTier * top) * MYTHIC.goldMult * (1 + 0.05 * level) * rnd(0.9, 1.1));
   const xp = Math.round(REWARD.xpBase * Math.pow(top + 1, REWARD.xpExp) * MYTHIC.xpMult * (1 + 0.1 * level));
   const n = inTime ? 3 : 2, loot = []; // v0.9.2：6 個裝備格，掉落 +1
   const legend = level >= MYTHIC.legendFrom ? Math.min(MYTHIC.legendMax, MYTHIC.legendBase + MYTHIC.legendPerLevel * (level - MYTHIC.legendFrom)) : 0;
+  const ilvl = t2 ? MYTHIC.ch2.dropBase + MYTHIC.ch2.dropPerLevel * level : MYTHIC.dropBase + MYTHIC.dropPerLevel * level;
   for (let k = 0; k < n; k++) {
     const rar = R() < legend ? RARITY.length - 1 : rollRarity(1); // 秘境至少精良
-    loot.push(makeItem(pick(Object.keys(SLOTS)), MYTHIC.dropBase + MYTHIC.dropPerLevel * level + rint(-1, 2), rar));
+    loot.push(makeItem(pick(Object.keys(SLOTS)), ilvl + rint(-1, 2), rar));
   }
   return { gold, xp, loot };
 }

@@ -10,14 +10,15 @@
  *   4. 複製結尾是 /exec 的網址，交給遊戲
  *
  * 之後改了程式：部署 → 管理部署作業 → 編輯 → 版本選「新版本」→ 部署（網址不變）
+ * v0.9.3：新增「深淵最高／深淵鑰石」兩欄 → 貼上後先執行一次 setup（補表頭），再部署新版本
  */
 
 const SHEETS = {
-  players: { name: '玩家', headers: ['玩家ID', '暱稱', '第一次遊玩', '最後上線', '回訪天數', '遊玩分鐘', '隊伍等級', '最高層', '秘境鑰石', '秘境最高', '版本', '遊玩日期'] },
+  players: { name: '玩家', headers: ['玩家ID', '暱稱', '第一次遊玩', '最後上線', '回訪天數', '遊玩分鐘', '隊伍等級', '最高層', '秘境鑰石', '秘境最高', '版本', '遊玩日期', '深淵最高', '深淵鑰石'] },
   events: { name: '事件', headers: ['時間', '玩家ID', '暱稱', '類型', '內容'] },
   feedback: { name: '回饋', headers: ['時間', '玩家ID', '暱稱', '意見', '當時進度', '版本'] },
 };
-const COL = { pid: 1, name: 2, first: 3, last: 4, days: 5, minutes: 6, level: 7, top: 8, key: 9, best: 10, ver: 11, dates: 12 };
+const COL = { pid: 1, name: 2, first: 3, last: 4, days: 5, minutes: 6, level: 7, top: 8, key: 9, best: 10, ver: 11, dates: 12, best2: 13, key2: 14 };
 const TZ = 'Asia/Taipei';
 const LIMIT_SEC = { snapshot: 20, event: 2, feedback: 60 }; // 同一位玩家的送出間隔下限
 
@@ -85,10 +86,10 @@ function doGet(e) {
   if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
   const rows = rowsOf(SHEETS.players).filter(r => r[COL.pid - 1]);
   const list = rows.map(r => ({
-    name: r[COL.name - 1], best: Number(r[COL.best - 1]) || 0, top: Number(r[COL.top - 1]) || 0,
+    name: r[COL.name - 1], best: Number(r[COL.best - 1]) || 0, best2: Number(r[COL.best2 - 1]) || 0, top: Number(r[COL.top - 1]) || 0,
     level: Number(r[COL.level - 1]) || 0, last: r[COL.last - 1],
   }))
-    .sort((a, b) => b.best - a.best || b.top - a.top || b.level - a.level)
+    .sort((a, b) => b.best2 - a.best2 || b.best - a.best || b.top - a.top || b.level - a.level)
     .slice(0, 10);
   const out = JSON.stringify({ ok: true, updated: now(), list });
   cache.put('leaderboard', out, 60); // 1 分鐘快取，避免大家同時讀
@@ -102,7 +103,7 @@ function upsertPlayer(pid, name, d) {
   const idx = ids.indexOf(pid);
   const num = (v, max) => Math.max(0, Math.min(max, Math.round(Number(v) || 0)));
   if (idx === -1) {
-    sh.appendRow([pid, name, now(), now(), 1, num(d.playMin, 1e6), num(d.level, 40), num(d.top, 7), num(d.key, 99), num(d.best, 99), clean(d.ver, 10), today]);
+    sh.appendRow([pid, name, now(), now(), 1, num(d.playMin, 1e6), num(d.level, 100), num(d.top, 99), num(d.key, 99), num(d.best, 99), clean(d.ver, 10), today, num(d.best2, 99), num(d.key2, 99)]);
     return;
   }
   const r = idx + 2, row = sh.getRange(r, 1, 1, SHEETS.players.headers.length).getValues()[0];
@@ -112,10 +113,12 @@ function upsertPlayer(pid, name, d) {
   row[COL.last - 1] = now();
   row[COL.days - 1] = dates.length;
   row[COL.minutes - 1] = Math.max(Number(row[COL.minutes - 1]) || 0, num(d.playMin, 1e6));
-  row[COL.level - 1] = num(d.level, 40);
-  row[COL.top - 1] = Math.max(Number(row[COL.top - 1]) || 0, num(d.top, 7));
+  row[COL.level - 1] = num(d.level, 100);
+  row[COL.top - 1] = Math.max(Number(row[COL.top - 1]) || 0, num(d.top, 99));
   row[COL.key - 1] = num(d.key, 99);
   row[COL.best - 1] = Math.max(Number(row[COL.best - 1]) || 0, num(d.best, 99));
+  row[COL.best2 - 1] = Math.max(Number(row[COL.best2 - 1]) || 0, num(d.best2, 99));
+  row[COL.key2 - 1] = num(d.key2, 99);
   row[COL.ver - 1] = clean(d.ver, 10);
   row[COL.dates - 1] = dates.join(',');
   sh.getRange(r, 1, 1, row.length).setValues([row]);
