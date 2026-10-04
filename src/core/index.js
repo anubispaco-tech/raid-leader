@@ -12,3 +12,4 @@ export * from './advice.js';
 export { setSeed } from './rng.js';
 export { tx, LANGS, getLang, setLang } from './i18n.js';
 export * from './daily.js';
+export * from './achievements.js';

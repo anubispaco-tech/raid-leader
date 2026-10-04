@@ -228,8 +228,9 @@ export function salvageLowIlvl(s, gap, dry = false) {
   return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
 }
 export function addLoot(s, it) {
-  if (s.salvageIlvlGap && it.rarity < 4 && it.ilvl < partyIlvl(s) - s.salvageIlvlGap) { s.gold += salvageValue(it); s.dust = (s.dust || 0) + salvageDust(it); return 'salvaged'; }
-  if (it.rarity < s.autoSalvageBelow) { s.gold += salvageValue(it); s.dust = (s.dust || 0) + salvageDust(it); return 'salvaged'; }
+  const auto = () => { s.gold += salvageValue(it); s.dust = (s.dust || 0) + salvageDust(it); s.stats.salvaged = (s.stats.salvaged || 0) + 1; return 'salvaged'; };
+  if (s.salvageIlvlGap && it.rarity < 4 && it.ilvl < partyIlvl(s) - s.salvageIlvlGap) return auto();
+  if (it.rarity < s.autoSalvageBelow) return auto();
   if (s.bag.length < bagMax(s)) { s.items[it.id] = it; s.bag.push(it.id); return 'bag'; }
   if (it.rarity >= s.keepRarity && s.stash.length < ECONOMY.stashMax) { s.items[it.id] = it; s.stash.push(it.id); return 'stash'; }
   s.gold += salvageValue(it); s.dust = (s.dust || 0) + salvageDust(it); return 'salvaged';
@@ -279,7 +280,7 @@ export function applyMythicResult(s, battle) {
   if (kc.inTime && mythicTier(M.dIdx) === 2 && party.length && R() < SET_DROP.chance)
     rw.loot.push(makeSetItem(pick(party).cls, randomArmorSlot(), rw.loot[0].ilvl));
   s.stats.runs++; if (battle.win) s.stats.wins++;
-  s.mythic.runs++; if (kc.inTime) s.mythic.timed++;
+  s.mythic.runs++; if (kc.inTime) s.mythic.timed++; if (kc.delta === 2) s.stats.fast = (s.stats.fast || 0) + 1;
   s.gold += rw.gold;
   const lvUps = [];
   for (const h of partyHeroes(s)) if (gainXp(h, rw.xp)) lvUps.push({ name: h.name, level: h.level, para: h.para || 0 });
@@ -358,7 +359,7 @@ export function upgradeAll(s, heroId, dry = false) {
 export function salvage(s, itemId) {
   const it = s.items[itemId]; if (!it) return 0;
   s.bag = s.bag.filter(id => id !== itemId); s.stash = (s.stash || []).filter(id => id !== itemId); delete s.items[itemId];
-  const v = salvageValue(it); s.gold += v; s.dust = (s.dust || 0) + salvageDust(it); bump(s, 'salvage'); return v;
+  const v = salvageValue(it); s.gold += v; s.dust = (s.dust || 0) + salvageDust(it); s.stats.salvaged = (s.stats.salvaged || 0) + 1; bump(s, 'salvage'); return v;
 }
 // 分解背包中品質 ≤ maxRarity 的裝備（0 = 普通，1 = 精良以下）
 export function salvageUpTo(s, maxRarity) {

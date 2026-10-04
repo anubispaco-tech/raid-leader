@@ -69,7 +69,7 @@ export function claimQuest(s, i) {
 export const canChest = s => { const d = dailyToday(s); return !d.chest && d.q.length && d.q.every(q => q.claimed); };
 export function claimChest(s) {
   if (!canChest(s)) return null;
-  dailyToday(s).chest = true;
+  dailyToday(s).chest = true; s.stats.chests = (s.stats.chests || 0) + 1;
   return giveItem(s, DAILY.chestRarity, DAILY.chestSetChance);
 }
 // 累積簽到：每天一次，7 天一輪，斷簽不歸零

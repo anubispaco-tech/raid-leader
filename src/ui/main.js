@@ -32,6 +32,7 @@ function renderTabs() {
     `<button data-tab="${k}" class="${app.tab === k ? 'sel' : ''}" aria-label="${n}"><svg viewBox="0 0 24 24">${ICONS[k]}</svg>${n}${(k === 'battle' && app.battle && !app.battle.over && app.tab !== 'battle') || (k === 'bag' && app.S.stash.length) || (k === 'team' && app.S.heroes.some(h => G.pendingPicks(h))) ? '<span class="dot"></span>' : ''}</button>`).join('');
 }
 function render(skipModal) {
+  achToasts();
   $('#gold').textContent = fmt(app.S.gold);
   $('#idleChip').hidden = !G.partyLocked(app.S);
   renderTabs();
@@ -98,6 +99,8 @@ document.addEventListener('click', e => {
     case 'dlgnext': if (app.modal && app.modal.type === 'dialog') { if (app.modal.i < app.modal.lines.length - 1) { app.modal.i++; renderModal(); } else closeModal(); } return;
     case 'dlgskip': closeModal(); return;
     case 'settings': openModal({ type: 'settings' }); return;
+    case 'ach': openModal({ type: 'ach' }); return;
+    case 'achcat': app.achCat = t.dataset.v; renderModal(); return;
     case 'mode': app.mode = t.dataset.v; break;
     case 'chapter': app.chapter = +t.dataset.v; if (app.chapter === 1) storyOnce('post6'); break;
     case 'close-settings': closeModal(); return;
@@ -206,6 +209,15 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && app.modal) closeModal(); });
 
+// ---------- 成就 ----------
+// 每次重畫時檢查；新達成的跳提示（背包里程碑另有自己的提示）。啟動時先靜默補登舊進度
+function achToasts() {
+  const fresh = G.checkAchievements(app.S).filter(a => !a.reward);
+  if (!fresh.length) return;
+  save();
+  const a = fresh[0];
+  setTimeout(() => toast(tx('🏆 成就達成：{0}（+{1} 點）', a.name, a.pts) + (fresh.length > 1 ? tx('　另有 {0} 項', fresh.length - 1) : '')), 600);
+}
 // ---------- 每日 ----------
 function dailyToast(r, what) {
   if (!r) return;
@@ -257,6 +269,7 @@ function start(data) {
   const saved = (data && data.S) || load();
   installIcons(); // 職業圖示換成 SVG（在建立任何戰鬥之前）
   app.S = G.migrate(saved || G.newGame()); app.fresh = !saved;
+  G.checkAchievements(app.S); // 舊存檔：已達成的成就直接補登，不跳提示
   for (const h of [...app.S.heroes, ...(app.S.tavern || [])]) h.name = localName(h.name);
   for (const it of Object.values(app.S.items)) it.name = localName(it.name);
   $('.brand-t').textContent = tx('副本團長'); $('.brand').setAttribute('aria-label', tx('設定')); $('#idleChip').textContent = tx('掛機中'); document.title = tx('副本團長');

@@ -313,3 +313,17 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 .log .gi{width:1.05em;height:1.05em}
 .unit.boss .ic .gi{width:1.5em;height:1.5em}
 .horn .gi{width:1.2em;height:1.2em;margin-right:4px;color:var(--brass)}
+/* v0.12 成就 */
+.achbtn{float:right;margin-top:4px;display:flex;align-items:center;gap:6px}
+.achbtn .gi{width:1.2em;height:1.2em}
+.achsum{display:flex;align-items:baseline;gap:8px;margin:4px 0 10px}.achsum b{font-size:28px;color:var(--brass)}
+h3 .gi{vertical-align:-.12em}
+.seg.achcats{margin-bottom:10px}.seg.achcats button{flex:1;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 2px}.seg.achcats small{font-size:10px;opacity:.75}
+.achlist{display:grid;gap:8px;margin-bottom:12px}
+.ach{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;opacity:.72}
+.ach.ok{opacity:1;border-color:color-mix(in srgb,var(--brass) 60%,var(--line))}
+.achpts{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;border:2px solid var(--line);color:var(--muted)}
+.ach.ok .achpts{border-color:var(--brass);color:var(--ink);background:var(--brass)}
+.achbody{display:grid;gap:3px;min-width:0}.achbody b{font-size:14px}
+.achbar{display:block;height:5px;border-radius:3px;background:var(--panel);overflow:hidden;margin-top:2px}.achbar i{display:block;height:100%;background:var(--brass)}
+.achwhen{font-size:11px;white-space:nowrap}

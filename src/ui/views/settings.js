@@ -1,6 +1,7 @@
 // ===== 設定（點左上角標題開啟）：帳號、存檔、語言、意見回饋、關於 =====
 import { tx, LANGS, getLang } from '../../core/i18n.js';
 import { VERSION } from '../../core/version.js';
+import * as G from '../../core/index.js';
 import { app } from '../state.js';
 import { enabled } from '../telemetry.js';
 import { esc, fmt } from '../helpers.js';
@@ -14,6 +15,7 @@ export function sheetSettings() {
       ${row(tx('暱稱'), `<span class="row" style="align-items:center;margin:0"><b>${esc(p.name || tx('匿名'))}</b><button class="btn sm" data-act="nick">${tx('修改')}</button></span>`)}
       ${row(tx('玩家 ID'), `<span class="num sub" style="margin:0">${esc(p.pid)}</span>`)}
       ${row(tx('遊玩時間'), `<span class="num">${play}</span>`)}
+      ${row(tx('成就'), `<button class="btn sm" data-act="ach">${tx('{0} 點・查看', G.achPoints(S))}</button>`)}
       ${row(tx('戰績'), `<span class="num">${tx('共挑戰 {0} 次・通關 {1} 次', fmt(S.stats.runs), fmt(S.stats.wins))}</span>`)}
     </div>
     <span class="label">${tx('存檔')}</span>

@@ -12,6 +12,7 @@ const BOSS_GLYPH = ['mushroom-gills', 'golem-head', 'trident', 'fire-shield', 'c
   'rock-golem', 'anvil-impact', 'cultist', ['sun', 'moon'], 'crystal-growth', 'portal', 'horned-skull'];
 const TRASH = 'imp-laugh', GOBLIN = 'goblin-head', COIN = 'two-coins';
 export const HORN = 'hunting-horn'; // 英勇號角按鈕
+export const TROPHY = 'trophy-cup';  // 成就
 
 export const svg = (name, cls = '') => DATA[name]
   ? `<svg class="gi ${cls}" viewBox="0 0 512 512" aria-hidden="true"><path d="${DATA[name]}"/></svg>` : '';

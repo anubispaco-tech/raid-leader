@@ -5,6 +5,7 @@ import { app } from '../state.js';
 import { sheetSettings } from './settings.js';
 import { $, fmt, pct, toast, hero, cls, inParty, itemStatText, itemName, partyPower, avgPartyIlvl, avgPartyLv, heroName, rarityTag } from '../helpers.js';
 
+import { sheetAchievements } from './achievements.js';
 export function openModal(m) { app.modal = m; renderModal(); }
 export function closeModal() {
   const done = app.modal && app.modal.type === 'dialog' && app.modal.done;
@@ -22,6 +23,7 @@ export function renderModal() {
   if (app.modal.type === 'text') body = app.modal.html;
   if (app.modal.type === 'dialog') body = sheetDialog(app.modal);
   if (app.modal.type === 'settings') body = sheetSettings();
+  if (app.modal.type === 'ach') body = sheetAchievements();
   if (!body) { app.modal = null; el.innerHTML = ''; return; }
   // 只有新開抽屜時播放滑入動畫；在抽屜內操作（選天賦、換頁）不重播，並保留捲動位置
   const key = app.modal.type + ':' + (app.modal.id || ''), old = el.querySelector('.sheet');
