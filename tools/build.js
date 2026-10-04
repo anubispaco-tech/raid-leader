@@ -13,6 +13,10 @@ const head = read('src/head.html').trim(), body = read('src/body.html').trim();
 const pkg = JSON.parse(read('package.json'));
 
 const dev = process.argv.includes('--dev'), v = pkg.version;
+// 內容安全政策：只執行自己網站的腳本（擋掉被注入的 inline script），資料只能送到 GAS
+const CSP = ["default-src 'self'", "script-src 'self'", "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src https://fonts.gstatic.com", "img-src 'self' data:", "connect-src https://script.google.com https://script.googleusercontent.com",
+  "object-src 'none'", "base-uri 'none'", "form-action 'none'"].join('; ');
 fs.writeFileSync(path.join(root, 'src/core/version.js'), `// 由 tools/build.js 依 package.json 產生，請勿手動修改\nexport const VERSION = '${v}';\n`);
 const script = dev ? '<script type="module" src="src/ui/main.js"></script>' : `<script src="dist/app.js?v=${v}"></script>`;
 const pages = `<!doctype html>
@@ -20,6 +24,8 @@ const pages = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+${dev ? '' : `<meta http-equiv="Content-Security-Policy" content="${CSP}">`}
+<meta name="referrer" content="no-referrer">
 ${head}
 <link rel="stylesheet" href="src/styles.css?v=${v}">
 </head>

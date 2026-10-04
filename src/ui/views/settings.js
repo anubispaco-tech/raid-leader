@@ -24,6 +24,8 @@ export function sheetSettings() {
   if (enabled()) h += `<span class="label">${tx('意見回饋')}</span>
     <textarea id="fbText" class="fb" maxlength="1000" placeholder="${tx('哪裡好玩、哪裡卡住、想要什麼功能都可以寫')}">${esc(app.fbDraft || '')}</textarea>
     <div class="row" style="align-items:center"><span class="sub" style="margin:0">${tx('會附上暱稱「{0}」與目前進度', esc(p.name || tx('匿名')))}</span><button class="btn main" data-act="sendfb" style="margin-left:auto">${tx('送出')}</button></div>`;
+  h += `<span class="label">${tx('隱私與數據')}</span>
+    <p class="sub" style="margin:0">${tx('遊戲不需要帳號。為了改善平衡，會匿名送出：隨機玩家 ID、暱稱、隊伍等級、最高層與秘境成績、遊玩時間與版本；以及你主動送出的意見回饋。不收集姓名、Email、位置或裝置資訊。暱稱會顯示在天梯上，請不要填真實姓名。')}</p>`;
   h += `<span class="label">${tx('關於')}</span><div class="settings">
       ${row(tx('版本'), `<span class="num">v${VERSION}</span>`)}
       ${row(tx('故事'), `<button class="btn sm" data-act="replaystory">${tx('重看序章')}</button>`)}

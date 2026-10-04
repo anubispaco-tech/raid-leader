@@ -11,14 +11,17 @@
  *
  * 之後改了程式：部署 → 管理部署作業 → 編輯 → 版本選「新版本」→ 部署（網址不變）
  * v0.9.3：新增「深淵最高／深淵鑰石」兩欄 → 貼上後先執行一次 setup（補表頭），再部署新版本
+ * v0.10.1：新增「封鎖」欄與成績合理性檢查 → 同樣先執行 setup，再部署新版本
  */
 
 const SHEETS = {
-  players: { name: '玩家', headers: ['玩家ID', '暱稱', '第一次遊玩', '最後上線', '回訪天數', '遊玩分鐘', '隊伍等級', '最高層', '秘境鑰石', '秘境最高', '版本', '遊玩日期', '深淵最高', '深淵鑰石'] },
+  players: { name: '玩家', headers: ['玩家ID', '暱稱', '第一次遊玩', '最後上線', '回訪天數', '遊玩分鐘', '隊伍等級', '最高層', '秘境鑰石', '秘境最高', '版本', '遊玩日期', '深淵最高', '深淵鑰石', '封鎖（填任何字就不上天梯）'] },
   events: { name: '事件', headers: ['時間', '玩家ID', '暱稱', '類型', '內容'] },
   feedback: { name: '回饋', headers: ['時間', '玩家ID', '暱稱', '意見', '當時進度', '版本'] },
 };
-const COL = { pid: 1, name: 2, first: 3, last: 4, days: 5, minutes: 6, level: 7, top: 8, key: 9, best: 10, ver: 11, dates: 12, best2: 13, key2: 14 };
+const COL = { pid: 1, name: 2, first: 3, last: 4, days: 5, minutes: 6, level: 7, top: 8, key: 9, best: 10, ver: 11, dates: 12, best2: 13, key2: 14, ban: 15 };
+// 成績合理性（v0.10.1）：傳奇秘境要通關第 7 層、深淵秘境要通關第 14 層才可能有成績；每次回報最多進步 JUMP 級
+const SANE = { mythicTop: 7, abyssTop: 14, jump: 15 };
 const TZ = 'Asia/Taipei';
 const LIMIT_SEC = { snapshot: 20, event: 2, feedback: 60 }; // 同一位玩家的送出間隔下限
 
@@ -84,7 +87,7 @@ function doGet(e) {
   if (action !== 'leaderboard') return json({ ok: true, service: 'raid-leader' });
   const cache = CacheService.getScriptCache(), hit = cache.get('leaderboard');
   if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
-  const rows = rowsOf(SHEETS.players).filter(r => r[COL.pid - 1]);
+  const rows = rowsOf(SHEETS.players).filter(r => r[COL.pid - 1] && !String(r[COL.ban - 1] || '').trim());
   const list = rows.map(r => ({
     name: r[COL.name - 1], best: Number(r[COL.best - 1]) || 0, best2: Number(r[COL.best2 - 1]) || 0, top: Number(r[COL.top - 1]) || 0,
     level: Number(r[COL.level - 1]) || 0, last: r[COL.last - 1],
@@ -102,8 +105,12 @@ function upsertPlayer(pid, name, d) {
   const ids = sh.getLastRow() > 1 ? sh.getRange(2, COL.pid, sh.getLastRow() - 1, 1).getValues().flat() : [];
   const idx = ids.indexOf(pid);
   const num = (v, max) => Math.max(0, Math.min(max, Math.round(Number(v) || 0)));
+  // 不合理的成績直接歸零（例如還沒通關第 7 層卻有秘境成績）
+  const top = num(d.top, 99);
+  if (top < SANE.mythicTop) { d.best = 0; d.key = 0; }
+  if (top < SANE.abyssTop) { d.best2 = 0; d.key2 = 0; }
   if (idx === -1) {
-    sh.appendRow([pid, name, now(), now(), 1, num(d.playMin, 1e6), num(d.level, 100), num(d.top, 99), num(d.key, 99), num(d.best, 99), clean(d.ver, 10), today, num(d.best2, 99), num(d.key2, 99)]);
+    sh.appendRow([pid, name, now(), now(), 1, num(d.playMin, 1e6), num(d.level, 100), num(d.top, 99), num(d.key, 99), Math.min(num(d.best, 99), SANE.jump), clean(d.ver, 10), today, Math.min(num(d.best2, 99), SANE.jump), num(d.key2, 99), '']);
     return;
   }
   const r = idx + 2, row = sh.getRange(r, 1, 1, SHEETS.players.headers.length).getValues()[0];
@@ -116,8 +123,10 @@ function upsertPlayer(pid, name, d) {
   row[COL.level - 1] = num(d.level, 100);
   row[COL.top - 1] = Math.max(Number(row[COL.top - 1]) || 0, num(d.top, 99));
   row[COL.key - 1] = num(d.key, 99);
-  row[COL.best - 1] = Math.max(Number(row[COL.best - 1]) || 0, num(d.best, 99));
-  row[COL.best2 - 1] = Math.max(Number(row[COL.best2 - 1]) || 0, num(d.best2, 99));
+  const capJump = (old, v) => Math.min(num(v, 99), old + SANE.jump); // 一次最多進步 jump 級
+  const oldBest = Number(row[COL.best - 1]) || 0, oldBest2 = Number(row[COL.best2 - 1]) || 0;
+  row[COL.best - 1] = Math.max(oldBest, capJump(oldBest, d.best));
+  row[COL.best2 - 1] = Math.max(oldBest2, capJump(oldBest2, d.best2));
   row[COL.key2 - 1] = num(d.key2, 99);
   row[COL.ver - 1] = clean(d.ver, 10);
   row[COL.dates - 1] = dates.join(',');

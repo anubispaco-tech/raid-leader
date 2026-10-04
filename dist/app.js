@@ -1,4 +1,4 @@
-/* 副本團長 v0.10.0 */
+/* 副本團長 v0.10.1 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -546,7 +546,7 @@
     '<h3>\u532F\u51FA\u5B58\u6A94\u78BC</h3><p class="sub" style="margin:0">\u8907\u88FD\u9019\u6BB5\u6587\u5B57\uFF0C\u5230\u53E6\u4E00\u53F0\u88DD\u7F6E\u7684\u300C\u532F\u5165\u300D\u8CBC\u4E0A\u3002</p><textarea id="expTxt" readonly>{0}</textarea><div class="row"><button class="btn main" data-act="copy">\u8907\u88FD</button><button class="btn" data-act="closebtn">\u95DC\u9589</button></div>': '<h3>Export save code</h3><p class="sub" style="margin:0">Copy this text and paste it into Import on another device.</p><textarea id="expTxt" readonly>{0}</textarea><div class="row"><button class="btn main" data-act="copy">Copy</button><button class="btn" data-act="closebtn">Off</button></div>',
     "\u5DF2\u8907\u88FD": "Copied",
     "\u8ACB\u624B\u52D5\u8907\u88FD": "Please copy it manually",
-    '<h3>\u532F\u5165\u5B58\u6A94\u78BC</h3><p class="sub" style="margin:0">\u6703\u8986\u84CB\u76EE\u524D\u9032\u5EA6\u3002</p><textarea id="impTxt" placeholder="\u8CBC\u4E0A\u5B58\u6A94\u78BC"></textarea><div class="row"><button class="btn main" data-act="doimport">\u532F\u5165</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>': '<h3>Import save code</h3><p class="sub" style="margin:0">This overwrites your current progress.</p><textarea id="impTxt" placeholder="Paste save code"></textarea><div class="row"><button class="btn main" data-act="doimport">Import</button><button class="btn" data-act="closebtn">Cancel</button></div>',
+    '<h3>\u532F\u5165\u5B58\u6A94\u78BC</h3><p class="sub" style="margin:0">\u6703\u8986\u84CB\u76EE\u524D\u9032\u5EA6\u3002\u53EA\u532F\u5165\u4F60\u81EA\u5DF1\u532F\u51FA\u3001\u6216\u4FE1\u4EFB\u7684\u4EBA\u7D66\u7684\u5B58\u6A94\u78BC\u3002</p><textarea id="impTxt" placeholder="\u8CBC\u4E0A\u5B58\u6A94\u78BC"></textarea><div class="row"><button class="btn main" data-act="doimport">\u532F\u5165</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>': '<h3>Import save code</h3><p class="sub" style="margin:0">This replaces your current progress. Only import codes you exported yourself or got from someone you trust.</p><textarea id="impTxt" placeholder="Paste save code"></textarea><div class="row"><button class="btn main" data-act="doimport">Import</button><button class="btn" data-act="closebtn">Cancel</button></div>',
     "\u532F\u5165\u5B8C\u6210": "Import complete",
     "\u5B58\u6A94\u78BC\u7121\u6CD5\u8B80\u53D6\uFF0C\u8ACB\u78BA\u8A8D\u662F\u5426\u5B8C\u6574\u8907\u88FD": "Couldn't read that save code \u2014 make sure you copied all of it",
     '<h3>\u91CD\u65B0\u958B\u59CB\uFF1F</h3><p class="sub" style="margin:0">\u76EE\u524D\u7684\u82F1\u96C4\u3001\u88DD\u5099\u8207\u9032\u5EA6\u90FD\u6703\u6E05\u9664\uFF0C\u7121\u6CD5\u5FA9\u539F\u3002</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">\u6E05\u9664\u4E26\u91CD\u4F86</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>': `<h3>Start over?</h3><p class="sub" style="margin:0">All heroes, gear and progress will be erased. This can't be undone.</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">Erase and restart</button><button class="btn" data-act="closebtn">Cancel</button></div>`,
@@ -770,6 +770,8 @@
     "\u54EA\u88E1\u597D\u73A9\u3001\u54EA\u88E1\u5361\u4F4F\u3001\u60F3\u8981\u4EC0\u9EBC\u529F\u80FD\u90FD\u53EF\u4EE5\u5BEB": "What's fun, where you got stuck, what you'd like to see\u2026",
     "\u6703\u9644\u4E0A\u66B1\u7A31\u300C{0}\u300D\u8207\u76EE\u524D\u9032\u5EA6": 'Sent with your nickname "{0}" and progress',
     "\u9001\u51FA": "Send",
+    "\u96B1\u79C1\u8207\u6578\u64DA": "Privacy & data",
+    "\u904A\u6232\u4E0D\u9700\u8981\u5E33\u865F\u3002\u70BA\u4E86\u6539\u5584\u5E73\u8861\uFF0C\u6703\u533F\u540D\u9001\u51FA\uFF1A\u96A8\u6A5F\u73A9\u5BB6 ID\u3001\u66B1\u7A31\u3001\u968A\u4F0D\u7B49\u7D1A\u3001\u6700\u9AD8\u5C64\u8207\u79D8\u5883\u6210\u7E3E\u3001\u904A\u73A9\u6642\u9593\u8207\u7248\u672C\uFF1B\u4EE5\u53CA\u4F60\u4E3B\u52D5\u9001\u51FA\u7684\u610F\u898B\u56DE\u994B\u3002\u4E0D\u6536\u96C6\u59D3\u540D\u3001Email\u3001\u4F4D\u7F6E\u6216\u88DD\u7F6E\u8CC7\u8A0A\u3002\u66B1\u7A31\u6703\u986F\u793A\u5728\u5929\u68AF\u4E0A\uFF0C\u8ACB\u4E0D\u8981\u586B\u771F\u5BE6\u59D3\u540D\u3002": "No account needed. To improve balance, the game anonymously sends a random player ID, your nickname, party level, highest floor and Mythic results, play time and version, plus any feedback you choose to submit. No name, email, location or device info is collected. Your nickname appears on the leaderboard, so please don't use your real name.",
     "\u95DC\u65BC": "About",
     "\u7248\u672C": "Version",
     "\u6545\u4E8B": "Story",
@@ -2971,8 +2973,44 @@
     }
     if (s.salvageIlvlGap == null) s.salvageIlvlGap = 0;
     s.story = s.story || { seen: [] };
+    normalizeTypes(s);
     s.v = SAVE_VERSION;
     return s;
+  }
+  var int = (v, lo, hi, d = lo) => {
+    const n = Math.round(Number(v));
+    return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d;
+  };
+  function normalizeTypes(s) {
+    const R2 = HERO_RARITY.length - 1, IR = RARITY.length - 1;
+    s.gold = int(s.gold, 0, 1e12);
+    s.dust = int(s.dust, 0, 1e9);
+    s.unlocked = int(s.unlocked, 1, DUNGEONS.length);
+    const okHero = (h) => h && typeof h === "object" && CLASSES[h.cls] && h.gear && typeof h.gear === "object";
+    s.heroes = s.heroes.filter(okHero);
+    s.tavern = (s.tavern || []).filter(okHero);
+    for (const h of [...s.heroes, ...s.tavern]) {
+      h.rarity = int(h.rarity, 0, R2);
+      h.level = int(h.level, 1, HERO.maxLevel);
+      h.xp = int(h.xp, 0, 1e12);
+      if (h.spec != null && !CLASSES[h.cls].specs[h.spec]) h.spec = null;
+      if (typeof h.name !== "string") h.name = "?";
+    }
+    for (const [id, it] of Object.entries(s.items)) {
+      if (!it || typeof it !== "object" || !SLOTS[it.slot]) {
+        delete s.items[id];
+        continue;
+      }
+      it.rarity = int(it.rarity, 0, IR);
+      it.ilvl = int(it.ilvl, 1, 9999);
+      it.up = int(it.up, 0, GEAR.maxUp);
+      if (typeof it.name !== "string") it.name = "?";
+    }
+    const ids = new Set(s.heroes.map((h) => h.id));
+    s.party = (s.party || []).filter((id) => ids.has(id));
+    s.bag = (s.bag || []).filter((id) => s.items[id]);
+    s.stash = (s.stash || []).filter((id) => s.items[id]);
+    for (const h of s.heroes) for (const sl of Object.keys(h.gear)) if (h.gear[sl] && !s.items[h.gear[sl]]) h.gear[sl] = null;
   }
   var partyHeroes = (s) => s.party.map((id) => s.heroes.find((h) => h.id === id)).filter(Boolean);
   var avgLevel = (list) => list.length ? list.reduce((a, h) => a + h.level, 0) / list.length : 1;
@@ -3430,6 +3468,23 @@
     }
     return { sec: Math.round(sec), runs, wins, gold, items, stashed, lv };
   }
+  var UNSAFE = /[<>"'`&\\]/g;
+  function sanitizeSave(s, depth = 0) {
+    if (depth > 12) return null;
+    if (typeof s === "string") return s.replace(UNSAFE, "").slice(0, 200);
+    if (typeof s === "number") return Number.isFinite(s) ? s : 0;
+    if (typeof s === "boolean" || s == null) return s;
+    if (Array.isArray(s)) return s.slice(0, 5e3).map((x) => sanitizeSave(x, depth + 1));
+    if (typeof s === "object") {
+      const o = {};
+      for (const k of Object.keys(s)) {
+        if (k === "__proto__" || k === "constructor" || k === "prototype") continue;
+        o[k.replace(UNSAFE, "")] = sanitizeSave(s[k], depth + 1);
+      }
+      return o;
+    }
+    return null;
+  }
 
   // src/core/advice.js
   var ROLE_NAME2 = { tank: tx("\u5766\u514B"), heal: tx("\u6CBB\u7642"), dps: tx("\u8F38\u51FA") };
@@ -3477,7 +3532,7 @@
   function load() {
     try {
       const raw = localStorage.getItem(KEY2);
-      if (raw) return JSON.parse(raw);
+      if (raw) return sanitizeSave(JSON.parse(raw));
     } catch (e) {
     }
     return null;
@@ -3494,8 +3549,8 @@
     return btoa(unescape(encodeURIComponent(JSON.stringify(app.S))));
   }
   function importCode(code) {
-    const s = JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
-    if (!s || !Array.isArray(s.heroes) || !s.items) throw new Error(tx("\u683C\u5F0F\u4E0D\u7B26"));
+    const s = sanitizeSave(JSON.parse(decodeURIComponent(escape(atob(code.trim())))));
+    if (!s || typeof s !== "object" || !Array.isArray(s.heroes) || !s.items || typeof s.items !== "object") throw new Error(tx("\u683C\u5F0F\u4E0D\u7B26"));
     return s;
   }
 
@@ -3539,7 +3594,7 @@
   var dailyOpenNow = () => app.dailyOpen != null ? app.dailyOpen : dailyPending(app.S) > 0;
 
   // src/core/version.js
-  var VERSION = "0.10.0";
+  var VERSION = "0.10.1";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -3885,6 +3940,8 @@
     if (enabled()) h += `<span class="label">${tx("\u610F\u898B\u56DE\u994B")}</span>
     <textarea id="fbText" class="fb" maxlength="1000" placeholder="${tx("\u54EA\u88E1\u597D\u73A9\u3001\u54EA\u88E1\u5361\u4F4F\u3001\u60F3\u8981\u4EC0\u9EBC\u529F\u80FD\u90FD\u53EF\u4EE5\u5BEB")}">${esc(app.fbDraft || "")}</textarea>
     <div class="row" style="align-items:center"><span class="sub" style="margin:0">${tx("\u6703\u9644\u4E0A\u66B1\u7A31\u300C{0}\u300D\u8207\u76EE\u524D\u9032\u5EA6", esc(p.name || tx("\u533F\u540D")))}</span><button class="btn main" data-act="sendfb" style="margin-left:auto">${tx("\u9001\u51FA")}</button></div>`;
+    h += `<span class="label">${tx("\u96B1\u79C1\u8207\u6578\u64DA")}</span>
+    <p class="sub" style="margin:0">${tx("\u904A\u6232\u4E0D\u9700\u8981\u5E33\u865F\u3002\u70BA\u4E86\u6539\u5584\u5E73\u8861\uFF0C\u6703\u533F\u540D\u9001\u51FA\uFF1A\u96A8\u6A5F\u73A9\u5BB6 ID\u3001\u66B1\u7A31\u3001\u968A\u4F0D\u7B49\u7D1A\u3001\u6700\u9AD8\u5C64\u8207\u79D8\u5883\u6210\u7E3E\u3001\u904A\u73A9\u6642\u9593\u8207\u7248\u672C\uFF1B\u4EE5\u53CA\u4F60\u4E3B\u52D5\u9001\u51FA\u7684\u610F\u898B\u56DE\u994B\u3002\u4E0D\u6536\u96C6\u59D3\u540D\u3001Email\u3001\u4F4D\u7F6E\u6216\u88DD\u7F6E\u8CC7\u8A0A\u3002\u66B1\u7A31\u6703\u986F\u793A\u5728\u5929\u68AF\u4E0A\uFF0C\u8ACB\u4E0D\u8981\u586B\u771F\u5BE6\u59D3\u540D\u3002")}</p>`;
     h += `<span class="label">${tx("\u95DC\u65BC")}</span><div class="settings">
       ${row(tx("\u7248\u672C"), `<span class="num">v${VERSION}</span>`)}
       ${row(tx("\u6545\u4E8B"), `<button class="btn sm" data-act="replaystory">${tx("\u91CD\u770B\u5E8F\u7AE0")}</button>`)}
@@ -4622,11 +4679,11 @@
         return;
       }
       case "import":
-        openModal({ type: "text", html: tx('<h3>\u532F\u5165\u5B58\u6A94\u78BC</h3><p class="sub" style="margin:0">\u6703\u8986\u84CB\u76EE\u524D\u9032\u5EA6\u3002</p><textarea id="impTxt" placeholder="\u8CBC\u4E0A\u5B58\u6A94\u78BC"></textarea><div class="row"><button class="btn main" data-act="doimport">\u532F\u5165</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>') });
+        openModal({ type: "text", html: tx('<h3>\u532F\u5165\u5B58\u6A94\u78BC</h3><p class="sub" style="margin:0">\u6703\u8986\u84CB\u76EE\u524D\u9032\u5EA6\u3002\u53EA\u532F\u5165\u4F60\u81EA\u5DF1\u532F\u51FA\u3001\u6216\u4FE1\u4EFB\u7684\u4EBA\u7D66\u7684\u5B58\u6A94\u78BC\u3002</p><textarea id="impTxt" placeholder="\u8CBC\u4E0A\u5B58\u6A94\u78BC"></textarea><div class="row"><button class="btn main" data-act="doimport">\u532F\u5165</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>') });
         return;
       case "doimport":
         try {
-          app.S = importCode($("#impTxt").value);
+          app.S = migrate(importCode($("#impTxt").value));
           app.battle = null;
           save();
           app.modal = null;

@@ -7,7 +7,7 @@ import { makeHero, gainXp, heroPower, roleOf, heroIlvl } from './heroes.js';
 import { getLang } from './i18n.js';
 import { dungeonInfo } from './dungeons.js';
 import { SPECS, TALENT_ROWS, SPEC_LEVEL, applyRecommend } from './talents.js';
-import { MYTHIC, CH1_TOP, SET_DROP } from './config.js';
+import { MYTHIC, CH1_TOP, SET_DROP, RARITY } from './config.js';
 import { bump } from './daily.js';
 import { mythicRewards, keyChange, mythicBattleOpts, keyOf, setKey, mythicTier } from './mythic.js';
 import { Battle } from './battle.js';
@@ -81,8 +81,31 @@ export function migrate(s) {
   // v0.9.0：依裝等自動分解、劇情進度
   if (s.salvageIlvlGap == null) s.salvageIlvlGap = 0;
   s.story = s.story || { seen: [] };
+  normalizeTypes(s);
   s.v = SAVE_VERSION;
   return s;
+}
+// v0.10.1：數值欄位強制成合法數字、未知職業／部位移除（防止被竄改的存檔讓畫面壞掉或注入）
+const int = (v, lo, hi, d = lo) => { const n = Math.round(Number(v)); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : d; };
+function normalizeTypes(s) {
+  const R = HERO_RARITY.length - 1, IR = RARITY.length - 1;
+  s.gold = int(s.gold, 0, 1e12); s.dust = int(s.dust, 0, 1e9); s.unlocked = int(s.unlocked, 1, DUNGEONS.length);
+  const okHero = h => h && typeof h === 'object' && CLASSES[h.cls] && h.gear && typeof h.gear === 'object';
+  s.heroes = s.heroes.filter(okHero); s.tavern = (s.tavern || []).filter(okHero);
+  for (const h of [...s.heroes, ...s.tavern]) {
+    h.rarity = int(h.rarity, 0, R); h.level = int(h.level, 1, HERO.maxLevel); h.xp = int(h.xp, 0, 1e12);
+    if (h.spec != null && !CLASSES[h.cls].specs[h.spec]) h.spec = null;
+    if (typeof h.name !== 'string') h.name = '?';
+  }
+  for (const [id, it] of Object.entries(s.items)) {
+    if (!it || typeof it !== 'object' || !SLOTS[it.slot]) { delete s.items[id]; continue; }
+    it.rarity = int(it.rarity, 0, IR); it.ilvl = int(it.ilvl, 1, 9999); it.up = int(it.up, 0, GEAR.maxUp);
+    if (typeof it.name !== 'string') it.name = '?';
+  }
+  const ids = new Set(s.heroes.map(h => h.id));
+  s.party = (s.party || []).filter(id => ids.has(id));
+  s.bag = (s.bag || []).filter(id => s.items[id]); s.stash = (s.stash || []).filter(id => s.items[id]);
+  for (const h of s.heroes) for (const sl of Object.keys(h.gear)) if (h.gear[sl] && !s.items[h.gear[sl]]) h.gear[sl] = null;
 }
 
 // ---------- 隊伍與酒館 ----------
@@ -421,4 +444,21 @@ export function offlineProgress(s, now = Date.now()) {
     runs++; if (b.win) wins++; gold += r.gold; items += r.kept.length; stashed += r.stashed.length; lv += r.lvUps.length;
   }
   return { sec: Math.round(sec), runs, wins, gold, items, stashed, lv };
+}
+
+// ---------- 存檔安全（v0.10.1）----------
+// 存檔裡的文字會被顯示在畫面上；匯入別人給的存檔碼時，先把可能變成 HTML 的字元拿掉，並限制長度與型別，避免藏惡意程式碼
+const UNSAFE = /[<>"'`&\\]/g;
+export function sanitizeSave(s, depth = 0) {
+  if (depth > 12) return null;
+  if (typeof s === 'string') return s.replace(UNSAFE, '').slice(0, 200);
+  if (typeof s === 'number') return Number.isFinite(s) ? s : 0;
+  if (typeof s === 'boolean' || s == null) return s;
+  if (Array.isArray(s)) return s.slice(0, 5000).map(x => sanitizeSave(x, depth + 1));
+  if (typeof s === 'object') {
+    const o = {};
+    for (const k of Object.keys(s)) { if (k === '__proto__' || k === 'constructor' || k === 'prototype') continue; o[k.replace(UNSAFE, '')] = sanitizeSave(s[k], depth + 1); }
+    return o;
+  }
+  return null; // 函式等其他型別直接丟掉
 }
