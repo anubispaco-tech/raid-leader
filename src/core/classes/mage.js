@@ -25,8 +25,10 @@ const P = {
       b: { name: tx('暴風雪'), desc: tx('烈焰風暴冷卻 9 → 6 秒'), mods: { baseCd: 6 } } },
     { a: { name: tx('法術反制'), desc: tx('可以打斷首領讀條（冷卻 12 秒）'), mods: { canKick: 1 } },
       b: { name: tx('奧術專精'), desc: tx('暴擊率 +6%'), mods: { critAdd: 0.06 } } },
+    { a: { name: tx('熾烈'), desc: tx('暴擊傷害 ×2 → ×2.5'), mods: { critDmg: 2.5 } },
+      b: { name: tx('法力屏障'), desc: tx('生命 +15%'), mods: { hpMult: 1.15 } } },
   ],
-  recommend: has => ({ spec: has('summon') ? 'frost' : 'fire', t: ['a', 'b', has('summon') ? 'a' : 'b', 'b', 'a', has('cast') ? 'a' : 'b'] }),
+  recommend: has => ({ spec: has('summon') ? 'frost' : 'fire', t: ['a', 'b', has('summon') ? 'a' : 'b', 'b', 'a', has('cast') ? 'a' : 'b', 'a'] }),
   legend: {
     name: tx('莉薇亞'), title: tx('星火'), passive: 'molten', pname: tx('熔熱'), desc: tx('烈焰風暴冷卻 −50%，擊殺敵人時再減 1 秒'),
     hooks: {

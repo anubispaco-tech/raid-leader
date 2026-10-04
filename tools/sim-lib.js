@@ -17,7 +17,13 @@ export function playthrough({ maxRuns = 1500, talents = true, horn = false, stop
     for (const id of [...s.bag]) if (s.bag.length > 20) G.salvage(s, id);
     const top = s.unlocked - 1;
     const d = s._fs >= 1 && top > 0 && run % 2 === 0 ? top - 1 : top;
-    if (talents) for (const h of G.partyHeroes(s)) G.applyRecommend(h, G.DUNGEONS[d].mech.map(m => m.t));
+    if (d > G.CH1_TOP) { // 第二章：雙首領需要第二位坦克 → 從酒館補一位守護騎士，並用一鍵備戰排陣容
+      if (G.mechHints(d).includes('twin') && s.heroes.filter(h => G.roleOf(h) === 'tank').length < 2) {
+        const t = s.tavern.find(h => h.cls === 'guardian');
+        if (t && s.gold >= G.hireCost(t)) G.hire(s, t.id); else if (!t && s.gold >= G.refreshCost(s)) G.refreshTavern(s);
+      }
+      G.prepare(s, G.mechHints(d));
+    } else if (talents) for (const h of G.partyHeroes(s)) G.applyRecommend(h, G.mechHints(d));
     const b = new G.Battle(G.partyHeroes(s), s.items, d, { autoHorn: horn }).runToEnd();
     G.applyResult(s, d, b);
     if (d === top) s._fs = b.win ? 0 : (s._fs || 0) + 1;
@@ -42,7 +48,7 @@ export function mythicRun({ runs = 300, perDay = 15, start = new Date('2026-10-0
     for (const id of [...s.bag]) if (s.bag.length > 20) G.salvage(s, id);
     const d = r % (G.CH1_TOP + 1), lvl = s.mythic.key;
     const o = G.mythicBattleOpts(d, lvl, date);
-    const hints = [...G.DUNGEONS[d].mech.map(m => m.t), ...G.affixHints(o.mythic.affixes)];
+    const hints = [...G.mechHints(d), ...G.affixHints(o.mythic.affixes)];
     for (const h of G.partyHeroes(s)) G.applyRecommend(h, hints);
     const b = new G.Battle(G.partyHeroes(s), s.items, d, { ...o, autoHorn: true }).runToEnd();
     const res = G.applyMythicResult(s, b);

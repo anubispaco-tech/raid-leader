@@ -307,7 +307,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.9.0 */
+/* 副本團長 v0.9.1 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -344,6 +344,8 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u2620 {0} \u8A5B\u5492\u4E86 {1}": "\u2620 {0} curses {1}",
     "\u{1F4D6} {0} \u958B\u59CB\u8B80\u689D\uFF08{1} \u79D2\uFF09": "\u{1F4D6} {0} begins casting ({1}s)",
     "\u{1F6E1} {0} \u5F35\u958B\u8B77\u76FE\uFF01{1} \u79D2\u5167\u6253\u7834\u5B83": "\u{1F6E1} {0} raises a shield! Break it within {1}s",
+    "\u{1F311} {0} \u9032\u5165\u7B2C\u4E8C\u968E\u6BB5\uFF01\u653B\u64CA\u5927\u589E": "\u{1F311} {0} enters phase two! Attack greatly increased",
+    "\u{1F4A2} {0} \u60B2\u61A4\u4EA4\u52A0\uFF0C\u653B\u64CA\u5927\u589E": "\u{1F4A2} {0} is consumed by grief \u2014 attack greatly increased",
     "\u53EC\u559A\u7269": "Summon",
     "\u{1F300} {0} \u53EC\u559A\u4E86 {1} \u96BB\u5C0F\u602A": "\u{1F300} {0} summons {1} adds",
     "{0} {1}\uFF1A{2}{3}": "{0} {1}: {2}{3}",
@@ -395,6 +397,10 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u6DE8\u5316\u51B7\u537B 6 \u2192 3 \u79D2": "Dispel cooldown 6 \u2192 3s",
     "\u7948\u798F": "Blessing",
     "\u5168\u968A\u751F\u547D +5%": "Party HP +5%",
+    "\u4FE1\u4EF0\u8B77\u7532": "Armor of Faith",
+    "\u53D7\u5230\u7684\u50B7\u5BB3 \u221215%": "Damage taken \u221215%",
+    "\u8056\u5149\u704C\u6CE8": "Infusion of Light",
+    "\u5A01\u529B +10%": "Power +10%",
     "\u827E\u857E\u5A1C": "Elena",
     "\u6668\u66E6": "Dawnlight",
     "\u6EA2\u5149": "Overflow",
@@ -418,7 +424,6 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u6708\u5149\u5F37\u5316": "Lunar Empowerment",
     "\u6708\u706B\u8853\u50B7\u5BB3 +50%": "Moonfire damage +50%",
     "\u6A39\u76AE\u8853": "Barkskin",
-    "\u53D7\u5230\u7684\u50B7\u5BB3 \u221215%": "Damage taken \u221215%",
     "\u91CE\u6027\u672C\u80FD": "Feral Instinct",
     "\u66B4\u64CA\u7387 +6%": "Crit chance +6%",
     "\u5171\u751F": "Symbiosis",
@@ -432,6 +437,9 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u6253\u65B7\u51B7\u537B 12 \u2192 8 \u79D2": "Interrupt cooldown 12 \u2192 8s",
     "\u661F\u8FB0\u4E4B\u529B": "Astral Might",
     "\u66B4\u64CA\u50B7\u5BB3 \xD72 \u2192 \xD72.3": "Crit damage \xD72 \u2192 \xD72.3",
+    "\u81EA\u7136\u4E4B\u5FC3": "Heart of the Wild",
+    "\u9748\u5DE7": "Nimble",
+    "\u53D7\u5230\u653B\u64CA\u6642 10% \u6A5F\u7387\u9583\u904E": "10% chance to dodge attacks",
     "\u745F\u862D\u6735": "Serando",
     "\u68EE\u8A9E": "Forestsong",
     "\u842C\u7269\u5FA9\u7526": "Renewal",
@@ -465,6 +473,10 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u53D7\u5230\u7684\u6240\u6709\u50B7\u5BB3 \u221210%": "All damage taken \u221210%",
     "\u795E\u8056\u61A4\u6012": "Holy Fury",
     "\u76FE\u724C\u731B\u64CA\u51B7\u537B 8 \u2192 6 \u79D2": "Shield Slam cooldown 8 \u2192 6s",
+    "\u62DB\u67B6": "Parry",
+    "\u53D7\u5230\u653B\u64CA\u6642 10% \u6A5F\u7387\u5B8C\u5168\u683C\u958B": "10% chance to fully parry attacks",
+    "\u5BE9\u5224": "Judgment",
+    "\u76EE\u6A19\u751F\u547D\u4F4E\u65BC 35% \u6642\u50B7\u5BB3 +30%": "+30% damage to targets below 35% HP",
     "\u5DF4\u6D1B\u65AF": "Baros",
     "\u9435\u58C1": "Ironwall",
     "\u4E0D\u5C48": "Unbroken",
@@ -496,6 +508,10 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u6CD5\u8853\u53CD\u5236": "Counterspell",
     "\u53EF\u4EE5\u6253\u65B7\u9996\u9818\u8B80\u689D\uFF08\u51B7\u537B 12 \u79D2\uFF09": "Can interrupt boss casts (12s CD)",
     "\u5967\u8853\u5C08\u7CBE": "Arcane Mastery",
+    "\u71BE\u70C8": "Searing Heat",
+    "\u66B4\u64CA\u50B7\u5BB3 \xD72 \u2192 \xD72.5": "Crit damage \xD72 \u2192 \xD72.5",
+    "\u6CD5\u529B\u5C4F\u969C": "Mana Barrier",
+    "\u751F\u547D +15%": "HP +15%",
     "\u8389\u8587\u4E9E": "Livia",
     "\u661F\u706B": "Starfire",
     "\u7194\u71B1": "Molten Core",
@@ -513,13 +529,11 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u7CBE\u6E96": "Precision",
     "\u66B4\u64CA\u7387 +5%": "Crit chance +5%",
     "\u81F4\u547D": "Lethality",
-    "\u66B4\u64CA\u50B7\u5BB3 \xD72 \u2192 \xD72.5": "Crit damage \xD72 \u2192 \xD72.5",
     "\u9583\u907F": "Evasion",
     "\u53D7\u5230\u653B\u64CA\u6642 20% \u6A5F\u7387\u9583\u904E": "20% chance to dodge attacks",
     "\u5272\u88C2": "Rupture",
     "\u5254\u9AA8\u984D\u5916\u9020\u6210\u6D41\u8840\uFF085 \u79D2\uFF0C\u6BCF\u79D2\u5A01\u529B \xD70.5\uFF09": "Eviscerate also bleeds (5s, Power \xD70.5 per second)",
     "\u8655\u6C7A": "Execute",
-    "\u76EE\u6A19\u751F\u547D\u4F4E\u65BC 35% \u6642\u50B7\u5BB3 +30%": "+30% damage to targets below 35% HP",
     "\u6E05\u6383": "Sweep",
     "\u5C0D\u5C0F\u602A\u50B7\u5BB3 +25%": "+25% damage to adds",
     "\u6697\u5F71\u4E4B\u821E": "Shadow Dance",
@@ -529,6 +543,8 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u8173\u8E22\u7CBE\u901A": "Kick Mastery",
     "\u6BD2\u5203": "Venom Blades",
     "\u50B7\u5BB3 +12%": "Damage +12%",
+    "\u81F4\u547D\u7CBE\u901A": "Lethal Mastery",
+    "\u6697\u5F71\u6597\u7BF7": "Cloak of Shadows",
     "\u5361\u897F\u6069": "Cassian",
     "\u5F71\u5203": "Shadowblade",
     "\u9023\u9396\u66B4\u64CA": "Chain Crit",
@@ -652,6 +668,24 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u88C2\u8C37\u796D\u53F8": "Rift Priest",
     "\u88C2\u8C37\u4FE1\u5F92": "Rift Acolyte",
     "\u8108\u885D\uFF0B\u8B77\u76FE \u2192 \u6CBB\u7642\u8207\u7206\u767C\uFF0810 \u79D2\u5167\u6253\u7834\u8B77\u76FE\uFF0C\u5426\u5247\u9996\u9818\u56DE\u8840\uFF09": "Pulses + shield \u2192 healing and burst (break the shield within 10s or the boss heals)",
+    "\u96D9\u6708\u738B\u5EA7": "Twin Moon Throne",
+    "\u96D9\u5B50\u5148\u77E5": "The Twin Prophets",
+    "\u6708\u5F71\u4F8D\u5F9E": "Moonshade Attendant",
+    "\u65E5\u4E4B\u5148\u77E5": "Prophet of the Sun",
+    "\u6708\u4E4B\u5148\u77E5": "Prophet of the Moon",
+    "\u96D9\u9996\u9818 \u2192 \u5E36\u5169\u500B\u5766\u514B\u5404\u625B\u4E00\u96BB\uFF1B\u4E00\u96BB\u5148\u5012\uFF0C\u53E6\u4E00\u96BB\u6703\u60B2\u61A4\u8B8A\u5F37\uFF0C\u8840\u91CF\u8981\u4E00\u8D77\u58D3": "Twin bosses \u2192 bring two tanks, one each; when one falls the other grows stronger, so bring them down together",
+    "\u5BD2\u6DF5\u51B0\u7A9F": "Rimedeep Grotto",
+    "\u51B0\u6676\u5973\u7687": "The Crystal Empress",
+    "\u971C\u7E1B\u6230\u58EB": "Frostbound Warrior",
+    "\u8A5B\u5492\uFF0B\u72C2\u66B4 \u2192 \u6CBB\u7642\u6DE8\u5316\u8207\u8F38\u51FA": "Curses + enrage \u2192 dispels and damage",
+    "\u865B\u5F71\u8FF4\u5ECA": "Hall of Shadows",
+    "\u865B\u7A7A\u5B88\u9580\u4EBA": "Void Gatekeeper",
+    "\u865B\u5F71\u6F5B\u4F0F\u8005": "Shade Lurker",
+    "\u8B80\u689D\uFF0B\u8F49\u968E\u6BB5 \u2192 \u6253\u65B7\uFF1B\u8840\u91CF\u4F4E\u65BC 50% \u5F8C\u653B\u64CA\u5927\u589E\uFF0C\u865F\u89D2\u7559\u5230\u5F8C\u534A": "Casts + phase change \u2192 interrupts; below 50% HP it hits much harder, so save the horn",
+    "\u6DF1\u6DF5\u4E4B\u5FC3": "Heart of the Abyss",
+    "\u88C2\u8C37\u4E4B\u4E3B\u30FB\u83AB\u745E\u65AF": "Morris, Lord of the Rift",
+    "\u6DF1\u6DF5\u5316\u8EAB": "Abyssal Avatar",
+    "\u8A5B\u5492\uFF0B\u8B77\u76FE\uFF0B\u8F49\u968E\u6BB5 \u2192 \u5168\u968A\u7D9C\u5408\u8003\u9A57": "Curses + shield + phase change \u2192 tests the whole party",
     "\u7B2C\u4E00\u7AE0": "Chapter I",
     "\u9F8D\u7720\u4E4B\u8DEF": "Dragonsleep Road",
     "\u7B2C\u4E8C\u7AE0": "Chapter II",
@@ -801,6 +835,21 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u4ED6\u7684\u8B77\u76FE\u5F88\u786C\u3002\u5341\u79D2\u5167\u6253\u4E0D\u7834\uFF0C\u4ED6\u5C31\u6703\u56DE\u8840\u3002": "His shield is tough. If you can't break it in ten seconds, he heals.",
     "\u5148\u77E5\uFF1F\u2026\u2026\u61F8\u8CDE\u4EE4\u4E0A\u7684\u7F72\u540D\uFF0C\u5C31\u662F\u300C\u96D9\u6708\u300D\u3002": 'Prophets? \u2026The writ was signed "Twin Moons."',
     "\u518D\u5F80\u4E0B\u662F\u96D9\u6708\u738B\u5EA7\u3002\u6211\u5148\u53BB\u63A2\u8DEF\uFF0C\u7B49\u6211\u6D88\u606F\u3002": "Below lies the Twin Moon Throne. I'll scout ahead \u2014 wait for word.",
+    "\u8B1D\u8B1D\u4F60\u5011\u66FF\u6211\u5011\u6BBA\u4E86\u9F8D\u3002": "Thank you for killing the dragon for us.",
+    "\u5C01\u5370\u4E00\u788E\uFF0C\u6211\u5011\u7684\u4E3B\u4EBA\u5C31\u80FD\u56DE\u4F86\u4E86\u3002": "With the seal shattered, our master can return.",
+    "\u5169\u500B\u4E00\u8D77\u4E0A\uFF01\u5E36\u5169\u500B\u625B\u5F97\u4F4F\u7684\u4EBA\uFF0C\u5404\u770B\u4F4F\u4E00\u96BB\uFF0C\u8840\u91CF\u8981\u4E00\u8D77\u58D3\u3002": "Both at once! Bring two who can take hits, one on each \u2014 and wear them down together.",
+    "\u5C01\u5370\u9084\u80FD\u88DC\u2014\u2014\u9700\u8981\u51B0\u6676\u5973\u7687\u624B\u4E0A\u7684\u5C01\u5370\u788E\u7247\u3002": "The seal can still be mended \u2014 we need the shard the Crystal Empress holds.",
+    "\u6211\u51CD\u4F4F\u81EA\u5DF1\u5B88\u4E86\u4E09\u767E\u5E74\u2026\u2026\u6211\u5DF2\u7D93\u5206\u4E0D\u6E05\u8AB0\u662F\u6575\u4EBA\u3002": "I froze myself to stand guard for three hundred years\u2026 I can no longer tell friend from foe.",
+    "\u2026\u2026\u62FF\u53BB\u3002\u628A\u5B83\u95DC\u4E0A\u3002": "\u2026Take it. Close it.",
+    "\u4F60\u5011\u5F97\u5230\u4E86\u5C01\u5370\u788E\u7247\u3002": "You obtained the seal shard.",
+    "\u9580\u5DF2\u7D93\u958B\u4E86\uFF0C\u5C0F\u5C0F\u7684\u5C01\u5370\u5E2B\u3002": "The gate is already open, little sealer.",
+    "\u4ED6\u8840\u91CF\u4E00\u4F4E\u5C31\u6703\u767C\u72C2\uFF0C\u865F\u89D2\u7559\u5230\u5F8C\u534A\u6BB5\u518D\u5439\u3002": "He goes berserk when wounded \u2014 save the horn for the second half.",
+    "\u6700\u5F8C\u4E00\u6BB5\u8DEF\u4E86\u3002": "This is the last stretch.",
+    "\u9F8D\u6B7B\u4E86\uFF0C\u6C92\u6709\u4EBA\u80FD\u518D\u95DC\u4E0A\u9019\u6247\u9580\u3002": "The dragon is dead. No one can close this door again.",
+    "\u5C01\u5370\u788E\u7247\u2026\u2026\u653E\u9032\u53BB\u4E86\uFF01": "The shard\u2026 it's in!",
+    "\u88C2\u8C37\u7DE9\u7DE9\u95D4\u4E0A\uFF0C\u53EA\u5269\u6DF1\u8655\u50B3\u4F86\u7684\u4F4E\u9CF4\u3002": "The rift slowly closes, leaving only a low hum from the depths.",
+    "\u5C01\u5370\u53EA\u64CB\u4F4F\u4E86\u4E3B\u9AD4\uFF0C\u6B98\u97FF\u9084\u6703\u4E00\u76F4\u6EB6\u51FA\u4F86\u2014\u2014\u90A3\u4E9B\u6B98\u97FF\uFF0C\u5C31\u662F\u4F60\u5011\u4E4B\u5F8C\u8981\u9762\u5C0D\u7684\u79D8\u5883\u3002": "The seal holds back the main body, but echoes will keep seeping out \u2014 those echoes are the Mythic dungeons you'll face.",
+    "\u7B2C\u4E8C\u7AE0\u300C\u6DF1\u6DF5\u88C2\u8C37\u300D\u5B8C\u3002": "End of Chapter II: The Abyssal Rift.",
     "\u533F\u540D": "Anonymous",
     "Lv{0}\u30FB\u7B2C {1} \u5C64{2}": "Lv{0} \xB7 Floor {1}{2}",
     "\u30FB\u79D8\u5883 +{0}": " \xB7 Mythic +{0}",
@@ -1101,9 +1150,13 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       {
         a: { name: tx("\u4E0D\u52D5\u5982\u5C71"), desc: tx("\u53D7\u5230\u7684\u6240\u6709\u50B7\u5BB3 \u221210%"), mods: { allReduce: 0.1 } },
         b: { name: tx("\u795E\u8056\u61A4\u6012"), desc: tx("\u76FE\u724C\u731B\u64CA\u51B7\u537B 8 \u2192 6 \u79D2"), mods: { baseCd: 6 } }
+      },
+      {
+        a: { name: tx("\u62DB\u67B6"), desc: tx("\u53D7\u5230\u653B\u64CA\u6642 10% \u6A5F\u7387\u5B8C\u5168\u683C\u958B"), mods: { dodge: 0.1 } },
+        b: { name: tx("\u5BE9\u5224"), desc: tx("\u76EE\u6A19\u751F\u547D\u4F4E\u65BC 35% \u6642\u50B7\u5BB3 +30%"), mods: { execute: 0.3 } }
       }
     ],
-    recommend: (has) => ({ spec: has("buster") ? "prot" : "ret", t: ["a", has("buster") ? "a" : "b", "a", "b", has("enrage") ? "b" : "a", has("enrage") ? "b" : "a"] }),
+    recommend: (has) => ({ spec: has("buster") ? "prot" : "ret", t: ["a", has("buster") ? "a" : "b", "a", "b", has("enrage") ? "b" : "a", has("enrage") ? "b" : "a", "a"] }),
     legend: {
       name: tx("\u5DF4\u6D1B\u65AF"),
       title: tx("\u9435\u58C1"),
@@ -1203,9 +1256,13 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       {
         a: { name: tx("\u6DE8\u5316\u5C08\u7CBE"), desc: tx("\u6DE8\u5316\u51B7\u537B 6 \u2192 3 \u79D2"), mods: { dispelCd: 3 } },
         b: { name: tx("\u7948\u798F"), desc: tx("\u5168\u968A\u751F\u547D +5%"), mods: { partyHp: 0.05 } }
+      },
+      {
+        a: { name: tx("\u4FE1\u4EF0\u8B77\u7532"), desc: tx("\u53D7\u5230\u7684\u50B7\u5BB3 \u221215%"), mods: { allReduce: 0.15 } },
+        b: { name: tx("\u8056\u5149\u704C\u6CE8"), desc: tx("\u5A01\u529B +10%"), mods: { powMult: 1.1 } }
       }
     ],
-    recommend: (has) => ({ spec: has("buster") && !has("pulse") ? "disc" : "holy", t: ["a", "a", "a", "b", has("pulse") ? "a" : "b", has("curse") ? "a" : "b"] }),
+    recommend: (has) => ({ spec: has("buster") && !has("pulse") ? "disc" : "holy", t: ["a", "a", "a", "b", has("pulse") ? "a" : "b", has("curse") ? "a" : "b", has("pulse") ? "b" : "a"] }),
     legend: {
       name: tx("\u827E\u857E\u5A1C"),
       title: tx("\u6668\u66E6"),
@@ -1311,9 +1368,13 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       {
         a: { name: tx("\u8173\u8E22\u7CBE\u901A"), desc: tx("\u6253\u65B7\u51B7\u537B 12 \u2192 8 \u79D2"), mods: { kickCd: 8 } },
         b: { name: tx("\u6BD2\u5203"), desc: tx("\u50B7\u5BB3 +12%"), mods: { dmgMult: 1.12 } }
+      },
+      {
+        a: { name: tx("\u81F4\u547D\u7CBE\u901A"), desc: tx("\u5A01\u529B +10%"), mods: { powMult: 1.1 } },
+        b: { name: tx("\u6697\u5F71\u6597\u7BF7"), desc: tx("\u53D7\u5230\u7684\u50B7\u5BB3 \u221215%"), mods: { allReduce: 0.15 } }
       }
     ],
-    recommend: (has) => ({ spec: has("summon") ? "combat" : "assa", t: ["b", "b", has("summon") ? "b" : "a", "b", "a", has("cast") ? "a" : "b"] }),
+    recommend: (has) => ({ spec: has("summon") ? "combat" : "assa", t: ["b", "b", has("summon") ? "b" : "a", "b", "a", has("cast") ? "a" : "b", "a"] }),
     legend: {
       name: tx("\u5361\u897F\u6069"),
       title: tx("\u5F71\u5203"),
@@ -1405,9 +1466,13 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       {
         a: { name: tx("\u6CD5\u8853\u53CD\u5236"), desc: tx("\u53EF\u4EE5\u6253\u65B7\u9996\u9818\u8B80\u689D\uFF08\u51B7\u537B 12 \u79D2\uFF09"), mods: { canKick: 1 } },
         b: { name: tx("\u5967\u8853\u5C08\u7CBE"), desc: tx("\u66B4\u64CA\u7387 +6%"), mods: { critAdd: 0.06 } }
+      },
+      {
+        a: { name: tx("\u71BE\u70C8"), desc: tx("\u66B4\u64CA\u50B7\u5BB3 \xD72 \u2192 \xD72.5"), mods: { critDmg: 2.5 } },
+        b: { name: tx("\u6CD5\u529B\u5C4F\u969C"), desc: tx("\u751F\u547D +15%"), mods: { hpMult: 1.15 } }
       }
     ],
-    recommend: (has) => ({ spec: has("summon") ? "frost" : "fire", t: ["a", "b", has("summon") ? "a" : "b", "b", "a", has("cast") ? "a" : "b"] }),
+    recommend: (has) => ({ spec: has("summon") ? "frost" : "fire", t: ["a", "b", has("summon") ? "a" : "b", "b", "a", has("cast") ? "a" : "b", "a"] }),
     legend: {
       name: tx("\u8389\u8587\u4E9E"),
       title: tx("\u661F\u706B"),
@@ -1517,12 +1582,16 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       {
         a: { name: tx("\u91CE\u6027\u885D\u92D2"), desc: tx("\u6253\u65B7\u51B7\u537B 12 \u2192 8 \u79D2"), mods: { kickCd: 8 } },
         b: { name: tx("\u661F\u8FB0\u4E4B\u529B"), desc: tx("\u66B4\u64CA\u50B7\u5BB3 \xD72 \u2192 \xD72.3"), mods: { critDmg: 2.3 } }
+      },
+      {
+        a: { name: tx("\u81EA\u7136\u4E4B\u5FC3"), desc: tx("\u5A01\u529B +10%"), mods: { powMult: 1.1 } },
+        b: { name: tx("\u9748\u5DE7"), desc: tx("\u53D7\u5230\u653B\u64CA\u6642 10% \u6A5F\u7387\u9583\u904E"), mods: { dodge: 0.1 } }
       }
     ],
     // 備戰不改德魯伊的職責（陣容是照目前職責挑的），只依職責配天賦
     recommend(has, h) {
       const sp = h && h.spec || "feral";
-      const t = { bear: ["a", "a", "a", "b", "a", has("cast") ? "a" : "b"], resto: ["a", "a", "a", "b", "a", "b"], feral: ["b", "b", "b", "b", "b", has("cast") ? "a" : "b"] }[sp];
+      const t = { bear: ["a", "a", "a", "b", "a", has("cast") ? "a" : "b", "b"], resto: ["a", "a", "a", "b", "a", "b", "a"], feral: ["b", "b", "b", "b", "b", has("cast") ? "a" : "b", "a"] }[sp];
       return { spec: sp, t };
     },
     legend: {
@@ -1608,8 +1677,8 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   var CLASSES = PACKS;
   var ROLE_NAME = { tank: tx("\u5766\u514B"), heal: tx("\u6CBB\u7642"), dps: tx("\u8F38\u51FA") };
   var HERO = {
-    maxLevel: 50,
-    // v0.9.0：第二章開放 40 → 50
+    maxLevel: 60,
+    // v0.9.1：第二章完整開放 → 60
     paragon: { need: 2e4, growth: 0.1, bonus: 0.01 },
     // 巔峰：Lv40 後經驗轉巔峰點；第 p 級需 need×(1+growth×p)，每級生命／威力 +1%
     xpBase: 60,
@@ -1713,23 +1782,38 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     // ---- 第二章：深淵裂谷（v0.9.0：VIII~X）----
     { name: tx("\u5854\u5E95\u65B7\u5C64"), boss: tx("\u77F3\u9C57\u5B88\u885B"), trash: tx("\u88C2\u8C37\u722C\u884C\u8005"), mech: [{ t: "buster", every: 8, mult: 3.2 }, { t: "curse", every: 9, pct: 0.04, dur: 8 }], tip: tx("\u91CD\u64CA\uFF0B\u8A5B\u5492 \u2192 \u5766\u514B\u8207\u6CBB\u7642\uFF08\u6CBB\u7642\u6703\u81EA\u52D5\u6DE8\u5316\u8A5B\u5492\uFF09") },
     { name: tx("\u8FF4\u8072\u7926\u8108"), boss: tx("\u9B42\u9444\u5320"), trash: tx("\u9B42\u9444\u5080\u5121"), mech: [{ t: "summon", every: 11, n: 2 }, { t: "cast", every: 14, time: 3, mult: 2.2 }], tip: tx("\u53EC\u559A\uFF0B\u8B80\u689D \u2192 \u7BC4\u570D\u8F38\u51FA\u8207\u6253\u65B7\uFF08\u5B88\u8B77\u9A0E\u58EB\u3001\u76DC\u8CCA\u3001\u718A\uFF0F\u8C79\u5FB7\u9B6F\u4F0A\u6703\u6253\u65B7\uFF09") },
-    { name: tx("\u71FC\u5FC3\u796D\u58C7"), boss: tx("\u88C2\u8C37\u796D\u53F8"), trash: tx("\u88C2\u8C37\u4FE1\u5F92"), mech: [{ t: "pulse", every: 7, dmg: 0.9 }, { t: "shield", every: 20, pct: 0.08, window: 10, heal: 0.1 }], tip: tx("\u8108\u885D\uFF0B\u8B77\u76FE \u2192 \u6CBB\u7642\u8207\u7206\u767C\uFF0810 \u79D2\u5167\u6253\u7834\u8B77\u76FE\uFF0C\u5426\u5247\u9996\u9818\u56DE\u8840\uFF09") }
+    { name: tx("\u71FC\u5FC3\u796D\u58C7"), boss: tx("\u88C2\u8C37\u796D\u53F8"), trash: tx("\u88C2\u8C37\u4FE1\u5F92"), mech: [{ t: "pulse", every: 7, dmg: 0.9 }, { t: "shield", every: 20, pct: 0.08, window: 10, heal: 0.1 }], tip: tx("\u8108\u885D\uFF0B\u8B77\u76FE \u2192 \u6CBB\u7642\u8207\u7206\u767C\uFF0810 \u79D2\u5167\u6253\u7834\u8B77\u76FE\uFF0C\u5426\u5247\u9996\u9818\u56DE\u8840\uFF09") },
+    // ---- 第二章後半（v0.9.1：XI~XIV）----
+    {
+      name: tx("\u96D9\u6708\u738B\u5EA7"),
+      boss: tx("\u96D9\u5B50\u5148\u77E5"),
+      trash: tx("\u6708\u5F71\u4F8D\u5F9E"),
+      mech: [],
+      twin: [
+        { name: tx("\u65E5\u4E4B\u5148\u77E5"), mech: [{ t: "buster", every: 8, mult: 3 }, { t: "bond", mult: 1.5 }] },
+        { name: tx("\u6708\u4E4B\u5148\u77E5"), mech: [{ t: "pulse", every: 7, dmg: 0.8 }, { t: "bond", mult: 1.5 }] }
+      ],
+      tip: tx("\u96D9\u9996\u9818 \u2192 \u5E36\u5169\u500B\u5766\u514B\u5404\u625B\u4E00\u96BB\uFF1B\u4E00\u96BB\u5148\u5012\uFF0C\u53E6\u4E00\u96BB\u6703\u60B2\u61A4\u8B8A\u5F37\uFF0C\u8840\u91CF\u8981\u4E00\u8D77\u58D3")
+    },
+    { name: tx("\u5BD2\u6DF5\u51B0\u7A9F"), boss: tx("\u51B0\u6676\u5973\u7687"), trash: tx("\u971C\u7E1B\u6230\u58EB"), mech: [{ t: "curse", every: 8, pct: 0.045, dur: 8 }, { t: "enrage", at: 75, mult: 3 }], tip: tx("\u8A5B\u5492\uFF0B\u72C2\u66B4 \u2192 \u6CBB\u7642\u6DE8\u5316\u8207\u8F38\u51FA") },
+    { name: tx("\u865B\u5F71\u8FF4\u5ECA"), boss: tx("\u865B\u7A7A\u5B88\u9580\u4EBA"), trash: tx("\u865B\u5F71\u6F5B\u4F0F\u8005"), mech: [{ t: "cast", every: 13, time: 3, mult: 2.4 }, { t: "phase", at: 0.5, atk: 1.4 }], tip: tx("\u8B80\u689D\uFF0B\u8F49\u968E\u6BB5 \u2192 \u6253\u65B7\uFF1B\u8840\u91CF\u4F4E\u65BC 50% \u5F8C\u653B\u64CA\u5927\u589E\uFF0C\u865F\u89D2\u7559\u5230\u5F8C\u534A") },
+    { name: tx("\u6DF1\u6DF5\u4E4B\u5FC3"), boss: tx("\u88C2\u8C37\u4E4B\u4E3B\u30FB\u83AB\u745E\u65AF"), trash: tx("\u6DF1\u6DF5\u5316\u8EAB"), mech: [{ t: "curse", every: 10, pct: 0.04, dur: 8 }, { t: "shield", every: 22, pct: 0.06, window: 10, heal: 0.1 }, { t: "phase", at: 0.5, atk: 1.4 }], tip: tx("\u8A5B\u5492\uFF0B\u8B77\u76FE\uFF0B\u8F49\u968E\u6BB5 \u2192 \u5168\u968A\u7D9C\u5408\u8003\u9A57") }
   ];
   var CHAPTERS = [
     { name: tx("\u7B2C\u4E00\u7AE0"), sub: tx("\u9F8D\u7720\u4E4B\u8DEF"), floors: [0, 6] },
-    { name: tx("\u7B2C\u4E8C\u7AE0"), sub: tx("\u6DF1\u6DF5\u88C2\u8C37"), floors: [7, 9] }
+    { name: tx("\u7B2C\u4E8C\u7AE0"), sub: tx("\u6DF1\u6DF5\u88C2\u8C37"), floors: [7, 13] }
   ];
   var CH1_TOP = 6;
   var DUNGEON = {
     hpGrowth: 2.15,
     atkGrowth: 1.82,
     // 每層敵人生命 / 攻擊倍率（v0.3 天賦上線後調高）
-    difficulty: [1, 1.1, 1, 1.4, 1, 1.35, 1, 1, 1, 1],
+    difficulty: [1, 1.1, 1, 1.4, 1, 1.35, 1, 1, 1, 1, 1, 1, 1, 1],
     // 個別層加難
-    recLevel: [1, 2, 3, 5, 10, 14, 19, 25, 30, 35],
+    recLevel: [1, 2, 3, 5, 10, 14, 19, 25, 30, 35, 40, 45, 50, 55],
     // 建議等級（第一章為 v0.3 模擬首通時的等級）
     // 第二章：相對第 7 層的生命／攻擊倍率（逐層列出，方便調；避免第一章 ×2.15 的成長讓數字爆掉）
-    ch2: { hp: [3.2, 2.8, 4], atk: [1.6, 1.45, 1.75], dropGrowth: 1.12 },
+    ch2: { hp: [3.2, 2.8, 4, 5, 5.4, 8.5, 8], atk: [1.6, 1.45, 1.75, 1.9, 2, 2.6, 2.6], dropGrowth: 1.12 },
     dropBase: 6,
     dropGrowth: 1.5,
     // 掉落裝等 = base × growth^層
@@ -1910,7 +1994,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   var SPECS = Object.fromEntries(Object.entries(PACKS).map(([k, p]) => [k, p.specs]));
   var TALENTS = Object.fromEntries(Object.entries(PACKS).map(([k, p]) => [k, p.talents]));
   var SPEC_LEVEL = 10;
-  var TALENT_ROWS = [5, 15, 20, 25, 30, 40];
+  var TALENT_ROWS = [5, 15, 20, 25, 30, 40, 50];
   var unlockedRows = (h) => TALENT_ROWS.filter((lv) => h.level >= lv);
   var canPickSpec = (h) => h.level >= SPEC_LEVEL;
   function pendingPicks(h) {
@@ -2031,16 +2115,22 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     const sh = Math.pow(DUNGEON.hpGrowth, k) * (c2 >= 0 ? DUNGEON.ch2.hp[c2] : 1) * diff, sa = Math.pow(DUNGEON.atkGrowth, k) * (c2 >= 0 ? DUNGEON.ch2.atk[c2] : 1) * Math.sqrt(diff);
     const T = DUNGEON.trash, B = DUNGEON.boss;
     const trash = () => Array.from({ length: T.count }, () => ({ name: d.trash, hp: Math.round(T.hp * sh), atk: T.atk * sa, boss: false }));
-    return [trash(), trash(), [{
-      name: d.boss,
-      hp: Math.round(B.hp * sh),
-      atk: B.atk * sa,
+    const boss = (name, mech, hpK = 1, atkK = 1) => ({
+      name,
+      hp: Math.round(B.hp * sh * hpK),
+      atk: B.atk * sa * atkK,
       boss: true,
-      mech: d.mech,
+      mech,
       addHp: Math.round(B.addHp * sh),
       addAtk: B.addAtk * sa
-    }]];
+    });
+    const last = d.twin ? d.twin.map((t) => boss(t.name, t.mech, 0.6, 0.8)) : [boss(d.boss, d.mech)];
+    return [trash(), trash(), last];
   }
+  var mechHints = (i) => {
+    const d = DUNGEONS[i];
+    return d.twin ? ["twin", ...new Set(d.twin.flatMap((t) => t.mech.map((m) => m.t)))] : d.mech.map((m) => m.t);
+  };
 
   // src/core/battle.js
   var BOSS_MECHS = {
@@ -2087,6 +2177,24 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       e.bshieldUntil = b.tick + m.window;
       e.bshieldHeal = m.heal;
       b.push(tx("\u{1F6E1} {0} \u5F35\u958B\u8B77\u76FE\uFF01{1} \u79D2\u5167\u6253\u7834\u5B83", e.name, m.window), "warn");
+      return 1;
+    },
+    // 轉階段：生命低於 at 時攻擊永久 ×atk
+    phase(b, e, m) {
+      if (!e.phased && e.hp < e.max * m.at) {
+        e.phased = true;
+        e.atk *= m.atk;
+        b.push(tx("\u{1F311} {0} \u9032\u5165\u7B2C\u4E8C\u968E\u6BB5\uFF01\u653B\u64CA\u5927\u589E", e.name), "warn");
+      }
+      return 1;
+    },
+    // 雙首領的羈絆：另一隻先倒下，這隻攻擊 ×mult
+    bond(b, e, m) {
+      if (!e.bonded && b.enemies.some((x) => x.boss && x !== e && x.hp <= 0)) {
+        e.bonded = true;
+        e.atk *= m.mult;
+        b.push(tx("\u{1F4A2} {0} \u60B2\u61A4\u4EA4\u52A0\uFF0C\u653B\u64CA\u5927\u589E", e.name), "warn");
+      }
       return 1;
     },
     summon(b, e, m) {
@@ -2322,10 +2430,16 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       }
       return false;
     }
-    enemyTarget() {
+    // 敵人目標：坦克；雙首領時第二隻首領打第二位坦克（有的話）
+    enemyTarget(e) {
       const a = this.alive();
       if (!a.length) return null;
-      return a.find((u) => u.role === "tank") || pick(a);
+      const tanks = a.filter((u) => u.role === "tank");
+      if (e && e.boss && tanks.length > 1) {
+        const bi = this.foes().filter((x) => x.boss).indexOf(e);
+        if (bi > 0) return tanks[Math.min(bi, tanks.length - 1)];
+      }
+      return tanks[0] || pick(a);
     }
     // ---------- 每 tick 的持續效果 ----------
     tickEffects() {
@@ -2359,7 +2473,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
         u.pack.act(this, u, foes, foes.find((e) => !e.boss) || foes[0]);
       }
       for (const e of this.foes()) {
-        const tgt = this.enemyTarget();
+        const tgt = this.enemyTarget(e);
         if (!tgt) break;
         this.isBuster = false;
         let atk = e.atk * this.weakMult(e);
@@ -2907,7 +3021,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   function recommendParty(s, hints) {
     const has = (t) => hints.includes(t), pw = (h) => heroPower(h, s.items);
     const byRole = (r) => s.heroes.filter((h) => roleOf(h) === r).sort((a, b) => pw(b) - pw(a));
-    const pick2 = [...byRole("tank").slice(0, 1), ...byRole("heal").slice(0, has("pulse") ? 2 : 1)];
+    const pick2 = [...byRole("tank").slice(0, has("twin") ? 2 : 1), ...byRole("heal").slice(0, has("pulse") ? 2 : 1)];
     const pref = (h) => (CLASSES[h.cls].prefers || []).reduce((m, t) => m * (has(t) ? 1.25 : 1), 1);
     const rest = s.heroes.filter((h) => !pick2.includes(h)).sort((a, b) => (roleOf(b) === "dps") - (roleOf(a) === "dps") || pw(b) * pref(b) - pw(a) * pref(a));
     pick2.push(...rest.slice(0, Math.max(0, ECONOMY.partyMax - pick2.length)));
@@ -3152,7 +3266,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   }
 
   // src/core/version.js
-  var VERSION = "0.9.0";
+  var VERSION = "0.9.1";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -3587,6 +3701,29 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     post9: [
       { who: ORIN(), text: tx("\u5148\u77E5\uFF1F\u2026\u2026\u61F8\u8CDE\u4EE4\u4E0A\u7684\u7F72\u540D\uFF0C\u5C31\u662F\u300C\u96D9\u6708\u300D\u3002") },
       { who: ORIN(), text: tx("\u518D\u5F80\u4E0B\u662F\u96D9\u6708\u738B\u5EA7\u3002\u6211\u5148\u53BB\u63A2\u8DEF\uFF0C\u7B49\u6211\u6D88\u606F\u3002") }
+    ],
+    pre10: [
+      { who: tx("\u65E5\u4E4B\u5148\u77E5"), text: tx("\u8B1D\u8B1D\u4F60\u5011\u66FF\u6211\u5011\u6BBA\u4E86\u9F8D\u3002") },
+      { who: tx("\u6708\u4E4B\u5148\u77E5"), text: tx("\u5C01\u5370\u4E00\u788E\uFF0C\u6211\u5011\u7684\u4E3B\u4EBA\u5C31\u80FD\u56DE\u4F86\u4E86\u3002") },
+      { who: ORIN(), text: tx("\u5169\u500B\u4E00\u8D77\u4E0A\uFF01\u5E36\u5169\u500B\u625B\u5F97\u4F4F\u7684\u4EBA\uFF0C\u5404\u770B\u4F4F\u4E00\u96BB\uFF0C\u8840\u91CF\u8981\u4E00\u8D77\u58D3\u3002") }
+    ],
+    post10: [{ who: ORIN(), text: tx("\u5C01\u5370\u9084\u80FD\u88DC\u2014\u2014\u9700\u8981\u51B0\u6676\u5973\u7687\u624B\u4E0A\u7684\u5C01\u5370\u788E\u7247\u3002") }],
+    pre11: [{ who: tx("\u51B0\u6676\u5973\u7687"), text: tx("\u6211\u51CD\u4F4F\u81EA\u5DF1\u5B88\u4E86\u4E09\u767E\u5E74\u2026\u2026\u6211\u5DF2\u7D93\u5206\u4E0D\u6E05\u8AB0\u662F\u6575\u4EBA\u3002") }],
+    post11: [
+      { who: tx("\u51B0\u6676\u5973\u7687"), text: tx("\u2026\u2026\u62FF\u53BB\u3002\u628A\u5B83\u95DC\u4E0A\u3002") },
+      { who: "", text: tx("\u4F60\u5011\u5F97\u5230\u4E86\u5C01\u5370\u788E\u7247\u3002") }
+    ],
+    pre12: [
+      { who: tx("\u865B\u7A7A\u5B88\u9580\u4EBA"), text: tx("\u9580\u5DF2\u7D93\u958B\u4E86\uFF0C\u5C0F\u5C0F\u7684\u5C01\u5370\u5E2B\u3002") },
+      { who: ORIN(), text: tx("\u4ED6\u8840\u91CF\u4E00\u4F4E\u5C31\u6703\u767C\u72C2\uFF0C\u865F\u89D2\u7559\u5230\u5F8C\u534A\u6BB5\u518D\u5439\u3002") }
+    ],
+    post12: [{ who: ORIN(), text: tx("\u6700\u5F8C\u4E00\u6BB5\u8DEF\u4E86\u3002") }],
+    pre13: [{ who: tx("\u88C2\u8C37\u4E4B\u4E3B\u30FB\u83AB\u745E\u65AF"), text: tx("\u9F8D\u6B7B\u4E86\uFF0C\u6C92\u6709\u4EBA\u80FD\u518D\u95DC\u4E0A\u9019\u6247\u9580\u3002") }],
+    post13: [
+      { who: ORIN(), text: tx("\u5C01\u5370\u788E\u7247\u2026\u2026\u653E\u9032\u53BB\u4E86\uFF01") },
+      { who: "", text: tx("\u88C2\u8C37\u7DE9\u7DE9\u95D4\u4E0A\uFF0C\u53EA\u5269\u6DF1\u8655\u50B3\u4F86\u7684\u4F4E\u9CF4\u3002") },
+      { who: ORIN(), text: tx("\u5C01\u5370\u53EA\u64CB\u4F4F\u4E86\u4E3B\u9AD4\uFF0C\u6B98\u97FF\u9084\u6703\u4E00\u76F4\u6EB6\u51FA\u4F86\u2014\u2014\u90A3\u4E9B\u6B98\u97FF\uFF0C\u5C31\u662F\u4F60\u5011\u4E4B\u5F8C\u8981\u9762\u5C0D\u7684\u79D8\u5883\u3002") },
+      { who: "", text: tx("\u7B2C\u4E8C\u7AE0\u300C\u6DF1\u6DF5\u88C2\u8C37\u300D\u5B8C\u3002") }
     ]
   };
 
@@ -3797,7 +3934,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
         return;
       }
       case "recommend-mythic": {
-        const d = +t.dataset.d, r = prepare(app.S, [...DUNGEONS[d].mech.map((m) => m.t), ...affixHints(activeAffixes(app.S.mythic.key))]);
+        const d = +t.dataset.d, r = prepare(app.S, [...mechHints(d), ...affixHints(activeAffixes(app.S.mythic.key))]);
         toast(prepMsg(r, tx("\u300C{0}\u300D\u8207\u4ECA\u65E5\u8A5E\u7DB4", DUNGEONS[d].name)));
         save();
         break;
@@ -3923,13 +4060,13 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
         save();
         break;
       case "recommend":
-        applyRecommend(hero(id), DUNGEONS[+t.dataset.d].mech.map((m) => m.t));
+        applyRecommend(hero(id), mechHints(+t.dataset.d));
         toast(tx("\u5DF2\u5957\u7528\u63A8\u85A6\u914D\u7F6E"));
         save();
         break;
       case "recommend-party":
       case "prepare": {
-        const d = +t.dataset.d, r = prepare(app.S, DUNGEONS[d].mech.map((m) => m.t));
+        const d = +t.dataset.d, r = prepare(app.S, mechHints(d));
         toast(prepMsg(r, tx("\u300C{0}\u300D", DUNGEONS[d].name)));
         save();
         break;

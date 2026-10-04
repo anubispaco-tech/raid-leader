@@ -324,7 +324,7 @@ export function salvageUpTo(s, maxRarity) {
 export function recommendParty(s, hints) {
   const has = t => hints.includes(t), pw = h => heroPower(h, s.items);
   const byRole = r => s.heroes.filter(h => roleOf(h) === r).sort((a, b) => pw(b) - pw(a));
-  const pick = [...byRole('tank').slice(0, 1), ...byRole('heal').slice(0, has('pulse') ? 2 : 1)];
+  const pick = [...byRole('tank').slice(0, has('twin') ? 2 : 1), ...byRole('heal').slice(0, has('pulse') ? 2 : 1)]; // 雙首領帶 2 坦
   // 職業包的 prefers：遇到這些機制時戰力 ×1.25 優先挑選
   const pref = h => (CLASSES[h.cls].prefers || []).reduce((m, t) => m * (has(t) ? 1.25 : 1), 1);
   const rest = s.heroes.filter(h => !pick.includes(h)).sort((a, b) => (roleOf(b) === 'dps') - (roleOf(a) === 'dps') || pw(b) * pref(b) - pw(a) * pref(a));

@@ -1,24 +1,27 @@
-// 難度探針：固定隊伍（坦補盜法盜、普通稀有度），給定等級與裝等，看各層勝率
-//   node tools/probe.js
+// 難度探針：名冊 6 人（2 坦、補、盜、法、盜，普通稀有度），給定等級與裝等，用「一鍵備戰」排陣容，看各層勝率
+//   node tools/probe.js [起始層 index] [結束層 index]
 import * as G from '../src/core/index.js';
 G.setSeed(11);
-const mkParty = (L, ilvl) => {
-  const items = {}, party = ['guardian', 'cleric', 'rogue', 'mage', 'rogue'].map(c => {
+const [from = 6, to = G.DUNGEONS.length - 1] = process.argv.slice(2).map(Number);
+const mk = (L, ilvl) => {
+  const s = G.newGame(); s.heroes = []; s.items = {};
+  for (const c of ['guardian', 'guardian', 'cleric', 'rogue', 'mage', 'rogue']) {
     const h = G.makeHero(c, L, 0);
-    for (const sl of Object.keys(G.SLOTS)) { const it = G.makeItem(sl, ilvl, 2); it.up = 5; items[it.id] = it; h.gear[sl] = it.id; }
-    return h;
-  });
-  return { party, items };
+    for (const sl of Object.keys(G.SLOTS)) { const it = G.makeItem(sl, ilvl, 2); it.up = 5; s.items[it.id] = it; h.gear[sl] = it.id; }
+    s.heroes.push(h);
+  }
+  return s;
 };
-const floors = [6, 7, 8, 9];
-console.log('等級/裝等 → ' + floors.map(d => 'D' + (d + 1)).join('   '));
-for (const [L, il] of [[20, 50], [25, 60], [25, 70], [30, 70], [30, 80], [35, 85], [35, 95], [40, 95], [40, 105], [45, 110]]) {
-  const { party, items } = mkParty(L, il);
+const floors = []; for (let d = from; d <= to; d++) floors.push(d);
+console.log('等級/裝等 → ' + floors.map(d => G.ROMAN[d].padStart(5)).join(''));
+const grid = [[20, 50], [25, 65], [30, 75], [35, 85], [40, 95], [45, 105], [50, 115], [55, 125], [60, 140]];
+for (const [L, il] of grid) {
+  const s = mk(L, il);
   const row = floors.map(d => {
-    for (const h of party) G.applyRecommend(h, G.DUNGEONS[d].mech.map(m => m.t));
-    let w = 0; for (let i = 0; i < 20; i++) if (new G.Battle(party, items, d, { autoHorn: true }).runToEnd().win) w++;
-    return String(w * 5).padStart(3) + '%';
+    G.prepare(s, G.mechHints(d));
+    let w = 0; for (let i = 0; i < 20; i++) if (new G.Battle(G.partyHeroes(s), s.items, d, { autoHorn: true }).runToEnd().win) w++;
+    return String(w * 5).padStart(4) + '%';
   });
-  console.log(`Lv${L} 裝${il}  ` + row.join('  '));
+  console.log(`Lv${L} 裝${il}`.padEnd(11) + row.join(''));
 }
 G.setSeed(null);

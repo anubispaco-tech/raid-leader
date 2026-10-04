@@ -52,6 +52,16 @@ const BOSS_MECHS = {
     b.push(tx('🛡 {0} 張開護盾！{1} 秒內打破它', e.name, m.window), 'warn');
     return 1;
   },
+  // 轉階段：生命低於 at 時攻擊永久 ×atk
+  phase(b, e, m) {
+    if (!e.phased && e.hp < e.max * m.at) { e.phased = true; e.atk *= m.atk; b.push(tx('🌑 {0} 進入第二階段！攻擊大增', e.name), 'warn'); }
+    return 1;
+  },
+  // 雙首領的羈絆：另一隻先倒下，這隻攻擊 ×mult
+  bond(b, e, m) {
+    if (!e.bonded && b.enemies.some(x => x.boss && x !== e && x.hp <= 0)) { e.bonded = true; e.atk *= m.mult; b.push(tx('💢 {0} 悲憤交加，攻擊大增', e.name), 'warn'); }
+    return 1;
+  },
   summon(b, e, m) {
     if (b.waveTick % m.every) return 1;
     for (let k = 0; k < m.n; k++) b.enemies.push({ name: tx('召喚物'), hp: e.addHp, max: e.addHp, atk: e.addAtk, boss: false, id: uid() });
@@ -202,9 +212,12 @@ export class Battle {
     }
     return false;
   }
-  enemyTarget() {
+  // 敵人目標：坦克；雙首領時第二隻首領打第二位坦克（有的話）
+  enemyTarget(e) {
     const a = this.alive(); if (!a.length) return null;
-    return a.find(u => u.role === 'tank') || pick(a);
+    const tanks = a.filter(u => u.role === 'tank');
+    if (e && e.boss && tanks.length > 1) { const bi = this.foes().filter(x => x.boss).indexOf(e); if (bi > 0) return tanks[Math.min(bi, tanks.length - 1)]; }
+    return tanks[0] || pick(a);
   }
 
   // ---------- 每 tick 的持續效果 ----------
@@ -236,7 +249,7 @@ export class Battle {
       u.pack.act(this, u, foes, foes.find(e => !e.boss) || foes[0]);
     }
     for (const e of this.foes()) {
-      const tgt = this.enemyTarget(); if (!tgt) break;
+      const tgt = this.enemyTarget(e); if (!tgt) break;
       this.isBuster = false;
       let atk = e.atk * this.weakMult(e);
       if (!e.boss && this.has('raging') && e.hp < e.max * 0.3) atk *= 1.5; // 暴怒

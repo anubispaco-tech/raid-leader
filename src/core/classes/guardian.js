@@ -24,8 +24,10 @@ const P = {
       b: { name: tx('正義之錘'), desc: tx('傷害 +20%'), mods: { dmgMult: 1.2 } } },
     { a: { name: tx('不動如山'), desc: tx('受到的所有傷害 −10%'), mods: { allReduce: 0.1 } },
       b: { name: tx('神聖憤怒'), desc: tx('盾牌猛擊冷卻 8 → 6 秒'), mods: { baseCd: 6 } } },
+    { a: { name: tx('招架'), desc: tx('受到攻擊時 10% 機率完全格開'), mods: { dodge: 0.1 } },
+      b: { name: tx('審判'), desc: tx('目標生命低於 35% 時傷害 +30%'), mods: { execute: 0.3 } } },
   ],
-  recommend: has => ({ spec: has('buster') ? 'prot' : 'ret', t: ['a', has('buster') ? 'a' : 'b', 'a', 'b', has('enrage') ? 'b' : 'a', has('enrage') ? 'b' : 'a'] }),
+  recommend: has => ({ spec: has('buster') ? 'prot' : 'ret', t: ['a', has('buster') ? 'a' : 'b', 'a', 'b', has('enrage') ? 'b' : 'a', has('enrage') ? 'b' : 'a', 'a'] }),
   legend: {
     name: tx('巴洛斯'), title: tx('鐵壁'), passive: 'undying', pname: tx('不屈'), desc: tx('每場第一次受到致命傷害改為剩 1 血並無敵 3 秒；在場時全隊受到的傷害 −8%'),
     hooks: {

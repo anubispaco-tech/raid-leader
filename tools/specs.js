@@ -14,7 +14,7 @@ function party(lv, ilvl, mode, mech) {
   return { heroes, items };
 }
 const wr = (d, lv, il, mode, n = 200) => {
-  const mech = G.DUNGEONS[d].mech.map(m => m.t); let w = 0;
+  const mech = G.mechHints(d); let w = 0;
   for (let i = 0; i < n; i++) { const p = party(lv, il, mode, mech); if (new G.Battle(p.heroes, p.items, d).runToEnd().win) w++; }
   return Math.round(100 * w / n);
 };

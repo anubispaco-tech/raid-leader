@@ -30,7 +30,7 @@ const shot = n => (process.env.SHOTS || '/tmp/claude-0') + '/' + n;
 // 分類與章節
 check(await page.locator('.seg.modes button').count() === 4, '遊玩分類 4 個：' + (await page.locator('.seg.modes').innerText()).replace(/\n/g, '｜'));
 check((await page.locator('.seg.chapters button.sel').innerText()).includes('第二章'), '已解鎖第二章時預設顯示第二章');
-check(await page.locator('.dg').count() === 3 && (await page.locator('.dg .tier').first().innerText()).startsWith('VIII'), '第二章顯示 VIII~X');
+check(await page.locator('.dg').count() === 7 && (await page.locator('.dg .tier').first().innerText()).startsWith('VIII'), '第二章顯示 VIII~XIV');
 await page.screenshot({ path: shot('ch2-list.png') });
 await page.click('[data-act="mode"][data-v="mythic"]'); check(await page.locator('.mythic .keystone').count() === 1, '秘境分類');
 await page.click('[data-act="mode"][data-v="vault"]'); check(await page.locator('.vault').count() === 1, '寶庫分類');

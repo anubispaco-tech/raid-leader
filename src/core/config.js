@@ -11,7 +11,7 @@ export const ROLE_NAME = { tank: tx('坦克'), heal: tx('治療'), dps: tx('輸�
 
 // ---------- 英雄 ----------
 export const HERO = {
-  maxLevel: 50, // v0.9.0：第二章開放 40 → 50
+  maxLevel: 60, // v0.9.1：第二章完整開放 → 60
   paragon: { need: 20000, growth: 0.1, bonus: 0.01 }, // 巔峰：Lv40 後經驗轉巔峰點；第 p 級需 need×(1+growth×p)，每級生命／威力 +1%
   xpBase: 60, xpExp: 1.8,          // 升級所需經驗 = xpBase × 等級^xpExp
   // 名字＋稱號組合（24 × 20 = 480 種），招募時避開名冊與酒館裡已有的名字
@@ -66,19 +66,27 @@ export const DUNGEONS = [
   { name: tx('塔底斷層'), boss: tx('石鱗守衛'), trash: tx('裂谷爬行者'), mech: [{ t: 'buster', every: 8, mult: 3.2 }, { t: 'curse', every: 9, pct: 0.04, dur: 8 }], tip: tx('重擊＋詛咒 → 坦克與治療（治療會自動淨化詛咒）') },
   { name: tx('迴聲礦脈'), boss: tx('魂鑄匠'), trash: tx('魂鑄傀儡'), mech: [{ t: 'summon', every: 11, n: 2 }, { t: 'cast', every: 14, time: 3, mult: 2.2 }], tip: tx('召喚＋讀條 → 範圍輸出與打斷（守護騎士、盜賊、熊／豹德魯伊會打斷）') },
   { name: tx('燼心祭壇'), boss: tx('裂谷祭司'), trash: tx('裂谷信徒'), mech: [{ t: 'pulse', every: 7, dmg: 0.9 }, { t: 'shield', every: 20, pct: 0.08, window: 10, heal: 0.1 }], tip: tx('脈衝＋護盾 → 治療與爆發（10 秒內打破護盾，否則首領回血）') },
+  // ---- 第二章後半（v0.9.1：XI~XIV）----
+  { name: tx('雙月王座'), boss: tx('雙子先知'), trash: tx('月影侍從'), mech: [],
+    twin: [{ name: tx('日之先知'), mech: [{ t: 'buster', every: 8, mult: 3.0 }, { t: 'bond', mult: 1.5 }] },
+           { name: tx('月之先知'), mech: [{ t: 'pulse', every: 7, dmg: 0.8 }, { t: 'bond', mult: 1.5 }] }],
+    tip: tx('雙首領 → 帶兩個坦克各扛一隻；一隻先倒，另一隻會悲憤變強，血量要一起壓') },
+  { name: tx('寒淵冰窟'), boss: tx('冰晶女皇'), trash: tx('霜縛戰士'), mech: [{ t: 'curse', every: 8, pct: 0.045, dur: 8 }, { t: 'enrage', at: 75, mult: 3 }], tip: tx('詛咒＋狂暴 → 治療淨化與輸出') },
+  { name: tx('虛影迴廊'), boss: tx('虛空守門人'), trash: tx('虛影潛伏者'), mech: [{ t: 'cast', every: 13, time: 3, mult: 2.4 }, { t: 'phase', at: 0.5, atk: 1.4 }], tip: tx('讀條＋轉階段 → 打斷；血量低於 50% 後攻擊大增，號角留到後半') },
+  { name: tx('深淵之心'), boss: tx('裂谷之主・莫瑞斯'), trash: tx('深淵化身'), mech: [{ t: 'curse', every: 10, pct: 0.04, dur: 8 }, { t: 'shield', every: 22, pct: 0.06, window: 10, heal: 0.1 }, { t: 'phase', at: 0.5, atk: 1.4 }], tip: tx('詛咒＋護盾＋轉階段 → 全隊綜合考驗') },
 ];
 // 章節：floors = [第一層 index, 最後一層 index]
 export const CHAPTERS = [
   { name: tx('第一章'), sub: tx('龍眠之路'), floors: [0, 6] },
-  { name: tx('第二章'), sub: tx('深淵裂谷'), floors: [7, 9] },
+  { name: tx('第二章'), sub: tx('深淵裂谷'), floors: [7, 13] },
 ];
 export const CH1_TOP = 6; // 第一章最後一層（秘境、寶庫目前以第一章為範圍）
 export const DUNGEON = {
   hpGrowth: 2.15, atkGrowth: 1.82,  // 每層敵人生命 / 攻擊倍率（v0.3 天賦上線後調高）
-  difficulty: [1, 1.1, 1, 1.4, 1, 1.35, 1, 1, 1, 1], // 個別層加難
-  recLevel: [1, 2, 3, 5, 10, 14, 19, 25, 30, 35],       // 建議等級（第一章為 v0.3 模擬首通時的等級）
+  difficulty: [1, 1.1, 1, 1.4, 1, 1.35, 1, 1, 1, 1, 1, 1, 1, 1], // 個別層加難
+  recLevel: [1, 2, 3, 5, 10, 14, 19, 25, 30, 35, 40, 45, 50, 55],       // 建議等級（第一章為 v0.3 模擬首通時的等級）
   // 第二章：相對第 7 層的生命／攻擊倍率（逐層列出，方便調；避免第一章 ×2.15 的成長讓數字爆掉）
-  ch2: { hp: [3.2, 2.8, 4.0], atk: [1.6, 1.45, 1.75], dropGrowth: 1.12 },
+  ch2: { hp: [3.2, 2.8, 4.0, 5.0, 5.4, 8.5, 8.0], atk: [1.6, 1.45, 1.75, 1.9, 2.0, 2.6, 2.6], dropGrowth: 1.12 },
   dropBase: 6, dropGrowth: 1.5,     // 掉落裝等 = base × growth^層
   trash: { count: 3, hp: 85, atk: 6.5 },
   boss: { hp: 850, atk: 13, addHp: 70, addAtk: 5 },

@@ -42,11 +42,13 @@ const P = {
       b: { name: tx('迅捷月火'), desc: tx('月火術冷卻 6 → 4 秒'), mods: { baseCd: 4 } } },
     { a: { name: tx('野性衝鋒'), desc: tx('打斷冷卻 12 → 8 秒'), mods: { kickCd: 8 } },
       b: { name: tx('星辰之力'), desc: tx('暴擊傷害 ×2 → ×2.3'), mods: { critDmg: 2.3 } } },
+    { a: { name: tx('自然之心'), desc: tx('威力 +10%'), mods: { powMult: 1.1 } },
+      b: { name: tx('靈巧'), desc: tx('受到攻擊時 10% 機率閃過'), mods: { dodge: 0.1 } } },
   ],
   // 備戰不改德魯伊的職責（陣容是照目前職責挑的），只依職責配天賦
   recommend(has, h) {
     const sp = (h && h.spec) || 'feral';
-    const t = { bear: ['a', 'a', 'a', 'b', 'a', has('cast') ? 'a' : 'b'], resto: ['a', 'a', 'a', 'b', 'a', 'b'], feral: ['b', 'b', 'b', 'b', 'b', has('cast') ? 'a' : 'b'] }[sp];
+    const t = { bear: ['a', 'a', 'a', 'b', 'a', has('cast') ? 'a' : 'b', 'b'], resto: ['a', 'a', 'a', 'b', 'a', 'b', 'a'], feral: ['b', 'b', 'b', 'b', 'b', has('cast') ? 'a' : 'b', 'a'] }[sp];
     return { spec: sp, t };
   },
   legend: {

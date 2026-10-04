@@ -68,7 +68,7 @@ document.addEventListener('click', e => {
       save(); showDraw(r.heroes, r.cost); return;
     }
     case 'recommend-mythic': {
-      const d = +t.dataset.d, r = G.prepare(app.S, [...G.DUNGEONS[d].mech.map(m => m.t), ...G.affixHints(G.activeAffixes(app.S.mythic.key))]);
+      const d = +t.dataset.d, r = G.prepare(app.S, [...G.mechHints(d), ...G.affixHints(G.activeAffixes(app.S.mythic.key))]);
       toast(prepMsg(r, tx('「{0}」與今日詞綴', G.DUNGEONS[d].name))); save(); break;
     }
     case 'idle': {
@@ -108,9 +108,9 @@ document.addEventListener('click', e => {
     case 'heroview': app.modal = { type: 'hero', id, view: t.dataset.v }; break;
     case 'spec': G.setSpec(hero(id), t.dataset.v); save(); break;
     case 'talent': G.setTalent(hero(id), +t.dataset.lv, t.dataset.v); save(); break;
-    case 'recommend': G.applyRecommend(hero(id), G.DUNGEONS[+t.dataset.d].mech.map(m => m.t)); toast(tx('已套用推薦配置')); save(); break;
+    case 'recommend': G.applyRecommend(hero(id), G.mechHints(+t.dataset.d)); toast(tx('已套用推薦配置')); save(); break;
     case 'recommend-party': case 'prepare': {
-      const d = +t.dataset.d, r = G.prepare(app.S, G.DUNGEONS[d].mech.map(m => m.t));
+      const d = +t.dataset.d, r = G.prepare(app.S, G.mechHints(d));
       toast(prepMsg(r, tx('「{0}」', G.DUNGEONS[d].name))); save(); break;
     }
     case 'horn': if (app.battle && app.battle.useHorn()) app.render(true); return;

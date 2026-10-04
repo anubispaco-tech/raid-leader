@@ -15,7 +15,7 @@ const swap = (role, specKey, legend) => {
 const run = (p, dIdx, idx, opts = {}) => {
   let w = 0, ticks = 0, val = 0;
   for (let i = 0; i < N; i++) {
-    const hints = G.DUNGEONS[dIdx].mech.map(m => m.t);
+    const hints = G.mechHints(dIdx);
     for (const h of p) G.applyRecommend(h, hints);
     const b = new G.Battle(p, s.items, dIdx, { autoHorn: true, ...opts }).runToEnd();
     if (b.win) w++; ticks += b.tick;

@@ -25,8 +25,10 @@ const P = {
       b: { name: tx('冷血'), desc: tx('每波第一次攻擊必定暴擊'), mods: { coldBlood: 1 } } },
     { a: { name: tx('腳踢精通'), desc: tx('打斷冷卻 12 → 8 秒'), mods: { kickCd: 8 } },
       b: { name: tx('毒刃'), desc: tx('傷害 +12%'), mods: { dmgMult: 1.12 } } },
+    { a: { name: tx('致命精通'), desc: tx('威力 +10%'), mods: { powMult: 1.1 } },
+      b: { name: tx('暗影斗篷'), desc: tx('受到的傷害 −15%'), mods: { allReduce: 0.15 } } },
   ],
-  recommend: has => ({ spec: has('summon') ? 'combat' : 'assa', t: ['b', 'b', has('summon') ? 'b' : 'a', 'b', 'a', has('cast') ? 'a' : 'b'] }),
+  recommend: has => ({ spec: has('summon') ? 'combat' : 'assa', t: ['b', 'b', has('summon') ? 'b' : 'a', 'b', 'a', has('cast') ? 'a' : 'b', 'a'] }),
   legend: {
     name: tx('卡西恩'), title: tx('影刃'), passive: 'chain', pname: tx('連鎖暴擊'), desc: tx('暴擊後的下一次攻擊必定暴擊，每 6 秒最多一次'),
     hooks: {
