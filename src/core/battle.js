@@ -91,7 +91,11 @@ export class Battle {
     const partyHp = this.units.reduce((a, u) => a + (u.mods.partyHp || 0) + (u.mods.setPartyHp || 0), 0);
     for (const u of this.units) { u.max = Math.round(u.max * (1 + partyHp)); u.hp = u.max; }
     this.partyAoe = Math.min(0.3, this.units.reduce((a, u) => a + (u.mods.partyAoe || 0), 0));
+    // 怒風圖騰等：全隊暴擊光環（上限 +15%）
+    const partyCrit = Math.min(0.15, this.units.reduce((a, u) => a + (u.mods.partyCrit || 0), 0));
+    if (partyCrit) for (const u of this.units) u.crit += partyCrit;
     this.horn = { used: false, until: -1 };
+    this.lust = { used: false, until: -1, haste: 0, proc: 0, src: null }; // 嗜血（薩滿）
     this.waves = opts.waves || buildWaves(dIdx);
     this.waveIdx = 0; this.tick = 0; this.waveTick = 0; this.over = false; this.win = false;
     this.log = [];
@@ -115,6 +119,14 @@ export class Battle {
     if (this.horn.used || this.over) return false;
     this.horn.used = true; this.horn.until = this.tick + RAID_HORN.dur;
     this.push(tx('📯 英勇號角！全隊傷害與治療 +{0}%，持續 {1} 秒', Math.round(RAID_HORN.bonus * 100), RAID_HORN.dur), 'info');
+    return true;
+  }
+  // 嗜血：持續期間每位隊員每秒有 haste 機率多出手一次；proc > 0 時隊員攻擊有機率引發閃電（傳說雷鳴・卡洛）
+  lustActive() { return this.lust.until > this.tick; }
+  startLust(src, dur, haste, proc = 0, procMult = 1) {
+    if (this.lust.used || this.over) return false;
+    Object.assign(this.lust, { used: true, until: this.tick + dur, haste, proc, procMult, src });
+    this.push(tx('🥁 {0} 施放嗜血！全隊出手速度 +{1}%，持續 {2} 秒', src.name, Math.round(haste * 100), dur), 'info');
     return true;
   }
   healMult(u) { return (u.mods.healMult || 1) * (u.mods.setHeal ? 1 + u.mods.setHeal : 1) * (this.hornActive() ? 1 + RAID_HORN.bonus : 1); }
@@ -142,6 +154,10 @@ export class Battle {
     }
     e.hp -= amt; u.dmgDone += amt; if (o.skill || o.dot) u.skillDmg += amt;
     if (u.hk.afterHit) u.hk.afterHit(this, u, e, amt, o);           // 掛勾：命中後（吸血、疊毒、額外目標…）
+    if (this.lust.proc && !o.dot && !o.proc && this.lustActive() && R() < this.lust.proc) { // 風暴之怒：引發閃電
+      const L = this.lust, t = e.hp > amt ? e : this.foes().find(x => x !== e);
+      if (t) { this.hitEnemy(L.src, t, L.src.pow * L.procMult, { proc: true, skill: true }); }
+    }
     if (e.hp === 0) {
       if (e.goblin) this.kills = (this.kills || 0) + 1;
       if (u.lh.onKill) u.lh.onKill(this, u, e);                     // 傳說掛勾：擊殺後
@@ -250,6 +266,9 @@ export class Battle {
       const foes = this.foes(); if (!foes.length) break;
       if (this.utility(u, foes)) continue; // 打斷讀條、淨化詛咒（用掉這一秒的行動）
       u.pack.act(this, u, foes, foes.find(e => !e.boss) || foes[0]);
+      if (this.lustActive() && R() < this.lust.haste) { // 嗜血：多出手一次
+        const f2 = this.foes(); if (f2.length) u.pack.act(this, u, f2, f2.find(e => !e.boss) || f2[0]);
+      }
     }
     for (const e of this.foes()) {
       const tgt = this.enemyTarget(e); if (!tgt) break;

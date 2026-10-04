@@ -63,6 +63,8 @@ export const SETS = {
     d2: tx('傷害 +8%'), d4: tx('傷害再 +10%、烈焰風暴冷卻 −20%') },
   druid: { name: tx('林冠守護'), b2: { setDmg: 0.05, setHeal: 0.05, setTaken: 0.05 }, b4: { setDmg: 0.1, setHeal: 0.1, setTaken: 0.1 },
     d2: tx('傷害、治療 +5%，受到的傷害 −5%'), d4: tx('以上效果加倍') },
+  shaman: { name: tx('雷誓者'), b2: { setDmg: 0.06, setHeal: 0.06 }, b4: { setDmg: 0.12, setHeal: 0.12, setLust: 4 },
+    d2: tx('傷害、治療 +6%'), d4: tx('傷害、治療再 +6%，嗜血持續 +4 秒') },
 };
 export const SET_PIECE = { head: tx('頭冠'), chest: tx('胸甲'), hands: tx('護手'), legs: tx('腿甲') };
 export const SET_DROP = { chance: 0.15, rarity: 3 }; // 第二章每場勝利 15% 掉一件（出戰隊員其中一人的職業）

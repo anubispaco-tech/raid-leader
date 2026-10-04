@@ -322,7 +322,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.9.4 */
+/* 副本團長 v0.10.0 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -365,6 +365,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u{1F300} {0} \u53EC\u559A\u4E86 {1} \u96BB\u5C0F\u602A": "\u{1F300} {0} summons {1} adds",
     "{0} {1}\uFF1A{2}{3}": "{0} {1}: {2}{3}",
     "\u{1F4EF} \u82F1\u52C7\u865F\u89D2\uFF01\u5168\u968A\u50B7\u5BB3\u8207\u6CBB\u7642 +{0}%\uFF0C\u6301\u7E8C {1} \u79D2": "\u{1F4EF} Heroic Horn! Party damage and healing +{0}% for {1}s",
+    "\u{1F941} {0} \u65BD\u653E\u55DC\u8840\uFF01\u5168\u968A\u51FA\u624B\u901F\u5EA6 +{1}%\uFF0C\u6301\u7E8C {2} \u79D2": "\u{1F941} {0} casts Bloodlust! Party haste +{1}% for {2}s",
     "\u{1F4A5} {0} \u7684\u8B77\u76FE\u88AB\u6253\u7834\u4E86": "\u{1F4A5} {0}'s shield is broken",
     "{0} \u88AB\u64CA\u6BBA": "{0} slain",
     "\u{1F33F} \u7E41\u76DB\uFF1A\u5176\u9918 {0} \u96BB\u5C0F\u602A\u8B8A\u5F37": "\u{1F33F} Bolstering: {0} remaining adds grow stronger",
@@ -564,6 +565,37 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u5F71\u5203": "Shadowblade",
     "\u9023\u9396\u66B4\u64CA": "Chain Crit",
     "\u66B4\u64CA\u5F8C\u7684\u4E0B\u4E00\u6B21\u653B\u64CA\u5FC5\u5B9A\u66B4\u64CA\uFF0C\u6BCF 6 \u79D2\u6700\u591A\u4E00\u6B21": "After a crit, the next attack always crits (at most once per 6s)",
+    "\u85A9\u6EFF": "Shaman",
+    "\u8F38\u51FA\uFF0F\u6CBB\u7642": "DPS / Healer",
+    "\u5143\u7D20\u53EF\u8F38\u51FA\u3001\u6062\u5FA9\u53EF\u6CBB\u7642\uFF1B\u9996\u9818\u6230\u958B\u5834\u81EA\u52D5\u65BD\u653E\u55DC\u8840\uFF0C\u5168\u968A\u52A0\u901F\uFF0C\u5716\u9A30\u518D\u5F37\u5316\u5168\u968A\u3002": "Elemental deals damage, Restoration heals. Casts Bloodlust when the boss appears to haste the party, and totems empower everyone.",
+    "\u55DC\u8840": "Bloodlust",
+    "\u6BCF\u5834\u4E00\u6B21\uFF1A\u9996\u9818\u73FE\u8EAB\u6642\u81EA\u52D5\u65BD\u653E\uFF0C\u5168\u968A\u51FA\u624B\u901F\u5EA6 +30%\uFF0C\u6301\u7E8C 10 \u79D2\uFF1B\u4E00\u968A\u53EA\u7B97\u4E00\u6B21": "Once per fight: cast automatically when the boss appears. Party haste +30% for 10s. Only one per party.",
+    "\u5143\u7D20": "Elemental",
+    "\u9583\u96FB\u93C8": "Chain Lightning",
+    "\u8F38\u51FA\u3002\u51B7\u537B 8 \u79D2\uFF1A\u9583\u96FB\u5F48\u8DF3\u6700\u591A 3 \u500B\u76EE\u6A19\uFF0C\u6BCF\u8DF3\u5A01\u529B \xD72.2\u3001\u905E\u6E1B 15%": "DPS. 8s cooldown: lightning jumps to up to 3 targets for power \xD72.2, \u221215% per jump",
+    "\u6F6E\u6C50\u6062\u5FA9": "Restoration",
+    "\u6CBB\u7642\u4E4B\u6F6E": "Healing Tide",
+    "\u6CBB\u7642\u3002\u51B7\u537B 12 \u79D2\uFF1A\u5168\u968A\u56DE\u5FA9\u5A01\u529B \xD70.7\uFF0C\u4E26\u7559\u4E0B\u6CBB\u7642\u5716\u9A30 4 \u79D2\uFF08\u6BCF\u79D2\u5A01\u529B \xD70.25\uFF09\uFF1B\u6BCF 5 \u79D2\u300C\u6CBB\u7642\u93C8\u300D\u88DC 3 \u4EBA\uFF1B\u5766\u514B\u5371\u6025\u6642\u300C\u5148\u7956\u8FC5\u6377\u300D\u5927\u88DC\uFF08\u51B7\u537B 6 \u79D2\uFF09": "Healer. 12s cooldown: heals the party for power \xD70.7 and leaves a healing totem for 4s (power \xD70.25 per second). Chain Heal hits 3 allies every 5s; Ancestral Swiftness gives the tank a big heal in emergencies (6s cooldown)",
+    "\u5143\u7D20\u4E4B\u529B": "Elemental Force",
+    "\u5927\u5730\u4E4B\u76FE": "Earth Shield",
+    "\u5148\u7956\u6307\u5F15": "Ancestral Guidance",
+    "\u96F7\u9706": "Thunder",
+    "\u5927\u5730\u5716\u9A30": "Earthen Wall Totem",
+    "\u6012\u98A8\u5716\u9A30": "Windfury Totem",
+    "\u5168\u968A\u66B4\u64CA\u7387 +5%": "Party crit chance +5%",
+    "\u5148\u7956\u4E4B\u9B42": "Ancestral Spirit",
+    "\u98A8\u6012": "Windfury",
+    "\u6DE8\u5316\u5716\u9A30": "Cleansing Totem",
+    "\u6BCF 6 \u79D2\u6DE8\u5316 1 \u540D\u968A\u54E1\u7684\u8A5B\u5492": "Removes a curse from one ally every 6s",
+    "\u98A8\u526A": "Wind Shear",
+    "\u82F1\u96C4\u6C23\u6982": "Heroism",
+    "\u55DC\u8840\u6301\u7E8C +4 \u79D2": "Bloodlust lasts 4s longer",
+    "\u5143\u7D20\u7CBE\u901A": "Elemental Mastery",
+    "\u5361\u6D1B": "Karo",
+    "\u96F7\u9CF4": "Thunderhowl",
+    "\u98A8\u66B4\u4E4B\u6012": "Storm's Fury",
+    "\u55DC\u8840\u6301\u7E8C 10 \u2192 16 \u79D2\uFF1B\u55DC\u8840\u671F\u9593\u5168\u968A\u6BCF\u6B21\u653B\u64CA\u6709 15% \u6A5F\u7387\u5F15\u767C\u9583\u96FB\uFF08\u5A01\u529B \xD71\uFF09": "Bloodlust lasts 16s instead of 10s; during Bloodlust, every party attack has a 15% chance to call lightning (power \xD71)",
+    "\u5148\u7956\u8FC5\u6377": "Ancestral Swiftness",
     "\u5C08\u7CBE\u7CBE\u901A": "Spec Mastery",
     "\u5C08\u7CBE\u6280\u80FD\u51B7\u537B \u221230%": "Spec skill cooldown \u221230%",
     "\u5C08\u7CBE\u5F37\u5316": "Spec Empowerment",
@@ -579,7 +611,6 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u6668\u9732": "Dewmorn",
     "\u6697\u6B65": "Darkstride",
     "\u6A61\u76FE": "Oakshield",
-    "\u96F7\u9CF4": "Thunderhowl",
     "\u661F\u5875": "Stardust",
     "\u9727\u884C": "Mistwalker",
     "\u70AD\u706B": "Emberbrand",
@@ -661,6 +692,9 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u6797\u51A0\u5B88\u8B77": "Canopy Guardian",
     "\u50B7\u5BB3\u3001\u6CBB\u7642 +5%\uFF0C\u53D7\u5230\u7684\u50B7\u5BB3 \u22125%": "Damage and healing +5%, damage taken \u22125%",
     "\u4EE5\u4E0A\u6548\u679C\u52A0\u500D": "Doubles the above",
+    "\u96F7\u8A93\u8005": "Thunderoath",
+    "\u50B7\u5BB3\u3001\u6CBB\u7642 +6%": "Damage and healing +6%",
+    "\u50B7\u5BB3\u3001\u6CBB\u7642\u518D +6%\uFF0C\u55DC\u8840\u6301\u7E8C +4 \u79D2": "Damage and healing another +6%; Bloodlust lasts 4s longer",
     "\u5805\u6BC5\u7684": "Steadfast ",
     "\u92B3\u5229\u7684": "Keen ",
     "\u707C\u71B1\u7684": "Searing ",
@@ -1754,8 +1788,144 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   };
   var druid_default = P5;
 
+  // src/core/classes/shaman.js
+  var ROLE2 = { elemental: "dps", resto: "heal" };
+  var P6 = {
+    id: "shaman",
+    name: tx("\u85A9\u6EFF"),
+    role: "dps",
+    roleText: tx("\u8F38\u51FA\uFF0F\u6CBB\u7642"),
+    icon: "\u26A1",
+    hp: 125,
+    hpL: 21,
+    pow: 8.5,
+    powL: 1.95,
+    armor: 0.22,
+    crit: 0.07,
+    desc: tx("\u5143\u7D20\u53EF\u8F38\u51FA\u3001\u6062\u5FA9\u53EF\u6CBB\u7642\uFF1B\u9996\u9818\u6230\u958B\u5834\u81EA\u52D5\u65BD\u653E\u55DC\u8840\uFF0C\u5168\u968A\u52A0\u901F\uFF0C\u5716\u9A30\u518D\u5F37\u5316\u5168\u968A\u3002"),
+    roleOf: (h) => ROLE2[h.spec] || "dps",
+    prefers: ["enrage", "shield", "phase"],
+    // 嗜血爆發：狂暴、護盾、轉階段
+    kick: (u) => !!u.mods.canKick,
+    // 學了「風剪」才能打斷
+    ai: { bolt: 1.3, falloff: 0.85, wave: 1.6, surge: 2.6, surgeCd: 6, idleHit: 0.5, tideHot: 0.25, tideHotDur: 4, chain: 1.1, chainCd: 5 },
+    lust: { dur: 10, haste: 0.3, legendDur: 6, proc: 0.15, procMult: 1 },
+    base: { name: tx("\u55DC\u8840"), cd: 0, desc: tx("\u6BCF\u5834\u4E00\u6B21\uFF1A\u9996\u9818\u73FE\u8EAB\u6642\u81EA\u52D5\u65BD\u653E\uFF0C\u5168\u968A\u51FA\u624B\u901F\u5EA6 +30%\uFF0C\u6301\u7E8C 10 \u79D2\uFF1B\u4E00\u968A\u53EA\u7B97\u4E00\u6B21") },
+    specs: {
+      elemental: { name: tx("\u5143\u7D20"), skill: tx("\u9583\u96FB\u93C8"), counters: "summon", desc: tx("\u8F38\u51FA\u3002\u51B7\u537B 8 \u79D2\uFF1A\u9583\u96FB\u5F48\u8DF3\u6700\u591A 3 \u500B\u76EE\u6A19\uFF0C\u6BCF\u8DF3\u5A01\u529B \xD72.2\u3001\u905E\u6E1B 15%"), cd: 8, mult: 2.2, jumps: 3 },
+      resto: { name: tx("\u6F6E\u6C50\u6062\u5FA9"), skill: tx("\u6CBB\u7642\u4E4B\u6F6E"), counters: "pulse", desc: tx("\u6CBB\u7642\u3002\u51B7\u537B 12 \u79D2\uFF1A\u5168\u968A\u56DE\u5FA9\u5A01\u529B \xD70.7\uFF0C\u4E26\u7559\u4E0B\u6CBB\u7642\u5716\u9A30 4 \u79D2\uFF08\u6BCF\u79D2\u5A01\u529B \xD70.25\uFF09\uFF1B\u6BCF 5 \u79D2\u300C\u6CBB\u7642\u93C8\u300D\u88DC 3 \u4EBA\uFF1B\u5766\u514B\u5371\u6025\u6642\u300C\u5148\u7956\u8FC5\u6377\u300D\u5927\u88DC\uFF08\u51B7\u537B 6 \u79D2\uFF09"), cd: 12, mult: 0.7 }
+    },
+    talents: [
+      {
+        a: { name: tx("\u5143\u7D20\u4E4B\u529B"), desc: tx("\u5A01\u529B +8%"), mods: { powMult: 1.08 } },
+        b: { name: tx("\u5927\u5730\u4E4B\u76FE"), desc: tx("\u53D7\u5230\u7684\u50B7\u5BB3 \u221215%"), mods: { allReduce: 0.15 } }
+      },
+      {
+        a: { name: tx("\u5148\u7956\u6307\u5F15"), desc: tx("\u6CBB\u7642 +15%"), mods: { healMult: 1.15 } },
+        b: { name: tx("\u96F7\u9706"), desc: tx("\u50B7\u5BB3 +15%"), mods: { dmgMult: 1.15 } }
+      },
+      {
+        a: { name: tx("\u5927\u5730\u5716\u9A30"), desc: tx("\u5168\u968A\u53D7\u5230\u7684\u7BC4\u570D\u50B7\u5BB3 \u221210%"), mods: { partyAoe: 0.1 } },
+        b: { name: tx("\u6012\u98A8\u5716\u9A30"), desc: tx("\u5168\u968A\u66B4\u64CA\u7387 +5%"), mods: { partyCrit: 0.05 } }
+      },
+      SPEC_ROW,
+      {
+        a: { name: tx("\u5148\u7956\u4E4B\u9B42"), desc: tx("\u5168\u968A\u751F\u547D +5%"), mods: { partyHp: 0.05 } },
+        b: { name: tx("\u98A8\u6012"), desc: tx("\u66B4\u64CA\u50B7\u5BB3 \xD72 \u2192 \xD72.3"), mods: { critDmg: 2.3 } }
+      },
+      {
+        a: { name: tx("\u6DE8\u5316\u5716\u9A30"), desc: tx("\u6BCF 6 \u79D2\u6DE8\u5316 1 \u540D\u968A\u54E1\u7684\u8A5B\u5492"), mods: { cleanseTotem: 6 } },
+        b: { name: tx("\u98A8\u526A"), desc: tx("\u53EF\u4EE5\u6253\u65B7\u9996\u9818\u8B80\u689D\uFF08\u51B7\u537B 12 \u79D2\uFF09"), mods: { canKick: 1 } }
+      },
+      {
+        a: { name: tx("\u82F1\u96C4\u6C23\u6982"), desc: tx("\u55DC\u8840\u6301\u7E8C +4 \u79D2"), mods: { lustDur: 4 } },
+        b: { name: tx("\u5143\u7D20\u7CBE\u901A"), desc: tx("\u66B4\u64CA\u7387 +6%"), mods: { critAdd: 0.06 } }
+      }
+    ],
+    // 備戰不改薩滿的職責，只依職責與機制配天賦
+    recommend(has, h) {
+      const sp = h && h.spec || "elemental";
+      const row6 = has("curse") ? "a" : has("cast") ? "b" : "a";
+      const t = sp === "resto" ? ["b", "a", has("pulse") || has("curse") ? "a" : "b", "b", "a", row6, "a"] : ["a", "b", has("pulse") ? "a" : "b", "b", "b", row6, has("enrage") || has("shield") ? "a" : "b"];
+      return { spec: sp, t };
+    },
+    legend: {
+      name: tx("\u5361\u6D1B"),
+      title: tx("\u96F7\u9CF4"),
+      passive: "stormfury",
+      pname: tx("\u98A8\u66B4\u4E4B\u6012"),
+      desc: tx("\u55DC\u8840\u6301\u7E8C 10 \u2192 16 \u79D2\uFF1B\u55DC\u8840\u671F\u9593\u5168\u968A\u6BCF\u6B21\u653B\u64CA\u6709 15% \u6A5F\u7387\u5F15\u767C\u9583\u96FB\uFF08\u5A01\u529B \xD71\uFF09"),
+      hooks: {}
+      // 效果在下方 hooks.tick 施放嗜血時一併處理
+    },
+    act(b, u, foes, focus) {
+      const S = spec(P6, u), A = P6.ai, boss = foes.find((e) => e.boss);
+      if (u.spec === "resto") {
+        const team = b.alive();
+        const tankLow = team.find((x) => x.role === "tank" && x.hp < x.max * 0.5);
+        if (tankLow && ready(b, u, "surge")) {
+          b.heal(u, tankLow, u.pow * A.surge);
+          u.cd.surge = b.tick + A.surgeCd;
+          b.skillLog(u, tx("\u5148\u7956\u8FC5\u6377"), tankLow);
+          return;
+        }
+        if (tankLow) {
+          b.heal(u, tankLow, u.pow * A.wave);
+          return;
+        }
+        if (ready(b, u, "spec") && team.some((x) => x.hp < x.max * 0.85)) {
+          for (const x of team) {
+            b.heal(u, x, u.pow * S.mult * fx(u));
+            x.hots.push({ until: b.tick + A.tideHotDur, amt: u.pow * A.tideHot * fx(u), src: u });
+          }
+          u.cd.spec = b.tick + specCd(u, S);
+          b.skillLog(u, S.skill);
+          return;
+        }
+        const hurt = team.filter((x) => x.hp < x.max * 0.85).sort((x, y) => x.hp / x.max - y.hp / y.max);
+        if (hurt.length >= 2 && ready(b, u, "chain")) {
+          hurt.slice(0, 3).forEach((x, i) => b.heal(u, x, u.pow * A.chain * Math.pow(A.falloff, i)));
+          u.cd.chain = b.tick + A.chainCd;
+          return;
+        }
+        const tank = team.find((x) => x.role === "tank" && x.hp < x.max * 0.8);
+        const low = tank || team.reduce((m, x) => x.hp / x.max < m.hp / m.max ? x : m);
+        if (low.hp < low.max * 0.7) {
+          b.heal(u, low, u.pow * A.wave);
+          return;
+        }
+        b.hitEnemy(u, focus, u.pow * A.idleHit);
+        return;
+      }
+      if (u.spec === "elemental" && ready(b, u, "spec") && (foes.length >= 2 || boss)) {
+        const tgts = [...foes].sort((x, y) => (y.boss ? 1 : 0) - (x.boss ? 1 : 0) || y.hp - x.hp).slice(0, S.jumps);
+        tgts.forEach((e, i) => b.hitEnemy(u, e, u.pow * S.mult * fx(u) * Math.pow(A.falloff, i), { skill: true, aoe: true }));
+        u.cd.spec = b.tick + specCd(u, S);
+        b.skillLog(u, S.skill);
+        return;
+      }
+      b.hitEnemy(u, focus, u.pow * A.bolt);
+    },
+    hooks: {
+      tick(b, u) {
+        if (!b.lust.used && b.foes().some((e) => e.boss)) {
+          const L = P6.lust, leg = !!u.mods.legend;
+          b.startLust(u, L.dur + (u.mods.lustDur || 0) + (u.mods.setLust || 0) + (leg ? L.legendDur : 0), L.haste, leg ? L.proc : 0, L.procMult);
+        }
+        if (u.mods.cleanseTotem && b.tick % u.mods.cleanseTotem === 0) {
+          const c = b.alive().find((x) => x.curse > b.tick);
+          if (c) {
+            c.curse = 0;
+            b.skillLog(u, tx("\u6DE8\u5316\u5716\u9A30"), c);
+          }
+        }
+      }
+    }
+  };
+  var shaman_default = P6;
+
   // src/core/classes/index.js
-  var PACKS = { guardian: guardian_default, cleric: cleric_default, rogue: rogue_default, mage: mage_default, druid: druid_default };
+  var PACKS = { guardian: guardian_default, cleric: cleric_default, rogue: rogue_default, mage: mage_default, druid: druid_default, shaman: shaman_default };
   var roleOf = (h) => {
     const p = PACKS[h.cls];
     return p.roleOf ? p.roleOf(h) : p.role;
@@ -1884,6 +2054,13 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       b4: { setDmg: 0.1, setHeal: 0.1, setTaken: 0.1 },
       d2: tx("\u50B7\u5BB3\u3001\u6CBB\u7642 +5%\uFF0C\u53D7\u5230\u7684\u50B7\u5BB3 \u22125%"),
       d4: tx("\u4EE5\u4E0A\u6548\u679C\u52A0\u500D")
+    },
+    shaman: {
+      name: tx("\u96F7\u8A93\u8005"),
+      b2: { setDmg: 0.06, setHeal: 0.06 },
+      b4: { setDmg: 0.12, setHeal: 0.12, setLust: 4 },
+      d2: tx("\u50B7\u5BB3\u3001\u6CBB\u7642 +6%"),
+      d4: tx("\u50B7\u5BB3\u3001\u6CBB\u7642\u518D +6%\uFF0C\u55DC\u8840\u6301\u7E8C +4 \u79D2")
     }
   };
   var SET_PIECE = { head: tx("\u982D\u51A0"), chest: tx("\u80F8\u7532"), hands: tx("\u8B77\u624B"), legs: tx("\u817F\u7532") };
@@ -2437,7 +2614,10 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
         u.hp = u.max;
       }
       this.partyAoe = Math.min(0.3, this.units.reduce((a, u) => a + (u.mods.partyAoe || 0), 0));
+      const partyCrit = Math.min(0.15, this.units.reduce((a, u) => a + (u.mods.partyCrit || 0), 0));
+      if (partyCrit) for (const u of this.units) u.crit += partyCrit;
       this.horn = { used: false, until: -1 };
+      this.lust = { used: false, until: -1, haste: 0, proc: 0, src: null };
       this.waves = opts.waves || buildWaves(dIdx);
       this.waveIdx = 0;
       this.tick = 0;
@@ -2483,6 +2663,16 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       this.push(tx("\u{1F4EF} \u82F1\u52C7\u865F\u89D2\uFF01\u5168\u968A\u50B7\u5BB3\u8207\u6CBB\u7642 +{0}%\uFF0C\u6301\u7E8C {1} \u79D2", Math.round(RAID_HORN.bonus * 100), RAID_HORN.dur), "info");
       return true;
     }
+    // 嗜血：持續期間每位隊員每秒有 haste 機率多出手一次；proc > 0 時隊員攻擊有機率引發閃電（傳說雷鳴・卡洛）
+    lustActive() {
+      return this.lust.until > this.tick;
+    }
+    startLust(src, dur, haste, proc = 0, procMult = 1) {
+      if (this.lust.used || this.over) return false;
+      Object.assign(this.lust, { used: true, until: this.tick + dur, haste, proc, procMult, src });
+      this.push(tx("\u{1F941} {0} \u65BD\u653E\u55DC\u8840\uFF01\u5168\u968A\u51FA\u624B\u901F\u5EA6 +{1}%\uFF0C\u6301\u7E8C {2} \u79D2", src.name, Math.round(haste * 100), dur), "info");
+      return true;
+    }
     healMult(u) {
       return (u.mods.healMult || 1) * (u.mods.setHeal ? 1 + u.mods.setHeal : 1) * (this.hornActive() ? 1 + RAID_HORN.bonus : 1);
     }
@@ -2521,6 +2711,12 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       u.dmgDone += amt;
       if (o.skill || o.dot) u.skillDmg += amt;
       if (u.hk.afterHit) u.hk.afterHit(this, u, e, amt, o);
+      if (this.lust.proc && !o.dot && !o.proc && this.lustActive() && R() < this.lust.proc) {
+        const L = this.lust, t = e.hp > amt ? e : this.foes().find((x) => x !== e);
+        if (t) {
+          this.hitEnemy(L.src, t, L.src.pow * L.procMult, { proc: true, skill: true });
+        }
+      }
       if (e.hp === 0) {
         if (e.goblin) this.kills = (this.kills || 0) + 1;
         if (u.lh.onKill) u.lh.onKill(this, u, e);
@@ -2658,6 +2854,10 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
         if (!foes.length) break;
         if (this.utility(u, foes)) continue;
         u.pack.act(this, u, foes, foes.find((e) => !e.boss) || foes[0]);
+        if (this.lustActive() && R() < this.lust.haste) {
+          const f2 = this.foes();
+          if (f2.length) u.pack.act(this, u, f2, f2.find((e) => !e.boss) || f2[0]);
+        }
       }
       for (const e of this.foes()) {
         const tgt = this.enemyTarget(e);
@@ -3103,11 +3303,11 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   var ownsLegend = (s, cls2) => [...s.heroes, ...s.tavern || []].some((h) => h.legend && h.cls === cls2);
   var legendsAvailable = (s) => Object.keys(CLASSES).filter((c) => CLASSES[c].legend).filter((c) => !ownsLegend(s, c));
   function rollHeroRarity(s) {
-    const P6 = s.recruit || (s.recruit = { sinceEpic: 0, sinceLegend: 0, total: 0 });
+    const P7 = s.recruit || (s.recruit = { sinceEpic: 0, sinceLegend: 0, total: 0 });
     const canLegend = legendsAvailable(s).length > 0;
     let r;
-    if (P6.sinceLegend >= RECRUIT.pityLegend && canLegend) r = 4;
-    else if (P6.sinceEpic >= RECRUIT.pityEpic) r = 3;
+    if (P7.sinceLegend >= RECRUIT.pityLegend && canLegend) r = 4;
+    else if (P7.sinceEpic >= RECRUIT.pityEpic) r = 3;
     else {
       let x = R(), i = HERO_RARITY.length - 1;
       for (; i > 0; i--) {
@@ -3117,9 +3317,9 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       r = Math.max(0, i);
     }
     if (r === 4 && !canLegend) r = 3;
-    P6.total++;
-    P6.sinceEpic = r >= 3 ? 0 : P6.sinceEpic + 1;
-    P6.sinceLegend = r === 4 ? 0 : P6.sinceLegend + 1;
+    P7.total++;
+    P7.sinceEpic = r >= 3 ? 0 : P7.sinceEpic + 1;
+    P7.sinceLegend = r === 4 ? 0 : P7.sinceLegend + 1;
     return r;
   }
   function newRecruit(s, level) {
@@ -3663,7 +3863,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   var dailyOpenNow = () => app.dailyOpen != null ? app.dailyOpen : dailyPending(app.S) > 0;
 
   // src/core/version.js
-  var VERSION = "0.9.4";
+  var VERSION = "0.10.0";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -3975,8 +4175,8 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   // src/ui/views/tavern.js
   function viewTavern() {
     const S = app.S, E = ECONOMY, full = S.heroes.length >= E.rosterMax;
-    const one = scrollCost(S, 1), ten = scrollCost(S, 10), P6 = S.recruit, legendsLeft = legendsAvailable(S).length;
-    let h = tx('<h2>\u9152\u9928</h2><p class="sub">\u540D\u518A <b class="num">{0}/{1}</b>\u3002\u65B0\u82F1\u96C4\u7684\u7B49\u7D1A\u6703\u63A5\u8FD1\u4F60\u968A\u4F0D\u7684\u5E73\u5747\u3002</p> <div class="recruit"><div><span class="label">\u62DB\u52DF\u4EE4</span><b>\u76F4\u63A5\u62BD\u4E00\u4F4D\u82F1\u96C4\u52A0\u5165\u540D\u518A</b> <span class="sub num" style="margin:0">\u7B2C {2} \u62BD\u5167\u5FC5\u51FA\u53F2\u8A69\u4EE5\u4E0A{3}</span></div> <div class="row"><button class="btn main grow" data-act="scroll" data-n="1" {4}>\u55AE\u62BD <span class="num">{5}</span> \u91D1</button> <button class="btn main grow" data-act="scroll" data-n="10" {6}>\u5341\u9023 <span class="num">{7}</span> \u91D1</button></div> {8} <div class="rates">{9}</div></div> <h2 style="font-size:18px">\u4ECA\u65E5\u540D\u55AE</h2><div class="stack">', S.heroes.length, E.rosterMax, Math.max(1, RECRUIT.pityEpic - P6.sinceEpic + 1), legendsLeft ? tx("\u30FB\u7B2C {0} \u62BD\u5167\u5FC5\u51FA\u50B3\u8AAA", Math.max(1, RECRUIT.pityLegend - P6.sinceLegend + 1)) : "", full || S.gold < one ? "disabled" : "", fmt(one), S.heroes.length + 10 > E.rosterMax || S.gold < ten ? "disabled" : "", fmt(ten), full ? tx('<span class="sub" style="margin:0;color:var(--warn)">\u540D\u518A\u6EFF\u4E86\uFF0C\u5148\u5230\u300C\u5718\u968A\u300D\u89E3\u96C7\u4E00\u4E9B\u82F1\u96C4</span>') : S.heroes.length + 10 > E.rosterMax ? tx('<span class="sub" style="margin:0">\u5341\u9023\u9700\u8981\u540D\u518A\u9084\u6709 10 \u500B\u7A7A\u4F4D</span>') : "", HERO_RARITY.map((r, i) => `<span class="c${i}">${r.name} ${+(r.weight * 100).toFixed(1)}%</span>`).join(""));
+    const one = scrollCost(S, 1), ten = scrollCost(S, 10), P7 = S.recruit, legendsLeft = legendsAvailable(S).length;
+    let h = tx('<h2>\u9152\u9928</h2><p class="sub">\u540D\u518A <b class="num">{0}/{1}</b>\u3002\u65B0\u82F1\u96C4\u7684\u7B49\u7D1A\u6703\u63A5\u8FD1\u4F60\u968A\u4F0D\u7684\u5E73\u5747\u3002</p> <div class="recruit"><div><span class="label">\u62DB\u52DF\u4EE4</span><b>\u76F4\u63A5\u62BD\u4E00\u4F4D\u82F1\u96C4\u52A0\u5165\u540D\u518A</b> <span class="sub num" style="margin:0">\u7B2C {2} \u62BD\u5167\u5FC5\u51FA\u53F2\u8A69\u4EE5\u4E0A{3}</span></div> <div class="row"><button class="btn main grow" data-act="scroll" data-n="1" {4}>\u55AE\u62BD <span class="num">{5}</span> \u91D1</button> <button class="btn main grow" data-act="scroll" data-n="10" {6}>\u5341\u9023 <span class="num">{7}</span> \u91D1</button></div> {8} <div class="rates">{9}</div></div> <h2 style="font-size:18px">\u4ECA\u65E5\u540D\u55AE</h2><div class="stack">', S.heroes.length, E.rosterMax, Math.max(1, RECRUIT.pityEpic - P7.sinceEpic + 1), legendsLeft ? tx("\u30FB\u7B2C {0} \u62BD\u5167\u5FC5\u51FA\u50B3\u8AAA", Math.max(1, RECRUIT.pityLegend - P7.sinceLegend + 1)) : "", full || S.gold < one ? "disabled" : "", fmt(one), S.heroes.length + 10 > E.rosterMax || S.gold < ten ? "disabled" : "", fmt(ten), full ? tx('<span class="sub" style="margin:0;color:var(--warn)">\u540D\u518A\u6EFF\u4E86\uFF0C\u5148\u5230\u300C\u5718\u968A\u300D\u89E3\u96C7\u4E00\u4E9B\u82F1\u96C4</span>') : S.heroes.length + 10 > E.rosterMax ? tx('<span class="sub" style="margin:0">\u5341\u9023\u9700\u8981\u540D\u518A\u9084\u6709 10 \u500B\u7A7A\u4F4D</span>') : "", HERO_RARITY.map((r, i) => `<span class="c${i}">${r.name} ${+(r.weight * 100).toFixed(1)}%</span>`).join(""));
     for (const x of S.tavern) {
       const c = cls(x), cost = hireCost(x);
       h += tx('<div class="hero r-{0}"><div class="ic">{1}</div><div class="nm">{2}{3}<small>{4}{5}\u30FB{6}\u30FB<span class="num">Lv{7}</span></small></div> <button class="btn sm main" data-act="hire" data-id="{8}" {9} style="grid-row:span 2"><span class="num">{10}</span> \u91D1</button> <div class="st">{11}</div></div>', x.rarity || 0, c.icon, heroName(x), rarityTag(x), c.name, x.spec ? `\u30FB${SPECS[x.cls][x.spec].name}` : "", ROLE_NAME[roleOf(x)], x.level, x.id, S.gold < cost || full ? "disabled" : "", fmt(cost), x.legend ? tx('<b class="c4">{0}</b>\uFF1A{1}', LEGENDS[x.cls].pname, LEGENDS[x.cls].desc) : c.desc);
