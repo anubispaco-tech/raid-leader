@@ -1,4 +1,4 @@
-/* 副本團長 v0.12.0 */
+/* 副本團長 v0.13.0 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -562,6 +562,16 @@
     "\u8FD1 {0} \u5834\uFF1A\u9650\u6642 {1}\u30FB\u5931\u6557 {2}\u30FB\u76EE\u524D\u9470\u77F3 +{3}": "Last {0} runs: {1} timed \xB7 {2} failed \xB7 keystone +{3}",
     "\u9996\u901A": "First clear",
     "\u7B2C {0} \u5C64 {1}": "Floor {0} {1}",
+    "Google \u767B\u5165\u66AB\u6642\u7121\u6CD5\u8F09\u5165\uFF0C\u7A0D\u5F8C\u518D\u8A66\u3002": "Google sign-in couldn't load. Try again later.",
+    "\u767B\u5165\u5931\u6557\uFF0C\u8ACB\u518D\u8A66\u4E00\u6B21": "Sign-in failed. Please try again",
+    "\u5DF2\u767B\u5165\u3002\u96F2\u7AEF\u6709 {0} \u7684\u5B58\u6A94": "Signed in. Cloud save from {0} found",
+    "\u5DF2\u767B\u5165\u3002\u76EE\u524D\u96F2\u7AEF\u9084\u6C92\u6709\u5B58\u6A94\uFF0C\u5148\u4E0A\u50B3\u4E00\u6B21\u5427": "Signed in. No cloud save yet, so upload one first",
+    "\u767B\u5165\u5DF2\u904E\u671F\uFF0C\u8ACB\u91CD\u65B0\u767B\u5165": "Your sign-in expired. Please sign in again",
+    "\u5DF2\u4E0A\u50B3\u5230\u96F2\u7AEF": "Uploaded to the cloud",
+    "\u4E0A\u50B3\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66": "Upload failed. Try again later",
+    "\u4E0B\u8F09\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66": "Download failed. Try again later",
+    "\u96F2\u7AEF\u9084\u6C92\u6709\u5B58\u6A94": "There's no cloud save yet",
+    '<h3>\u5F9E\u96F2\u7AEF\u4E0B\u8F09</h3><p class="sub" style="margin:0">\u96F2\u7AEF\uFF1A{0}\uFF08{1}\uFF09<br>\u9019\u53F0\u88DD\u7F6E\uFF1A{2}<br>\u4E0B\u8F09\u6703\u8986\u84CB\u9019\u53F0\u88DD\u7F6E\u7684\u9032\u5EA6\u3002</p><div class="row"><button class="btn main grow" data-act="clouddo">\u4E0B\u8F09\u4E26\u8986\u84CB</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>': '<h3>Download from cloud</h3><p class="sub" style="margin:0">Cloud: {0} ({1})<br>This device: {2}<br>Downloading replaces the progress on this device.</p><div class="row"><button class="btn main grow" data-act="clouddo">Download and replace</button><button class="btn" data-act="closebtn">Cancel</button></div>',
     "\u5A01\u529B {0}": "Power {0}",
     "\u8010\u529B {0}": "Stamina {0}",
     "\u66B4\u64CA +{0}%": "Crit +{0}%",
@@ -617,6 +627,8 @@
     "\u532F\u5165\u5B8C\u6210": "Import complete",
     "\u5B58\u6A94\u78BC\u7121\u6CD5\u8B80\u53D6\uFF0C\u8ACB\u78BA\u8A8D\u662F\u5426\u5B8C\u6574\u8907\u88FD": "Couldn't read that save code \u2014 make sure you copied all of it",
     '<h3>\u91CD\u65B0\u958B\u59CB\uFF1F</h3><p class="sub" style="margin:0">\u76EE\u524D\u7684\u82F1\u96C4\u3001\u88DD\u5099\u8207\u9032\u5EA6\u90FD\u6703\u6E05\u9664\uFF0C\u7121\u6CD5\u5FA9\u539F\u3002</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">\u6E05\u9664\u4E26\u91CD\u4F86</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>': `<h3>Start over?</h3><p class="sub" style="margin:0">All heroes, gear and progress will be erased. This can't be undone.</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">Erase and restart</button><button class="btn" data-act="closebtn">Cancel</button></div>`,
+    "\u5DF2\u5F9E\u96F2\u7AEF\u8F09\u5165\u9032\u5EA6": "Progress loaded from the cloud",
+    "\u5DF2\u767B\u51FA\uFF08\u9019\u53F0\u88DD\u7F6E\u7684\u9032\u5EA6\u4FDD\u7559\uFF09": "Signed out (progress on this device is kept)",
     "\u66B1\u7A31\u8A2D\u70BA\u300C{0}\u300D\uFF0C\u5929\u68AF\u7D04 1 \u5206\u9418\u5167\u66F4\u65B0": 'Nickname set to "{0}" \u2014 the Ladder updates within a minute',
     "\u4EE5\u533F\u540D\u53C3\u52A0": "Joined anonymously",
     "\u8ACB\u5148\u8F38\u5165\u610F\u898B": "Please write something first",
@@ -822,6 +834,16 @@
     "\u4E00\u9375\u5099\u6230\uFF1A\u639B\u6A5F\u4E2D\u53EA\u8ABF\u5929\u8CE6\u3001\u88DD\u5099": "One-tap prep: talents and gear only while idling",
     "\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099": "One-tap prep: lineup, talents, gear",
     '<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u9EDE\u5DE6\u4E0A\u89D2\u300C\u526F\u672C\u5718\u9577\u300D\u958B\u555F\u8A2D\u5B9A\uFF0C\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>': `<div class="howto" style="margin-top:16px"><b>Prep</b>: sets lineup, talents and gear for this boss's weakness (while idling, only talents and gear).<br><b>Idle</b>: repeats the floor automatically, even with the page closed (up to {0}h); rewards are paid when you return.<br><b>Save data</b>: progress lives in this browser. To switch devices, tap "Raid Leader" at the top left to open Settings and export a save code.</div>`,
+    "\u96F2\u7AEF\u5B58\u6A94": "Cloud save",
+    "\u7528 Google \u5E33\u865F\u767B\u5165\uFF0C\u9032\u5EA6\u6703\u81EA\u52D5\u5099\u4EFD\u5230\u96F2\u7AEF\uFF1B\u63DB\u624B\u6A5F\u767B\u5165\u540C\u4E00\u500B\u5E33\u865F\u5C31\u80FD\u63A5\u7E8C\u3002\u53EA\u6703\u8A18\u4E0B Google \u5E33\u865F\u7DE8\u865F\uFF0C\u4E0D\u6703\u5132\u5B58 Email \u6216\u5176\u4ED6\u8CC7\u6599\u3002": "Sign in with Google to back up your progress automatically. Sign in with the same account on another phone to pick up where you left off. Only your Google account ID is stored, never your email or other data.",
+    "\u4E0A\u50B3\u4E2D\u2026": "Uploading\u2026",
+    "\u5DF2\u767B\u5165\u30FB\u96F2\u7AEF\u6700\u5F8C\u5099\u4EFD {0}\uFF08{1}\uFF09": "Signed in \xB7 last cloud backup {0} ({1})",
+    "\u5DF2\u767B\u5165\u30FB\u96F2\u7AEF\u9084\u6C92\u6709\u5B58\u6A94": "Signed in \xB7 no cloud save yet",
+    "\u5DF2\u767B\u5165\u30FB\u8B80\u53D6\u96F2\u7AEF\u72C0\u614B\u4E2D\u2026": "Signed in \xB7 checking the cloud\u2026",
+    "\u767B\u5165\u671F\u9593\u6BCF {0} \u5206\u9418\u81EA\u52D5\u4E0A\u50B3\u3002": "While signed in, progress uploads every {0} minutes.",
+    "\u7ACB\u5373\u4E0A\u50B3": "Upload now",
+    "\u5F9E\u96F2\u7AEF\u4E0B\u8F09": "Download from cloud",
+    "\u767B\u51FA": "Sign out",
     "{0} \u5C0F\u6642 {1} \u5206": "{0}h {1}m",
     "\u5E33\u865F": "Account",
     "\u66B1\u7A31": "Nickname",
@@ -2006,6 +2028,12 @@
     // 每玩幾分鐘送一次進度
     leaderboardSec: 60
     // 排行榜重新讀取間隔
+  };
+  var CLOUD = {
+    clientId: typeof window !== "undefined" && window.__RL_TEST_CLOUD_CID || "",
+    // 測試用可由 e2e 注入
+    autoMin: 10
+    // 登入後每幾分鐘自動上傳一次
   };
   var RAID_HORN = { name: tx("\u82F1\u52C7\u865F\u89D2"), dur: 15, bonus: 0.3 };
   var REWARD = {
@@ -3816,7 +3844,7 @@
   var dailyOpenNow = () => app.dailyOpen != null ? app.dailyOpen : dailyPending(app.S) > 0;
 
   // src/core/version.js
-  var VERSION = "0.12.0";
+  var VERSION = "0.13.0";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -4142,7 +4170,141 @@
     return h;
   }
 
+  // src/ui/cloud.js
+  var KEY3 = "raid-leader-cloud";
+  var cloudEnabled = () => !!CLOUD.clientId && !!TELEMETRY.url;
+  var cloud = { info: null, busy: false, lastAuto: Date.now() };
+  var session = () => {
+    try {
+      return JSON.parse(localStorage.getItem(KEY3) || "null");
+    } catch (e) {
+      return null;
+    }
+  };
+  var setSession = (v) => {
+    try {
+      v ? localStorage.setItem(KEY3, JSON.stringify(v)) : localStorage.removeItem(KEY3);
+    } catch (e) {
+    }
+  };
+  var loggedIn = () => !!(session() && session().token);
+  var rerender = () => {
+    if (app.modal && app.modal.type === "settings") app.renderModal();
+  };
+  var gis = null;
+  function loadGis() {
+    if (gis) return gis;
+    gis = new Promise((ok, fail2) => {
+      const sc = document.createElement("script");
+      sc.src = "https://accounts.google.com/gsi/client";
+      sc.async = true;
+      sc.onload = () => {
+        window.google.accounts.id.initialize({ client_id: CLOUD.clientId, callback: onCredential, ux_mode: "popup" });
+        ok();
+      };
+      sc.onerror = () => {
+        gis = null;
+        fail2(new Error("gsi"));
+      };
+      document.head.appendChild(sc);
+    });
+    return gis;
+  }
+  function mountButton() {
+    const el = document.getElementById("gsiBtn");
+    if (!el || el.dataset.done) return;
+    el.dataset.done = "1";
+    loadGis().then(() => window.google.accounts.id.renderButton(el, { theme: "filled_black", size: "large", shape: "pill", text: "signin_with", locale: document.documentElement.lang === "en" ? "en" : "zh-TW" })).catch(() => {
+      el.textContent = tx("Google \u767B\u5165\u66AB\u6642\u7121\u6CD5\u8F09\u5165\uFF0C\u7A0D\u5F8C\u518D\u8A66\u3002");
+    });
+  }
+  async function onCredential(resp) {
+    const r = await post({ type: "login", idToken: resp.credential });
+    if (!r || !r.ok) {
+      toast(tx("\u767B\u5165\u5931\u6557\uFF0C\u8ACB\u518D\u8A66\u4E00\u6B21"));
+      return;
+    }
+    setSession({ token: r.token, at: Date.now() });
+    cloud.info = { updated: r.updated, summary: r.summary };
+    toast(r.updated ? tx("\u5DF2\u767B\u5165\u3002\u96F2\u7AEF\u6709 {0} \u7684\u5B58\u6A94", r.updated) : tx("\u5DF2\u767B\u5165\u3002\u76EE\u524D\u96F2\u7AEF\u9084\u6C92\u6709\u5B58\u6A94\uFF0C\u5148\u4E0A\u50B3\u4E00\u6B21\u5427"));
+    rerender();
+  }
+  var fail = (r) => {
+    if (r && r.error === "login") {
+      setSession(null);
+      cloud.info = null;
+      toast(tx("\u767B\u5165\u5DF2\u904E\u671F\uFF0C\u8ACB\u91CD\u65B0\u767B\u5165"));
+      rerender();
+      return true;
+    }
+    return false;
+  };
+  async function refreshInfo() {
+    if (!loggedIn() || cloud.busy) return;
+    const r = await post({ type: "cloudinfo", token: session().token });
+    if (r && r.ok) {
+      cloud.info = { updated: r.updated, summary: r.summary };
+      rerender();
+    } else fail(r);
+  }
+  async function upload(quiet = false) {
+    if (!loggedIn() || cloud.busy || app.fresh) return;
+    cloud.busy = true;
+    if (!quiet) rerender();
+    const r = await post({ type: "cloudsave", token: session().token, save: JSON.stringify(app.S), summary: progressText(), ver: VERSION });
+    cloud.busy = false;
+    cloud.lastAuto = Date.now();
+    if (r && r.ok) {
+      cloud.info = { updated: r.updated, summary: progressText() };
+      if (!quiet) toast(tx("\u5DF2\u4E0A\u50B3\u5230\u96F2\u7AEF"));
+    } else if (!fail(r) && !quiet) toast(tx("\u4E0A\u50B3\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66"));
+    rerender();
+  }
+  async function askDownload(openModal2) {
+    if (!loggedIn()) return;
+    const r = await post({ type: "cloudload", token: session().token });
+    if (!r || !r.ok) {
+      if (!fail(r)) toast(tx("\u4E0B\u8F09\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66"));
+      return;
+    }
+    if (!r.save) {
+      toast(tx("\u96F2\u7AEF\u9084\u6C92\u6709\u5B58\u6A94"));
+      return;
+    }
+    cloud.pending = r.save;
+    openModal2({ type: "text", html: tx('<h3>\u5F9E\u96F2\u7AEF\u4E0B\u8F09</h3><p class="sub" style="margin:0">\u96F2\u7AEF\uFF1A{0}\uFF08{1}\uFF09<br>\u9019\u53F0\u88DD\u7F6E\uFF1A{2}<br>\u4E0B\u8F09\u6703\u8986\u84CB\u9019\u53F0\u88DD\u7F6E\u7684\u9032\u5EA6\u3002</p><div class="row"><button class="btn main grow" data-act="clouddo">\u4E0B\u8F09\u4E26\u8986\u84CB</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>', r.summary || "\u2014", r.updated || "\u2014", progressText()) });
+  }
+  function applyDownload() {
+    const raw = cloud.pending;
+    cloud.pending = null;
+    if (!raw) return false;
+    app.S = migrate(sanitizeSave(JSON.parse(raw)));
+    app.battle = null;
+    save();
+    return true;
+  }
+  function logout() {
+    setSession(null);
+    cloud.info = null;
+    try {
+      window.google && window.google.accounts.id.disableAutoSelect();
+    } catch (e) {
+    }
+  }
+  function autoTick() {
+    if (cloudEnabled() && loggedIn() && Date.now() - cloud.lastAuto > CLOUD.autoMin * 6e4) upload(true);
+  }
+
   // src/ui/views/settings.js
+  function cloudBlock() {
+    if (!loggedIn()) return `<span class="label">${tx("\u96F2\u7AEF\u5B58\u6A94")}</span>
+    <p class="sub" style="margin:0">${tx("\u7528 Google \u5E33\u865F\u767B\u5165\uFF0C\u9032\u5EA6\u6703\u81EA\u52D5\u5099\u4EFD\u5230\u96F2\u7AEF\uFF1B\u63DB\u624B\u6A5F\u767B\u5165\u540C\u4E00\u500B\u5E33\u865F\u5C31\u80FD\u63A5\u7E8C\u3002\u53EA\u6703\u8A18\u4E0B Google \u5E33\u865F\u7DE8\u865F\uFF0C\u4E0D\u6703\u5132\u5B58 Email \u6216\u5176\u4ED6\u8CC7\u6599\u3002")}</p>
+    <div id="gsiBtn" class="gsi"></div>`;
+    const i = cloud.info;
+    return `<span class="label">${tx("\u96F2\u7AEF\u5B58\u6A94")}</span>
+    <p class="sub" style="margin:0">${cloud.busy ? tx("\u4E0A\u50B3\u4E2D\u2026") : i ? i.updated ? tx("\u5DF2\u767B\u5165\u30FB\u96F2\u7AEF\u6700\u5F8C\u5099\u4EFD {0}\uFF08{1}\uFF09", esc(i.updated), esc(i.summary || "\u2014")) : tx("\u5DF2\u767B\u5165\u30FB\u96F2\u7AEF\u9084\u6C92\u6709\u5B58\u6A94") : tx("\u5DF2\u767B\u5165\u30FB\u8B80\u53D6\u96F2\u7AEF\u72C0\u614B\u4E2D\u2026")}<br>${tx("\u767B\u5165\u671F\u9593\u6BCF {0} \u5206\u9418\u81EA\u52D5\u4E0A\u50B3\u3002", CLOUD.autoMin)}</p>
+    <div class="row"><button class="btn main" data-act="cloudup" ${cloud.busy ? "disabled" : ""}>${tx("\u7ACB\u5373\u4E0A\u50B3")}</button><button class="btn" data-act="clouddown">${tx("\u5F9E\u96F2\u7AEF\u4E0B\u8F09")}</button><button class="btn" data-act="cloudout">${tx("\u767B\u51FA")}</button></div>`;
+  }
   var row = (label, value) => `<div class="set"><span>${label}</span>${value}</div>`;
   function sheetSettings() {
     const S = app.S, p = S.player, sec = p.playSec || 0;
@@ -4155,6 +4317,7 @@
       ${row(tx("\u6210\u5C31"), `<button class="btn sm" data-act="ach">${tx("{0} \u9EDE\u30FB\u67E5\u770B", achPoints(S))}</button>`)}
       ${row(tx("\u6230\u7E3E"), `<span class="num">${tx("\u5171\u6311\u6230 {0} \u6B21\u30FB\u901A\u95DC {1} \u6B21", fmt(S.stats.runs), fmt(S.stats.wins))}</span>`)}
     </div>
+    ${cloudEnabled() ? cloudBlock() : ""}
     <span class="label">${tx("\u5B58\u6A94")}</span>
     <p class="sub" style="margin:0">${tx("\u9032\u5EA6\u5B58\u5728\u9019\u53F0\u88DD\u7F6E\u7684\u700F\u89BD\u5668\u3002\u63DB\u88DD\u7F6E\u524D\uFF0C\u5148\u532F\u51FA\u5B58\u6A94\u78BC\u3002")}</p>
     <div class="row"><button class="btn" data-act="export">${tx("\u532F\u51FA\u5B58\u6A94\u78BC")}</button><button class="btn" data-act="import">${tx("\u532F\u5165")}</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">${tx("\u91CD\u65B0\u958B\u59CB")}</button></div>
@@ -4234,6 +4397,7 @@
     el.dataset.key = key;
     el.innerHTML = `<div class="scrim" data-act="close"><div class="sheet ${fresh ? "anim" : ""}" role="dialog" aria-modal="true">${body}</div></div>`;
     if (!fresh) el.querySelector(".sheet").scrollTop = scroll;
+    if (app.afterModal) app.afterModal();
   }
   function sheetDialog(m) {
     const L = m.lines[m.i], last = m.i >= m.lines.length - 1;
@@ -4521,6 +4685,16 @@
     if (!skipModal) renderModal();
   }
   app.render = render;
+  app.renderModal = renderModal;
+  app.afterModal = () => {
+    if (app.modal && app.modal.type === "settings" && cloudEnabled()) {
+      mountButton();
+      if (loggedIn() && !cloud.info && !cloud.asked) {
+        cloud.asked = true;
+        refreshInfo();
+      }
+    }
+  };
   app.renderTabs = renderTabs;
   document.addEventListener("click", (e) => {
     const t = e.target.closest("[data-tab],[data-act]");
@@ -4966,6 +5140,22 @@
       case "closebtn":
         app.modal = null;
         break;
+      case "cloudup":
+        upload();
+        return;
+      case "clouddown":
+        askDownload(openModal);
+        return;
+      case "clouddo":
+        if (applyDownload()) {
+          app.modal = null;
+          toast(tx("\u5DF2\u5F9E\u96F2\u7AEF\u8F09\u5165\u9032\u5EA6"));
+        }
+        break;
+      case "cloudout":
+        logout();
+        toast(tx("\u5DF2\u767B\u51FA\uFF08\u9019\u53F0\u88DD\u7F6E\u7684\u9032\u5EA6\u4FDD\u7559\uFF09"));
+        break;
       case "nick":
         openNick();
         return;
@@ -5056,6 +5246,7 @@
     if (!document.hidden) {
       tick(5);
       save();
+      autoTick();
     }
   }, 5e3);
   document.addEventListener("input", (e) => {

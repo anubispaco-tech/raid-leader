@@ -327,3 +327,5 @@ h3 .gi{vertical-align:-.12em}
 .achbody{display:grid;gap:3px;min-width:0}.achbody b{font-size:14px}
 .achbar{display:block;height:5px;border-radius:3px;background:var(--panel);overflow:hidden;margin-top:2px}.achbar i{display:block;height:100%;background:var(--brass)}
 .achwhen{font-size:11px;white-space:nowrap}
+/* v0.13 雲端存檔 */
+.gsi{min-height:44px;display:flex;align-items:center}

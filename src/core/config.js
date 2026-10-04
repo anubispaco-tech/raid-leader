@@ -207,6 +207,12 @@ export const TELEMETRY = {
   snapshotMin: 5,                   // 每玩幾分鐘送一次進度
   leaderboardSec: 60,               // 排行榜重新讀取間隔
 };
+// ---------- 雲端存檔（v0.13，Google 登入）----------
+// clientId 留空 = 不顯示雲端存檔；填入 Google Cloud 的 OAuth 用戶端 ID 後啟用（GAS 端 CLIENT_ID 要填同一個）
+export const CLOUD = {
+  clientId: (typeof window !== 'undefined' && window.__RL_TEST_CLOUD_CID) || '', // 測試用可由 e2e 注入
+  autoMin: 10,                      // 登入後每幾分鐘自動上傳一次
+};
 
 // ---------- 團長指令 ----------
 export const RAID_HORN = { name: tx('英勇號角'), dur: 15, bonus: 0.3 }; // 每場一次，全隊傷害與治療 +30%

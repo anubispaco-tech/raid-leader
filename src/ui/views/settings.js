@@ -5,7 +5,17 @@ import * as G from '../../core/index.js';
 import { app } from '../state.js';
 import { enabled } from '../telemetry.js';
 import { esc, fmt } from '../helpers.js';
+import { cloudEnabled, loggedIn, cloud } from '../cloud.js';
 
+function cloudBlock() {
+  if (!loggedIn()) return `<span class="label">${tx('雲端存檔')}</span>
+    <p class="sub" style="margin:0">${tx('用 Google 帳號登入，進度會自動備份到雲端；換手機登入同一個帳號就能接續。只會記下 Google 帳號編號，不會儲存 Email 或其他資料。')}</p>
+    <div id="gsiBtn" class="gsi"></div>`;
+  const i = cloud.info;
+  return `<span class="label">${tx('雲端存檔')}</span>
+    <p class="sub" style="margin:0">${cloud.busy ? tx('上傳中…') : i ? (i.updated ? tx('已登入・雲端最後備份 {0}（{1}）', esc(i.updated), esc(i.summary || '—')) : tx('已登入・雲端還沒有存檔')) : tx('已登入・讀取雲端狀態中…')}<br>${tx('登入期間每 {0} 分鐘自動上傳。', G.CLOUD.autoMin)}</p>
+    <div class="row"><button class="btn main" data-act="cloudup" ${cloud.busy ? 'disabled' : ''}>${tx('立即上傳')}</button><button class="btn" data-act="clouddown">${tx('從雲端下載')}</button><button class="btn" data-act="cloudout">${tx('登出')}</button></div>`;
+}
 const row = (label, value) => `<div class="set"><span>${label}</span>${value}</div>`;
 export function sheetSettings() {
   const S = app.S, p = S.player, sec = p.playSec || 0;
@@ -18,6 +28,7 @@ export function sheetSettings() {
       ${row(tx('成就'), `<button class="btn sm" data-act="ach">${tx('{0} 點・查看', G.achPoints(S))}</button>`)}
       ${row(tx('戰績'), `<span class="num">${tx('共挑戰 {0} 次・通關 {1} 次', fmt(S.stats.runs), fmt(S.stats.wins))}</span>`)}
     </div>
+    ${cloudEnabled() ? cloudBlock() : ''}
     <span class="label">${tx('存檔')}</span>
     <p class="sub" style="margin:0">${tx('進度存在這台裝置的瀏覽器。換裝置前，先匯出存檔碼。')}</p>
     <div class="row"><button class="btn" data-act="export">${tx('匯出存檔碼')}</button><button class="btn" data-act="import">${tx('匯入')}</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">${tx('重新開始')}</button></div>

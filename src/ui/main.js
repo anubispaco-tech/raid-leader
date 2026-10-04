@@ -17,6 +17,7 @@ import * as T from './telemetry.js';
 import { esc, heroName } from './helpers.js';
 import { VERSION } from '../core/version.js';
 import { installIcons } from './icons.js';
+import * as C from './cloud.js';
 
 // ---------- 分頁 ----------
 const ICONS = {
@@ -46,6 +47,9 @@ function render(skipModal) {
   if (!skipModal) renderModal();
 }
 app.render = render;
+app.renderModal = renderModal;
+// 設定頁畫好後放 Google 登入按鈕、讀雲端狀態
+app.afterModal = () => { if (app.modal && app.modal.type === 'settings' && C.cloudEnabled()) { C.mountButton(); if (C.loggedIn() && !C.cloud.info && !C.cloud.asked) { C.cloud.asked = true; C.refreshInfo(); } } };
 app.renderTabs = renderTabs;
 
 // ---------- 事件 ----------
@@ -186,6 +190,10 @@ document.addEventListener('click', e => {
     case 'reset': openModal({ type: 'text', html: tx('<h3>重新開始？</h3><p class="sub" style="margin:0">目前的英雄、裝備與進度都會清除，無法復原。</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">清除並重來</button><button class="btn" data-act="closebtn">取消</button></div>') }); return;
     case 'doreset': clearInterval(app.bTimer); clearTimeout(app.pendingRepeat); app.S = G.newGame(); app.battle = null; app.lastResult = null; app.modal = null; app.tab = 'dungeon'; save(); render(); playDialog(PROLOGUE, () => {}); return;
     case 'closebtn': app.modal = null; break;
+    case 'cloudup': C.upload(); return;
+    case 'clouddown': C.askDownload(openModal); return;
+    case 'clouddo': if (C.applyDownload()) { app.modal = null; toast(tx('已從雲端載入進度')); } break;
+    case 'cloudout': C.logout(); toast(tx('已登出（這台裝置的進度保留）')); break;
     case 'nick': openNick(); return;
     case 'savenick': {
       const v = ($('#nickInp').value || '').trim().slice(0, 16);
@@ -245,7 +253,7 @@ document.addEventListener('visibilitychange', () => {
   } else if (app.battle && !app.battle.over) runTimer();
   else resumeIdle();
 });
-setInterval(() => { if (!document.hidden) { T.tick(5); save(); } }, 5000);
+setInterval(() => { if (!document.hidden) { T.tick(5); save(); C.autoTick(); } }, 5000);
 document.addEventListener('input', e => { if (e.target.id === 'fbText') app.fbDraft = e.target.value; });
 document.addEventListener('change', e => {
   if (e.target.id === 'salvSel') { app.salvSel = +e.target.value; app.salvConfirm = false; render(); }

@@ -31,6 +31,7 @@ export function renderModal() {
   el.dataset.key = key;
   el.innerHTML = `<div class="scrim" data-act="close"><div class="sheet ${fresh ? 'anim' : ''}" role="dialog" aria-modal="true">${body}</div></div>`;
   if (!fresh) el.querySelector('.sheet').scrollTop = scroll;
+  if (app.afterModal) app.afterModal();
 }
 function sheetDialog(m) {
   const L = m.lines[m.i], last = m.i >= m.lines.length - 1;

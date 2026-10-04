@@ -12,6 +12,8 @@
  * 之後改了程式：部署 → 管理部署作業 → 編輯 → 版本選「新版本」→ 部署（網址不變）
  * v0.9.3：新增「深淵最高／深淵鑰石」兩欄 → 貼上後先執行一次 setup（補表頭），再部署新版本
  * v0.10.1：新增「封鎖」欄與成績合理性檢查 → 同樣先執行 setup，再部署新版本
+ * v0.13：雲端存檔（Google 登入）→ 在下面 CLIENT_ID 填入 OAuth 用戶端 ID，執行一次 setup（會要求 Drive 授權），再部署新版本
+ *        存檔放在你 Google Drive 的「raid-leader-saves」資料夾，一位玩家一個檔；工作表「雲端」只記 Google 帳號編號（sub），不存 Email
  */
 
 const SHEETS = {
@@ -23,7 +25,11 @@ const COL = { pid: 1, name: 2, first: 3, last: 4, days: 5, minutes: 6, level: 7,
 // 成績合理性（v0.10.1）：傳奇秘境要通關第 7 層、深淵秘境要通關第 14 層才可能有成績；每次回報最多進步 JUMP 級
 const SANE = { mythicTop: 7, abyssTop: 14, jump: 15 };
 const TZ = 'Asia/Taipei';
-const LIMIT_SEC = { snapshot: 20, event: 2, feedback: 60 }; // 同一位玩家的送出間隔下限
+// ---------- 雲端存檔（v0.13）----------
+const CLIENT_ID = ''; // ← 貼上 Google Cloud 的 OAuth 用戶端 ID（xxxx.apps.googleusercontent.com）
+const CLOUD = { sheet: '雲端', folder: 'raid-leader-saves', sessionDays: 30, maxBytes: 2 * 1024 * 1024 };
+const CLOUD_HEAD = ['Google 帳號編號', '登入憑證', '憑證到期', '存檔檔案 ID', '最後上傳', '進度摘要', '版本'];
+const LIMIT_SEC = { snapshot: 20, event: 2, feedback: 60, login: 3, cloudsave: 15, cloudload: 3, cloudinfo: 2 }; // 同一位玩家的送出間隔下限
 
 // ---------- 初始化：建立工作表與「摘要」 ----------
 function setup() {
@@ -34,6 +40,9 @@ function setup() {
     sh.setFrozenRows(1);
   });
   ss.getSheetByName(SHEETS.players.name).hideColumns(COL.dates); // 遊玩日期清單只給程式用
+  const cs = ss.getSheetByName(CLOUD.sheet) || ss.insertSheet(CLOUD.sheet);
+  cs.getRange(1, 1, 1, CLOUD_HEAD.length).setValues([CLOUD_HEAD]).setFontWeight('bold'); cs.setFrozenRows(1);
+  cloudFolder(); // 第一次執行會要求 Google Drive 授權
 
   const sum = ss.getSheetByName('摘要') || ss.insertSheet('摘要', 0);
   sum.clear();
@@ -62,6 +71,9 @@ function doPost(e) {
     const cache = CacheService.getScriptCache(), ck = `${d.type}:${pid}`;
     if (cache.get(ck)) return json({ ok: false, error: 'too fast' });
     cache.put(ck, '1', LIMIT_SEC[d.type]);
+
+    if (d.type === 'login') return json(cloudLogin(d));
+    if (d.type === 'cloudsave' || d.type === 'cloudload' || d.type === 'cloudinfo') return json(cloudOp(d));
 
     const lock = LockService.getScriptLock();
     lock.waitLock(10000);
@@ -152,3 +164,59 @@ function clean(v, max) {
   return s;
 }
 function json(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
+
+// ---------- 雲端存檔 ----------
+// 登入：遊戲送來 Google 的 ID token → 向 Google 驗證 → 發一組 30 天的登入憑證（之後上傳／下載都用它）
+function cloudLogin(d) {
+  if (!CLIENT_ID) return { ok: false, error: 'cloud off' };
+  const r = UrlFetchApp.fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(String(d.idToken || '')), { muteHttpExceptions: true });
+  if (r.getResponseCode() !== 200) return { ok: false, error: 'bad token' };
+  const t = JSON.parse(r.getContentText());
+  if (t.aud !== CLIENT_ID || !/^(https:\/\/)?accounts\.google\.com$/.test(t.iss) || Number(t.exp) * 1000 < Date.now()) return { ok: false, error: 'bad token' };
+  const sub = String(t.sub), token = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
+  const exp = Date.now() + CLOUD.sessionDays * 864e5;
+  const lock = LockService.getScriptLock(); lock.waitLock(10000);
+  try {
+    const sh = cloudSheet(), row = cloudRowBy(sh, 1, sub);
+    if (row) { sh.getRange(row.r, 2, 1, 2).setValues([[token, exp]]); return { ok: true, token, updated: row.v[4] || '', summary: row.v[5] || '' }; }
+    sh.appendRow([sub, token, exp, '', '', '', '']);
+    return { ok: true, token, updated: '', summary: '' };
+  } finally { lock.releaseLock(); }
+}
+function cloudOp(d) {
+  const sh = cloudSheet(), row = cloudRowBy(sh, 2, String(d.token || ''));
+  if (!row || !row.v[1] || Number(row.v[2]) < Date.now()) return { ok: false, error: 'login' };
+  if (d.type === 'cloudinfo') return { ok: true, updated: row.v[4] || '', summary: row.v[5] || '' };
+  if (d.type === 'cloudload') {
+    if (!row.v[3]) return { ok: true, save: null };
+    return { ok: true, save: DriveApp.getFileById(row.v[3]).getBlob().getDataAsString(), updated: row.v[4], summary: row.v[5] };
+  }
+  // cloudsave：存檔內容只做大小與 JSON 檢查，遊戲讀回來時會再過濾
+  const text = String(d.save || '');
+  if (!text || text.length > CLOUD.maxBytes) return { ok: false, error: 'size' };
+  try { JSON.parse(text); } catch (e) { return { ok: false, error: 'json' }; }
+  const lock = LockService.getScriptLock(); lock.waitLock(10000);
+  try {
+    let id = row.v[3];
+    if (id) DriveApp.getFileById(id).setContent(text);
+    else id = cloudFolder().createFile(row.v[0] + '.json', text, 'application/json').getId();
+    const at = now();
+    sh.getRange(row.r, 4, 1, 4).setValues([[id, at, clean(d.summary, 100), clean(d.ver, 10)]]);
+    return { ok: true, updated: at };
+  } finally { lock.releaseLock(); }
+}
+function cloudSheet() {
+  const ss = SpreadsheetApp.getActive();
+  return ss.getSheetByName(CLOUD.sheet) || (setup(), ss.getSheetByName(CLOUD.sheet));
+}
+function cloudRowBy(sh, col, value) {
+  if (!value || sh.getLastRow() < 2) return null;
+  const vals = sh.getRange(2, 1, sh.getLastRow() - 1, CLOUD_HEAD.length).getValues();
+  const i = vals.findIndex(v => String(v[col - 1]) === value);
+  return i < 0 ? null : { r: i + 2, v: vals[i] };
+}
+function cloudFolder() {
+  const it = DriveApp.getFoldersByName(CLOUD.folder);
+  return it.hasNext() ? it.next() : DriveApp.createFolder(CLOUD.folder);
+}
+

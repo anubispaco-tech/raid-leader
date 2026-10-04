@@ -8,7 +8,7 @@ const URL_ = G.TELEMETRY.url;
 export const enabled = () => !!URL_;
 const lb = { at: 0, data: null, loading: false, error: false };
 
-function post(body, keepalive = false) {
+export function post(body, keepalive = false) {
   if (!URL_ || !app.S) return Promise.resolve(null);
   const p = app.S.player;
   return fetch(URL_, { method: 'POST', keepalive, headers: { 'Content-Type': 'text/plain;charset=utf-8' },

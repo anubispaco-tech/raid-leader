@@ -14,8 +14,10 @@ const pkg = JSON.parse(read('package.json'));
 
 const dev = process.argv.includes('--dev'), v = pkg.version;
 // 內容安全政策：只執行自己網站的腳本（擋掉被注入的 inline script），資料只能送到 GAS
-const CSP = ["default-src 'self'", "script-src 'self'", "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src https://fonts.gstatic.com", "img-src 'self' data:", "connect-src https://script.google.com https://script.googleusercontent.com",
+// v0.13：Google 登入（accounts.google.com/gsi）
+const CSP = ["default-src 'self'", "script-src 'self' https://accounts.google.com/gsi/client", "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style",
+  "font-src https://fonts.gstatic.com", "img-src 'self' data: https://*.googleusercontent.com", "frame-src https://accounts.google.com/gsi/",
+  "connect-src https://script.google.com https://script.googleusercontent.com https://accounts.google.com/gsi/",
   "object-src 'none'", "base-uri 'none'", "form-action 'none'"].join('; ');
 fs.writeFileSync(path.join(root, 'src/core/version.js'), `// 由 tools/build.js 依 package.json 產生，請勿手動修改\nexport const VERSION = '${v}';\n`);
 const script = dev ? '<script type="module" src="src/ui/main.js"></script>' : `<script src="dist/app.js?v=${v}"></script>`;
