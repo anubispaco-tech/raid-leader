@@ -26,6 +26,7 @@ export const CLASS_AI = {
 // ---------- 英雄 ----------
 export const HERO = {
   maxLevel: 40,
+  paragon: { need: 20000, growth: 0.1, bonus: 0.01 }, // 巔峰：Lv40 後經驗轉巔峰點；第 p 級需 need×(1+growth×p)，每級生命／威力 +1%
   xpBase: 60, xpExp: 1.8,          // 升級所需經驗 = xpBase × 等級^xpExp
   names: ['艾倫', '凱莉', '雷恩', '米拉', '索恩', '伊薇', '巴頓', '妮雅', '托爾', '菲歐', '達克', '露娜',
     '葛雷', '希拉', '奧德', '薇絲', '布蘭', '卡珊', '洛克', '艾琳', '費恩', '茉兒', '賽勒', '朵拉'],
@@ -54,7 +55,9 @@ export const SLOT_NAMES = {
 };
 export const PREFIX = ['', '堅毅的', '銳利的', '灼熱的', '寒霜的', '虛空的', '遠古的', '龍鱗的'];
 export const GEAR = {
-  maxUp: 5, upBonus: 0.08,          // 每級強化屬性 +8%
+  maxUp: 10, upBonus: 0.08,         // 每級強化屬性 +8%（+6 以上為精煉）
+  refineFrom: 5, dustPerStep: 5,    // 精煉：+5 → +6 要 5 精華，之後每級多 5（+6→+7 要 10…）
+  salvageDust: [0, 1, 2, 4, 10],    // 分解得到的精華（依品質）
   upCostBase: 15,                   // 強化費用 = base × (等級+1) × (1 + 裝等/10)
   salvageMult: 1.5,                 // 分解金幣 = 裝等 × 稀有度倍率 × salvageMult
   staToHp: 2,                       // 1 耐力 = 2 生命
@@ -94,6 +97,7 @@ export const MYTHIC = {
   dropBase: 68, dropPerLevel: 3,    // 掉落裝等 = base + 每級 × 等級
   legendFrom: 7, legendBase: 0.03, legendPerLevel: 0.01, legendMax: 0.15,
   goldMult: 1.5, xpMult: 1.2,       // 相對第 7 層的獎勵
+  idleBelow: 2, idleMult: 0.7,      // 秘境掛機：打「限時最高 −2」，金幣經驗 7 折、每場 1 件，鑰石不變
 };
 
 // ---------- 英雄稀有度（v0.7）----------
@@ -166,6 +170,7 @@ export const REWARD = {
   doubleDropChance: 0.35,
   firstClearMinRarity: 2,           // 首通保底稀有
   decayGrace: 4, decayPerLevel: 0.25, decayFloor: 0.05, // 等級壓制
+  decayFloorTop: 0.4,               // 最高層（第 7 層）壓制下限：後期仍可掛機
 };
 export const ECONOMY = {
   startGold: 60,

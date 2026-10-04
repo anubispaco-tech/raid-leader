@@ -26,7 +26,8 @@ export function heroStats(h, items) {
   const c = CLASSES[h.cls], m = heroMods(h), R = HERO_RARITY[h.rarity || 0];
   let pow = (c.pow + c.powL * (h.level - 1)) * R.mult, hp = (c.hp + c.hpL * (h.level - 1)) * R.mult, crit = c.crit + R.crit;
   for (const it of gearOf(h, items)) { pow += itemPow(it); hp += itemSta(it) * GEAR.staToHp; crit += it.crit; }
-  pow *= m.powMult || 1; hp *= m.hpMult || 1; crit += m.critAdd || 0;
+  const para = 1 + HERO.paragon.bonus * (h.para || 0);
+  pow *= (m.powMult || 1) * para; hp *= (m.hpMult || 1) * para; crit += m.critAdd || 0;
   return { pow: Math.round(pow), hp: Math.round(hp), crit: Math.min(0.5, crit), armor: c.armor };
 }
 export function heroIlvl(h, items) {
@@ -36,11 +37,18 @@ export function heroPower(h, items) { // 戰力（顯示用）
   const s = heroStats(h, items);
   return Math.round(s.pow * 10 * (1 + s.crit) + s.hp * 0.5);
 }
+export const paraNeed = p => Math.round(HERO.paragon.need * (1 + HERO.paragon.growth * p));
+// 滿級後的經驗進巔峰：h.para = 巔峰等級，h.paraXp = 目前進度
 export function gainXp(h, xp) {
-  if (h.level >= HERO.maxLevel) return 0;
   let ups = 0;
-  h.xp += xp;
-  while (h.level < HERO.maxLevel && h.xp >= xpNeed(h.level)) { h.xp -= xpNeed(h.level); h.level++; ups++; }
-  if (h.level >= HERO.maxLevel) h.xp = 0;
+  if (h.level < HERO.maxLevel) {
+    h.xp += xp; xp = 0;
+    while (h.level < HERO.maxLevel && h.xp >= xpNeed(h.level)) { h.xp -= xpNeed(h.level); h.level++; ups++; }
+    if (h.level >= HERO.maxLevel) { xp = h.xp; h.xp = 0; }
+  }
+  if (h.level >= HERO.maxLevel && xp > 0) {
+    h.para = h.para || 0; h.paraXp = (h.paraXp || 0) + xp;
+    while (h.paraXp >= paraNeed(h.para)) { h.paraXp -= paraNeed(h.para); h.para++; ups++; }
+  }
   return ups;
 }

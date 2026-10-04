@@ -29,7 +29,7 @@ function sheetHero(x) {
   let h = `<h3>${c.icon} ${heroName(x)} ${rarityTag(x)}</h3><div class="sub" style="margin:0">${c.name}${sp ? `・${sp.name}` : ''}・${G.ROLE_NAME[c.role]}　${c.desc}</div>
     ${x.rarity ? `<div class="raritycard r-${x.rarity}"><b class="c${x.rarity}">${R.name}加成</b><span>基礎屬性 ×${R.mult.toFixed(2)}${R.crit ? `・暴擊 +${Math.round(R.crit * 100)}%` : ''}${R.baseCdMult ? '・基礎技能冷卻 −10%' : ''}</span>${L ? `<span><b class="c4">${L.pname}</b>：${L.desc}</span>` : ''}</div>` : ''}
     <div class="statgrid num"><div><b>${x.level}</b><span>等級</span></div><div><b>${fmt(st.hp)}</b><span>生命</span></div><div><b>${st.pow}</b><span>威力</span></div><div><b>${Math.round(st.crit * 100)}%</b><span>暴擊</span></div></div>
-    <div class="sub" style="margin:0">經驗 <span class="num">${fmt(x.xp)} / ${fmt(G.xpNeed(x.level))}</span>・護甲減傷 ${Math.round(st.armor * 100)}%</div>
+    <div class="sub" style="margin:0">${x.level >= G.HERO.maxLevel ? `<b style="color:var(--brass)">巔峰 ${x.para || 0}</b>（生命／威力 +${x.para || 0}%）<span class="num">${fmt(x.paraXp || 0)} / ${fmt(G.paraNeed(x.para || 0))}</span>` : `經驗 <span class="num">${fmt(x.xp)} / ${fmt(G.xpNeed(x.level))}</span>`}・護甲減傷 ${Math.round(st.armor * 100)}%</div>
     <div class="seg wide"><button data-act="heroview" data-id="${x.id}" data-v="gear" class="${view === 'gear' ? 'sel' : ''}">裝備</button><button data-act="heroview" data-id="${x.id}" data-v="talent" class="${view === 'talent' ? 'sel' : ''}">天賦${pend ? `<span class="pip">${pend}</span>` : ''}</button></div>`;
   if (view === 'talent') return h + talentView(x) + heroActions(x);
   h += `<div>`;
@@ -37,7 +37,7 @@ function sheetHero(x) {
     const it = x.gear[slot] && app.S.items[x.gear[slot]];
     const n = app.S.bag.filter(id => app.S.items[id].slot === slot).length;
     h += `<div class="gearrow"><span class="sl">${sn}</span><span>${it ? `${itemName(it)} <span class="sub num">${it.ilvl}</span><br><span class="sub num" style="font-size:12px">${itemStatText(it)}</span>` : '<span class="sub">（空）</span>'}</span>
-      <span class="row">${it ? `<button class="btn sm" data-act="up" data-id="${it.id}" ${it.up >= G.GEAR.maxUp ? 'disabled' : ''}>強化 <span class="num">${it.up >= G.GEAR.maxUp ? 'MAX' : G.upgradeCost(it)}</span></button>` : ''}
+      <span class="row">${it ? upBtn(it, 'sm') : ''}
       <button class="btn sm" data-act="pick" data-id="${x.id}" data-slot="${slot}" ${n ? '' : 'disabled'}>更換</button></span></div>`;
   }
   const plan = G.upgradeAll(app.S, x.id, true), hasGear = Object.values(x.gear).some(Boolean);
@@ -46,7 +46,7 @@ function sheetHero(x) {
     <button class="btn grow ${better ? 'main' : ''}" data-act="autoequip1" data-id="${x.id}" ${better ? '' : 'disabled'}>${better ? `一鍵配裝（${better} 件更好）` : '已是最佳配裝'}</button>
     <button class="btn" data-act="unequipall" data-id="${x.id}" ${hasGear ? '' : 'disabled'}>全部卸下</button></div>
     <div class="row">
-    <button class="btn grow" data-act="upall" data-id="${x.id}" ${plan.count ? '' : 'disabled'}>${plan.empty ? '沒有裝備' : plan.count ? `一鍵強化 ${plan.count} 次（${fmt(plan.spent)} 金）` : plan.maxed ? '已全部強化到 +5' : '金幣不夠強化'}</button>
+    <button class="btn grow" data-act="upall" data-id="${x.id}" ${plan.count ? '' : 'disabled'}>${plan.empty ? '沒有裝備' : plan.count ? `一鍵強化 ${plan.count} 次（${fmt(plan.spent)} 金${plan.dustSpent ? `・${plan.dustSpent} 精華` : ''}）` : plan.maxed ? `已全部強化到 +${G.maxUpFor(app.S)}` : '金幣或精華不夠'}</button>
 </div>`;
   return h + heroActions(x);
 }
@@ -87,12 +87,18 @@ function sheetPick() {
 function sheetItem(it) {
   if (!it) return '';
   const party = G.partyHeroes(app.S);
-  return `<h3>${itemName(it)}</h3><div class="sub num" style="margin:0">${G.RARITY[it.rarity].name}${G.SLOTS[it.slot]}・裝等 ${it.ilvl}・強化 +${it.up}/${G.GEAR.maxUp}<br>${itemStatText(it)}</div>
+  return `<h3>${itemName(it)}</h3><div class="sub num" style="margin:0">${G.RARITY[it.rarity].name}${G.SLOTS[it.slot]}・裝等 ${it.ilvl}・強化 +${it.up}/${G.maxUpFor(app.S)}<br>${itemStatText(it)}</div>
     <span class="label">裝備給</span><div class="stack">${party.map(x => {
       const cur = x.gear[it.slot] && app.S.items[x.gear[it.slot]];
       const better = !cur || G.itemScore(it) > G.itemScore(cur);
       return `<button class="hero" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="ic">${cls(x).icon}</div><div class="nm">${x.name}<small>${cls(x).name}</small></div><span class="tag ${better ? 'in' : ''}">${better ? '▲ 提升' : '較差'}</span><div class="st">目前：${cur ? `${cur.name}（${cur.ilvl}）` : '空'}</div></button>`;
     }).join('')}</div>
-    <div class="row"><button class="btn" data-act="up" data-id="${it.id}" ${it.up >= G.GEAR.maxUp || app.S.gold < G.upgradeCost(it) ? 'disabled' : ''}>強化（<span class="num">${it.up >= G.GEAR.maxUp ? 'MAX' : G.upgradeCost(it)}</span> 金）</button>
-    <button class="btn" data-act="salvage" data-id="${it.id}">分解 +<span class="num">${G.salvageValue(it)}</span> 金</button></div>`;
+    <div class="row">${upBtn(it, '')}
+    <button class="btn" data-act="salvage" data-id="${it.id}">分解 +<span class="num">${G.salvageValue(it)}</span> 金${G.salvageDust(it) ? `・<span class="dust num">${G.salvageDust(it)}</span> 精華` : ''}</button></div>`;
+}
+// 強化按鈕：+5 以上叫「精煉」，額外需要精華
+function upBtn(it, size) {
+  if (it.up >= G.maxUpFor(app.S)) return `<button class="btn ${size}" disabled>強化 MAX</button>`;
+  const g = G.upgradeCost(it), d = G.dustCost(it), ok = app.S.gold >= g && (app.S.dust || 0) >= d;
+  return `<button class="btn ${size}" data-act="up" data-id="${it.id}" ${ok ? '' : 'disabled'}>${d ? '精煉' : '強化'} <span class="num">${fmt(g)}</span>${d ? `<span class="dust num">+${d}✦</span>` : ''}</button>`;
 }

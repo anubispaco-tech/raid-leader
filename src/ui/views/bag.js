@@ -1,7 +1,7 @@
 // ===== 背包分頁（含戰利品箱與分解設定）=====
 import * as G from '../../core/index.js';
 import { app } from '../state.js';
-import { itemStatText, itemName } from '../helpers.js';
+import { itemStatText, itemName, fmt } from '../helpers.js';
 
 function bestUpgradeFor(it) { // 是否比某位出戰者身上的更好
   return G.partyHeroes(app.S).some(h => { const cur = h.gear[it.slot] && app.S.items[h.gear[it.slot]]; return !cur || G.itemScore(it) > G.itemScore(cur); });
@@ -19,7 +19,8 @@ export function viewBag() {
     .filter(it => app.invFilter === 'all' || it.slot === app.invFilter)
     .sort((a, b) => G.itemScore(b) - G.itemScore(a));
   const cap = G.bagMax(S), full = S.bag.length >= cap;
-  let h = `<h2>背包 <span class="sub num ${full ? 'warnc' : ''}">${S.bag.length}/${cap}</span></h2>`;
+  let h = `<h2>背包 <span class="sub num ${full ? 'warnc' : ''}">${S.bag.length}/${cap}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">精華 <b class="dust num">${fmt(S.dust || 0)}</b></span></h2>
+    <p class="sub" style="margin:0 0 8px">分解精良以上的裝備會得到精華。通關第 7 層後，可用精華把裝備精煉到 +6 ~ +${G.GEAR.maxUp}。</p>`;
   if (S.stash.length) {
     h += `<div class="stashbox"><div class="row" style="align-items:center"><b>戰利品箱</b><span class="sub num" style="margin:0">${S.stash.length}/${E.stashMax}</span>
       <span class="sub" style="margin:0 0 0 auto">背包滿時掉落的裝備</span></div>

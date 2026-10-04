@@ -31,11 +31,12 @@ function mythicSection() {
   const key = S.mythic.key, today = G.dailyAffixes(), active = G.activeAffixes(key);
   let h = `<div class="mythic"><div class="mhead"><div><span class="label">傳奇秘境</span><b>目前鑰石</b></div><span class="keystone num">+${key}</span></div>
     <div class="affixes">${today.map((a, i) => `<div class="affix ${active.includes(a) ? 'on' : ''}"><b>${G.AFFIXES[a].name}</b><span>${G.AFFIXES[a].desc}</span><small>${active.includes(a) ? `考驗${G.AFFIXES[a].test}` : `+${G.MYTHIC.affixAt[i]} 起生效`}</small></div>`).join('')}</div>
-    <p class="sub" style="margin:0">今日詞綴，每天 00:00 更換。限時內通關，鑰石 +1，打得夠快 +2；超時或失敗，鑰石 −1。秘境要親自挑戰，不能掛機。</p>
+    <p class="sub" style="margin:0">今日詞綴，每天 00:00 更換。限時內通關，鑰石 +1，打得夠快 +2；超時或失敗，鑰石 −1。<b>秘境掛機</b>：限時通關過的副本可以掛機，固定打該副本最佳 −${G.MYTHIC.idleBelow}，鑰石不變、獎勵 ${Math.round(G.MYTHIC.idleMult * 100)}%，離線也會累積。</p>
     <div class="mlist">`;
   G.DUNGEONS.forEach((d, i) => {
     const best = S.mythic.best[i];
     h += `<div class="mrow2"><div class="mname"><b>${d.name}</b><span class="sub num" style="margin:0">限時 ${mmss(G.mythicTimer(i))}・${best ? `最佳 +${best.level}（${mmss(best.time)}）` : '還沒限時通關'}</span></div>
+      ${G.mythicIdleLevel(S, i) ? `<button class="btn sm ${S.idleMythic === i ? 'on' : ''}" data-act="idlemythic" data-d="${i}">${S.idleMythic === i ? '掛機中・停止' : `掛機 +${G.mythicIdleLevel(S, i)}`}</button>` : ''}
       <button class="btn sm" data-act="recommend-mythic" data-d="${i}" aria-label="一鍵備戰：陣容、天賦、裝備">備戰</button>
       <button class="btn sm main" data-act="mythic" data-d="${i}">挑戰 +${key}</button></div>`;
   });
@@ -73,7 +74,7 @@ export function viewDungeons() {
       <div class="acts">${locked ? `<span class="sub" style="margin:0">先通關上一層</span>` :
         `<button class="btn main grow" data-act="fight" data-d="${i}">挑戰</button>
          <button class="btn ${idleHere ? 'on' : ''}" data-act="idle" data-d="${i}" ${clears ? '' : 'disabled title="通關一次後才能掛機"'}>${idleHere ? '掛機中・停止' : '掛機刷'}</button>
-         <button class="btn" data-act="prepare" data-d="${i}" aria-label="${app.S.idle != null ? '一鍵備戰：掛機中只調天賦、裝備' : '一鍵備戰：陣容、天賦、裝備'}">備戰</button>`}
+         <button class="btn" data-act="prepare" data-d="${i}" aria-label="${G.partyLocked(app.S) ? '一鍵備戰：掛機中只調天賦、裝備' : '一鍵備戰：陣容、天賦、裝備'}">備戰</button>`}
       </div></div>`;
   });
   h += `</div>` + boardCard() + `<div class="howto" style="margin-top:16px"><b>備戰</b>：依這層首領的弱點，自動排好陣容、天賦與裝備（掛機中陣容鎖定，只調天賦與裝備）。<br><b>掛機刷</b>：自動重複挑戰，關掉頁面也會累積（最多 ${G.ECONOMY.offlineCapHours} 小時），回來時一次結算。<br><b>存檔</b>：進度存在這支手機的瀏覽器。要換手機玩，到「團隊」最下方匯出存檔碼。</div>`;

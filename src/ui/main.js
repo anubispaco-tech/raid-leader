@@ -9,7 +9,7 @@ import { viewTeam } from './views/team.js';
 import { viewBag } from './views/bag.js';
 import { viewTavern } from './views/tavern.js';
 import { renderModal, openModal, closeModal } from './views/sheets.js';
-import { startBattle, startMythic, startVault, runTimer, finishBattle } from './battle-runner.js';
+import { startBattle, startMythic, startMythicIdle, startVault, runTimer, finishBattle } from './battle-runner.js';
 import * as T from './telemetry.js';
 import { esc, heroName } from './helpers.js';
 
@@ -28,7 +28,7 @@ function renderTabs() {
 }
 function render(skipModal) {
   $('#gold').textContent = fmt(app.S.gold);
-  $('#idleChip').hidden = app.S.idle == null;
+  $('#idleChip').hidden = !G.partyLocked(app.S);
   renderTabs();
   const v = $('#view');
   if (app.tab === 'dungeon') v.innerHTML = viewDungeons();
@@ -69,7 +69,18 @@ document.addEventListener('click', e => {
     case 'idle': {
       const d = +t.dataset.d;
       if (app.S.idle === d) { app.S.idle = null; clearTimeout(app.pendingRepeat); app.pendingRepeat = null; toast('已停止掛機'); }
-      else { app.S.idle = d; toast(`開始掛機：${G.DUNGEONS[d].name}`); if (!app.battle || app.battle.over) { startBattle(d); } }
+      else { const swap = app.S.idleMythic != null; app.S.idleMythic = null; app.S.idle = d; toast(`開始掛機：${G.DUNGEONS[d].name}`); if (swap || !app.battle || app.battle.over) { startBattle(d); } }
+      save(); break;
+    }
+    case 'idlemythic': {
+      const d = +t.dataset.d, lv = G.mythicIdleLevel(app.S, d);
+      if (app.S.idleMythic === d) { app.S.idleMythic = null; clearTimeout(app.pendingRepeat); app.pendingRepeat = null; toast('已停止秘境掛機'); }
+      else if (lv) {
+        const busy = app.battle && !app.battle.over && !app.battle.mythicIdle && !(app.S.idle != null && app.battle.dIdx === app.S.idle && !app.battle.mythic);
+        if (busy) { toast('目前有戰鬥進行中，打完再開始秘境掛機'); break; }
+        app.S.idle = null; app.S.idleMythic = d; toast(`開始秘境掛機：${G.DUNGEONS[d].name} +${lv}`);
+        startMythicIdle(d); app.tab = 'battle'; window.scrollTo(0, 0);
+      }
       save(); break;
     }
     case 'speed': app.speed = +t.dataset.x; runTimer(); break;
@@ -77,7 +88,7 @@ document.addEventListener('click', e => {
       const b = app.battle; b.opts.autoHorn = true; // 直接結算視同掛機：首領戰自動吹號角
       if (b.waveIdx === b.waves.length - 1) b.useHorn();
       b.runToEnd(); finishBattle(); } break;
-    case 'retreat': if (app.battle && !app.battle.over) { clearInterval(app.bTimer); app.battle.over = true; app.battle.win = false; app.battle.push('🏳 主動撤退', 'bad'); app.lastResult = G.applyResult(app.S, app.battle.dIdx, app.battle); if (app.S.idle === app.battle.dIdx) app.S.idle = null; save(); } break;
+    case 'retreat': if (app.battle && !app.battle.over) { clearInterval(app.bTimer); app.battle.over = true; app.battle.win = false; app.battle.push('🏳 主動撤退', 'bad'); app.lastResult = app.battle.mythicIdle ? G.applyMythicIdleResult(app.S, app.battle) : G.applyResult(app.S, app.battle.dIdx, app.battle); if (app.S.idle === app.battle.dIdx) app.S.idle = null; if (app.battle.mythicIdle) app.S.idleMythic = null; save(); } break;
     case 'hero': openModal({ type: 'hero', id, view: app.modal && app.modal.id === id ? app.modal.view : undefined }); return;
     case 'heroview': app.modal = { type: 'hero', id, view: t.dataset.v }; break;
     case 'spec': G.setSpec(hero(id), t.dataset.v); save(); break;
@@ -92,7 +103,8 @@ document.addEventListener('click', e => {
     case 'pick': openModal({ type: 'pick', id, slot: t.dataset.slot }); return;
     case 'equip': G.equip(app.S, t.dataset.hero, id); toast('已裝備'); save(); app.modal = { type: 'hero', id: t.dataset.hero }; break;
     case 'unequip': G.unequip(app.S, t.dataset.hero, t.dataset.slot); save(); app.modal = { type: 'hero', id: t.dataset.hero }; break;
-    case 'up': if (G.upgrade(app.S, id)) { toast('強化成功'); save(); } else toast('金幣不足'); break;
+    case 'up': { const it = app.S.items[id], refine = it && it.up >= G.GEAR.refineFrom;
+      if (G.upgrade(app.S, id)) { toast(`${refine ? '精煉' : '強化'}成功 +${it.up}`); save(); } else toast(refine ? '金幣或精華不足' : '金幣不足'); break; }
     case 'salvage': toast(`分解獲得 ${G.salvage(app.S, id)} 金`); save(); app.modal = null; break;
     case 'join': if (G.partyLocked(app.S)) { toast('掛機中不能更換隊員，請先停止掛機'); break; } G.joinParty(app.S, id); save(); break;
     case 'bench': if (G.partyLocked(app.S)) { toast('掛機中不能更換隊員，請先停止掛機'); break; } G.benchHero(app.S, id); save(); break;
@@ -172,7 +184,7 @@ function settleOffline() {
   if (!r || !r.runs) return;
   save();
   const hrs = r.sec >= 3600 ? `${(r.sec / 3600).toFixed(1)} 小時` : `${Math.round(r.sec / 60)} 分鐘`;
-  openModal({ type: 'text', html: `<h3>離線收益</h3><p class="sub" style="margin:0">你離開了 ${hrs}，隊伍在 ${G.DUNGEONS[app.S.idle].name} 持續作戰。</p>
+  openModal({ type: 'text', html: `<h3>離線收益</h3><p class="sub" style="margin:0">你離開了 ${hrs}，隊伍在 ${app.S.idleMythic != null ? `秘境「${G.DUNGEONS[app.S.idleMythic].name}」+${G.mythicIdleLevel(app.S, app.S.idleMythic)}` : G.DUNGEONS[app.S.idle].name} 持續作戰。</p>
     <div class="statgrid num"><div><b>${r.runs}</b><span>挑戰</span></div><div><b>${r.wins}</b><span>通關</span></div><div><b>+${fmt(r.gold)}</b><span>金幣</span></div><div><b>${r.items}</b><span>裝備</span></div></div>
     ${r.stashed ? `<div style="color:var(--brass)">背包已滿，${r.stashed} 件放進戰利品箱，到背包取出</div>` : ''}
     ${r.lv ? `<div style="color:var(--good)">期間共升級 ${r.lv} 次</div>` : ''}
@@ -181,10 +193,10 @@ function settleOffline() {
 // 切到背景：暫停即時戰鬥並記錄時間；回來時掛機改用離線結算，避免重複計算
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { clearInterval(app.bTimer); clearTimeout(app.pendingRepeat); app.pendingRepeat = null; save(); if (app.S.player.asked) T.sendSnapshot(true); return; }
-  if (app.S.idle != null && (Date.now() - app.S.lastSeen) > 60000) {
-    app.battle = null; app.lastResult = null; settleOffline(); startBattle(app.S.idle); render();
+  if (G.partyLocked(app.S) && (Date.now() - app.S.lastSeen) > 60000) {
+    app.battle = null; app.lastResult = null; settleOffline(); resumeIdle(); render();
   } else if (app.battle && !app.battle.over) runTimer();
-  else if (app.S.idle != null) startBattle(app.S.idle);
+  else resumeIdle();
 });
 setInterval(() => { if (!document.hidden) { T.tick(5); save(); } }, 5000);
 document.addEventListener('input', e => { if (e.target.id === 'fbText') app.fbDraft = e.target.value; });
@@ -214,7 +226,7 @@ document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preven
 function start(data) {
   app.S = G.migrate((data && data.S) || load() || G.newGame());
   settleOffline();
-  if (app.S.idle != null && app.S.clears[app.S.idle]) startBattle(app.S.idle);
+  resumeIdle();
   render();
   if (T.enabled() && !app.S.player.asked && !app.modal) openNick();
   else if (app.S.player.asked) setTimeout(() => T.sendSnapshot(), 3000);
@@ -224,8 +236,14 @@ window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude
 
 // 手動開打其他副本／秘境／寶庫時先停掉掛機，避免掛機迴圈與陣容鎖卡住
 function stopIdleFor(d) {
-  if (app.S.idle == null || app.S.idle === d) return;
-  app.S.idle = null; clearTimeout(app.pendingRepeat); app.pendingRepeat = null; toast('已停止掛機'); save();
+  const m = app.S.idleMythic != null, i = app.S.idle != null && app.S.idle !== d;
+  if (!m && !i) return;
+  app.S.idleMythic = null; if (i) app.S.idle = null;
+  clearTimeout(app.pendingRepeat); app.pendingRepeat = null; toast('已停止掛機'); save();
+}
+function resumeIdle() {
+  if (app.S.idleMythic != null && G.mythicIdleLevel(app.S, app.S.idleMythic)) startMythicIdle(app.S.idleMythic);
+  else if (app.S.idle != null && app.S.clears[app.S.idle]) startBattle(app.S.idle);
 }
 function prepMsg(r, what) {
   const roles = `坦 ${r.roles.tank}・補 ${r.roles.heal}・輸出 ${r.roles.dps}`, gear = r.swapped ? `，換上 ${r.swapped} 件裝備` : '';

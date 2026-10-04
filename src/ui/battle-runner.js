@@ -23,6 +23,16 @@ export function startMythic(dIdx) {
   app.battle.push(`進入傳奇秘境：${G.DUNGEONS[dIdx].name} +${o.mythic.level}｜詞綴：${o.mythic.affixes.map(a => G.AFFIXES[a].name).join('、')}`, 'info');
   runTimer();
 }
+// 秘境掛機：固定打「限時最高 −2」，結束 3 秒後自動再開
+export function startMythicIdle(dIdx) {
+  const p = G.partyHeroes(app.S), lv = G.mythicIdleLevel(app.S, dIdx);
+  if (!p.length || !lv) return;
+  clearTimeout(app.pendingRepeat); app.pendingRepeat = null;
+  const o = G.mythicBattleOpts(dIdx, lv);
+  app.battle = new G.Battle(p, app.S.items, dIdx, { ...o, autoHorn: true }); app.battle.mythicIdle = true; app.lastResult = null;
+  app.battle.push(`秘境掛機：${G.DUNGEONS[dIdx].name} +${lv}（鑰石不變，獎勵 ${Math.round(G.MYTHIC.idleMult * 100)}%）`, 'info');
+  runTimer();
+}
 // 寶庫：每日次數用完就不能開
 export function startVault(floor) {
   const p = G.partyHeroes(app.S);
@@ -47,16 +57,22 @@ function stepBattle() {
 export function finishBattle() {
   clearInterval(app.bTimer);
   app.lastResult = app.battle.vault ? G.applyVaultResult(app.S, app.battle, G.partyHeroes)
+    : app.battle.mythicIdle ? G.applyMythicIdleResult(app.S, app.battle)
     : app.battle.mythic ? G.applyMythicResult(app.S, app.battle) : G.applyResult(app.S, app.battle.dIdx, app.battle);
   save();
   const r = app.lastResult, b = app.battle;
   for (const m of G.newBagMilestones(app.S)) setTimeout(() => toast(`🎒 ${m.name}：背包 +${G.BAG_PER_MILESTONE} 格`), 400);
   if (b.vault) sendEvent('寶庫', `第 ${b.vault.floor + 1} 層 打倒 ${r.kills} 隻 +${r.gold} 金`);
+  else if (b.mythicIdle) { /* 掛機不送事件，避免洗版 */ }
   else if (b.mythic) sendEvent('秘境', `${G.DUNGEONS[b.dIdx].name} +${b.mythic.level} ${r.inTime ? '限時' : b.win ? '超時' : '失敗'} ${mmss(b.tick)}${r.record ? '（新紀錄）' : ''}`);
   else if (r.first) sendEvent('首通', `第 ${b.dIdx + 1} 層 ${G.DUNGEONS[b.dIdx].name}`);
   if (!app.battle.mythic && !app.battle.vault && app.S.idle === app.battle.dIdx) {
     const d = app.battle.dIdx;
     app.pendingRepeat = setTimeout(() => { app.pendingRepeat = null; if (app.S.idle === d) startBattle(d); }, 3000);
+  }
+  if (b.mythicIdle && app.S.idleMythic === b.dIdx) {
+    const d = b.dIdx;
+    app.pendingRepeat = setTimeout(() => { app.pendingRepeat = null; if (app.S.idleMythic === d) startMythicIdle(d); }, 3000);
   }
   app.render(true);
 }

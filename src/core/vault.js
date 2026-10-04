@@ -33,6 +33,6 @@ export function applyVaultResult(s, battle, partyHeroes) {
   const record = kills > (v.best[f] || 0); if (record) v.best[f] = kills;
   s.gold += gold; s.stats.runs++;
   const lvUps = [];
-  for (const h of partyHeroes(s)) if (gainXp(h, xp)) lvUps.push({ name: h.name, level: h.level });
+  for (const h of partyHeroes(s)) if (gainXp(h, xp)) lvUps.push({ name: h.name, level: h.level, para: h.para || 0 });
   return { vault: true, kills, gold, xp, record, lvUps, loot: [], kept: [], stashed: [], salvaged: 0, first: false, decayed: false };
 }
