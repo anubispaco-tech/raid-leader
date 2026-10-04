@@ -1,6 +1,7 @@
 // ===== 裝備 =====
-import { RARITY, SLOTS, SLOT_STATS, SLOT_NAMES, PREFIX, GEAR } from './config.js';
+import { RARITY, SLOTS, SLOT_STATS, SLOT_NAMES, PREFIX, GEAR, SETS, SET_PIECE, ARMOR_SLOTS } from './config.js';
 import { R, rnd, pick, uid } from './rng.js';
+import { getLang } from './i18n.js';
 
 export function makeItem(slot, ilvl, rarity) {
   const B = ilvl * RARITY[rarity].mult, w = SLOT_STATS[slot];
@@ -16,6 +17,23 @@ export function rollRarity(minR = 0) {
   for (let i = RARITY.length - 1; i >= 0; i--) { x -= RARITY[i].weight; if (x < 0) { r = i; break; } }
   return Math.max(r, minR);
 }
+// T0 套裝部件：固定史詩、屬性比一般史詩高 10%
+export function makeSetItem(cls, slot, ilvl) {
+  const it = makeItem(slot, ilvl, 3);
+  it.set = cls; it.pow = Math.round(it.pow * 1.1); it.sta = Math.round(it.sta * 1.1);
+  it.name = SETS[cls].name + (getLang() === 'en' ? ' ' : '') + SET_PIECE[slot];
+  return it;
+}
+export const randomArmorSlot = () => pick(ARMOR_SLOTS);
+// 套裝件數與啟動的效果
+export function setMods(h, items) {
+  const set = SETS[h.cls]; if (!set) return {};
+  const n = ARMOR_SLOTS.filter(sl => h.gear[sl] && items[h.gear[sl]] && items[h.gear[sl]].set === h.cls).length;
+  return n >= 4 ? set.b4 : n >= 2 ? set.b2 : {};
+}
+export const setCount = (h, items) => ARMOR_SLOTS.filter(sl => h.gear[sl] && items[h.gear[sl]] && items[h.gear[sl]].set === h.cls).length;
+// 給某位英雄看的裝備分數：同職業套裝件 +20%（讓一鍵配裝願意保留套裝）
+export const heroItemScore = (h, it) => itemScore(it) * (it.set && it.set === h.cls ? 1.2 : 1);
 export const upMult = it => 1 + GEAR.upBonus * (it.up || 0);
 export const itemPow = it => Math.round(it.pow * upMult(it));
 export const itemSta = it => Math.round(it.sta * upMult(it));

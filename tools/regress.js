@@ -41,6 +41,12 @@ for (const [slot, sp] of [[0, 'bear'], [1, 'resto'], [2, 'feral']]) for (const r
   const p2 = party.map((h, i) => (i === slot ? d : h));
   for (let dd = 0; dd <= G.CH1_TOP; dd++) rec(`druid-${sp}-${rar}-d${dd}`, new G.Battle(p2, items, dd, { autoHorn: true }).runToEnd());
 }
+// 5) T0 套裝（v0.9.2）：四職業穿滿 4 件
+{
+  const p5 = party.map(h => JSON.parse(JSON.stringify(h)));
+  for (const h of p5.slice(0, 4)) for (const sl of G.ARMOR_SLOTS) { const it = G.makeSetItem(h.cls, sl, 90); items[it.id] = it; h.gear[sl] = it.id; }
+  for (let dd = 4; dd <= G.CH1_TOP; dd++) rec(`set-d${dd}`, new G.Battle(p5, items, dd, { autoHorn: true }).runToEnd());
+}
 // 4) 第二章（v0.9.0）：詛咒、讀條、護盾、打斷、淨化
 for (let combo = 0; combo < 4; combo++) {
   party.slice(0, 4).forEach((h, i) => G.setSpec(h, specs[h.cls][(combo >> (i % 2)) & 1]));

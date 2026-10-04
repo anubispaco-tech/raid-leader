@@ -1,4 +1,4 @@
-/* 副本團長 v0.9.1 */
+/* 副本團長 v0.9.2 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -294,7 +294,10 @@
     "\u53F2\u8A69": "Epic",
     "\u50B3\u8AAA": "Legendary",
     "\u6B66\u5668": "Weapon",
-    "\u8B77\u7532": "Armor",
+    "\u982D\u90E8": "Head",
+    "\u80F8\u7532": "Chest",
+    "\u624B\u90E8": "Hands",
+    "\u817F\u90E8": "Legs",
     "\u98FE\u54C1": "Trinket",
     "\u9577\u528D": "Longsword",
     "\u6CD5\u6756": "Staff",
@@ -302,16 +305,38 @@
     "\u6230\u9318": "Warhammer",
     "\u6B0A\u6756": "Scepter",
     "\u77ED\u5F13": "Shortbow",
+    "\u982D\u76D4": "Helm",
+    "\u515C\u5E3D": "Hood",
+    "\u982D\u51A0": "Crown",
+    "\u9762\u7532": "Visor",
     "\u9396\u7532": "Chainmail",
     "\u6CD5\u888D": "Robe",
     "\u76AE\u7532": "Leathers",
     "\u677F\u7532": "Plate",
-    "\u6597\u7BF7": "Cloak",
+    "\u624B\u5957": "Gloves",
+    "\u8B77\u624B": "Gauntlets",
+    "\u8155\u7532": "Bracers",
+    "\u8B77\u817F": "Greaves",
+    "\u7D81\u817F": "Leggings",
+    "\u817F\u7532": "Legplates",
     "\u8B77\u7B26": "Talisman",
     "\u6212\u6307": "Ring",
     "\u5FBD\u8A18": "Sigil",
     "\u5BF6\u73E0": "Orb",
     "\u9805\u934A": "Necklace",
+    "\u6DF1\u6DF5\u5B88\u671B\u8005": "Abyss Warden",
+    "\u53D7\u5230\u7684\u50B7\u5BB3 \u22128%": "Damage taken \u22128%",
+    "\u53D7\u5230\u7684\u50B7\u5BB3\u518D \u22127%\u3001\u50B7\u5BB3 +15%": "Damage taken another \u22127%, damage +15%",
+    "\u6668\u79B1\u8005": "Dawnprayer",
+    "\u6CBB\u7642\u518D +10%\u3001\u5168\u968A\u751F\u547D +5%": "Healing another +10%, party HP +5%",
+    "\u5F71\u88C2\u8005": "Riftshadow",
+    "\u50B7\u5BB3 +8%": "Damage +8%",
+    "\u50B7\u5BB3\u518D +10%\u3001\u66B4\u64CA\u7387 +5%": "Damage another +10%, crit chance +5%",
+    "\u661F\u71FC": "Starcinder",
+    "\u50B7\u5BB3\u518D +10%\u3001\u70C8\u7130\u98A8\u66B4\u51B7\u537B \u221220%": "Damage another +10%, Flamestrike cooldown \u221220%",
+    "\u6797\u51A0\u5B88\u8B77": "Canopy Guardian",
+    "\u50B7\u5BB3\u3001\u6CBB\u7642 +5%\uFF0C\u53D7\u5230\u7684\u50B7\u5BB3 \u22125%": "Damage and healing +5%, damage taken \u22125%",
+    "\u4EE5\u4E0A\u6548\u679C\u52A0\u500D": "Doubles the above",
     "\u5805\u6BC5\u7684": "Steadfast ",
     "\u92B3\u5229\u7684": "Keen ",
     "\u707C\u71B1\u7684": "Searing ",
@@ -551,6 +576,8 @@
     "\u53D6\u51FA\u5230\u80CC\u5305\uFF08\u9084\u80FD\u653E {0} \u4EF6\uFF09": "Move to bag ({0} slots free)",
     '<div class="toolbar">{0} <button class="btn sm main" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button></div> <div class="toolbar"><label class="selwrap"><span>\u5206\u89E3</span><select id="salvSel" aria-label="\u5206\u89E3\u54C1\u8CEA">{1}</select></label> <button class="btn sm {2}" data-act="salvageupto">{3}</button></div>': '<div class="toolbar">{0} <button class="btn sm main" data-act="autoequip">Auto-equip</button></div> <div class="toolbar"><label class="selwrap"><span>Salvage</span><select id="salvSel" aria-label="Salvage quality">{1}</select></label> <button class="btn sm {2}" data-act="salvageupto">{3}</button></div>',
     "\u5168\u90E8": "All",
+    "\u8B77\u7532": "Armor",
+    "\u5957\u88DD": "Sets",
     "\u4EE5\u4E0B": " & below",
     "\u78BA\u5B9A\u5206\u89E3 {0} \u4EF6\uFF1F": "Salvage {0} item(s)?",
     "\u5206\u89E3\uFF08{0} \u4EF6\uFF09": "Salvage ({0})",
@@ -691,6 +718,9 @@
     "\u30FB{0} \u7CBE\u83EF": " \xB7 {0} essence",
     "\u5DF2\u5168\u90E8\u5F37\u5316\u5230 +{0}": "All at +{0}",
     "\u91D1\u5E63\u6216\u7CBE\u83EF\u4E0D\u5920": "Not enough gold or essence",
+    "2 \u4EF6": "2-piece",
+    "4 \u4EF6": "4-piece",
+    "{0}\u5C08\u5C6C\u5957\u88DD": "{0} set",
     '<div class="row"><button class="btn grow" disabled>{0}\u30FB\u639B\u6A5F\u6642\u7121\u6CD5\u66F4\u63DB\u968A\u54E1</button></div>': `<div class="row"><button class="btn grow" disabled>{0} \xB7 can't change members while idling</button></div>`,
     "\u51FA\u6230\u4E2D": "Active",
     "\u5F85\u547D\u4E2D": "Benched",
@@ -793,7 +823,7 @@
   var specCd = (u, s) => Math.round(s.cd * (u.mods.specCd || 1));
   var fx = (u) => u.mods.specFx || 1;
   var spec = (pack, u) => u.spec && pack.specs[u.spec];
-  var baseCd = (u, def) => Math.max(1, Math.round((u.mods.baseCd || def) * (u.mods.baseCdMult || 1) * (u.legendCd || 1)));
+  var baseCd = (u, def) => Math.max(1, Math.round((u.mods.baseCd || def) * (u.mods.baseCdMult || 1) * (u.legendCd || 1) * (u.mods.setCd || 1)));
   var SPEC_ROW = {
     a: { name: tx("\u5C08\u7CBE\u7CBE\u901A"), desc: tx("\u5C08\u7CBE\u6280\u80FD\u51B7\u537B \u221230%"), mods: { specCd: 0.7 } },
     b: { name: tx("\u5C08\u7CBE\u5F37\u5316"), desc: tx("\u5C08\u7CBE\u6280\u80FD\u6548\u679C +30%"), mods: { specFx: 1.3 } }
@@ -1434,17 +1464,63 @@
     { name: tx("\u50B3\u8AAA"), mult: 2.1, color: "#f59e0b", weight: 0 }
     // 只從傳奇秘境 +7 起掉落
   ];
-  var SLOTS = { weapon: tx("\u6B66\u5668"), armor: tx("\u8B77\u7532"), trinket: tx("\u98FE\u54C1") };
+  var SLOTS = { weapon: tx("\u6B66\u5668"), head: tx("\u982D\u90E8"), chest: tx("\u80F8\u7532"), hands: tx("\u624B\u90E8"), legs: tx("\u817F\u90E8"), trinket: tx("\u98FE\u54C1") };
+  var ARMOR_SLOTS = ["head", "chest", "hands", "legs"];
   var SLOT_STATS = {
     weapon: { pow: 0.6, sta: 1 },
-    armor: { pow: 0.15, sta: 3 },
+    head: { pow: 0.0375, sta: 0.75 },
+    chest: { pow: 0.045, sta: 0.9 },
+    hands: { pow: 0.03, sta: 0.6 },
+    legs: { pow: 0.0375, sta: 0.75 },
     trinket: { pow: 0.35, sta: 1 }
   };
   var SLOT_NAMES = {
     weapon: [tx("\u9577\u528D"), tx("\u6CD5\u6756"), tx("\u5315\u9996"), tx("\u6230\u9318"), tx("\u6B0A\u6756"), tx("\u77ED\u5F13")],
-    armor: [tx("\u9396\u7532"), tx("\u6CD5\u888D"), tx("\u76AE\u7532"), tx("\u677F\u7532"), tx("\u6597\u7BF7")],
+    head: [tx("\u982D\u76D4"), tx("\u515C\u5E3D"), tx("\u982D\u51A0"), tx("\u9762\u7532")],
+    chest: [tx("\u9396\u7532"), tx("\u6CD5\u888D"), tx("\u76AE\u7532"), tx("\u677F\u7532")],
+    hands: [tx("\u624B\u5957"), tx("\u8B77\u624B"), tx("\u8155\u7532")],
+    legs: [tx("\u8B77\u817F"), tx("\u7D81\u817F"), tx("\u817F\u7532")],
     trinket: [tx("\u8B77\u7B26"), tx("\u6212\u6307"), tx("\u5FBD\u8A18"), tx("\u5BF6\u73E0"), tx("\u9805\u934A")]
   };
+  var SETS = {
+    guardian: {
+      name: tx("\u6DF1\u6DF5\u5B88\u671B\u8005"),
+      b2: { setTaken: 0.08 },
+      b4: { setTaken: 0.15, setDmg: 0.15 },
+      d2: tx("\u53D7\u5230\u7684\u50B7\u5BB3 \u22128%"),
+      d4: tx("\u53D7\u5230\u7684\u50B7\u5BB3\u518D \u22127%\u3001\u50B7\u5BB3 +15%")
+    },
+    cleric: {
+      name: tx("\u6668\u79B1\u8005"),
+      b2: { setHeal: 0.1 },
+      b4: { setHeal: 0.2, setPartyHp: 0.05 },
+      d2: tx("\u6CBB\u7642 +10%"),
+      d4: tx("\u6CBB\u7642\u518D +10%\u3001\u5168\u968A\u751F\u547D +5%")
+    },
+    rogue: {
+      name: tx("\u5F71\u88C2\u8005"),
+      b2: { setDmg: 0.08 },
+      b4: { setDmg: 0.18, setCrit: 0.05 },
+      d2: tx("\u50B7\u5BB3 +8%"),
+      d4: tx("\u50B7\u5BB3\u518D +10%\u3001\u66B4\u64CA\u7387 +5%")
+    },
+    mage: {
+      name: tx("\u661F\u71FC"),
+      b2: { setDmg: 0.08 },
+      b4: { setDmg: 0.18, setCd: 0.8 },
+      d2: tx("\u50B7\u5BB3 +8%"),
+      d4: tx("\u50B7\u5BB3\u518D +10%\u3001\u70C8\u7130\u98A8\u66B4\u51B7\u537B \u221220%")
+    },
+    druid: {
+      name: tx("\u6797\u51A0\u5B88\u8B77"),
+      b2: { setDmg: 0.05, setHeal: 0.05, setTaken: 0.05 },
+      b4: { setDmg: 0.1, setHeal: 0.1, setTaken: 0.1 },
+      d2: tx("\u50B7\u5BB3\u3001\u6CBB\u7642 +5%\uFF0C\u53D7\u5230\u7684\u50B7\u5BB3 \u22125%"),
+      d4: tx("\u4EE5\u4E0A\u6548\u679C\u52A0\u500D")
+    }
+  };
+  var SET_PIECE = { head: tx("\u982D\u51A0"), chest: tx("\u80F8\u7532"), hands: tx("\u8B77\u624B"), legs: tx("\u817F\u7532") };
+  var SET_DROP = { chance: 0.15, rarity: 3 };
   var PREFIX = ["", tx("\u5805\u6BC5\u7684"), tx("\u92B3\u5229\u7684"), tx("\u707C\u71B1\u7684"), tx("\u5BD2\u971C\u7684"), tx("\u865B\u7A7A\u7684"), tx("\u9060\u53E4\u7684"), tx("\u9F8D\u9C57\u7684")];
   var GEAR = {
     maxUp: 10,
@@ -1612,6 +1688,8 @@
     loseMult: 0.3,
     // 失敗時金幣經驗比例
     doubleDropChance: 0.35,
+    baseDrops: 2,
+    // v0.9.2：裝備格從 3 變 6，基本掉落 1 → 2 件補回節奏
     firstClearMinRarity: 2,
     // 首通保底稀有
     decayGrace: 4,
@@ -1667,6 +1745,23 @@
     }
     return Math.max(r, minR);
   }
+  function makeSetItem(cls2, slot, ilvl) {
+    const it = makeItem(slot, ilvl, 3);
+    it.set = cls2;
+    it.pow = Math.round(it.pow * 1.1);
+    it.sta = Math.round(it.sta * 1.1);
+    it.name = SETS[cls2].name + (getLang() === "en" ? " " : "") + SET_PIECE[slot];
+    return it;
+  }
+  var randomArmorSlot = () => pick(ARMOR_SLOTS);
+  function setMods(h, items) {
+    const set = SETS[h.cls];
+    if (!set) return {};
+    const n = ARMOR_SLOTS.filter((sl) => h.gear[sl] && items[h.gear[sl]] && items[h.gear[sl]].set === h.cls).length;
+    return n >= 4 ? set.b4 : n >= 2 ? set.b2 : {};
+  }
+  var setCount = (h, items) => ARMOR_SLOTS.filter((sl) => h.gear[sl] && items[h.gear[sl]] && items[h.gear[sl]].set === h.cls).length;
+  var heroItemScore = (h, it) => itemScore(it) * (it.set && it.set === h.cls ? 1.2 : 1);
   var upMult = (it) => 1 + GEAR.upBonus * (it.up || 0);
   var itemPow = (it) => Math.round(it.pow * upMult(it));
   var itemSta = (it) => Math.round(it.sta * upMult(it));
@@ -1735,7 +1830,7 @@
       legend: !!legend,
       spec: null,
       talents: {},
-      gear: { weapon: null, armor: null, trinket: null }
+      gear: { weapon: null, head: null, chest: null, hands: null, legs: null, trinket: null }
     };
   }
   function rarityMods(h) {
@@ -1756,7 +1851,7 @@
     const para = 1 + HERO.paragon.bonus * (h.para || 0);
     pow *= (m.powMult || 1) * para;
     hp *= (m.hpMult || 1) * para;
-    crit += m.critAdd || 0;
+    crit += (m.critAdd || 0) + (setMods(h, items).setCrit || 0);
     return { pow: Math.round(pow), hp: Math.round(hp), crit: Math.min(0.5, crit), armor: c.armor };
   }
   function heroIlvl(h, items) {
@@ -1906,7 +2001,7 @@
       this.kills = 0;
       this.maxTicks = opts.maxTicks || DUNGEON.maxTicks;
       this.units = party.map((h) => {
-        const s = heroStats(h, items), pack = PACKS[h.cls], mods = { ...heroMods(h), ...rarityMods(h), ...pack.modsOf ? pack.modsOf(h) : {} };
+        const s = heroStats(h, items), pack = PACKS[h.cls], mods = { ...heroMods(h), ...rarityMods(h), ...pack.modsOf ? pack.modsOf(h) : {}, ...setMods(h, items) };
         const lh = mods.legend && pack.legend.hooks || {};
         return {
           id: h.id,
@@ -1937,7 +2032,7 @@
           taken: 0
         };
       });
-      const partyHp = this.units.reduce((a, u) => a + (u.mods.partyHp || 0), 0);
+      const partyHp = this.units.reduce((a, u) => a + (u.mods.partyHp || 0) + (u.mods.setPartyHp || 0), 0);
       for (const u of this.units) {
         u.max = Math.round(u.max * (1 + partyHp));
         u.hp = u.max;
@@ -1990,7 +2085,7 @@
       return true;
     }
     healMult(u) {
-      return (u.mods.healMult || 1) * (this.hornActive() ? 1 + RAID_HORN.bonus : 1);
+      return (u.mods.healMult || 1) * (u.mods.setHeal ? 1 + u.mods.setHeal : 1) * (this.hornActive() ? 1 + RAID_HORN.bonus : 1);
     }
     weakMult(e) {
       return e.weakUntil > this.tick ? 1 - e.weak : 1;
@@ -2000,6 +2095,7 @@
       if (e.hp <= 0) return 0;
       const m = u.mods;
       amt *= (m.dmgMult || 1) * (this.hornActive() ? 1 + RAID_HORN.bonus : 1);
+      if (m.setDmg) amt *= 1 + m.setDmg;
       if (u.hk.outMult) amt *= u.hk.outMult(this, u, e, o);
       if (m.execute && e.hp < e.max * 0.35) amt *= 1 + m.execute;
       if (m.sweep && !e.boss) amt *= 1 + m.sweep;
@@ -2054,6 +2150,7 @@
         if (g) red *= g.hk.busterGuard.apply(this, g, u);
       }
       red *= 1 - (m.allReduce || 0);
+      if (m.setTaken) red *= 1 - m.setTaken;
       const aura = this.alive().find((x) => x.lh.partyTaken);
       if (aura) red *= aura.lh.partyTaken;
       if (m.lowHpReduce && u.hp < u.max * 0.5) red *= 1 - m.lowHpReduce;
@@ -2273,7 +2370,7 @@
     const top = CH1_TOP;
     const gold = Math.round((REWARD.goldBase + REWARD.goldPerTier * top) * MYTHIC.goldMult * (1 + 0.05 * level) * rnd(0.9, 1.1));
     const xp = Math.round(REWARD.xpBase * Math.pow(top + 1, REWARD.xpExp) * MYTHIC.xpMult * (1 + 0.1 * level));
-    const n = inTime ? 2 : 1, loot = [];
+    const n = inTime ? 3 : 2, loot = [];
     const legend = level >= MYTHIC.legendFrom ? Math.min(MYTHIC.legendMax, MYTHIC.legendBase + MYTHIC.legendPerLevel * (level - MYTHIC.legendFrom)) : 0;
     for (let k = 0; k < n; k++) {
       const rar = R() < legend ? RARITY.length - 1 : rollRarity(1);
@@ -2297,7 +2394,7 @@
     const xp = Math.round(REWARD.xpBase * Math.pow(dIdx + 1, REWARD.xpExp) * m);
     const loot = [];
     if (win) {
-      const n = R() < REWARD.doubleDropChance ? 2 : 1;
+      const n = REWARD.baseDrops + (R() < REWARD.doubleDropChance ? 1 : 0);
       for (let k = 0; k < n; k++) {
         loot.push(makeItem(pick(Object.keys(SLOTS)), info.dropIlvl + rint(-1, 2), rollRarity(firstClear && k === 0 ? REWARD.firstClearMinRarity : 0)));
       }
@@ -2372,6 +2469,14 @@
     s.vault = s.vault || { day: "", used: 0, runs: 0, best: {} };
     if (s.dust == null) s.dust = 0;
     if (s.idleMythic === void 0) s.idleMythic = null;
+    for (const it of Object.values(s.items)) if (it.slot === "armor") it.slot = "chest";
+    for (const h of [...s.heroes, ...s.tavern || []]) {
+      if ("armor" in h.gear) {
+        h.gear.chest = h.gear.chest || h.gear.armor;
+        delete h.gear.armor;
+      }
+      for (const sl of ["head", "hands", "legs"]) if (h.gear[sl] === void 0) h.gear[sl] = null;
+    }
     if (s.salvageIlvlGap == null) s.salvageIlvlGap = 0;
     s.story = s.story || { seen: [] };
     s.v = SAVE_VERSION;
@@ -2514,7 +2619,7 @@
     return p.length ? p.reduce((a, h) => a + heroIlvl(h, s.items), 0) / p.length : 0;
   };
   function salvageLowIlvl(s, gap, dry = false) {
-    const lim = partyIlvl(s) - gap, ids = s.bag.filter((i) => s.items[i].rarity < 4 && s.items[i].ilvl < lim);
+    const lim = partyIlvl(s) - gap, ids = s.bag.filter((i) => s.items[i].rarity < 4 && !s.items[i].set && s.items[i].ilvl < lim);
     if (dry) return { count: ids.length };
     return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
   }
@@ -2563,9 +2668,25 @@
       s.clears[dIdx] = (s.clears[dIdx] || 0) + 1;
       if (dIdx + 1 >= s.unlocked && dIdx + 1 < DUNGEONS.length) s.unlocked = dIdx + 2;
     }
-    const dest = rw.loot.map((it) => addLoot(s, it));
+    if (battle.win && dIdx > CH1_TOP && party.length && R() < SET_DROP.chance) rw.loot.push(makeSetItem(pick(party).cls, randomArmorSlot(), dungeonInfo(dIdx).dropIlvl + 2));
+    const dest = rw.loot.map((it) => it.set ? addSetLoot(s, it) : addLoot(s, it));
     const kept = rw.loot.filter((_, i) => dest[i] === "bag"), stashed = rw.loot.filter((_, i) => dest[i] === "stash");
     return { ...rw, first, lvUps, kept, stashed, salvaged: dest.filter((d) => d === "salvaged").length };
+  }
+  function addSetLoot(s, it) {
+    s.items[it.id] = it;
+    if (s.bag.length < bagMax(s)) {
+      s.bag.push(it.id);
+      return "bag";
+    }
+    if (s.stash.length < ECONOMY.stashMax) {
+      s.stash.push(it.id);
+      return "stash";
+    }
+    delete s.items[it.id];
+    s.gold += salvageValue(it);
+    s.dust = (s.dust || 0) + salvageDust(it);
+    return "salvaged";
   }
   var mythicUnlocked = (s) => !!s.clears[MYTHIC.unlockAfter];
   var maxUpFor = (s) => mythicUnlocked(s) ? GEAR.maxUp : GEAR.refineFrom;
@@ -2609,7 +2730,7 @@
     const rw = mythicRewards(M.level, true), m = win ? MYTHIC.idleMult : MYTHIC.idleMult * REWARD.loseMult;
     rw.gold = Math.round(rw.gold * m);
     rw.xp = Math.round(rw.xp * m);
-    rw.loot = win ? rw.loot.slice(0, 1) : [];
+    rw.loot = win ? rw.loot.slice(0, 2) : [];
     s.stats.runs++;
     if (win) s.stats.wins++;
     s.gold += rw.gold;
@@ -2706,7 +2827,7 @@
     return v;
   }
   function salvageUpTo(s, maxRarity) {
-    const ids = s.bag.filter((i) => s.items[i].rarity <= maxRarity);
+    const ids = s.bag.filter((i) => s.items[i].rarity <= maxRarity && !s.items[i].set);
     return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
   }
   function recommendParty(s, hints) {
@@ -2761,7 +2882,7 @@
       const cur = h.gear[slot] && s.items[h.gear[slot]];
       return s.bag.some((id) => {
         const it = s.items[id];
-        return it.slot === slot && (!cur || itemScore(it) > itemScore(cur));
+        return it.slot === slot && (!cur || heroItemScore(h, it) > heroItemScore(h, cur));
       });
     }));
   }
@@ -2774,9 +2895,9 @@
         let best = null;
         for (const id of s.bag) {
           const it = s.items[id];
-          if (it.slot === slot && (!best || itemScore(it) > itemScore(best))) best = it;
+          if (it.slot === slot && (!best || heroItemScore(h, it) > heroItemScore(h, best))) best = it;
         }
-        if (best && (!cur || itemScore(best) > itemScore(cur))) {
+        if (best && (!cur || heroItemScore(h, best) > heroItemScore(h, cur))) {
           if (!dry) equip(s, h.id, best.id);
           changed++;
         }
@@ -2942,7 +3063,7 @@
     return p.join(" \xB7 ");
   }
   function itemName(it) {
-    return `<span class="c${it.rarity}">${it.name}</span>${it.up ? `<span class="up">+${it.up}</span>` : ""}`;
+    return `${it.set ? '<span class="settag">T0</span>' : ""}<span class="c${it.rarity}">${it.name}</span>${it.up ? `<span class="up">+${it.up}</span>` : ""}`;
   }
   function partyPower() {
     return partyHeroes(app.S).reduce((a, h) => a + heroPower(h, app.S.items), 0);
@@ -2957,7 +3078,7 @@
   }
 
   // src/core/version.js
-  var VERSION = "0.9.1";
+  var VERSION = "0.9.2";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -3181,7 +3302,7 @@
   function bestUpgradeFor(it) {
     return partyHeroes(app.S).some((h) => {
       const cur = h.gear[it.slot] && app.S.items[h.gear[it.slot]];
-      return !cur || itemScore(it) > itemScore(cur);
+      return !cur || heroItemScore(h, it) > heroItemScore(h, cur);
     });
   }
   var seg = (act, cur, opts) => `<div class="seg">${opts.map(([v, n]) => `<button data-act="${act}" data-v="${v}" class="${cur === v ? "sel" : ""}">${n}</button>`).join("")}</div>`;
@@ -3189,16 +3310,16 @@
     <div class="in">${itemName(it)}${bestUpgradeFor(it) ? tx('<span class="better">\u25B2 \u53EF\u63D0\u5347</span>') : ""}</div>
     <div class="il">${SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div>
     <div class="is num">${RARITY[it.rarity].name}\u30FB${itemStatText(it)}</div></button>`;
-  var salvCount = () => app.S.bag.filter((id) => app.S.items[id].rarity <= (app.salvSel ?? 0)).length;
+  var salvCount = () => app.S.bag.filter((id) => app.S.items[id].rarity <= (app.salvSel ?? 0) && !app.S.items[id].set).length;
   function viewBag() {
     const S = app.S, E = ECONOMY;
-    const items = S.bag.map((id) => S.items[id]).filter(Boolean).filter((it) => app.invFilter === "all" || it.slot === app.invFilter).sort((a, b) => itemScore(b) - itemScore(a));
+    const items = S.bag.map((id) => S.items[id]).filter(Boolean).filter((it) => app.invFilter === "all" || it.slot === app.invFilter || app.invFilter === "armor" && ARMOR_SLOTS.includes(it.slot) || app.invFilter === "set" && it.set).sort((a, b) => itemScore(b) - itemScore(a));
     const cap = bagMax(S), full = S.bag.length >= cap;
     let h = tx('<h2>\u80CC\u5305 <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">\u7CBE\u83EF <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">\u5206\u89E3\u7CBE\u826F\u4EE5\u4E0A\u7684\u88DD\u5099\u6703\u5F97\u5230\u7CBE\u83EF\u3002\u901A\u95DC\u7B2C 7 \u5C64\u5F8C\uFF0C\u53EF\u7528\u7CBE\u83EF\u628A\u88DD\u5099\u7CBE\u7149\u5230 +6 ~ +{4}\u3002</p>', full ? "warnc" : "", S.bag.length, cap, fmt(S.dust || 0), GEAR.maxUp);
     if (S.stash.length) {
       h += tx('<div class="stashbox"><div class="row" style="align-items:center"><b>\u6230\u5229\u54C1\u7BB1</b><span class="sub num" style="margin:0">{0}/{1}</span> <span class="sub" style="margin:0 0 0 auto">\u80CC\u5305\u6EFF\u6642\u6389\u843D\u7684\u88DD\u5099</span></div> <div class="stack">{2} {3}</div> <div class="row"><button class="btn sm main grow" data-act="takestash" {4}>{5}</button> <button class="btn sm" data-act="salvagestash">\u5168\u90E8\u5206\u89E3</button></div></div>', S.stash.length, E.stashMax, S.stash.map((id) => S.items[id]).sort((a, b) => itemScore(b) - itemScore(a)).slice(0, 5).map((it) => itemRow(it)).join(""), S.stash.length > 5 ? tx('<div class="sub" style="margin:0">\u9084\u6709 {0} \u4EF6</div>', S.stash.length - 5) : "", full ? "disabled" : "", full ? tx("\u80CC\u5305\u5DF2\u6EFF") : tx("\u53D6\u51FA\u5230\u80CC\u5305\uFF08\u9084\u80FD\u653E {0} \u4EF6\uFF09", cap - S.bag.length));
     }
-    h += tx('<div class="toolbar">{0} <button class="btn sm main" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button></div> <div class="toolbar"><label class="selwrap"><span>\u5206\u89E3</span><select id="salvSel" aria-label="\u5206\u89E3\u54C1\u8CEA">{1}</select></label> <button class="btn sm {2}" data-act="salvageupto">{3}</button></div>', seg("filter", app.invFilter, [["all", tx("\u5168\u90E8")], ["weapon", tx("\u6B66\u5668")], ["armor", tx("\u8B77\u7532")], ["trinket", tx("\u98FE\u54C1")]]), [0, 1, 2, 3].map((r) => `<option value="${r}" ${app.salvSel === r ? "selected" : ""}>${RARITY[r].name}${r ? tx("\u4EE5\u4E0B") : ""}</option>`).join(""), app.salvConfirm ? "danger" : "", app.salvConfirm ? tx("\u78BA\u5B9A\u5206\u89E3 {0} \u4EF6\uFF1F", salvCount()) : tx("\u5206\u89E3\uFF08{0} \u4EF6\uFF09", salvCount()));
+    h += tx('<div class="toolbar">{0} <button class="btn sm main" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button></div> <div class="toolbar"><label class="selwrap"><span>\u5206\u89E3</span><select id="salvSel" aria-label="\u5206\u89E3\u54C1\u8CEA">{1}</select></label> <button class="btn sm {2}" data-act="salvageupto">{3}</button></div>', seg("filter", app.invFilter, [["all", tx("\u5168\u90E8")], ["weapon", tx("\u6B66\u5668")], ["armor", tx("\u8B77\u7532")], ["trinket", tx("\u98FE\u54C1")], ["set", tx("\u5957\u88DD")]]), [0, 1, 2, 3].map((r) => `<option value="${r}" ${app.salvSel === r ? "selected" : ""}>${RARITY[r].name}${r ? tx("\u4EE5\u4E0B") : ""}</option>`).join(""), app.salvConfirm ? "danger" : "", app.salvConfirm ? tx("\u78BA\u5B9A\u5206\u89E3 {0} \u4EF6\uFF1F", salvCount()) : tx("\u5206\u89E3\uFF08{0} \u4EF6\uFF09", salvCount()));
     {
       const gap = S.salvageIlvlGap || 10, n = salvageLowIlvl(S, gap, true).count;
       h += `<div class="toolbar"><span class="sub" style="margin:0">${tx("\u6BD4\u5E73\u5747\u88DD\u7B49\u4F4E {0} \u4EE5\u4E0A", gap)}</span><button class="btn sm" data-act="salvlow" ${n ? "" : "disabled"}>${tx("\u5206\u89E3\u4F4E\u88DD\u7B49\uFF08{0} \u4EF6\uFF09", n)}</button></div>`;
@@ -3314,8 +3435,22 @@
     }
     const plan = upgradeAll(app.S, x.id, true), hasGear = Object.values(x.gear).some(Boolean);
     const better = autoEquip(app.S, x.id, true);
+    h += setLine(x);
     h += tx('</div><div class="row"> <button class="btn grow {0}" data-act="autoequip1" data-id="{1}" {2}>{3}</button> <button class="btn" data-act="unequipall" data-id="{4}" {5}>\u5168\u90E8\u5378\u4E0B</button></div> <div class="row"> <button class="btn grow" data-act="upall" data-id="{6}" {7}>{8}</button> </div>', better ? "main" : "", x.id, better ? "" : "disabled", better ? tx("\u4E00\u9375\u914D\u88DD\uFF08{0} \u4EF6\u66F4\u597D\uFF09", better) : tx("\u5DF2\u662F\u6700\u4F73\u914D\u88DD"), x.id, hasGear ? "" : "disabled", x.id, plan.count ? "" : "disabled", plan.empty ? tx("\u6C92\u6709\u88DD\u5099") : plan.count ? tx("\u4E00\u9375\u5F37\u5316 {0} \u6B21\uFF08{1} \u91D1{2}\uFF09", plan.count, fmt(plan.spent), plan.dustSpent ? tx("\u30FB{0} \u7CBE\u83EF", plan.dustSpent) : "") : plan.maxed ? tx("\u5DF2\u5168\u90E8\u5F37\u5316\u5230 +{0}", maxUpFor(app.S)) : tx("\u91D1\u5E63\u6216\u7CBE\u83EF\u4E0D\u5920"));
     return h + heroActions(x);
+  }
+  function setLine(x) {
+    const S = SETS[x.cls];
+    if (!S) return "";
+    const n = setCount(x, app.S.items);
+    if (!n && !Object.values(app.S.items).some((it) => it.set === x.cls)) return "";
+    return `<div class="setline"><b class="c3">T0\u300C${S.name}\u300D</b><span class="num">${n}/4</span>
+    <span class="${n >= 2 ? "on" : ""}">${tx("2 \u4EF6")}\uFF1A${S.d2}</span><span class="${n >= 4 ? "on" : ""}">${tx("4 \u4EF6")}\uFF1A${S.d4}</span></div>`;
+  }
+  function setInfo(it) {
+    if (!it.set) return "";
+    const S = SETS[it.set];
+    return `<div class="setline"><b class="c3">T0\u300C${S.name}\u300D</b><span>${tx("{0}\u5C08\u5C6C\u5957\u88DD", CLASSES[it.set].name)}</span><span>${tx("2 \u4EF6")}\uFF1A${S.d2}</span><span>${tx("4 \u4EF6")}\uFF1A${S.d4}</span></div>`;
   }
   function heroActions(x) {
     const locked = partyLocked(app.S);
@@ -3341,17 +3476,18 @@
   }
   function sheetPick() {
     const x = hero(app.modal.id), slot = app.modal.slot, cur = x.gear[slot] && app.S.items[x.gear[slot]];
-    const list = app.S.bag.map((id) => app.S.items[id]).filter((it) => it.slot === slot).sort((a, b) => itemScore(b) - itemScore(a));
-    return tx('<h3>\u70BA {0} \u9078\u64C7{1}</h3><div class="sub" style="margin:0">\u76EE\u524D\uFF1A{2}</div> <div class="choices">{3}</div> <div class="row">{4}<button class="btn" data-act="hero" data-id="{5}">\u8FD4\u56DE</button></div>', x.name, SLOTS[slot], cur ? itemName(cur) + "\u30FB" + itemStatText(cur) : tx("\u7121"), list.map((it) => `<button class="item rar${it.rarity}" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="in">${itemName(it)}${!cur || itemScore(it) > itemScore(cur) ? '<span class="better">\u25B2</span>' : ""}</div><div class="il"><b class="num">${it.ilvl}</b></div><div class="is num">${itemStatText(it)}</div></button>`).join(""), cur ? tx('<button class="btn" data-act="unequip" data-hero="{0}" data-slot="{1}">\u5378\u4E0B</button>', x.id, slot) : "", x.id);
+    const list = app.S.bag.map((id) => app.S.items[id]).filter((it) => it.slot === slot).sort((a, b) => heroItemScore(x, b) - heroItemScore(x, a));
+    return tx('<h3>\u70BA {0} \u9078\u64C7{1}</h3><div class="sub" style="margin:0">\u76EE\u524D\uFF1A{2}</div> <div class="choices">{3}</div> <div class="row">{4}<button class="btn" data-act="hero" data-id="{5}">\u8FD4\u56DE</button></div>', x.name, SLOTS[slot], cur ? itemName(cur) + "\u30FB" + itemStatText(cur) : tx("\u7121"), list.map((it) => `<button class="item rar${it.rarity}" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="in">${itemName(it)}${!cur || heroItemScore(x, it) > heroItemScore(x, cur) ? '<span class="better">\u25B2</span>' : ""}</div><div class="il"><b class="num">${it.ilvl}</b></div><div class="is num">${itemStatText(it)}</div></button>`).join(""), cur ? tx('<button class="btn" data-act="unequip" data-hero="{0}" data-slot="{1}">\u5378\u4E0B</button>', x.id, slot) : "", x.id);
   }
+  var withSet = (it, html) => html.replace('<span class="label">', setInfo(it) + '<span class="label">');
   function sheetItem(it) {
     if (!it) return "";
     const party = partyHeroes(app.S);
-    return tx('<h3>{0}</h3><div class="sub num" style="margin:0">{1}{2}\u30FB\u88DD\u7B49 {3}\u30FB\u5F37\u5316 +{4}/{5}<br>{6}</div> <span class="label">\u88DD\u5099\u7D66</span><div class="stack">{7}</div> <div class="row">{8} <button class="btn" data-act="salvage" data-id="{9}">\u5206\u89E3 +<span class="num">{10}</span> \u91D1{11}</button></div>', itemName(it), RARITY[it.rarity].name, SLOTS[it.slot], it.ilvl, it.up, maxUpFor(app.S), itemStatText(it), party.map((x) => {
+    return withSet(it, tx('<h3>{0}</h3><div class="sub num" style="margin:0">{1}{2}\u30FB\u88DD\u7B49 {3}\u30FB\u5F37\u5316 +{4}/{5}<br>{6}</div> <span class="label">\u88DD\u5099\u7D66</span><div class="stack">{7}</div> <div class="row">{8} <button class="btn" data-act="salvage" data-id="{9}">\u5206\u89E3 +<span class="num">{10}</span> \u91D1{11}</button></div>', itemName(it), RARITY[it.rarity].name, SLOTS[it.slot], it.ilvl, it.up, maxUpFor(app.S), itemStatText(it), party.map((x) => {
       const cur = x.gear[it.slot] && app.S.items[x.gear[it.slot]];
-      const better = !cur || itemScore(it) > itemScore(cur);
+      const better = !cur || heroItemScore(x, it) > heroItemScore(x, cur);
       return tx('<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">\u76EE\u524D\uFF1A{7}</div></button>', x.id, it.id, cls(x).icon, x.name, cls(x).name, better ? "in" : "", better ? tx("\u25B2 \u63D0\u5347") : tx("\u8F03\u5DEE"), cur ? tx("{0}\uFF08{1}\uFF09", cur.name, cur.ilvl) : tx("\u7A7A"));
-    }).join(""), upBtn(it, ""), it.id, salvageValue(it), salvageDust(it) ? tx('\u30FB<span class="dust num">{0}</span> \u7CBE\u83EF', salvageDust(it)) : "");
+    }).join(""), upBtn(it, ""), it.id, salvageValue(it), salvageDust(it) ? tx('\u30FB<span class="dust num">{0}</span> \u7CBE\u83EF', salvageDust(it)) : ""));
   }
   function upBtn(it, size) {
     if (it.up >= maxUpFor(app.S)) return tx('<button class="btn {0}" disabled>\u5F37\u5316 MAX</button>', size);

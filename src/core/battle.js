@@ -6,6 +6,7 @@ import { tx } from './i18n.js';
 import { DUNGEON, RAID_HORN } from './config.js';
 import { R, rnd, pick, uid } from './rng.js';
 import { heroStats, rarityMods } from './heroes.js';
+import { setMods } from './items.js';
 import { buildWaves } from './dungeons.js';
 import { heroMods } from './talents.js';
 import { PACKS, roleOf } from './classes/index.js';
@@ -79,7 +80,7 @@ export class Battle {
     this.vault = opts.vault || null; this.kills = 0;
     this.maxTicks = opts.maxTicks || DUNGEON.maxTicks;
     this.units = party.map(h => {
-      const s = heroStats(h, items), pack = PACKS[h.cls], mods = { ...heroMods(h), ...rarityMods(h), ...(pack.modsOf ? pack.modsOf(h) : {}) }; // modsOf：職業包依型態給的固定修正
+      const s = heroStats(h, items), pack = PACKS[h.cls], mods = { ...heroMods(h), ...rarityMods(h), ...(pack.modsOf ? pack.modsOf(h) : {}), ...setMods(h, items) }; // modsOf：職業包依型態給的固定修正
       const lh = (mods.legend && pack.legend.hooks) || {}; // 傳說被動的掛勾
       return { id: h.id, name: h.name, cls: h.cls, rarity: h.rarity || 0, role: roleOf(h), icon: pack.icon, spec: h.spec || null, mods,
         pack, hk: pack.hooks || {}, lh, legendCd: lh.cdMult || 1,
@@ -87,7 +88,7 @@ export class Battle {
         dmgDone: 0, skillDmg: 0, healDone: 0, taken: 0 };
     });
     // 隊伍光環：鼓舞（全隊生命）、守護天使（全隊範圍減傷）
-    const partyHp = this.units.reduce((a, u) => a + (u.mods.partyHp || 0), 0);
+    const partyHp = this.units.reduce((a, u) => a + (u.mods.partyHp || 0) + (u.mods.setPartyHp || 0), 0);
     for (const u of this.units) { u.max = Math.round(u.max * (1 + partyHp)); u.hp = u.max; }
     this.partyAoe = Math.min(0.3, this.units.reduce((a, u) => a + (u.mods.partyAoe || 0), 0));
     this.horn = { used: false, until: -1 };
@@ -116,7 +117,7 @@ export class Battle {
     this.push(tx('📯 英勇號角！全隊傷害與治療 +{0}%，持續 {1} 秒', Math.round(RAID_HORN.bonus * 100), RAID_HORN.dur), 'info');
     return true;
   }
-  healMult(u) { return (u.mods.healMult || 1) * (this.hornActive() ? 1 + RAID_HORN.bonus : 1); }
+  healMult(u) { return (u.mods.healMult || 1) * (u.mods.setHeal ? 1 + u.mods.setHeal : 1) * (this.hornActive() ? 1 + RAID_HORN.bonus : 1); }
   weakMult(e) { return e.weakUntil > this.tick ? 1 - e.weak : 1; }
 
   // ---------- 傷害與治療 ----------
@@ -124,6 +125,7 @@ export class Battle {
     if (e.hp <= 0) return 0;
     const m = u.mods;
     amt *= (m.dmgMult || 1) * (this.hornActive() ? 1 + RAID_HORN.bonus : 1);
+    if (m.setDmg) amt *= 1 + m.setDmg;                                // 套裝
     if (u.hk.outMult) amt *= u.hk.outMult(this, u, e, o);           // 掛勾：輸出倍率
     if (m.execute && e.hp < e.max * 0.35) amt *= 1 + m.execute;
     if (m.sweep && !e.boss) amt *= 1 + m.sweep;
@@ -164,6 +166,7 @@ export class Battle {
       if (g) red *= g.hk.busterGuard.apply(this, g, u);
     }
     red *= 1 - (m.allReduce || 0);
+    if (m.setTaken) red *= 1 - m.setTaken;                            // 套裝
     const aura = this.alive().find(x => x.lh.partyTaken);            // 傳說掛勾：在場時全隊減傷
     if (aura) red *= aura.lh.partyTaken;
     if (m.lowHpReduce && u.hp < u.max * 0.5) red *= 1 - m.lowHpReduce;

@@ -51,8 +51,23 @@ function sheetHero(x) {
   }
   const plan = G.upgradeAll(app.S, x.id, true), hasGear = Object.values(x.gear).some(Boolean);
   const better = G.autoEquip(app.S, x.id, true);
+  h += setLine(x);
   h += tx('</div><div class="row"> <button class="btn grow {0}" data-act="autoequip1" data-id="{1}" {2}>{3}</button> <button class="btn" data-act="unequipall" data-id="{4}" {5}>全部卸下</button></div> <div class="row"> <button class="btn grow" data-act="upall" data-id="{6}" {7}>{8}</button> </div>', better ? 'main' : '', x.id, better ? '' : 'disabled', better ? tx('一鍵配裝（{0} 件更好）', better) : tx('已是最佳配裝'), x.id, hasGear ? '' : 'disabled', x.id, plan.count ? '' : 'disabled', plan.empty ? tx('沒有裝備') : plan.count ? tx('一鍵強化 {0} 次（{1} 金{2}）', plan.count, fmt(plan.spent), plan.dustSpent ? tx('・{0} 精華', plan.dustSpent) : '') : plan.maxed ? tx('已全部強化到 +{0}', G.maxUpFor(app.S)) : tx('金幣或精華不夠'));
   return h + heroActions(x);
+}
+// 套裝狀態：這位英雄職業的 T0 穿了幾件、啟動哪些效果
+function setLine(x) {
+  const S = G.SETS[x.cls]; if (!S) return '';
+  const n = G.setCount(x, app.S.items);
+  if (!n && !Object.values(app.S.items).some(it => it.set === x.cls)) return '';
+  return `<div class="setline"><b class="c3">T0「${S.name}」</b><span class="num">${n}/4</span>
+    <span class="${n >= 2 ? 'on' : ''}">${tx('2 件')}：${S.d2}</span><span class="${n >= 4 ? 'on' : ''}">${tx('4 件')}：${S.d4}</span></div>`;
+}
+// 套裝說明（裝備抽屜）
+export function setInfo(it) {
+  if (!it.set) return '';
+  const S = G.SETS[it.set];
+  return `<div class="setline"><b class="c3">T0「${S.name}」</b><span>${tx('{0}專屬套裝', G.CLASSES[it.set].name)}</span><span>${tx('2 件')}：${S.d2}</span><span>${tx('4 件')}：${S.d4}</span></div>`;
 }
 function heroActions(x) {
   const locked = G.partyLocked(app.S);
@@ -82,17 +97,19 @@ function talentView(x) {
 }
 function sheetPick() {
   const x = hero(app.modal.id), slot = app.modal.slot, cur = x.gear[slot] && app.S.items[x.gear[slot]];
-  const list = app.S.bag.map(id => app.S.items[id]).filter(it => it.slot === slot).sort((a, b) => G.itemScore(b) - G.itemScore(a));
-  return tx('<h3>為 {0} 選擇{1}</h3><div class="sub" style="margin:0">目前：{2}</div> <div class="choices">{3}</div> <div class="row">{4}<button class="btn" data-act="hero" data-id="{5}">返回</button></div>', x.name, G.SLOTS[slot], cur ? itemName(cur) + '・' + itemStatText(cur) : tx('無'), list.map(it => `<button class="item rar${it.rarity}" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="in">${itemName(it)}${!cur || G.itemScore(it) > G.itemScore(cur) ? '<span class="better">▲</span>' : ''}</div><div class="il"><b class="num">${it.ilvl}</b></div><div class="is num">${itemStatText(it)}</div></button>`).join(''), cur ? tx('<button class="btn" data-act="unequip" data-hero="{0}" data-slot="{1}">卸下</button>', x.id, slot) : '', x.id);
+  const list = app.S.bag.map(id => app.S.items[id]).filter(it => it.slot === slot).sort((a, b) => G.heroItemScore(x, b) - G.heroItemScore(x, a));
+  return tx('<h3>為 {0} 選擇{1}</h3><div class="sub" style="margin:0">目前：{2}</div> <div class="choices">{3}</div> <div class="row">{4}<button class="btn" data-act="hero" data-id="{5}">返回</button></div>', x.name, G.SLOTS[slot], cur ? itemName(cur) + '・' + itemStatText(cur) : tx('無'), list.map(it => `<button class="item rar${it.rarity}" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="in">${itemName(it)}${!cur || G.heroItemScore(x, it) > G.heroItemScore(x, cur) ? '<span class="better">▲</span>' : ''}</div><div class="il"><b class="num">${it.ilvl}</b></div><div class="is num">${itemStatText(it)}</div></button>`).join(''), cur ? tx('<button class="btn" data-act="unequip" data-hero="{0}" data-slot="{1}">卸下</button>', x.id, slot) : '', x.id);
 }
+// 套裝說明插在「裝備給」上方
+const withSet = (it, html) => html.replace('<span class="label">', setInfo(it) + '<span class="label">');
 function sheetItem(it) {
   if (!it) return '';
   const party = G.partyHeroes(app.S);
-  return tx('<h3>{0}</h3><div class="sub num" style="margin:0">{1}{2}・裝等 {3}・強化 +{4}/{5}<br>{6}</div> <span class="label">裝備給</span><div class="stack">{7}</div> <div class="row">{8} <button class="btn" data-act="salvage" data-id="{9}">分解 +<span class="num">{10}</span> 金{11}</button></div>', itemName(it), G.RARITY[it.rarity].name, G.SLOTS[it.slot], it.ilvl, it.up, G.maxUpFor(app.S), itemStatText(it), party.map(x => {
+  return withSet(it, tx('<h3>{0}</h3><div class="sub num" style="margin:0">{1}{2}・裝等 {3}・強化 +{4}/{5}<br>{6}</div> <span class="label">裝備給</span><div class="stack">{7}</div> <div class="row">{8} <button class="btn" data-act="salvage" data-id="{9}">分解 +<span class="num">{10}</span> 金{11}</button></div>', itemName(it), G.RARITY[it.rarity].name, G.SLOTS[it.slot], it.ilvl, it.up, G.maxUpFor(app.S), itemStatText(it), party.map(x => {
       const cur = x.gear[it.slot] && app.S.items[x.gear[it.slot]];
-      const better = !cur || G.itemScore(it) > G.itemScore(cur);
+      const better = !cur || G.heroItemScore(x, it) > G.heroItemScore(x, cur);
       return tx('<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">目前：{7}</div></button>', x.id, it.id, cls(x).icon, x.name, cls(x).name, better ? 'in' : '', better ? tx('▲ 提升') : tx('較差'), cur ? tx('{0}（{1}）', cur.name, cur.ilvl) : tx('空'));
-    }).join(''), upBtn(it, ''), it.id, G.salvageValue(it), G.salvageDust(it) ? tx('・<span class="dust num">{0}</span> 精華', G.salvageDust(it)) : '');
+    }).join(''), upBtn(it, ''), it.id, G.salvageValue(it), G.salvageDust(it) ? tx('・<span class="dust num">{0}</span> 精華', G.salvageDust(it)) : ''));
 }
 // 強化按鈕：+5 以上叫「精煉」，額外需要精華
 function upBtn(it, size) {

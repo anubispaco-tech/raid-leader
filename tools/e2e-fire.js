@@ -15,7 +15,7 @@ s.party = s.heroes.slice(0, 5).map(h => h.id);
 // 把出戰隊員的裝備複製成 3 位待命英雄（普通／精良／傳說），各穿 3 件裝備
 const proto = s.heroes[0];
 [0, 1, 4].forEach((r, i) => { const h = JSON.parse(JSON.stringify(proto)); h.id = 'bench' + i; h.rarity = r; h.legend = r === 4; h.gear = {};
-  for (const sl of ['weapon', 'armor', 'trinket']) { const it = { ...s.items[proto.gear[sl]], id: `bi${i}${sl}` }; s.items[it.id] = it; h.gear[sl] = it.id; }
+  for (const sl of ['weapon', 'chest', 'trinket']) { const it = { ...s.items[proto.gear[sl]], id: `bi${i}${sl}` }; s.items[it.id] = it; h.gear[sl] = it.id; }
   s.heroes.push(h); });
 s.idle = 0; // 掛機中也能一鍵解雇待命英雄
 

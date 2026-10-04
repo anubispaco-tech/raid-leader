@@ -25,7 +25,7 @@ export function itemStatText(it) {
   return p.join(' · ');
 }
 export function itemName(it) {
-  return `<span class="c${it.rarity}">${it.name}</span>${it.up ? `<span class="up">+${it.up}</span>` : ''}`;
+  return `${it.set ? '<span class="settag">T0</span>' : ''}<span class="c${it.rarity}">${it.name}</span>${it.up ? `<span class="up">+${it.up}</span>` : ''}`;
 }
 export function partyPower() { return G.partyHeroes(app.S).reduce((a, h) => a + G.heroPower(h, app.S.items), 0); }
 export function avgPartyIlvl() { const p = G.partyHeroes(app.S); return p.length ? Math.round(p.reduce((a, h) => a + G.heroIlvl(h, app.S.items), 0) / p.length) : 0; }

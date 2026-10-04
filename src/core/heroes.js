@@ -1,7 +1,7 @@
 // ===== 英雄：屬性計算與升級 =====
 import { CLASSES, HERO, SLOTS, GEAR, HERO_RARITY, LEGENDS } from './config.js';
 import { pick, uid } from './rng.js';
-import { itemPow, itemSta } from './items.js';
+import { itemPow, itemSta, setMods } from './items.js';
 import { heroMods } from './talents.js';
 export { roleOf } from './classes/index.js';
 
@@ -11,7 +11,7 @@ export const xpNeed = L => Math.round(HERO.xpBase * Math.pow(L, HERO.xpExp));
 export function makeHero(cls, level = 1, rarity = 0) {
   const legend = rarity === 4 ? CLASSES[cls].legend : null;
   return { id: uid(), cls, name: legend ? legend.name : pick(HERO.names), level, xp: 0, rarity, legend: !!legend,
-    spec: null, talents: {}, gear: { weapon: null, armor: null, trinket: null } };
+    spec: null, talents: {}, gear: { weapon: null, head: null, chest: null, hands: null, legs: null, trinket: null } };
 }
 // 稀有度帶來的戰鬥修正（battle.js 合併到 mods）
 export function rarityMods(h) {
@@ -28,7 +28,7 @@ export function heroStats(h, items) {
   let pow = (c.pow + c.powL * (h.level - 1)) * R.mult, hp = (c.hp + c.hpL * (h.level - 1)) * R.mult, crit = c.crit + R.crit;
   for (const it of gearOf(h, items)) { pow += itemPow(it); hp += itemSta(it) * GEAR.staToHp; crit += it.crit; }
   const para = 1 + HERO.paragon.bonus * (h.para || 0);
-  pow *= (m.powMult || 1) * para; hp *= (m.hpMult || 1) * para; crit += m.critAdd || 0;
+  pow *= (m.powMult || 1) * para; hp *= (m.hpMult || 1) * para; crit += (m.critAdd || 0) + (setMods(h, items).setCrit || 0);
   return { pow: Math.round(pow), hp: Math.round(hp), crit: Math.min(0.5, crit), armor: c.armor };
 }
 export function heroIlvl(h, items) {

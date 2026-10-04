@@ -2,12 +2,12 @@
 // 所有函式都接收存檔物件 s 並直接修改它；畫面層只呼叫這裡，不自己改存檔。
 import { CLASSES, HERO, SLOTS, DUNGEONS, REWARD, ECONOMY, GEAR, BAG_MILESTONES, BAG_PER_MILESTONE, HERO_RARITY, LEGENDS, RECRUIT } from './config.js';
 import { R, rnd, rint, pick } from './rng.js';
-import { makeItem, rollRarity, itemScore, salvageValue, salvageDust, upgradeCost, dustCost } from './items.js';
+import { makeItem, rollRarity, itemScore, heroItemScore, makeSetItem, randomArmorSlot, salvageValue, salvageDust, upgradeCost, dustCost } from './items.js';
 import { makeHero, gainXp, heroPower, roleOf, heroIlvl } from './heroes.js';
 import { getLang } from './i18n.js';
 import { dungeonInfo } from './dungeons.js';
 import { SPECS, TALENT_ROWS, SPEC_LEVEL, applyRecommend } from './talents.js';
-import { MYTHIC, CH1_TOP } from './config.js';
+import { MYTHIC, CH1_TOP, SET_DROP } from './config.js';
 import { mythicRewards, keyChange, mythicBattleOpts } from './mythic.js';
 import { Battle } from './battle.js';
 
@@ -22,7 +22,7 @@ export function rewards(dIdx, win, firstClear) {
   const xp = Math.round(REWARD.xpBase * Math.pow(dIdx + 1, REWARD.xpExp) * m);
   const loot = [];
   if (win) {
-    const n = R() < REWARD.doubleDropChance ? 2 : 1;
+    const n = REWARD.baseDrops + (R() < REWARD.doubleDropChance ? 1 : 0);
     for (let k = 0; k < n; k++) {
       loot.push(makeItem(pick(Object.keys(SLOTS)), info.dropIlvl + rint(-1, 2), rollRarity(firstClear && k === 0 ? REWARD.firstClearMinRarity : 0)));
     }
@@ -70,6 +70,12 @@ export function migrate(s) {
   // v0.7.4：精華（精煉材料）、秘境掛機
   if (s.dust == null) s.dust = 0;
   if (s.idleMythic === undefined) s.idleMythic = null;
+  // v0.9.2：護甲拆成頭胸手腿 → 舊的「護甲」變成胸甲
+  for (const it of Object.values(s.items)) if (it.slot === 'armor') it.slot = 'chest';
+  for (const h of [...s.heroes, ...(s.tavern || [])]) {
+    if ('armor' in h.gear) { h.gear.chest = h.gear.chest || h.gear.armor; delete h.gear.armor; }
+    for (const sl of ['head', 'hands', 'legs']) if (h.gear[sl] === undefined) h.gear[sl] = null;
+  }
   // v0.9.0：依裝等自動分解、劇情進度
   if (s.salvageIlvlGap == null) s.salvageIlvlGap = 0;
   s.story = s.story || { seen: [] };
@@ -191,7 +197,7 @@ export function newBagMilestones(s) {
 export const partyIlvl = s => { const p = partyHeroes(s); return p.length ? p.reduce((a, h) => a + heroIlvl(h, s.items), 0) / p.length : 0; };
 // 分解背包裡比平均裝等低 gap 以上的裝備（傳說除外）
 export function salvageLowIlvl(s, gap, dry = false) {
-  const lim = partyIlvl(s) - gap, ids = s.bag.filter(i => s.items[i].rarity < 4 && s.items[i].ilvl < lim);
+  const lim = partyIlvl(s) - gap, ids = s.bag.filter(i => s.items[i].rarity < 4 && !s.items[i].set && s.items[i].ilvl < lim);
   if (dry) return { count: ids.length };
   return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
 }
@@ -219,9 +225,18 @@ export function applyResult(s, dIdx, battle) {
     s.clears[dIdx] = (s.clears[dIdx] || 0) + 1;
     if (dIdx + 1 >= s.unlocked && dIdx + 1 < DUNGEONS.length) s.unlocked = dIdx + 2;
   }
-  const dest = rw.loot.map(it => addLoot(s, it));
+  // 第二章：T0 套裝部件（出戰隊員其中一人的職業）
+  if (battle.win && dIdx > CH1_TOP && party.length && R() < SET_DROP.chance) rw.loot.push(makeSetItem(pick(party).cls, randomArmorSlot(), dungeonInfo(dIdx).dropIlvl + 2));
+  const dest = rw.loot.map(it => (it.set ? addSetLoot(s, it) : addLoot(s, it)));
   const kept = rw.loot.filter((_, i) => dest[i] === 'bag'), stashed = rw.loot.filter((_, i) => dest[i] === 'stash');
   return { ...rw, first, lvUps, kept, stashed, salvaged: dest.filter(d => d === 'salvaged').length };
+}
+// 套裝部件不會被自動分解：背包滿就進戰利品箱
+function addSetLoot(s, it) {
+  s.items[it.id] = it;
+  if (s.bag.length < bagMax(s)) { s.bag.push(it.id); return 'bag'; }
+  if (s.stash.length < ECONOMY.stashMax) { s.stash.push(it.id); return 'stash'; }
+  delete s.items[it.id]; s.gold += salvageValue(it); s.dust = (s.dust || 0) + salvageDust(it); return 'salvaged';
 }
 
 // ---------- 傳奇秘境 ----------
@@ -254,7 +269,7 @@ export const canMythicIdle = s => Object.keys(s.mythic.best || {}).length > 0;
 export function applyMythicIdleResult(s, battle) {
   const M = battle.mythic, win = battle.win;
   const rw = mythicRewards(M.level, true), m = win ? MYTHIC.idleMult : MYTHIC.idleMult * REWARD.loseMult;
-  rw.gold = Math.round(rw.gold * m); rw.xp = Math.round(rw.xp * m); rw.loot = win ? rw.loot.slice(0, 1) : [];
+  rw.gold = Math.round(rw.gold * m); rw.xp = Math.round(rw.xp * m); rw.loot = win ? rw.loot.slice(0, 2) : [];
   s.stats.runs++; if (win) s.stats.wins++;
   s.gold += rw.gold;
   const lvUps = [];
@@ -315,7 +330,7 @@ export function salvage(s, itemId) {
 }
 // 分解背包中品質 ≤ maxRarity 的裝備（0 = 普通，1 = 精良以下）
 export function salvageUpTo(s, maxRarity) {
-  const ids = s.bag.filter(i => s.items[i].rarity <= maxRarity);
+  const ids = s.bag.filter(i => s.items[i].rarity <= maxRarity && !s.items[i].set); // 套裝不會被批次分解
   return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
 }
 // ---------- 推薦陣容 ----------
@@ -362,7 +377,7 @@ export function upgrade(s, itemId) {
 export function hasUpgrade(s) {
   return partyHeroes(s).some(h => Object.keys(SLOTS).some(slot => {
     const cur = h.gear[slot] && s.items[h.gear[slot]];
-    return s.bag.some(id => { const it = s.items[id]; return it.slot === slot && (!cur || itemScore(it) > itemScore(cur)); });
+    return s.bag.some(id => { const it = s.items[id]; return it.slot === slot && (!cur || heroItemScore(h, it) > heroItemScore(h, cur)); });
   }));
 }
 // 一鍵配裝：替出戰隊員從背包挑分數最高的
@@ -374,8 +389,8 @@ export function autoEquip(s, heroId, dry) {
     for (const slot of Object.keys(SLOTS)) {
       const cur = h.gear[slot] && s.items[h.gear[slot]];
       let best = null;
-      for (const id of s.bag) { const it = s.items[id]; if (it.slot === slot && (!best || itemScore(it) > itemScore(best))) best = it; }
-      if (best && (!cur || itemScore(best) > itemScore(cur))) { if (!dry) equip(s, h.id, best.id); changed++; }
+      for (const id of s.bag) { const it = s.items[id]; if (it.slot === slot && (!best || heroItemScore(h, it) > heroItemScore(h, best))) best = it; }
+      if (best && (!cur || heroItemScore(h, best) > heroItemScore(h, cur))) { if (!dry) equip(s, h.id, best.id); changed++; }
     }
   }
   return changed;

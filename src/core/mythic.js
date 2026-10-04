@@ -59,7 +59,7 @@ export function mythicRewards(level, inTime) {
   const top = CH1_TOP; // 秘境以第一章第 7 層為基準
   const gold = Math.round((REWARD.goldBase + REWARD.goldPerTier * top) * MYTHIC.goldMult * (1 + 0.05 * level) * rnd(0.9, 1.1));
   const xp = Math.round(REWARD.xpBase * Math.pow(top + 1, REWARD.xpExp) * MYTHIC.xpMult * (1 + 0.1 * level));
-  const n = inTime ? 2 : 1, loot = [];
+  const n = inTime ? 3 : 2, loot = []; // v0.9.2：6 個裝備格，掉落 +1
   const legend = level >= MYTHIC.legendFrom ? Math.min(MYTHIC.legendMax, MYTHIC.legendBase + MYTHIC.legendPerLevel * (level - MYTHIC.legendFrom)) : 0;
   for (let k = 0; k < n; k++) {
     const rar = R() < legend ? RARITY.length - 1 : rollRarity(1); // 秘境至少精良

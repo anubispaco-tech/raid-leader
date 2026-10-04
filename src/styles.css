@@ -287,3 +287,4 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 .dlg p.narr{color:var(--muted);font-style:italic}
 .trow.n3{grid-template-columns:44px 1fr}.trow.n3 .opt{grid-column:2}.trow.n3 .tlv{grid-row:span 3}
 .seg.modes{margin:14px 0 4px}.seg.modes button{flex:1}.seg.chapters{margin:6px 0 10px}.seg.chapters button{flex:1;font-size:13px}.seg button[disabled]{opacity:.45}
+.settag{font-size:10px;font-family:var(--f-num);color:var(--ink);background:var(--r3);border-radius:4px;padding:0 4px;margin-right:4px;vertical-align:1px}.setline{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:var(--muted);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:6px 0}.setline b{font-size:13px}.setline .on{color:var(--good)}

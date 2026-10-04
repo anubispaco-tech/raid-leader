@@ -30,18 +30,42 @@ export const RARITY = [
   { name: tx('史詩'), mult: 1.75, color: '#a855f7', weight: 0.03 },
   { name: tx('傳說'), mult: 2.1,  color: '#f59e0b', weight: 0 },    // 只從傳奇秘境 +7 起掉落
 ];
-export const SLOTS = { weapon: tx('武器'), armor: tx('護甲'), trinket: tx('飾品') };
+// v0.9.2：護甲拆成頭／胸／手／腿四件（四件合計＝原本一件護甲的屬性）
+export const SLOTS = { weapon: tx('武器'), head: tx('頭部'), chest: tx('胸甲'), hands: tx('手部'), legs: tx('腿部'), trinket: tx('飾品') };
+export const ARMOR_SLOTS = ['head', 'chest', 'hands', 'legs'];
 // 各部位屬性分配（× 裝等 × 稀有度倍率）
 export const SLOT_STATS = {
   weapon:  { pow: 0.6,  sta: 1.0 },
-  armor:   { pow: 0.15, sta: 3.0 },
+  head:    { pow: 0.0375, sta: 0.75 },
+  chest:   { pow: 0.045, sta: 0.9 },
+  hands:   { pow: 0.03, sta: 0.6 },
+  legs:    { pow: 0.0375, sta: 0.75 },
   trinket: { pow: 0.35, sta: 1.0 },
 };
 export const SLOT_NAMES = {
   weapon: [tx('長劍'), tx('法杖'), tx('匕首'), tx('戰錘'), tx('權杖'), tx('短弓')],
-  armor: [tx('鎖甲'), tx('法袍'), tx('皮甲'), tx('板甲'), tx('斗篷')],
+  head: [tx('頭盔'), tx('兜帽'), tx('頭冠'), tx('面甲')],
+  chest: [tx('鎖甲'), tx('法袍'), tx('皮甲'), tx('板甲')],
+  hands: [tx('手套'), tx('護手'), tx('腕甲')],
+  legs: [tx('護腿'), tx('綁腿'), tx('腿甲')],
   trinket: [tx('護符'), tx('戒指'), tx('徽記'), tx('寶珠'), tx('項鍊')],
 };
+// ---------- T0 職業套裝（v0.9.2）----------
+// 第二章首領掉落；只有同職業穿上才有套裝效果。bonus 的修正值在 battle.js / heroes.js 讀取
+export const SETS = {
+  guardian: { name: tx('深淵守望者'), b2: { setTaken: 0.08 }, b4: { setTaken: 0.15, setDmg: 0.15 },
+    d2: tx('受到的傷害 −8%'), d4: tx('受到的傷害再 −7%、傷害 +15%') },
+  cleric: { name: tx('晨禱者'), b2: { setHeal: 0.1 }, b4: { setHeal: 0.2, setPartyHp: 0.05 },
+    d2: tx('治療 +10%'), d4: tx('治療再 +10%、全隊生命 +5%') },
+  rogue: { name: tx('影裂者'), b2: { setDmg: 0.08 }, b4: { setDmg: 0.18, setCrit: 0.05 },
+    d2: tx('傷害 +8%'), d4: tx('傷害再 +10%、暴擊率 +5%') },
+  mage: { name: tx('星燼'), b2: { setDmg: 0.08 }, b4: { setDmg: 0.18, setCd: 0.8 },
+    d2: tx('傷害 +8%'), d4: tx('傷害再 +10%、烈焰風暴冷卻 −20%') },
+  druid: { name: tx('林冠守護'), b2: { setDmg: 0.05, setHeal: 0.05, setTaken: 0.05 }, b4: { setDmg: 0.1, setHeal: 0.1, setTaken: 0.1 },
+    d2: tx('傷害、治療 +5%，受到的傷害 −5%'), d4: tx('以上效果加倍') },
+};
+export const SET_PIECE = { head: tx('頭冠'), chest: tx('胸甲'), hands: tx('護手'), legs: tx('腿甲') };
+export const SET_DROP = { chance: 0.15, rarity: 3 }; // 第二章每場勝利 15% 掉一件（出戰隊員其中一人的職業）
 export const PREFIX = ['', tx('堅毅的'), tx('銳利的'), tx('灼熱的'), tx('寒霜的'), tx('虛空的'), tx('遠古的'), tx('龍鱗的')];
 export const GEAR = {
   maxUp: 10, upBonus: 0.08,         // 每級強化屬性 +8%（+6 以上為精煉）
@@ -171,7 +195,7 @@ export const REWARD = {
   goldBase: 25, goldPerTier: 18,
   xpBase: 35, xpExp: 1.7,
   loseMult: 0.3,                    // 失敗時金幣經驗比例
-  doubleDropChance: 0.35,
+  doubleDropChance: 0.35, baseDrops: 2, // v0.9.2：裝備格從 3 變 6，基本掉落 1 → 2 件補回節奏
   firstClearMinRarity: 2,           // 首通保底稀有
   decayGrace: 4, decayPerLevel: 0.25, decayFloor: 0.05, // 等級壓制
   decayFloorTop: 0.4,               // 最高層（第 7 層）壓制下限：後期仍可掛機

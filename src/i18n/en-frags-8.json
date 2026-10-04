@@ -1,0 +1,23 @@
+{
+"頭部": "Head", "胸甲": "Chest", "手部": "Hands", "腿部": "Legs",
+"頭盔": "Helm", "兜帽": "Hood", "頭冠": "Crown", "面甲": "Visor",
+"手套": "Gloves", "護手": "Gauntlets", "腕甲": "Bracers",
+"護腿": "Greaves", "綁腿": "Leggings", "腿甲": "Legplates",
+"深淵守望者": "Abyss Warden",
+"受到的傷害 −8%": "Damage taken −8%",
+"受到的傷害再 −7%、傷害 +15%": "Damage taken another −7%, damage +15%",
+"晨禱者": "Dawnprayer",
+"治療再 +10%、全隊生命 +5%": "Healing another +10%, party HP +5%",
+"影裂者": "Riftshadow",
+"傷害 +8%": "Damage +8%",
+"傷害再 +10%、暴擊率 +5%": "Damage another +10%, crit chance +5%",
+"星燼": "Starcinder",
+"傷害再 +10%、烈焰風暴冷卻 −20%": "Damage another +10%, Flamestrike cooldown −20%",
+"林冠守護": "Canopy Guardian",
+"傷害、治療 +5%，受到的傷害 −5%": "Damage and healing +5%, damage taken −5%",
+"以上效果加倍": "Doubles the above",
+"套裝": "Sets",
+"2 件": "2-piece",
+"4 件": "4-piece",
+"{0}專屬套裝": "{0} set"
+}
