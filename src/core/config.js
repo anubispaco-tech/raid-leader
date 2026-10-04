@@ -1,27 +1,12 @@
 // ===== 數值與內容設定 =====
-// 調平衡只改這個檔：改完跑 `node tools/sim.js 10` 看首通場次。
+// 職業數值在 classes/ 的職業包；其餘平衡改這個檔。改完跑 `node tools/sim.js 10` 看首通場次。
 
 // ---------- 職業 ----------
-// hp/pow = Lv1 數值；hpL/powL = 每級成長；armor = 物理減傷
-export const CLASSES = {
-  guardian: { name: '守護騎士', role: 'tank', icon: '🛡️', hp: 230, hpL: 42, pow: 6, powL: 1.5, armor: 0.45, crit: 0.05,
-    desc: '嘲諷所有敵人，承受傷害。護甲減傷 45%。' },
-  cleric:   { name: '聖光牧師', role: 'heal', icon: '✨', hp: 130, hpL: 22, pow: 9, powL: 2.0, armor: 0.15, crit: 0.05,
-    desc: '治療血量最低的隊友，每 5 秒群體治療。' },
-  rogue:    { name: '暗影盜賊', role: 'dps',  icon: '🗡️', hp: 140, hpL: 24, pow: 10, powL: 2.3, armor: 0.2, crit: 0.15,
-    desc: '單體爆發，暴擊率高。擅長打王。' },
-  mage:     { name: '奧術法師', role: 'dps',  icon: '🔥', hp: 115, hpL: 19, pow: 9, powL: 2.1, armor: 0.1, crit: 0.08,
-    desc: '範圍傷害，同時攻擊所有敵人。擅長清小怪。' },
-};
+// 職業資料都在 classes/ 資料夾的職業包裡；這裡只是方便其他模組沿用舊名稱
+import { PACKS } from './classes/index.js';
+export const CLASSES = PACKS;
 export const ROLE_NAME = { tank: '坦克', heal: '治療', dps: '輸出' };
 
-// 職業戰鬥係數（傷害 / 治療 = 威力 × 係數）
-export const CLASS_AI = {
-  tank:  { hit: 0.8 },
-  heal:  { single: 1.9, critMult: 1.5, groupEvery: 5, group: 0.75, groupBelow: 0.9, idleHit: 0.5 },
-  rogue: { hit: 1.3 },
-  mage:  { aoe: 0.72, single: 1.0 },
-};
 
 // ---------- 英雄 ----------
 export const HERO = {
@@ -109,13 +94,8 @@ export const HERO_RARITY = [
   { name: '史詩', mult: 1.25, crit: 0.04, weight: 0.045, hire: 4, baseCdMult: 0.9 },
   { name: '傳說', mult: 1.40, crit: 0.04, weight: 0.005, hire: 8, baseCdMult: 0.9 },
 ];
-// 每個職業唯一的傳奇英雄（名字與被動皆為原創）
-export const LEGENDS = {
-  guardian: { name: '巴洛斯', title: '鐵壁', passive: 'undying', pname: '不屈', desc: '每場第一次受到致命傷害改為剩 1 血並無敵 3 秒；在場時全隊受到的傷害 −8%' },
-  cleric:   { name: '艾蕾娜', title: '晨曦', passive: 'overflow', pname: '溢光', desc: '治療超出的部分轉為護盾（上限是該隊員生命的 20%）' },
-  rogue:    { name: '卡西恩', title: '影刃', passive: 'chain', pname: '連鎖暴擊', desc: '暴擊後的下一次攻擊必定暴擊，每 6 秒最多一次' },
-  mage:     { name: '莉薇亞', title: '星火', passive: 'molten', pname: '熔熱', desc: '烈焰風暴冷卻 −50%，擊殺敵人時再減 1 秒' },
-};
+// 每個職業唯一的傳奇英雄（名字與被動在各職業包的 legend）
+export const LEGENDS = Object.fromEntries(Object.entries(PACKS).map(([k, p]) => [k, p.legend]));
 export const RECRUIT = {
   scrollBase: 120, scrollPerLevel: 30, // 招募令單抽價格 = base + 每級 × 隊伍平均等級
   tenDiscount: 0.9,

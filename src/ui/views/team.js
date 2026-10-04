@@ -5,7 +5,7 @@ import { enabled } from '../telemetry.js';
 import { $, fmt, pct, toast, hero, cls, inParty, itemStatText, itemName, partyPower, avgPartyIlvl, avgPartyLv , esc, heroName, rarityTag } from '../helpers.js';
 
 function roleCount() {
-  const c = { tank: 0, heal: 0, dps: 0 }; G.partyHeroes(app.S).forEach(h => c[cls(h).role]++); return c;
+  const c = { tank: 0, heal: 0, dps: 0 }; G.partyHeroes(app.S).forEach(h => c[G.roleOf(h)]++); return c;
 }
 export function viewTeam() {
   const party = G.partyHeroes(app.S), c = roleCount();
@@ -13,7 +13,7 @@ export function viewTeam() {
     <div class="party">${Array.from({ length: G.ECONOMY.partyMax }, (_, i) => {
       const x = party[i];
       if (!x) return `<div class="slot emptyslot">空位</div>`;
-      return `<button class="slot r-${x.rarity || 0}" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div><div class="n c${x.rarity || 0}">${x.name}</div><div class="lv num">Lv${x.level}</div><div class="rl role-${cls(x).role}"></div></button>`;
+      return `<button class="slot r-${x.rarity || 0}" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div><div class="n c${x.rarity || 0}">${x.name}</div><div class="lv num">Lv${x.level}</div><div class="rl role-${G.roleOf(x)}"></div></button>`;
     }).join('')}</div>
     <div class="comp"><span><b style="color:var(--tank)">坦克</b> ${c.tank}</span><span><b style="color:var(--heal)">治療</b> ${c.heal}</span><span><b style="color:var(--dps)">輸出</b> ${c.dps}</span><span>戰力 <b class="num" style="color:var(--fg)">${fmt(partyPower())}</b></span>
     ${!c.tank ? '<span style="color:var(--warn)">缺坦克</span>' : ''}${!c.heal ? '<span style="color:var(--warn)">缺治療</span>' : ''}</div>

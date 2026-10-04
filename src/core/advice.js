@@ -1,6 +1,7 @@
 // ===== 下一步建議：依目前狀態只給一個最重要的建議（副本頁頂端卡片）=====
 import { CLASSES, ECONOMY, DUNGEONS } from './config.js';
 import { partyHeroes, hasUpgrade, hireCost, mythicUnlocked } from './game.js';
+import { roleOf } from './classes/index.js';
 import { vaultUnlocked, vaultLeft } from './vault.js';
 import { pendingPicks } from './talents.js';
 
@@ -11,7 +12,7 @@ export function nextStep(s) {
   if (!s.stats.runs) return { text: '開始第一場戰鬥', sub: '按下「腐根洞窟」的挑戰，隊伍會自己打。', btn: { label: '挑戰', act: 'fight', d: 0 } };
   if (hasUpgrade(s)) return { text: '背包有更好的裝備', sub: '一鍵替出戰隊員換上分數更高的裝備。', btn: { label: '一鍵配裝', act: 'autoequip' } };
   if (s.idle == null && party.length < ECONOMY.partyMax && s.heroes.length < ECONOMY.rosterMax && s.tavern.some(h => s.gold >= hireCost(h))) {
-    const have = new Set(party.map(h => CLASSES[h.cls].role));
+    const have = new Set(party.map(roleOf));
     const need = ['tank', 'heal'].find(r => !have.has(r)) || 'dps';
     return { text: `隊伍還有 ${ECONOMY.partyMax - party.length} 個空位`, sub: `去酒館招募，建議補${ROLE_NAME[need]}。`, btn: { label: '前往酒館', tab: 'tavern' } };
   }

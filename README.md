@@ -10,13 +10,16 @@ dist/app.js             打包後的遊戲程式（由 tools/build.js 產生）
 dist/raid-leader.html   單檔版（JS、CSS 內嵌），用於預覽或分享
 src/
   core/                 遊戲邏輯，不碰畫面，可在 Node 執行
-    config.js           ★ 所有數值與內容（職業、副本、掉落、經濟）
-    rng.js              亂數
+    config.js           ★ 數值與內容（副本、掉落、經濟、秘境）
+    classes/            ★ 職業包：一個職業一個檔案（屬性、出手、技能、專精、天賦、傳說）
+      index.js          登記處：新增職業 = 放一個檔案＋在這裡登記一行
+      shared.js         職業包共用工具
+    rng.js              亂數（setSeed 可固定種子）
     items.js            裝備生成、強化、分解
-    talents.js          ★ 技能、專精、天賦（資料與推薦配置）
+    talents.js          天賦狀態、推薦配置（資料來自職業包）
     heroes.js           英雄屬性與升級
     dungeons.js         副本難度與敵人
-    battle.js           戰鬥模擬（職業行為、技能、首領機制、詞綴、英勇號角）
+    battle.js           戰鬥核心（掛勾點、首領機制、詞綴、英勇號角）
     mythic.js           傳奇秘境：鑰石、每日詞綴、敵人成長、結算
     vault.js            寶庫：每日次數、哥布林、金幣結算
     advice.js           下一步建議
@@ -38,6 +41,7 @@ tools/
   sim-lib.js / sim.js   數值模擬：各層首通場次（套用推薦天賦、不吹號角）
   specs.js              選對 / 選錯專精 / 無天賦 的勝率比較
   sim-mythic.js         秘境節奏：達到各鑰石等級所需場數
+  regress.js            回歸測試：固定種子跑 290 場戰鬥，重構前後結果要一模一樣
   e2e*.js               瀏覽器端對端測試（主流程、背包操作、天賦與號角）
 ```
 
@@ -50,12 +54,22 @@ tools/
 | `node tools/sim.js 10` | 模擬 10 次完整遊玩 |
 | `node tools/specs.js` | 選對 / 選錯專精的勝率差 |
 | `node tools/sim-mythic.js 4 300` | 秘境節奏 |
-| `node tools/e2e.js`、`e2e-actions.js`、`e2e-talents.js`、`e2e-mythic.js`、`e2e-telemetry.js`、`e2e-v07.js` | 瀏覽器測試 |
+| `node tools/regress.js` | 回歸測試（改戰鬥程式後必跑；刻意改平衡時用 `--save` 更新基準） |
+| `node tools/e2e.js`、`e2e-actions.js`、`e2e-talents.js`、`e2e-mythic.js`、`e2e-telemetry.js`、`e2e-v07.js`、`e2e-idlelock.js`、`e2e-fire.js`、`e2e-v074.js` | 瀏覽器測試 |
 
-調整數值只改 `src/core/config.js` 與 `src/core/talents.js`，改完跑 `sim.js` 與 `specs.js` 確認節奏。
+調整數值改 `src/core/config.js`（副本、經濟）與 `src/core/classes/`（職業），改完跑 `sim.js` 與 `specs.js` 確認節奏。
+
+### 新增職業
+
+1. 複製 `src/core/classes/guardian.js` 改成新職業（屬性、`act` 出手邏輯、技能、專精、天賦、`recommend`、傳說）。
+2. 在 `src/core/classes/index.js` 登記一行。
+3. 需要依專精切換職責時，在職業包加 `roleOf(h)`。
+4. 職業專屬效果用 `hooks`（outMult、critBonus、afterHit、busterGuard、lifeSaver、tick），傳說用 `legend.hooks`（partyTaken、lifeSaver、onHeal、onCrit、onKill、cdMult）。戰鬥核心不用改。
 
 ## 版本
 
+- **v0.8.0** 職業包重構（一職業一檔案、戰鬥掛勾點、固定種子回歸測試；玩家端行為不變）
+- **v0.7.1~0.7.5** 掛機鎖陣容、單人一鍵配裝、一鍵解雇、名冊 30、秘境掛機、巔峰等級、裝備精煉、羅馬數字樓層
 - **v0.7.0** 英雄稀有度（普通~傳說）、4 位傳奇英雄、招募令與保底、寶庫
 - **v0.6.0** 分解下拉、背包擴充里程碑、一鍵強化 / 卸下、一鍵備戰（推薦陣容＋天賦＋配裝）、文字口吻調整
 - **v0.5.0** 天梯（排行榜）、遊玩數據、意見回饋（GAS + 試算表）、暱稱

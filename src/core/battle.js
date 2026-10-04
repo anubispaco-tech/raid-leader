@@ -1,95 +1,13 @@
 // ===== 戰鬥模擬（每 tick = 1 秒）=====
 // 結構：每 tick 先結算持續效果 → 英雄行動（技能優先）→ 敵人行動 → 判定波次。
-// 職業行為在 HERO_ACTIONS，首領機制在 BOSS_MECHS，技能數值在 talents.js。
-import { CLASSES, CLASS_AI, DUNGEON, RAID_HORN } from './config.js';
+// 職業行為與職業專屬效果都在職業包（classes/）：act() 每秒出手，hooks / legend.hooks 掛在下面標出的時機。
+// 首領機制在 BOSS_MECHS；天賦這類通用修正值（mods）在這裡統一處理。
+import { DUNGEON, RAID_HORN } from './config.js';
 import { R, rnd, pick, uid } from './rng.js';
 import { heroStats, rarityMods } from './heroes.js';
 import { buildWaves } from './dungeons.js';
-import { BASE_SKILLS, SPECS, heroMods } from './talents.js';
-
-const ready = (b, u, key) => (u.cd[key] || 0) <= b.tick;
-const spec = u => u.spec && SPECS[u.cls][u.spec];
-const specCd = (u, s) => Math.round(s.cd * (u.mods.specCd || 1));
-const fx = u => u.mods.specFx || 1;
-// 基礎技能冷卻：天賦改的秒數 × 史詩/傳說的冷卻倍率 × 星火・莉薇亞的熔熱
-const baseCd = (u, def) => Math.max(1, Math.round((u.mods.baseCd || def) * (u.mods.baseCdMult || 1) * (u.mods.legend === 'molten' ? 0.5 : 1)));
-
-// ---------- 職業行為：(battle, 英雄, 活著的敵人, 優先目標) ----------
-const HERO_ACTIONS = {
-  guardian(b, u, foes, focus) {
-    const S = spec(u), B = BASE_SKILLS.guardian;
-    if (u.spec === 'ret' && ready(b, u, 'spec')) {
-      u.buf.wrath = b.tick + S.dur; u.cd.spec = b.tick + specCd(u, S); b.skillLog(u, S.skill);
-    }
-    if (ready(b, u, 'base')) {
-      const t = foes.find(e => e.boss) || focus;
-      b.hitEnemy(u, t, u.pow * B.mult * (u.mods.baseMult || 1), { skill: true });
-      t.weak = Math.max(t.weakUntil > b.tick ? t.weak : 0, B.weaken); t.weakUntil = b.tick + B.weakenDur;
-      u.cd.base = b.tick + baseCd(u, B.cd); b.skillLog(u, B.name, t);
-      return;
-    }
-    b.hitEnemy(u, focus, u.pow * CLASS_AI.tank.hit);
-  },
-  cleric(b, u, foes, focus) {
-    const A = CLASS_AI.heal, S = spec(u), B = BASE_SKILLS.cleric, team = b.alive();
-    const avg = team.reduce((a, x) => a + x.hp / x.max, 0) / team.length;
-    if (u.spec === 'holy' && ready(b, u, 'spec') && avg < S.below) {
-      u.buf.hymn = b.tick + S.dur; u.cd.spec = b.tick + specCd(u, S); b.skillLog(u, S.skill);
-    }
-    if (u.buf.hymn > b.tick) return; // 引導中：每 tick 群補在 tickEffects 處理
-    const low = team.reduce((m, x) => (x.hp / x.max < m.hp / m.max ? x : m));
-    if (ready(b, u, 'base') && low.hp < low.max * 0.85) {
-      const tgt = team.find(x => x.role === 'tank' && x.hp < x.max * 0.85) || low;
-      tgt.shield += Math.round(u.pow * B.mult * (u.mods.baseMult || 1) * b.healMult(u));
-      u.cd.base = b.tick + baseCd(u, B.cd); b.skillLog(u, B.name, tgt);
-      return;
-    }
-    if (b.tick % (u.mods.groupEvery || A.groupEvery) === 0 && team.some(x => x.hp < x.max * A.groupBelow)) {
-      for (const x of team) b.heal(u, x, u.pow * A.group);
-      return;
-    }
-    if (low.hp < low.max) {
-      b.heal(u, low, u.pow * A.single * (R() < u.crit ? A.critMult : 1));
-      if (u.mods.renew) low.hots.push({ until: b.tick + 3, amt: u.pow * u.mods.renew, src: u });
-    } else b.hitEnemy(u, focus, u.pow * A.idleHit * (u.mods.smite || 1));
-  },
-  rogue(b, u, foes, focus) {
-    const S = spec(u), B = BASE_SKILLS.rogue, boss = foes.find(e => e.boss);
-    if (u.spec === 'combat' && ready(b, u, 'spec') && foes.length > 1) {
-      u.buf.flurry = b.tick + S.dur; u.cd.spec = b.tick + specCd(u, S); b.skillLog(u, S.skill);
-    }
-    if (ready(b, u, 'base')) {
-      const t = boss || focus;
-      b.hitEnemy(u, t, u.pow * B.mult, { skill: true });
-      if (u.mods.bleed) t.bleed = { until: b.tick + 5, amt: u.pow * u.mods.bleed, src: u };
-      u.cd.base = b.tick + baseCd(u, B.cd); b.skillLog(u, B.name, t);
-      return;
-    }
-    b.hitEnemy(u, boss || focus, u.pow * CLASS_AI.rogue.hit);
-  },
-  mage(b, u, foes) {
-    const S = spec(u), B = BASE_SKILLS.mage, boss = foes.find(e => e.boss);
-    if (u.spec === 'fire' && ready(b, u, 'spec') && boss) {
-      u.buf.combust = b.tick + S.dur; u.cd.spec = b.tick + specCd(u, S); b.skillLog(u, S.skill);
-    }
-    if (u.spec === 'frost' && ready(b, u, 'spec') && (foes.length >= 2 || boss)) {
-      const w = Math.min(0.8, S.weaken * fx(u));
-      for (const e of foes) { e.weak = Math.max(e.weakUntil > b.tick ? e.weak : 0, w); e.weakUntil = b.tick + S.dur; }
-      u.cd.spec = b.tick + specCd(u, S); b.skillLog(u, S.skill);
-    }
-    if (u.mods.pyro && b.tick % 10 === 0) {
-      const t = boss || foes[0]; b.hitEnemy(u, t, u.pow * u.mods.pyro, { skill: true }); b.skillLog(u, '炎爆術', t);
-    }
-    const n = foes.length, chain = 1 + (u.mods.chain || 0) * (n - 1), focusM = n === 1 ? 1 + (u.mods.focus || 0) : 1;
-    if (ready(b, u, 'base')) {
-      for (const e of b.foes()) b.hitEnemy(u, e, u.pow * B.mult * (u.mods.baseMult || 1) * chain * focusM, { skill: true, aoe: true });
-      u.cd.base = b.tick + baseCd(u, B.cd); b.skillLog(u, B.name);
-      return;
-    }
-    const per = n > 1 ? CLASS_AI.mage.aoe : CLASS_AI.mage.single;
-    for (const e of b.foes()) b.hitEnemy(u, e, u.pow * per * chain * focusM, { aoe: true });
-  },
-};
+import { heroMods } from './talents.js';
+import { PACKS, roleOf } from './classes/index.js';
 
 // ---------- 首領機制：回傳本 tick 對坦克的攻擊倍率 ----------
 const BOSS_MECHS = {
@@ -127,8 +45,10 @@ export class Battle {
     this.vault = opts.vault || null; this.kills = 0;
     this.maxTicks = opts.maxTicks || DUNGEON.maxTicks;
     this.units = party.map(h => {
-      const s = heroStats(h, items), c = CLASSES[h.cls];
-      return { id: h.id, name: h.name, cls: h.cls, rarity: h.rarity || 0, role: c.role, icon: c.icon, spec: h.spec || null, mods: { ...heroMods(h), ...rarityMods(h) },
+      const s = heroStats(h, items), pack = PACKS[h.cls], mods = { ...heroMods(h), ...rarityMods(h) };
+      const lh = (mods.legend && pack.legend.hooks) || {}; // 傳說被動的掛勾
+      return { id: h.id, name: h.name, cls: h.cls, rarity: h.rarity || 0, role: roleOf(h), icon: pack.icon, spec: h.spec || null, mods,
+        pack, hk: pack.hooks || {}, lh, legendCd: lh.cdMult || 1,
         max: s.hp, hp: s.hp, pow: s.pow, crit: s.crit, armor: s.armor, shield: 0, hots: [], cd: {}, buf: {}, used: {},
         dmgDone: 0, skillDmg: 0, healDone: 0, taken: 0 };
     });
@@ -170,25 +90,21 @@ export class Battle {
     if (e.hp <= 0) return 0;
     const m = u.mods;
     amt *= (m.dmgMult || 1) * (this.hornActive() ? 1 + RAID_HORN.bonus : 1);
-    if (u.buf.wrath > this.tick) amt *= 1 + SPECS.guardian.ret.dmg * fx(u);
+    if (u.hk.outMult) amt *= u.hk.outMult(this, u, e, o);           // 掛勾：輸出倍率
     if (m.execute && e.hp < e.max * 0.35) amt *= 1 + m.execute;
     if (m.sweep && !e.boss) amt *= 1 + m.sweep;
-    let critC = u.crit + (u.buf.combust > this.tick ? SPECS.mage.fire.crit * fx(u) : 0);
+    let critC = u.crit + (u.hk.critBonus ? u.hk.critBonus(this, u) : 0); // 掛勾：暫時暴擊加成
     if (u.cold) { critC = 1; u.cold = false; }
-    if (u.chainCrit) { critC = 1; u.chainCrit = false; } // 影刃・卡西恩：連鎖暴擊
+    if (u.nextCrit) { critC = 1; u.nextCrit = false; } // 下一擊必暴（傳說等效果設定）
     const crit = R() < critC;
     if (crit) amt *= m.critDmg || 2;
-    if (crit && m.legend === 'chain' && !o.dot && (u.chainReady || 0) <= this.tick) { u.chainCrit = true; u.chainReady = this.tick + 6; }
+    if (crit && !o.dot && u.lh.onCrit) u.lh.onCrit(this, u, e);       // 傳說掛勾：暴擊後
     amt = Math.min(e.hp, Math.round(amt * rnd(0.92, 1.08)));
     e.hp -= amt; u.dmgDone += amt; if (o.skill || o.dot) u.skillDmg += amt;
-    if (u.buf.wrath > this.tick && amt > 0) this.heal(u, u, amt * SPECS.guardian.ret.leech * fx(u), true);
-    if (u.spec === 'assa' && !o.dot) { const S = SPECS.rogue.assa; e.poison = Math.min(S.maxStacks, (e.poison || 0) + 1); e.poisonSrc = u; }
-    if (u.buf.flurry > this.tick && !o.aoe && !o.dot && !o.extra) {
-      for (const x of this.foes().filter(x => x !== e).slice(0, SPECS.rogue.combat.extra)) this.hitEnemy(u, x, amt, { extra: true, skill: true });
-    }
+    if (u.hk.afterHit) u.hk.afterHit(this, u, e, amt, o);           // 掛勾：命中後（吸血、疊毒、額外目標…）
     if (e.hp === 0) {
       if (e.goblin) this.kills = (this.kills || 0) + 1;
-      if (m.legend === 'molten' && u.cd.base) u.cd.base -= 1; // 星火・莉薇亞：擊殺減冷卻
+      if (u.lh.onKill) u.lh.onKill(this, u, e);                     // 傳說掛勾：擊殺後
       this.push(`${e.name} 被擊殺`, e.boss ? 'good' : '');
       if (!e.boss && this.has('bolstering')) { // 繁盛：其他小怪變強
         const rest = this.foes().filter(x => !x.boss);
@@ -206,11 +122,12 @@ export class Battle {
     let red = kind === 'magic' ? 1 - (m.aoeReduce || 0) - this.partyAoe : 1 - u.armor;
     if (kind === 'buster') {
       red *= 1 - (m.busterReduce || 0);
-      const disc = this.alive().find(x => x.spec === 'disc' && ready(this, x, 'spec'));
-      if (disc) { const S = SPECS.cleric.disc; red *= 1 - Math.min(0.9, S.reduce * fx(disc)); disc.cd.spec = this.tick + specCd(disc, S); this.skillLog(disc, S.skill, u); }
+      const g = this.alive().find(x => x.hk.busterGuard && x.hk.busterGuard.can(this, x)); // 掛勾：隊友替坦克擋重擊
+      if (g) red *= g.hk.busterGuard.apply(this, g, u);
     }
     red *= 1 - (m.allReduce || 0);
-    if (this.alive().some(x => x.mods.legend === 'undying')) red *= 0.92; // 鐵壁・巴洛斯在場：全隊 −8%
+    const aura = this.alive().find(x => x.lh.partyTaken);            // 傳說掛勾：在場時全隊減傷
+    if (aura) red *= aura.lh.partyTaken;
     if (m.lowHpReduce && u.hp < u.max * 0.5) red *= 1 - m.lowHpReduce;
     amt = Math.round(amt * Math.max(0.05, red) * rnd(0.9, 1.1));
     const absorbed = Math.min(u.shield, amt); u.shield -= absorbed; amt -= absorbed;
@@ -221,33 +138,27 @@ export class Battle {
     if (u.hp === 0) this.onDeath(u);
     return amt;
   }
-  // 聖盾術、寒冰屏障：跌破門檻（含致命一擊）時觸發，每場一次
+  // 保命技能：跌破門檻（含致命一擊）時觸發，每場一次（職業包的專精技能 → 天賦寒冰屏障 → 傳說被動）
   lifeSavers(u) {
-    const P = SPECS.guardian.prot;
     const save = (key, below, dur, name) => {
       if (u.used[key] || u.hp >= u.max * below) return;
       u.used[key] = true; u.hp = Math.max(1, u.hp); u.buf.immune = this.tick + dur; this.skillLog(u, name);
     };
-    if (u.spec === 'prot') save('divine', P.below, Math.round(P.dur * fx(u)), P.skill);
+    if (u.hk.lifeSaver) u.hk.lifeSaver(this, u, save);
     if (u.mods.iceBlock) save('ice', 0.3, u.mods.iceBlock, '寒冰屏障');
-    if (u.mods.legend === 'undying' && u.hp === 0 && !u.used.undying) { // 鐵壁・巴洛斯：不屈
-      u.used.undying = true; u.hp = 1; u.buf.immune = this.tick + 3; this.skillLog(u, '不屈');
-    }
+    if (u.lh.lifeSaver) u.lh.lifeSaver(this, u);
   }
   onDeath(u) {
     const priest = this.alive().find(x => x.mods.redemption && !x.used.redemption);
     if (priest) { priest.used.redemption = true; u.hp = Math.round(u.max * priest.mods.redemption); this.skillLog(priest, '救贖', u); return; }
-    this.push(`💀 ${u.name}（${CLASSES[u.cls].name}）陣亡`, 'bad');
+    this.push(`💀 ${u.name}（${u.pack.name}）陣亡`, 'bad');
   }
   heal(src, tgt, amt, raw = false) {
     if (tgt.hp <= 0) return 0;
     const necro = tgt.necro ? Math.max(0.2, 1 - 0.02 * tgt.necro) : 1; // 壞疽
     const h = Math.min(tgt.max - tgt.hp, Math.round(amt * (raw ? 1 : this.healMult(src)) * necro));
     tgt.hp += h; src.healDone += h;
-    if (src.mods.legend === 'overflow' && !raw) { // 晨曦・艾蕾娜：溢出的治療轉成護盾
-      const over = Math.round(amt * this.healMult(src)) - h;
-      if (over > 0) tgt.shield = Math.min(Math.round(tgt.max * 0.2), tgt.shield + over);
-    }
+    if (src.lh.onHeal && !raw) src.lh.onHeal(this, src, tgt, amt, h); // 傳說掛勾：治療後
     return h;
   }
   enemyTarget() {
@@ -258,13 +169,13 @@ export class Battle {
   // ---------- 每 tick 的持續效果 ----------
   tickEffects() {
     for (const e of this.foes()) {
-      if (e.poison && e.poisonSrc) this.hitEnemy(e.poisonSrc, e, e.poison * SPECS.rogue.assa.perStack * e.poisonSrc.pow, { dot: true });
+      if (e.poison && e.poisonSrc) this.hitEnemy(e.poisonSrc, e, e.poison * e.poisonPer * e.poisonSrc.pow, { dot: true });
       if (e.bleed && e.bleed.until >= this.tick && e.hp > 0) this.hitEnemy(e.bleed.src, e, e.bleed.amt, { dot: true });
     }
     for (const u of this.alive()) {
       u.hots = u.hots.filter(h => h.until >= this.tick);
       for (const h of u.hots) this.heal(h.src, u, h.amt);
-      if (u.buf.hymn > this.tick) { const S = SPECS.cleric.holy; for (const x of this.alive()) this.heal(u, x, u.pow * S.mult * fx(u)); }
+      if (u.hk.tick) u.hk.tick(this, u);                               // 掛勾：每秒（引導技能等）
     }
   }
 
@@ -274,7 +185,7 @@ export class Battle {
     this.tickEffects();
     for (const u of this.alive()) {
       const foes = this.foes(); if (!foes.length) break;
-      HERO_ACTIONS[u.cls](this, u, foes, foes.find(e => !e.boss) || foes[0]);
+      u.pack.act(this, u, foes, foes.find(e => !e.boss) || foes[0]);
     }
     for (const e of this.foes()) {
       const tgt = this.enemyTarget(); if (!tgt) break;

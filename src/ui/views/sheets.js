@@ -26,7 +26,7 @@ function sheetHero(x) {
   const c = cls(x), st = G.heroStats(x, app.S.items), view = app.modal.view || 'gear', pend = G.pendingPicks(x);
   const sp = x.spec && G.SPECS[x.cls][x.spec];
   const R = G.HERO_RARITY[x.rarity || 0], L = x.legend && G.LEGENDS[x.cls];
-  let h = `<h3>${c.icon} ${heroName(x)} ${rarityTag(x)}</h3><div class="sub" style="margin:0">${c.name}${sp ? `・${sp.name}` : ''}・${G.ROLE_NAME[c.role]}　${c.desc}</div>
+  let h = `<h3>${c.icon} ${heroName(x)} ${rarityTag(x)}</h3><div class="sub" style="margin:0">${c.name}${sp ? `・${sp.name}` : ''}・${G.ROLE_NAME[G.roleOf(x)]}　${c.desc}</div>
     ${x.rarity ? `<div class="raritycard r-${x.rarity}"><b class="c${x.rarity}">${R.name}加成</b><span>基礎屬性 ×${R.mult.toFixed(2)}${R.crit ? `・暴擊 +${Math.round(R.crit * 100)}%` : ''}${R.baseCdMult ? '・基礎技能冷卻 −10%' : ''}</span>${L ? `<span><b class="c4">${L.pname}</b>：${L.desc}</span>` : ''}</div>` : ''}
     <div class="statgrid num"><div><b>${x.level}</b><span>等級</span></div><div><b>${fmt(st.hp)}</b><span>生命</span></div><div><b>${st.pow}</b><span>威力</span></div><div><b>${Math.round(st.crit * 100)}%</b><span>暴擊</span></div></div>
     <div class="sub" style="margin:0">${x.level >= G.HERO.maxLevel ? `<b style="color:var(--brass)">巔峰 ${x.para || 0}</b>（生命／威力 +${x.para || 0}%）<span class="num">${fmt(x.paraXp || 0)} / ${fmt(G.paraNeed(x.para || 0))}</span>` : `經驗 <span class="num">${fmt(x.xp)} / ${fmt(G.xpNeed(x.level))}</span>`}・護甲減傷 ${Math.round(st.armor * 100)}%</div>

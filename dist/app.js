@@ -1,63 +1,405 @@
-/* 副本團長 v0.7.5 */
+/* 副本團長 v0.8.0 */
 (() => {
-  // src/core/config.js
-  var CLASSES = {
-    guardian: {
-      name: "\u5B88\u8B77\u9A0E\u58EB",
-      role: "tank",
-      icon: "\u{1F6E1}\uFE0F",
-      hp: 230,
-      hpL: 42,
-      pow: 6,
-      powL: 1.5,
-      armor: 0.45,
-      crit: 0.05,
-      desc: "\u5632\u8AF7\u6240\u6709\u6575\u4EBA\uFF0C\u627F\u53D7\u50B7\u5BB3\u3002\u8B77\u7532\u6E1B\u50B7 45%\u3002"
+  // src/core/classes/shared.js
+  var ready = (b, u, key) => (u.cd[key] || 0) <= b.tick;
+  var specCd = (u, s) => Math.round(s.cd * (u.mods.specCd || 1));
+  var fx = (u) => u.mods.specFx || 1;
+  var spec = (pack, u) => u.spec && pack.specs[u.spec];
+  var baseCd = (u, def) => Math.max(1, Math.round((u.mods.baseCd || def) * (u.mods.baseCdMult || 1) * (u.legendCd || 1)));
+  var SPEC_ROW = {
+    a: { name: "\u5C08\u7CBE\u7CBE\u901A", desc: "\u5C08\u7CBE\u6280\u80FD\u51B7\u537B \u221230%", mods: { specCd: 0.7 } },
+    b: { name: "\u5C08\u7CBE\u5F37\u5316", desc: "\u5C08\u7CBE\u6280\u80FD\u6548\u679C +30%", mods: { specFx: 1.3 } }
+  };
+
+  // src/core/classes/guardian.js
+  var P = {
+    id: "guardian",
+    name: "\u5B88\u8B77\u9A0E\u58EB",
+    role: "tank",
+    icon: "\u{1F6E1}\uFE0F",
+    hp: 230,
+    hpL: 42,
+    pow: 6,
+    powL: 1.5,
+    armor: 0.45,
+    crit: 0.05,
+    desc: "\u5632\u8AF7\u6240\u6709\u6575\u4EBA\uFF0C\u627F\u53D7\u50B7\u5BB3\u3002\u8B77\u7532\u6E1B\u50B7 45%\u3002",
+    ai: { hit: 0.8 },
+    base: { name: "\u76FE\u724C\u731B\u64CA", cd: 8, mult: 2.5, weaken: 0.3, weakenDur: 4, desc: "\u51B7\u537B 8 \u79D2\uFF1A\u5A01\u529B \xD72.5 \u50B7\u5BB3\uFF0C\u76EE\u6A19\u653B\u64CA \u221230% \u6301\u7E8C 4 \u79D2" },
+    specs: {
+      prot: { name: "\u9632\u8B77", skill: "\u8056\u76FE\u8853", counters: "buster", desc: "\u751F\u547D\u4F4E\u65BC 30% \u6642\u81EA\u52D5 5 \u79D2\u7121\u6575\uFF0C\u6BCF\u5834\u4E00\u6B21", below: 0.3, dur: 5 },
+      ret: { name: "\u61F2\u6212", skill: "\u5FA9\u4EC7\u4E4B\u6012", counters: "enrage", desc: "\u51B7\u537B 20 \u79D2\uFF1A10 \u79D2\u5167\u50B7\u5BB3 +50%\u3001\u5438\u8840 20%", cd: 20, dur: 10, dmg: 0.5, leech: 0.2 }
     },
-    cleric: {
-      name: "\u8056\u5149\u7267\u5E2B",
-      role: "heal",
-      icon: "\u2728",
-      hp: 130,
-      hpL: 22,
-      pow: 9,
-      powL: 2,
-      armor: 0.15,
-      crit: 0.05,
-      desc: "\u6CBB\u7642\u8840\u91CF\u6700\u4F4E\u7684\u968A\u53CB\uFF0C\u6BCF 5 \u79D2\u7FA4\u9AD4\u6CBB\u7642\u3002"
+    talents: [
+      {
+        a: { name: "\u5805\u97CC", desc: "\u751F\u547D +10%", mods: { hpMult: 1.1 } },
+        b: { name: "\u92B3\u5229\u76FE\u724C", desc: "\u76FE\u724C\u731B\u64CA\u50B7\u5BB3 +50%", mods: { baseMult: 1.5 } }
+      },
+      {
+        a: { name: "\u683C\u64CB", desc: "\u53D7\u5230\u91CD\u64CA\u7684\u50B7\u5BB3 \u221225%", mods: { busterReduce: 0.25 } },
+        b: { name: "\u9B54\u6297", desc: "\u53D7\u5230\u7BC4\u570D\u653B\u64CA\u7684\u50B7\u5BB3 \u221230%", mods: { aoeReduce: 0.3 } }
+      },
+      {
+        a: { name: "\u9F13\u821E", desc: "\u5168\u968A\u751F\u547D +5%", mods: { partyHp: 0.05 } },
+        b: { name: "\u53CD\u64CA", desc: "\u53D7\u64CA\u6642 15% \u6A5F\u7387\u53CD\u64CA\u5A01\u529B \xD71", mods: { counter: 0.15 } }
+      },
+      SPEC_ROW,
+      {
+        a: { name: "\u76FE\u7246", desc: "\u751F\u547D\u4F4E\u65BC 50% \u6642\u518D\u6E1B\u50B7 15%", mods: { lowHpReduce: 0.15 } },
+        b: { name: "\u6B63\u7FA9\u4E4B\u9318", desc: "\u50B7\u5BB3 +20%", mods: { dmgMult: 1.2 } }
+      }
+    ],
+    recommend: (has) => ({ spec: has("buster") ? "prot" : "ret", t: ["a", has("buster") ? "a" : "b", "a", "b", has("enrage") ? "b" : "a"] }),
+    legend: {
+      name: "\u5DF4\u6D1B\u65AF",
+      title: "\u9435\u58C1",
+      passive: "undying",
+      pname: "\u4E0D\u5C48",
+      desc: "\u6BCF\u5834\u7B2C\u4E00\u6B21\u53D7\u5230\u81F4\u547D\u50B7\u5BB3\u6539\u70BA\u5269 1 \u8840\u4E26\u7121\u6575 3 \u79D2\uFF1B\u5728\u5834\u6642\u5168\u968A\u53D7\u5230\u7684\u50B7\u5BB3 \u22128%",
+      hooks: {
+        partyTaken: 0.92,
+        // 在場時全隊受到的傷害倍率
+        lifeSaver(b, u) {
+          if (u.hp === 0 && !u.used.undying) {
+            u.used.undying = true;
+            u.hp = 1;
+            u.buf.immune = b.tick + 3;
+            b.skillLog(u, "\u4E0D\u5C48");
+          }
+        }
+      }
     },
-    rogue: {
-      name: "\u6697\u5F71\u76DC\u8CCA",
-      role: "dps",
-      icon: "\u{1F5E1}\uFE0F",
-      hp: 140,
-      hpL: 24,
-      pow: 10,
-      powL: 2.3,
-      armor: 0.2,
-      crit: 0.15,
-      desc: "\u55AE\u9AD4\u7206\u767C\uFF0C\u66B4\u64CA\u7387\u9AD8\u3002\u64C5\u9577\u6253\u738B\u3002"
+    act(b, u, foes, focus) {
+      const S = spec(P, u), B = P.base;
+      if (u.spec === "ret" && ready(b, u, "spec")) {
+        u.buf.wrath = b.tick + S.dur;
+        u.cd.spec = b.tick + specCd(u, S);
+        b.skillLog(u, S.skill);
+      }
+      if (ready(b, u, "base")) {
+        const t = foes.find((e) => e.boss) || focus;
+        b.hitEnemy(u, t, u.pow * B.mult * (u.mods.baseMult || 1), { skill: true });
+        t.weak = Math.max(t.weakUntil > b.tick ? t.weak : 0, B.weaken);
+        t.weakUntil = b.tick + B.weakenDur;
+        u.cd.base = b.tick + baseCd(u, B.cd);
+        b.skillLog(u, B.name, t);
+        return;
+      }
+      b.hitEnemy(u, focus, u.pow * P.ai.hit);
     },
-    mage: {
-      name: "\u5967\u8853\u6CD5\u5E2B",
-      role: "dps",
-      icon: "\u{1F525}",
-      hp: 115,
-      hpL: 19,
-      pow: 9,
-      powL: 2.1,
-      armor: 0.1,
-      crit: 0.08,
-      desc: "\u7BC4\u570D\u50B7\u5BB3\uFF0C\u540C\u6642\u653B\u64CA\u6240\u6709\u6575\u4EBA\u3002\u64C5\u9577\u6E05\u5C0F\u602A\u3002"
+    hooks: {
+      // 復仇之怒：傷害加成與吸血
+      outMult: (b, u) => u.buf.wrath > b.tick ? 1 + P.specs.ret.dmg * fx(u) : 1,
+      afterHit(b, u, e, amt) {
+        if (u.buf.wrath > b.tick && amt > 0) b.heal(u, u, amt * P.specs.ret.leech * fx(u), true);
+      },
+      // 聖盾術
+      lifeSaver(b, u, save2) {
+        if (u.spec === "prot") save2("divine", P.specs.prot.below, Math.round(P.specs.prot.dur * fx(u)), P.specs.prot.skill);
+      }
     }
   };
-  var ROLE_NAME = { tank: "\u5766\u514B", heal: "\u6CBB\u7642", dps: "\u8F38\u51FA" };
-  var CLASS_AI = {
-    tank: { hit: 0.8 },
-    heal: { single: 1.9, critMult: 1.5, groupEvery: 5, group: 0.75, groupBelow: 0.9, idleHit: 0.5 },
-    rogue: { hit: 1.3 },
-    mage: { aoe: 0.72, single: 1 }
+  var guardian_default = P;
+
+  // src/core/rng.js
+  var rand = Math.random;
+  var R = () => rand();
+  var rnd = (a, b) => a + R() * (b - a);
+  var rint = (a, b) => Math.floor(rnd(a, b + 1));
+  var pick = (arr) => arr[Math.floor(R() * arr.length)];
+  var uid = () => R().toString(36).slice(2, 9);
+
+  // src/core/classes/cleric.js
+  var P2 = {
+    id: "cleric",
+    name: "\u8056\u5149\u7267\u5E2B",
+    role: "heal",
+    icon: "\u2728",
+    hp: 130,
+    hpL: 22,
+    pow: 9,
+    powL: 2,
+    armor: 0.15,
+    crit: 0.05,
+    desc: "\u6CBB\u7642\u8840\u91CF\u6700\u4F4E\u7684\u968A\u53CB\uFF0C\u6BCF 5 \u79D2\u7FA4\u9AD4\u6CBB\u7642\u3002",
+    ai: { single: 1.9, critMult: 1.5, groupEvery: 5, group: 0.75, groupBelow: 0.9, idleHit: 0.5 },
+    base: { name: "\u771F\u8A00\u8853\uFF1A\u76FE", cd: 10, mult: 4, desc: "\u51B7\u537B 10 \u79D2\uFF1A\u7D66\u8840\u91CF\u6700\u4F4E\u7684\u968A\u53CB\u8B77\u76FE\uFF08\u5A01\u529B \xD74\uFF09" },
+    specs: {
+      disc: { name: "\u6212\u5F8B", skill: "\u75DB\u82E6\u93AE\u58D3", counters: "buster", desc: "\u51B7\u537B 15 \u79D2\uFF1A\u5766\u514B\u53D7\u5230\u91CD\u64CA\u6642\uFF0C\u8A72\u6B21\u50B7\u5BB3 \u221260%", cd: 15, reduce: 0.6 },
+      holy: { name: "\u795E\u8056", skill: "\u795E\u8056\u8B9A\u7F8E\u8A69", counters: "pulse", desc: "\u51B7\u537B 30 \u79D2\uFF1A\u5168\u968A\u5E73\u5747\u8840\u91CF\u4F4E\u65BC 60% \u6642\uFF0C\u9023\u7E8C 3 \u79D2\u7FA4\u88DC\uFF08\u5A01\u529B \xD71.2\uFF09", cd: 30, dur: 3, mult: 1.2, below: 0.6 }
+    },
+    talents: [
+      {
+        a: { name: "\u51A5\u60F3", desc: "\u6CBB\u7642 +10%", mods: { healMult: 1.1 } },
+        b: { name: "\u8FC5\u6377\u79B1\u8A00", desc: "\u7FA4\u88DC\u9593\u9694 5 \u2192 4 \u79D2", mods: { groupEvery: 4 } }
+      },
+      {
+        a: { name: "\u5805\u5B9A\u8B77\u76FE", desc: "\u8B77\u76FE +40%", mods: { baseMult: 1.4 } },
+        b: { name: "\u6062\u5FA9", desc: "\u55AE\u9AD4\u6CBB\u7642\u5F8C\u518D\u6301\u7E8C\u56DE\u8840 3 \u79D2", mods: { renew: 0.3 } }
+      },
+      {
+        a: { name: "\u6551\u8D16", desc: "\u7B2C\u4E00\u4F4D\u9663\u4EA1\u7684\u968A\u53CB\u4EE5 50% \u751F\u547D\u5FA9\u6D3B\uFF0C\u6BCF\u5834\u4E00\u6B21", mods: { redemption: 0.5 } },
+        b: { name: "\u8056\u5149\u4E4B\u6012", desc: "\u6C92\u4EBA\u9700\u8981\u6CBB\u7642\u6642\uFF0C\u653B\u64CA\u50B7\u5BB3 \xD73", mods: { smite: 3 } }
+      },
+      SPEC_ROW,
+      {
+        a: { name: "\u5B88\u8B77\u5929\u4F7F", desc: "\u5168\u968A\u53D7\u5230\u7684\u7BC4\u570D\u50B7\u5BB3 \u221210%", mods: { partyAoe: 0.1 } },
+        b: { name: "\u6148\u60B2", desc: "\u66B4\u64CA\u7387 +10%", mods: { critAdd: 0.1 } }
+      }
+    ],
+    recommend: (has) => ({ spec: has("buster") && !has("pulse") ? "disc" : "holy", t: ["a", "a", "a", "b", has("pulse") ? "a" : "b"] }),
+    legend: {
+      name: "\u827E\u857E\u5A1C",
+      title: "\u6668\u66E6",
+      passive: "overflow",
+      pname: "\u6EA2\u5149",
+      desc: "\u6CBB\u7642\u8D85\u51FA\u7684\u90E8\u5206\u8F49\u70BA\u8B77\u76FE\uFF08\u4E0A\u9650\u662F\u8A72\u968A\u54E1\u751F\u547D\u7684 20%\uFF09",
+      hooks: {
+        onHeal(b, src, tgt, amt, h) {
+          const over = Math.round(amt * b.healMult(src)) - h;
+          if (over > 0) tgt.shield = Math.min(Math.round(tgt.max * 0.2), tgt.shield + over);
+        }
+      }
+    },
+    act(b, u, foes, focus) {
+      const A = P2.ai, S = spec(P2, u), B = P2.base, team = b.alive();
+      const avg = team.reduce((a, x) => a + x.hp / x.max, 0) / team.length;
+      if (u.spec === "holy" && ready(b, u, "spec") && avg < S.below) {
+        u.buf.hymn = b.tick + S.dur;
+        u.cd.spec = b.tick + specCd(u, S);
+        b.skillLog(u, S.skill);
+      }
+      if (u.buf.hymn > b.tick) return;
+      const low = team.reduce((m, x) => x.hp / x.max < m.hp / m.max ? x : m);
+      if (ready(b, u, "base") && low.hp < low.max * 0.85) {
+        const tgt = team.find((x) => x.role === "tank" && x.hp < x.max * 0.85) || low;
+        tgt.shield += Math.round(u.pow * B.mult * (u.mods.baseMult || 1) * b.healMult(u));
+        u.cd.base = b.tick + baseCd(u, B.cd);
+        b.skillLog(u, B.name, tgt);
+        return;
+      }
+      if (b.tick % (u.mods.groupEvery || A.groupEvery) === 0 && team.some((x) => x.hp < x.max * A.groupBelow)) {
+        for (const x of team) b.heal(u, x, u.pow * A.group);
+        return;
+      }
+      if (low.hp < low.max) {
+        b.heal(u, low, u.pow * A.single * (R() < u.crit ? A.critMult : 1));
+        if (u.mods.renew) low.hots.push({ until: b.tick + 3, amt: u.pow * u.mods.renew, src: u });
+      } else b.hitEnemy(u, focus, u.pow * A.idleHit * (u.mods.smite || 1));
+    },
+    hooks: {
+      // 痛苦鎮壓：隊上有戒律牧師且冷卻好了，坦克吃重擊時減傷
+      busterGuard: {
+        can: (b, x) => x.spec === "disc" && ready(b, x, "spec"),
+        apply(b, x, tgt) {
+          const S = P2.specs.disc;
+          const f = 1 - Math.min(0.9, S.reduce * fx(x));
+          x.cd.spec = b.tick + specCd(x, S);
+          b.skillLog(x, S.skill, tgt);
+          return f;
+        }
+      },
+      // 神聖讚美詩：引導中每秒群補
+      tick(b, u) {
+        if (u.buf.hymn > b.tick) {
+          const S = P2.specs.holy;
+          for (const x of b.alive()) b.heal(u, x, u.pow * S.mult * fx(u));
+        }
+      }
+    }
   };
+  var cleric_default = P2;
+
+  // src/core/classes/rogue.js
+  var P3 = {
+    id: "rogue",
+    name: "\u6697\u5F71\u76DC\u8CCA",
+    role: "dps",
+    icon: "\u{1F5E1}\uFE0F",
+    hp: 140,
+    hpL: 24,
+    pow: 10,
+    powL: 2.3,
+    armor: 0.2,
+    crit: 0.15,
+    desc: "\u55AE\u9AD4\u7206\u767C\uFF0C\u66B4\u64CA\u7387\u9AD8\u3002\u64C5\u9577\u6253\u738B\u3002",
+    prefers: ["enrage"],
+    // 推薦陣容：遇到這些機制時優先帶
+    ai: { hit: 1.3 },
+    base: { name: "\u5254\u9AA8", cd: 6, mult: 3.5, desc: "\u51B7\u537B 6 \u79D2\uFF1A\u5C0D\u9996\u9818\u9020\u6210\u5A01\u529B \xD73.5" },
+    specs: {
+      assa: { name: "\u523A\u6BBA", skill: "\u81F4\u547D\u6BD2\u85E5", counters: "enrage", desc: "\u6BCF\u6B21\u653B\u64CA\u758A 1 \u5C64\u6BD2\uFF0C\u6BCF\u5C64\u6BCF\u79D2\u5A01\u529B \xD70.4\uFF0C\u6700\u591A 3 \u5C64", perStack: 0.4, maxStacks: 3 },
+      combat: { name: "\u6230\u9B25", skill: "\u528D\u5203\u4E82\u821E", counters: "summon", desc: "\u51B7\u537B 15 \u79D2\uFF1A8 \u79D2\u5167\u6BCF\u6B21\u653B\u64CA\u984D\u5916\u6253\u4E2D 2 \u500B\u76EE\u6A19", cd: 15, dur: 8, extra: 2 }
+    },
+    talents: [
+      {
+        a: { name: "\u7CBE\u6E96", desc: "\u66B4\u64CA\u7387 +5%", mods: { critAdd: 0.05 } },
+        b: { name: "\u81F4\u547D", desc: "\u66B4\u64CA\u50B7\u5BB3 \xD72 \u2192 \xD72.5", mods: { critDmg: 2.5 } }
+      },
+      {
+        a: { name: "\u9583\u907F", desc: "\u53D7\u5230\u653B\u64CA\u6642 20% \u6A5F\u7387\u9583\u904E", mods: { dodge: 0.2 } },
+        b: { name: "\u5272\u88C2", desc: "\u5254\u9AA8\u984D\u5916\u9020\u6210\u6D41\u8840\uFF085 \u79D2\uFF0C\u6BCF\u79D2\u5A01\u529B \xD70.5\uFF09", mods: { bleed: 0.5 } }
+      },
+      {
+        a: { name: "\u8655\u6C7A", desc: "\u76EE\u6A19\u751F\u547D\u4F4E\u65BC 35% \u6642\u50B7\u5BB3 +30%", mods: { execute: 0.3 } },
+        b: { name: "\u6E05\u6383", desc: "\u5C0D\u5C0F\u602A\u50B7\u5BB3 +25%", mods: { sweep: 0.25 } }
+      },
+      SPEC_ROW,
+      {
+        a: { name: "\u6697\u5F71\u4E4B\u821E", desc: "\u5254\u9AA8\u51B7\u537B 6 \u2192 4 \u79D2", mods: { baseCd: 4 } },
+        b: { name: "\u51B7\u8840", desc: "\u6BCF\u6CE2\u7B2C\u4E00\u6B21\u653B\u64CA\u5FC5\u5B9A\u66B4\u64CA", mods: { coldBlood: 1 } }
+      }
+    ],
+    recommend: (has) => ({ spec: has("summon") ? "combat" : "assa", t: ["b", "b", has("summon") ? "b" : "a", "b", "a"] }),
+    legend: {
+      name: "\u5361\u897F\u6069",
+      title: "\u5F71\u5203",
+      passive: "chain",
+      pname: "\u9023\u9396\u66B4\u64CA",
+      desc: "\u66B4\u64CA\u5F8C\u7684\u4E0B\u4E00\u6B21\u653B\u64CA\u5FC5\u5B9A\u66B4\u64CA\uFF0C\u6BCF 6 \u79D2\u6700\u591A\u4E00\u6B21",
+      hooks: {
+        onCrit(b, u) {
+          if ((u.chainReady || 0) <= b.tick) {
+            u.nextCrit = true;
+            u.chainReady = b.tick + 6;
+          }
+        }
+      }
+    },
+    act(b, u, foes, focus) {
+      const S = spec(P3, u), B = P3.base, boss = foes.find((e) => e.boss);
+      if (u.spec === "combat" && ready(b, u, "spec") && foes.length > 1) {
+        u.buf.flurry = b.tick + S.dur;
+        u.cd.spec = b.tick + specCd(u, S);
+        b.skillLog(u, S.skill);
+      }
+      if (ready(b, u, "base")) {
+        const t = boss || focus;
+        b.hitEnemy(u, t, u.pow * B.mult, { skill: true });
+        if (u.mods.bleed) t.bleed = { until: b.tick + 5, amt: u.pow * u.mods.bleed, src: u };
+        u.cd.base = b.tick + baseCd(u, B.cd);
+        b.skillLog(u, B.name, t);
+        return;
+      }
+      b.hitEnemy(u, boss || focus, u.pow * P3.ai.hit);
+    },
+    hooks: {
+      afterHit(b, u, e, amt, o) {
+        if (u.spec === "assa" && !o.dot) {
+          const S = P3.specs.assa;
+          e.poison = Math.min(S.maxStacks, (e.poison || 0) + 1);
+          e.poisonSrc = u;
+          e.poisonPer = S.perStack;
+        }
+        if (u.buf.flurry > b.tick && !o.aoe && !o.dot && !o.extra) {
+          for (const x of b.foes().filter((x2) => x2 !== e).slice(0, P3.specs.combat.extra)) b.hitEnemy(u, x, amt, { extra: true, skill: true });
+        }
+      }
+    }
+  };
+  var rogue_default = P3;
+
+  // src/core/classes/mage.js
+  var P4 = {
+    id: "mage",
+    name: "\u5967\u8853\u6CD5\u5E2B",
+    role: "dps",
+    icon: "\u{1F525}",
+    hp: 115,
+    hpL: 19,
+    pow: 9,
+    powL: 2.1,
+    armor: 0.1,
+    crit: 0.08,
+    desc: "\u7BC4\u570D\u50B7\u5BB3\uFF0C\u540C\u6642\u653B\u64CA\u6240\u6709\u6575\u4EBA\u3002\u64C5\u9577\u6E05\u5C0F\u602A\u3002",
+    prefers: ["summon"],
+    ai: { aoe: 0.72, single: 1 },
+    base: { name: "\u70C8\u7130\u98A8\u66B4", cd: 9, mult: 2, desc: "\u51B7\u537B 9 \u79D2\uFF1A\u5168\u9AD4\u6575\u4EBA\u5A01\u529B \xD72" },
+    specs: {
+      fire: { name: "\u706B\u7130", skill: "\u71C3\u71D2", counters: "enrage", desc: "\u51B7\u537B 30 \u79D2\uFF1A10 \u79D2\u5167\u66B4\u64CA\u7387 +40%", cd: 30, dur: 10, crit: 0.4 },
+      frost: { name: "\u51B0\u971C", skill: "\u51B0\u971C\u65B0\u661F", counters: "summon", desc: "\u51B7\u537B 18 \u79D2\uFF1A\u5168\u9AD4\u6575\u4EBA\u653B\u64CA \u221240% \u6301\u7E8C 4 \u79D2", cd: 18, dur: 4, weaken: 0.4 }
+    },
+    talents: [
+      {
+        a: { name: "\u5967\u8853\u667A\u6167", desc: "\u5A01\u529B +8%", mods: { powMult: 1.08 } },
+        b: { name: "\u6CD5\u8853\u5F37\u5316", desc: "\u70C8\u7130\u98A8\u66B4\u50B7\u5BB3 +40%", mods: { baseMult: 1.4 } }
+      },
+      {
+        a: { name: "\u5BD2\u51B0\u5C4F\u969C", desc: "\u751F\u547D\u4F4E\u65BC 30% \u6642\u514D\u50B7 4 \u79D2\uFF0C\u6BCF\u5834\u4E00\u6B21", mods: { iceBlock: 4 } },
+        b: { name: "\u6CD5\u529B\u8B77\u76FE", desc: "\u53D7\u5230\u7684\u50B7\u5BB3 \u221215%", mods: { allReduce: 0.15 } }
+      },
+      {
+        a: { name: "\u9023\u9396\u53CD\u61C9", desc: "\u7BC4\u570D\u653B\u64CA\u6BCF\u591A 1 \u500B\u76EE\u6A19\uFF0C\u50B7\u5BB3 +5%", mods: { chain: 0.05 } },
+        b: { name: "\u5C08\u6CE8", desc: "\u53EA\u5269 1 \u500B\u76EE\u6A19\u6642\u50B7\u5BB3 +25%", mods: { focus: 0.25 } }
+      },
+      SPEC_ROW,
+      {
+        a: { name: "\u708E\u7206\u8853", desc: "\u6BCF 10 \u79D2\u5C0D\u9996\u9818\u9020\u6210\u5A01\u529B \xD75", mods: { pyro: 5 } },
+        b: { name: "\u66B4\u98A8\u96EA", desc: "\u70C8\u7130\u98A8\u66B4\u51B7\u537B 9 \u2192 6 \u79D2", mods: { baseCd: 6 } }
+      }
+    ],
+    recommend: (has) => ({ spec: has("summon") ? "frost" : "fire", t: ["a", "b", has("summon") ? "a" : "b", "b", "a"] }),
+    legend: {
+      name: "\u8389\u8587\u4E9E",
+      title: "\u661F\u706B",
+      passive: "molten",
+      pname: "\u7194\u71B1",
+      desc: "\u70C8\u7130\u98A8\u66B4\u51B7\u537B \u221250%\uFF0C\u64CA\u6BBA\u6575\u4EBA\u6642\u518D\u6E1B 1 \u79D2",
+      hooks: {
+        cdMult: 0.5,
+        onKill(b, u) {
+          if (u.cd.base) u.cd.base -= 1;
+        }
+      }
+    },
+    act(b, u, foes) {
+      const S = spec(P4, u), B = P4.base, boss = foes.find((e) => e.boss);
+      if (u.spec === "fire" && ready(b, u, "spec") && boss) {
+        u.buf.combust = b.tick + S.dur;
+        u.cd.spec = b.tick + specCd(u, S);
+        b.skillLog(u, S.skill);
+      }
+      if (u.spec === "frost" && ready(b, u, "spec") && (foes.length >= 2 || boss)) {
+        const w = Math.min(0.8, S.weaken * fx(u));
+        for (const e of foes) {
+          e.weak = Math.max(e.weakUntil > b.tick ? e.weak : 0, w);
+          e.weakUntil = b.tick + S.dur;
+        }
+        u.cd.spec = b.tick + specCd(u, S);
+        b.skillLog(u, S.skill);
+      }
+      if (u.mods.pyro && b.tick % 10 === 0) {
+        const t = boss || foes[0];
+        b.hitEnemy(u, t, u.pow * u.mods.pyro, { skill: true });
+        b.skillLog(u, "\u708E\u7206\u8853", t);
+      }
+      const n = foes.length, chain = 1 + (u.mods.chain || 0) * (n - 1), focusM = n === 1 ? 1 + (u.mods.focus || 0) : 1;
+      if (ready(b, u, "base")) {
+        for (const e of b.foes()) b.hitEnemy(u, e, u.pow * B.mult * (u.mods.baseMult || 1) * chain * focusM, { skill: true, aoe: true });
+        u.cd.base = b.tick + baseCd(u, B.cd);
+        b.skillLog(u, B.name);
+        return;
+      }
+      const per = n > 1 ? P4.ai.aoe : P4.ai.single;
+      for (const e of b.foes()) b.hitEnemy(u, e, u.pow * per * chain * focusM, { aoe: true });
+    },
+    hooks: {
+      critBonus: (b, u) => u.buf.combust > b.tick ? P4.specs.fire.crit * fx(u) : 0
+      // 燃燒
+    }
+  };
+  var mage_default = P4;
+
+  // src/core/classes/index.js
+  var PACKS = { guardian: guardian_default, cleric: cleric_default, rogue: rogue_default, mage: mage_default };
+  var roleOf = (h) => {
+    const p = PACKS[h.cls];
+    return p.roleOf ? p.roleOf(h) : p.role;
+  };
+
+  // src/core/config.js
+  var CLASSES = PACKS;
+  var ROLE_NAME = { tank: "\u5766\u514B", heal: "\u6CBB\u7642", dps: "\u8F38\u51FA" };
   var HERO = {
     maxLevel: 40,
     paragon: { need: 2e4, growth: 0.1, bonus: 0.01 },
@@ -192,12 +534,7 @@
     { name: "\u53F2\u8A69", mult: 1.25, crit: 0.04, weight: 0.045, hire: 4, baseCdMult: 0.9 },
     { name: "\u50B3\u8AAA", mult: 1.4, crit: 0.04, weight: 5e-3, hire: 8, baseCdMult: 0.9 }
   ];
-  var LEGENDS = {
-    guardian: { name: "\u5DF4\u6D1B\u65AF", title: "\u9435\u58C1", passive: "undying", pname: "\u4E0D\u5C48", desc: "\u6BCF\u5834\u7B2C\u4E00\u6B21\u53D7\u5230\u81F4\u547D\u50B7\u5BB3\u6539\u70BA\u5269 1 \u8840\u4E26\u7121\u6575 3 \u79D2\uFF1B\u5728\u5834\u6642\u5168\u968A\u53D7\u5230\u7684\u50B7\u5BB3 \u22128%" },
-    cleric: { name: "\u827E\u857E\u5A1C", title: "\u6668\u66E6", passive: "overflow", pname: "\u6EA2\u5149", desc: "\u6CBB\u7642\u8D85\u51FA\u7684\u90E8\u5206\u8F49\u70BA\u8B77\u76FE\uFF08\u4E0A\u9650\u662F\u8A72\u968A\u54E1\u751F\u547D\u7684 20%\uFF09" },
-    rogue: { name: "\u5361\u897F\u6069", title: "\u5F71\u5203", passive: "chain", pname: "\u9023\u9396\u66B4\u64CA", desc: "\u66B4\u64CA\u5F8C\u7684\u4E0B\u4E00\u6B21\u653B\u64CA\u5FC5\u5B9A\u66B4\u64CA\uFF0C\u6BCF 6 \u79D2\u6700\u591A\u4E00\u6B21" },
-    mage: { name: "\u8389\u8587\u4E9E", title: "\u661F\u706B", passive: "molten", pname: "\u7194\u71B1", desc: "\u70C8\u7130\u98A8\u66B4\u51B7\u537B \u221250%\uFF0C\u64CA\u6BBA\u6575\u4EBA\u6642\u518D\u6E1B 1 \u79D2" }
-  };
+  var LEGENDS = Object.fromEntries(Object.entries(PACKS).map(([k, p]) => [k, p.legend]));
   var RECRUIT = {
     scrollBase: 120,
     scrollPerLevel: 30,
@@ -284,13 +621,6 @@
   };
   var ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV"];
 
-  // src/core/rng.js
-  var R = Math.random;
-  var rnd = (a, b) => a + R() * (b - a);
-  var rint = (a, b) => Math.floor(rnd(a, b + 1));
-  var pick = (arr) => arr[Math.floor(R() * arr.length)];
-  var uid = () => Math.random().toString(36).slice(2, 9);
-
   // src/core/items.js
   function makeItem(slot, ilvl, rarity) {
     const B = ilvl * RARITY[rarity].mult, w = SLOT_STATS[slot];
@@ -334,115 +664,11 @@
   var upgradeCost = (it) => Math.round(GEAR.upCostBase * (it.up + 1) * (1 + it.ilvl / 10));
 
   // src/core/talents.js
-  var BASE_SKILLS = {
-    guardian: { name: "\u76FE\u724C\u731B\u64CA", cd: 8, mult: 2.5, weaken: 0.3, weakenDur: 4, desc: "\u51B7\u537B 8 \u79D2\uFF1A\u5A01\u529B \xD72.5 \u50B7\u5BB3\uFF0C\u76EE\u6A19\u653B\u64CA \u221230% \u6301\u7E8C 4 \u79D2" },
-    cleric: { name: "\u771F\u8A00\u8853\uFF1A\u76FE", cd: 10, mult: 4, desc: "\u51B7\u537B 10 \u79D2\uFF1A\u7D66\u8840\u91CF\u6700\u4F4E\u7684\u968A\u53CB\u8B77\u76FE\uFF08\u5A01\u529B \xD74\uFF09" },
-    rogue: { name: "\u5254\u9AA8", cd: 6, mult: 3.5, desc: "\u51B7\u537B 6 \u79D2\uFF1A\u5C0D\u9996\u9818\u9020\u6210\u5A01\u529B \xD73.5" },
-    mage: { name: "\u70C8\u7130\u98A8\u66B4", cd: 9, mult: 2, desc: "\u51B7\u537B 9 \u79D2\uFF1A\u5168\u9AD4\u6575\u4EBA\u5A01\u529B \xD72" }
-  };
+  var BASE_SKILLS = Object.fromEntries(Object.entries(PACKS).map(([k, p]) => [k, p.base]));
+  var SPECS = Object.fromEntries(Object.entries(PACKS).map(([k, p]) => [k, p.specs]));
+  var TALENTS = Object.fromEntries(Object.entries(PACKS).map(([k, p]) => [k, p.talents]));
   var SPEC_LEVEL = 10;
-  var SPECS = {
-    guardian: {
-      prot: { name: "\u9632\u8B77", skill: "\u8056\u76FE\u8853", counters: "buster", desc: "\u751F\u547D\u4F4E\u65BC 30% \u6642\u81EA\u52D5 5 \u79D2\u7121\u6575\uFF0C\u6BCF\u5834\u4E00\u6B21", below: 0.3, dur: 5 },
-      ret: { name: "\u61F2\u6212", skill: "\u5FA9\u4EC7\u4E4B\u6012", counters: "enrage", desc: "\u51B7\u537B 20 \u79D2\uFF1A10 \u79D2\u5167\u50B7\u5BB3 +50%\u3001\u5438\u8840 20%", cd: 20, dur: 10, dmg: 0.5, leech: 0.2 }
-    },
-    cleric: {
-      disc: { name: "\u6212\u5F8B", skill: "\u75DB\u82E6\u93AE\u58D3", counters: "buster", desc: "\u51B7\u537B 15 \u79D2\uFF1A\u5766\u514B\u53D7\u5230\u91CD\u64CA\u6642\uFF0C\u8A72\u6B21\u50B7\u5BB3 \u221260%", cd: 15, reduce: 0.6 },
-      holy: { name: "\u795E\u8056", skill: "\u795E\u8056\u8B9A\u7F8E\u8A69", counters: "pulse", desc: "\u51B7\u537B 30 \u79D2\uFF1A\u5168\u968A\u5E73\u5747\u8840\u91CF\u4F4E\u65BC 60% \u6642\uFF0C\u9023\u7E8C 3 \u79D2\u7FA4\u88DC\uFF08\u5A01\u529B \xD71.2\uFF09", cd: 30, dur: 3, mult: 1.2, below: 0.6 }
-    },
-    rogue: {
-      assa: { name: "\u523A\u6BBA", skill: "\u81F4\u547D\u6BD2\u85E5", counters: "enrage", desc: "\u6BCF\u6B21\u653B\u64CA\u758A 1 \u5C64\u6BD2\uFF0C\u6BCF\u5C64\u6BCF\u79D2\u5A01\u529B \xD70.4\uFF0C\u6700\u591A 3 \u5C64", perStack: 0.4, maxStacks: 3 },
-      combat: { name: "\u6230\u9B25", skill: "\u528D\u5203\u4E82\u821E", counters: "summon", desc: "\u51B7\u537B 15 \u79D2\uFF1A8 \u79D2\u5167\u6BCF\u6B21\u653B\u64CA\u984D\u5916\u6253\u4E2D 2 \u500B\u76EE\u6A19", cd: 15, dur: 8, extra: 2 }
-    },
-    mage: {
-      fire: { name: "\u706B\u7130", skill: "\u71C3\u71D2", counters: "enrage", desc: "\u51B7\u537B 30 \u79D2\uFF1A10 \u79D2\u5167\u66B4\u64CA\u7387 +40%", cd: 30, dur: 10, crit: 0.4 },
-      frost: { name: "\u51B0\u971C", skill: "\u51B0\u971C\u65B0\u661F", counters: "summon", desc: "\u51B7\u537B 18 \u79D2\uFF1A\u5168\u9AD4\u6575\u4EBA\u653B\u64CA \u221240% \u6301\u7E8C 4 \u79D2", cd: 18, dur: 4, weaken: 0.4 }
-    }
-  };
   var TALENT_ROWS = [5, 15, 20, 25, 30];
-  var SPEC_ROW = {
-    // Lv25 四職業共用
-    a: { name: "\u5C08\u7CBE\u7CBE\u901A", desc: "\u5C08\u7CBE\u6280\u80FD\u51B7\u537B \u221230%", mods: { specCd: 0.7 } },
-    b: { name: "\u5C08\u7CBE\u5F37\u5316", desc: "\u5C08\u7CBE\u6280\u80FD\u6548\u679C +30%", mods: { specFx: 1.3 } }
-  };
-  var TALENTS = {
-    guardian: [
-      {
-        a: { name: "\u5805\u97CC", desc: "\u751F\u547D +10%", mods: { hpMult: 1.1 } },
-        b: { name: "\u92B3\u5229\u76FE\u724C", desc: "\u76FE\u724C\u731B\u64CA\u50B7\u5BB3 +50%", mods: { baseMult: 1.5 } }
-      },
-      {
-        a: { name: "\u683C\u64CB", desc: "\u53D7\u5230\u91CD\u64CA\u7684\u50B7\u5BB3 \u221225%", mods: { busterReduce: 0.25 } },
-        b: { name: "\u9B54\u6297", desc: "\u53D7\u5230\u7BC4\u570D\u653B\u64CA\u7684\u50B7\u5BB3 \u221230%", mods: { aoeReduce: 0.3 } }
-      },
-      {
-        a: { name: "\u9F13\u821E", desc: "\u5168\u968A\u751F\u547D +5%", mods: { partyHp: 0.05 } },
-        b: { name: "\u53CD\u64CA", desc: "\u53D7\u64CA\u6642 15% \u6A5F\u7387\u53CD\u64CA\u5A01\u529B \xD71", mods: { counter: 0.15 } }
-      },
-      SPEC_ROW,
-      {
-        a: { name: "\u76FE\u7246", desc: "\u751F\u547D\u4F4E\u65BC 50% \u6642\u518D\u6E1B\u50B7 15%", mods: { lowHpReduce: 0.15 } },
-        b: { name: "\u6B63\u7FA9\u4E4B\u9318", desc: "\u50B7\u5BB3 +20%", mods: { dmgMult: 1.2 } }
-      }
-    ],
-    cleric: [
-      {
-        a: { name: "\u51A5\u60F3", desc: "\u6CBB\u7642 +10%", mods: { healMult: 1.1 } },
-        b: { name: "\u8FC5\u6377\u79B1\u8A00", desc: "\u7FA4\u88DC\u9593\u9694 5 \u2192 4 \u79D2", mods: { groupEvery: 4 } }
-      },
-      {
-        a: { name: "\u5805\u5B9A\u8B77\u76FE", desc: "\u8B77\u76FE +40%", mods: { baseMult: 1.4 } },
-        b: { name: "\u6062\u5FA9", desc: "\u55AE\u9AD4\u6CBB\u7642\u5F8C\u518D\u6301\u7E8C\u56DE\u8840 3 \u79D2", mods: { renew: 0.3 } }
-      },
-      {
-        a: { name: "\u6551\u8D16", desc: "\u7B2C\u4E00\u4F4D\u9663\u4EA1\u7684\u968A\u53CB\u4EE5 50% \u751F\u547D\u5FA9\u6D3B\uFF0C\u6BCF\u5834\u4E00\u6B21", mods: { redemption: 0.5 } },
-        b: { name: "\u8056\u5149\u4E4B\u6012", desc: "\u6C92\u4EBA\u9700\u8981\u6CBB\u7642\u6642\uFF0C\u653B\u64CA\u50B7\u5BB3 \xD73", mods: { smite: 3 } }
-      },
-      SPEC_ROW,
-      {
-        a: { name: "\u5B88\u8B77\u5929\u4F7F", desc: "\u5168\u968A\u53D7\u5230\u7684\u7BC4\u570D\u50B7\u5BB3 \u221210%", mods: { partyAoe: 0.1 } },
-        b: { name: "\u6148\u60B2", desc: "\u66B4\u64CA\u7387 +10%", mods: { critAdd: 0.1 } }
-      }
-    ],
-    rogue: [
-      {
-        a: { name: "\u7CBE\u6E96", desc: "\u66B4\u64CA\u7387 +5%", mods: { critAdd: 0.05 } },
-        b: { name: "\u81F4\u547D", desc: "\u66B4\u64CA\u50B7\u5BB3 \xD72 \u2192 \xD72.5", mods: { critDmg: 2.5 } }
-      },
-      {
-        a: { name: "\u9583\u907F", desc: "\u53D7\u5230\u653B\u64CA\u6642 20% \u6A5F\u7387\u9583\u904E", mods: { dodge: 0.2 } },
-        b: { name: "\u5272\u88C2", desc: "\u5254\u9AA8\u984D\u5916\u9020\u6210\u6D41\u8840\uFF085 \u79D2\uFF0C\u6BCF\u79D2\u5A01\u529B \xD70.5\uFF09", mods: { bleed: 0.5 } }
-      },
-      {
-        a: { name: "\u8655\u6C7A", desc: "\u76EE\u6A19\u751F\u547D\u4F4E\u65BC 35% \u6642\u50B7\u5BB3 +30%", mods: { execute: 0.3 } },
-        b: { name: "\u6E05\u6383", desc: "\u5C0D\u5C0F\u602A\u50B7\u5BB3 +25%", mods: { sweep: 0.25 } }
-      },
-      SPEC_ROW,
-      {
-        a: { name: "\u6697\u5F71\u4E4B\u821E", desc: "\u5254\u9AA8\u51B7\u537B 6 \u2192 4 \u79D2", mods: { baseCd: 4 } },
-        b: { name: "\u51B7\u8840", desc: "\u6BCF\u6CE2\u7B2C\u4E00\u6B21\u653B\u64CA\u5FC5\u5B9A\u66B4\u64CA", mods: { coldBlood: 1 } }
-      }
-    ],
-    mage: [
-      {
-        a: { name: "\u5967\u8853\u667A\u6167", desc: "\u5A01\u529B +8%", mods: { powMult: 1.08 } },
-        b: { name: "\u6CD5\u8853\u5F37\u5316", desc: "\u70C8\u7130\u98A8\u66B4\u50B7\u5BB3 +40%", mods: { baseMult: 1.4 } }
-      },
-      {
-        a: { name: "\u5BD2\u51B0\u5C4F\u969C", desc: "\u751F\u547D\u4F4E\u65BC 30% \u6642\u514D\u50B7 4 \u79D2\uFF0C\u6BCF\u5834\u4E00\u6B21", mods: { iceBlock: 4 } },
-        b: { name: "\u6CD5\u529B\u8B77\u76FE", desc: "\u53D7\u5230\u7684\u50B7\u5BB3 \u221215%", mods: { allReduce: 0.15 } }
-      },
-      {
-        a: { name: "\u9023\u9396\u53CD\u61C9", desc: "\u7BC4\u570D\u653B\u64CA\u6BCF\u591A 1 \u500B\u76EE\u6A19\uFF0C\u50B7\u5BB3 +5%", mods: { chain: 0.05 } },
-        b: { name: "\u5C08\u6CE8", desc: "\u53EA\u5269 1 \u500B\u76EE\u6A19\u6642\u50B7\u5BB3 +25%", mods: { focus: 0.25 } }
-      },
-      SPEC_ROW,
-      {
-        a: { name: "\u708E\u7206\u8853", desc: "\u6BCF 10 \u79D2\u5C0D\u9996\u9818\u9020\u6210\u5A01\u529B \xD75", mods: { pyro: 5 } },
-        b: { name: "\u66B4\u98A8\u96EA", desc: "\u70C8\u7130\u98A8\u66B4\u51B7\u537B 9 \u2192 6 \u79D2", mods: { baseCd: 6 } }
-      }
-    ]
-  };
   var unlockedRows = (h) => TALENT_ROWS.filter((lv) => h.level >= lv);
   var canPickSpec = (h) => h.level >= SPEC_LEVEL;
   function pendingPicks(h) {
@@ -451,14 +677,14 @@
   }
   function heroMods(h) {
     const m = {}, t = h.talents || {};
-    TALENTS[h.cls].forEach((row, i) => {
+    PACKS[h.cls].talents.forEach((row, i) => {
       const lv = TALENT_ROWS[i], pick2 = h.level >= lv && t[lv];
       if (pick2 && row[pick2]) Object.assign(m, row[pick2].mods);
     });
     return m;
   }
   function setSpec(h, spec2) {
-    if (canPickSpec(h) && SPECS[h.cls][spec2]) h.spec = spec2;
+    if (canPickSpec(h) && PACKS[h.cls].specs[spec2]) h.spec = spec2;
   }
   function setTalent(h, lv, pick2) {
     if (!TALENT_ROWS.includes(lv) || h.level < lv || !["a", "b"].includes(pick2)) return;
@@ -466,13 +692,7 @@
   }
   function recommend(cls2, mechTypes) {
     const has = (t) => mechTypes.includes(t);
-    const R2 = {
-      guardian: () => ({ spec: has("buster") ? "prot" : "ret", t: ["a", has("buster") ? "a" : "b", "a", "b", has("enrage") ? "b" : "a"] }),
-      cleric: () => ({ spec: has("buster") && !has("pulse") ? "disc" : "holy", t: ["a", "a", "a", "b", has("pulse") ? "a" : "b"] }),
-      rogue: () => ({ spec: has("summon") ? "combat" : "assa", t: ["b", "b", has("summon") ? "b" : "a", "b", "a"] }),
-      mage: () => ({ spec: has("summon") ? "frost" : "fire", t: ["a", "b", has("summon") ? "a" : "b", "b", "a"] })
-    };
-    return R2[cls2]();
+    return PACKS[cls2].recommend(has);
   }
   function applyRecommend(h, mechTypes) {
     const r = recommend(h.cls, mechTypes);
@@ -487,7 +707,7 @@
   // src/core/heroes.js
   var xpNeed = (L) => Math.round(HERO.xpBase * Math.pow(L, HERO.xpExp));
   function makeHero(cls2, level = 1, rarity = 0) {
-    const legend = rarity === 4 ? LEGENDS[cls2] : null;
+    const legend = rarity === 4 ? CLASSES[cls2].legend : null;
     return {
       id: uid(),
       cls: cls2,
@@ -504,7 +724,7 @@
   function rarityMods(h) {
     const r = HERO_RARITY[h.rarity || 0], m = {};
     if (r.baseCdMult) m.baseCdMult = r.baseCdMult;
-    if (h.legend) m.legend = LEGENDS[h.cls].passive;
+    if (h.legend) m.legend = CLASSES[h.cls].legend.passive;
     return m;
   }
   var gearOf = (h, items) => Object.keys(SLOTS).map((s) => h.gear[s] && items[h.gear[s]]).filter(Boolean);
@@ -579,105 +799,6 @@
   }
 
   // src/core/battle.js
-  var ready = (b, u, key) => (u.cd[key] || 0) <= b.tick;
-  var spec = (u) => u.spec && SPECS[u.cls][u.spec];
-  var specCd = (u, s) => Math.round(s.cd * (u.mods.specCd || 1));
-  var fx = (u) => u.mods.specFx || 1;
-  var baseCd = (u, def) => Math.max(1, Math.round((u.mods.baseCd || def) * (u.mods.baseCdMult || 1) * (u.mods.legend === "molten" ? 0.5 : 1)));
-  var HERO_ACTIONS = {
-    guardian(b, u, foes, focus) {
-      const S = spec(u), B = BASE_SKILLS.guardian;
-      if (u.spec === "ret" && ready(b, u, "spec")) {
-        u.buf.wrath = b.tick + S.dur;
-        u.cd.spec = b.tick + specCd(u, S);
-        b.skillLog(u, S.skill);
-      }
-      if (ready(b, u, "base")) {
-        const t = foes.find((e) => e.boss) || focus;
-        b.hitEnemy(u, t, u.pow * B.mult * (u.mods.baseMult || 1), { skill: true });
-        t.weak = Math.max(t.weakUntil > b.tick ? t.weak : 0, B.weaken);
-        t.weakUntil = b.tick + B.weakenDur;
-        u.cd.base = b.tick + baseCd(u, B.cd);
-        b.skillLog(u, B.name, t);
-        return;
-      }
-      b.hitEnemy(u, focus, u.pow * CLASS_AI.tank.hit);
-    },
-    cleric(b, u, foes, focus) {
-      const A = CLASS_AI.heal, S = spec(u), B = BASE_SKILLS.cleric, team = b.alive();
-      const avg = team.reduce((a, x) => a + x.hp / x.max, 0) / team.length;
-      if (u.spec === "holy" && ready(b, u, "spec") && avg < S.below) {
-        u.buf.hymn = b.tick + S.dur;
-        u.cd.spec = b.tick + specCd(u, S);
-        b.skillLog(u, S.skill);
-      }
-      if (u.buf.hymn > b.tick) return;
-      const low = team.reduce((m, x) => x.hp / x.max < m.hp / m.max ? x : m);
-      if (ready(b, u, "base") && low.hp < low.max * 0.85) {
-        const tgt = team.find((x) => x.role === "tank" && x.hp < x.max * 0.85) || low;
-        tgt.shield += Math.round(u.pow * B.mult * (u.mods.baseMult || 1) * b.healMult(u));
-        u.cd.base = b.tick + baseCd(u, B.cd);
-        b.skillLog(u, B.name, tgt);
-        return;
-      }
-      if (b.tick % (u.mods.groupEvery || A.groupEvery) === 0 && team.some((x) => x.hp < x.max * A.groupBelow)) {
-        for (const x of team) b.heal(u, x, u.pow * A.group);
-        return;
-      }
-      if (low.hp < low.max) {
-        b.heal(u, low, u.pow * A.single * (R() < u.crit ? A.critMult : 1));
-        if (u.mods.renew) low.hots.push({ until: b.tick + 3, amt: u.pow * u.mods.renew, src: u });
-      } else b.hitEnemy(u, focus, u.pow * A.idleHit * (u.mods.smite || 1));
-    },
-    rogue(b, u, foes, focus) {
-      const S = spec(u), B = BASE_SKILLS.rogue, boss = foes.find((e) => e.boss);
-      if (u.spec === "combat" && ready(b, u, "spec") && foes.length > 1) {
-        u.buf.flurry = b.tick + S.dur;
-        u.cd.spec = b.tick + specCd(u, S);
-        b.skillLog(u, S.skill);
-      }
-      if (ready(b, u, "base")) {
-        const t = boss || focus;
-        b.hitEnemy(u, t, u.pow * B.mult, { skill: true });
-        if (u.mods.bleed) t.bleed = { until: b.tick + 5, amt: u.pow * u.mods.bleed, src: u };
-        u.cd.base = b.tick + baseCd(u, B.cd);
-        b.skillLog(u, B.name, t);
-        return;
-      }
-      b.hitEnemy(u, boss || focus, u.pow * CLASS_AI.rogue.hit);
-    },
-    mage(b, u, foes) {
-      const S = spec(u), B = BASE_SKILLS.mage, boss = foes.find((e) => e.boss);
-      if (u.spec === "fire" && ready(b, u, "spec") && boss) {
-        u.buf.combust = b.tick + S.dur;
-        u.cd.spec = b.tick + specCd(u, S);
-        b.skillLog(u, S.skill);
-      }
-      if (u.spec === "frost" && ready(b, u, "spec") && (foes.length >= 2 || boss)) {
-        const w = Math.min(0.8, S.weaken * fx(u));
-        for (const e of foes) {
-          e.weak = Math.max(e.weakUntil > b.tick ? e.weak : 0, w);
-          e.weakUntil = b.tick + S.dur;
-        }
-        u.cd.spec = b.tick + specCd(u, S);
-        b.skillLog(u, S.skill);
-      }
-      if (u.mods.pyro && b.tick % 10 === 0) {
-        const t = boss || foes[0];
-        b.hitEnemy(u, t, u.pow * u.mods.pyro, { skill: true });
-        b.skillLog(u, "\u708E\u7206\u8853", t);
-      }
-      const n = foes.length, chain = 1 + (u.mods.chain || 0) * (n - 1), focusM = n === 1 ? 1 + (u.mods.focus || 0) : 1;
-      if (ready(b, u, "base")) {
-        for (const e of b.foes()) b.hitEnemy(u, e, u.pow * B.mult * (u.mods.baseMult || 1) * chain * focusM, { skill: true, aoe: true });
-        u.cd.base = b.tick + baseCd(u, B.cd);
-        b.skillLog(u, B.name);
-        return;
-      }
-      const per = n > 1 ? CLASS_AI.mage.aoe : CLASS_AI.mage.single;
-      for (const e of b.foes()) b.hitEnemy(u, e, u.pow * per * chain * focusM, { aoe: true });
-    }
-  };
   var BOSS_MECHS = {
     enrage(b, e, m) {
       if (b.waveTick < m.at) return 1;
@@ -714,16 +835,21 @@
       this.kills = 0;
       this.maxTicks = opts.maxTicks || DUNGEON.maxTicks;
       this.units = party.map((h) => {
-        const s = heroStats(h, items), c = CLASSES[h.cls];
+        const s = heroStats(h, items), pack = PACKS[h.cls], mods = { ...heroMods(h), ...rarityMods(h) };
+        const lh = mods.legend && pack.legend.hooks || {};
         return {
           id: h.id,
           name: h.name,
           cls: h.cls,
           rarity: h.rarity || 0,
-          role: c.role,
-          icon: c.icon,
+          role: roleOf(h),
+          icon: pack.icon,
           spec: h.spec || null,
-          mods: { ...heroMods(h), ...rarityMods(h) },
+          mods,
+          pack,
+          hk: pack.hooks || {},
+          lh,
+          legendCd: lh.cdMult || 1,
           max: s.hp,
           hp: s.hp,
           pow: s.pow,
@@ -803,40 +929,29 @@
       if (e.hp <= 0) return 0;
       const m = u.mods;
       amt *= (m.dmgMult || 1) * (this.hornActive() ? 1 + RAID_HORN.bonus : 1);
-      if (u.buf.wrath > this.tick) amt *= 1 + SPECS.guardian.ret.dmg * fx(u);
+      if (u.hk.outMult) amt *= u.hk.outMult(this, u, e, o);
       if (m.execute && e.hp < e.max * 0.35) amt *= 1 + m.execute;
       if (m.sweep && !e.boss) amt *= 1 + m.sweep;
-      let critC = u.crit + (u.buf.combust > this.tick ? SPECS.mage.fire.crit * fx(u) : 0);
+      let critC = u.crit + (u.hk.critBonus ? u.hk.critBonus(this, u) : 0);
       if (u.cold) {
         critC = 1;
         u.cold = false;
       }
-      if (u.chainCrit) {
+      if (u.nextCrit) {
         critC = 1;
-        u.chainCrit = false;
+        u.nextCrit = false;
       }
       const crit = R() < critC;
       if (crit) amt *= m.critDmg || 2;
-      if (crit && m.legend === "chain" && !o.dot && (u.chainReady || 0) <= this.tick) {
-        u.chainCrit = true;
-        u.chainReady = this.tick + 6;
-      }
+      if (crit && !o.dot && u.lh.onCrit) u.lh.onCrit(this, u, e);
       amt = Math.min(e.hp, Math.round(amt * rnd(0.92, 1.08)));
       e.hp -= amt;
       u.dmgDone += amt;
       if (o.skill || o.dot) u.skillDmg += amt;
-      if (u.buf.wrath > this.tick && amt > 0) this.heal(u, u, amt * SPECS.guardian.ret.leech * fx(u), true);
-      if (u.spec === "assa" && !o.dot) {
-        const S = SPECS.rogue.assa;
-        e.poison = Math.min(S.maxStacks, (e.poison || 0) + 1);
-        e.poisonSrc = u;
-      }
-      if (u.buf.flurry > this.tick && !o.aoe && !o.dot && !o.extra) {
-        for (const x of this.foes().filter((x2) => x2 !== e).slice(0, SPECS.rogue.combat.extra)) this.hitEnemy(u, x, amt, { extra: true, skill: true });
-      }
+      if (u.hk.afterHit) u.hk.afterHit(this, u, e, amt, o);
       if (e.hp === 0) {
         if (e.goblin) this.kills = (this.kills || 0) + 1;
-        if (m.legend === "molten" && u.cd.base) u.cd.base -= 1;
+        if (u.lh.onKill) u.lh.onKill(this, u, e);
         this.push(`${e.name} \u88AB\u64CA\u6BBA`, e.boss ? "good" : "");
         if (!e.boss && this.has("bolstering")) {
           const rest = this.foes().filter((x) => !x.boss);
@@ -858,16 +973,12 @@
       let red = kind === "magic" ? 1 - (m.aoeReduce || 0) - this.partyAoe : 1 - u.armor;
       if (kind === "buster") {
         red *= 1 - (m.busterReduce || 0);
-        const disc = this.alive().find((x) => x.spec === "disc" && ready(this, x, "spec"));
-        if (disc) {
-          const S = SPECS.cleric.disc;
-          red *= 1 - Math.min(0.9, S.reduce * fx(disc));
-          disc.cd.spec = this.tick + specCd(disc, S);
-          this.skillLog(disc, S.skill, u);
-        }
+        const g = this.alive().find((x) => x.hk.busterGuard && x.hk.busterGuard.can(this, x));
+        if (g) red *= g.hk.busterGuard.apply(this, g, u);
       }
       red *= 1 - (m.allReduce || 0);
-      if (this.alive().some((x) => x.mods.legend === "undying")) red *= 0.92;
+      const aura = this.alive().find((x) => x.lh.partyTaken);
+      if (aura) red *= aura.lh.partyTaken;
       if (m.lowHpReduce && u.hp < u.max * 0.5) red *= 1 - m.lowHpReduce;
       amt = Math.round(amt * Math.max(0.05, red) * rnd(0.9, 1.1));
       const absorbed = Math.min(u.shield, amt);
@@ -881,9 +992,8 @@
       if (u.hp === 0) this.onDeath(u);
       return amt;
     }
-    // 聖盾術、寒冰屏障：跌破門檻（含致命一擊）時觸發，每場一次
+    // 保命技能：跌破門檻（含致命一擊）時觸發，每場一次（職業包的專精技能 → 天賦寒冰屏障 → 傳說被動）
     lifeSavers(u) {
-      const P = SPECS.guardian.prot;
       const save2 = (key, below, dur, name) => {
         if (u.used[key] || u.hp >= u.max * below) return;
         u.used[key] = true;
@@ -891,14 +1001,9 @@
         u.buf.immune = this.tick + dur;
         this.skillLog(u, name);
       };
-      if (u.spec === "prot") save2("divine", P.below, Math.round(P.dur * fx(u)), P.skill);
+      if (u.hk.lifeSaver) u.hk.lifeSaver(this, u, save2);
       if (u.mods.iceBlock) save2("ice", 0.3, u.mods.iceBlock, "\u5BD2\u51B0\u5C4F\u969C");
-      if (u.mods.legend === "undying" && u.hp === 0 && !u.used.undying) {
-        u.used.undying = true;
-        u.hp = 1;
-        u.buf.immune = this.tick + 3;
-        this.skillLog(u, "\u4E0D\u5C48");
-      }
+      if (u.lh.lifeSaver) u.lh.lifeSaver(this, u);
     }
     onDeath(u) {
       const priest = this.alive().find((x) => x.mods.redemption && !x.used.redemption);
@@ -908,7 +1013,7 @@
         this.skillLog(priest, "\u6551\u8D16", u);
         return;
       }
-      this.push(`\u{1F480} ${u.name}\uFF08${CLASSES[u.cls].name}\uFF09\u9663\u4EA1`, "bad");
+      this.push(`\u{1F480} ${u.name}\uFF08${u.pack.name}\uFF09\u9663\u4EA1`, "bad");
     }
     heal(src, tgt, amt, raw = false) {
       if (tgt.hp <= 0) return 0;
@@ -916,10 +1021,7 @@
       const h = Math.min(tgt.max - tgt.hp, Math.round(amt * (raw ? 1 : this.healMult(src)) * necro));
       tgt.hp += h;
       src.healDone += h;
-      if (src.mods.legend === "overflow" && !raw) {
-        const over = Math.round(amt * this.healMult(src)) - h;
-        if (over > 0) tgt.shield = Math.min(Math.round(tgt.max * 0.2), tgt.shield + over);
-      }
+      if (src.lh.onHeal && !raw) src.lh.onHeal(this, src, tgt, amt, h);
       return h;
     }
     enemyTarget() {
@@ -930,16 +1032,13 @@
     // ---------- 每 tick 的持續效果 ----------
     tickEffects() {
       for (const e of this.foes()) {
-        if (e.poison && e.poisonSrc) this.hitEnemy(e.poisonSrc, e, e.poison * SPECS.rogue.assa.perStack * e.poisonSrc.pow, { dot: true });
+        if (e.poison && e.poisonSrc) this.hitEnemy(e.poisonSrc, e, e.poison * e.poisonPer * e.poisonSrc.pow, { dot: true });
         if (e.bleed && e.bleed.until >= this.tick && e.hp > 0) this.hitEnemy(e.bleed.src, e, e.bleed.amt, { dot: true });
       }
       for (const u of this.alive()) {
         u.hots = u.hots.filter((h) => h.until >= this.tick);
         for (const h of u.hots) this.heal(h.src, u, h.amt);
-        if (u.buf.hymn > this.tick) {
-          const S = SPECS.cleric.holy;
-          for (const x of this.alive()) this.heal(u, x, u.pow * S.mult * fx(u));
-        }
+        if (u.hk.tick) u.hk.tick(this, u);
       }
     }
     step() {
@@ -950,7 +1049,7 @@
       for (const u of this.alive()) {
         const foes = this.foes();
         if (!foes.length) break;
-        HERO_ACTIONS[u.cls](this, u, foes, foes.find((e) => !e.boss) || foes[0]);
+        u.pack.act(this, u, foes, foes.find((e) => !e.boss) || foes[0]);
       }
       for (const e of this.foes()) {
         const tgt = this.enemyTarget();
@@ -1158,13 +1257,13 @@
   var partyHeroes = (s) => s.party.map((id) => s.heroes.find((h) => h.id === id)).filter(Boolean);
   var avgLevel = (list) => list.length ? list.reduce((a, h) => a + h.level, 0) / list.length : 1;
   var ownsLegend = (s, cls2) => [...s.heroes, ...s.tavern || []].some((h) => h.legend && h.cls === cls2);
-  var legendsAvailable = (s) => Object.keys(LEGENDS).filter((c) => !ownsLegend(s, c));
+  var legendsAvailable = (s) => Object.keys(CLASSES).filter((c) => CLASSES[c].legend).filter((c) => !ownsLegend(s, c));
   function rollHeroRarity(s) {
-    const P = s.recruit || (s.recruit = { sinceEpic: 0, sinceLegend: 0, total: 0 });
+    const P5 = s.recruit || (s.recruit = { sinceEpic: 0, sinceLegend: 0, total: 0 });
     const canLegend = legendsAvailable(s).length > 0;
     let r;
-    if (P.sinceLegend >= RECRUIT.pityLegend && canLegend) r = 4;
-    else if (P.sinceEpic >= RECRUIT.pityEpic) r = 3;
+    if (P5.sinceLegend >= RECRUIT.pityLegend && canLegend) r = 4;
+    else if (P5.sinceEpic >= RECRUIT.pityEpic) r = 3;
     else {
       let x = R(), i = HERO_RARITY.length - 1;
       for (; i > 0; i--) {
@@ -1174,16 +1273,16 @@
       r = Math.max(0, i);
     }
     if (r === 4 && !canLegend) r = 3;
-    P.total++;
-    P.sinceEpic = r >= 3 ? 0 : P.sinceEpic + 1;
-    P.sinceLegend = r === 4 ? 0 : P.sinceLegend + 1;
+    P5.total++;
+    P5.sinceEpic = r >= 3 ? 0 : P5.sinceEpic + 1;
+    P5.sinceLegend = r === 4 ? 0 : P5.sinceLegend + 1;
     return r;
   }
   function newRecruit(s, level) {
     const r = rollHeroRarity(s);
     const cls2 = r === 4 ? pick(legendsAvailable(s)) : pick(Object.keys(CLASSES));
     const h = makeHero(cls2, level, r);
-    if (h.level >= SPEC_LEVEL) h.spec = pick(Object.keys(SPECS[h.cls]));
+    if (h.level >= SPEC_LEVEL) h.spec = pick(Object.keys(CLASSES[h.cls].specs));
     for (const lv of TALENT_ROWS) if (h.level >= lv) h.talents[lv] = pick(["a", "b"]);
     return h;
   }
@@ -1465,10 +1564,10 @@
   }
   function recommendParty(s, hints) {
     const has = (t) => hints.includes(t), pw = (h) => heroPower(h, s.items);
-    const byRole = (r) => s.heroes.filter((h) => CLASSES[h.cls].role === r).sort((a, b) => pw(b) - pw(a));
+    const byRole = (r) => s.heroes.filter((h) => roleOf(h) === r).sort((a, b) => pw(b) - pw(a));
     const pick2 = [...byRole("tank").slice(0, 1), ...byRole("heal").slice(0, has("pulse") ? 2 : 1)];
-    const pref = (h) => (has("summon") && h.cls === "mage" ? 1.25 : 1) * (has("enrage") && h.cls === "rogue" ? 1.25 : 1);
-    const rest = s.heroes.filter((h) => !pick2.includes(h)).sort((a, b) => (CLASSES[b.cls].role === "dps") - (CLASSES[a.cls].role === "dps") || pw(b) * pref(b) - pw(a) * pref(a));
+    const pref = (h) => (CLASSES[h.cls].prefers || []).reduce((m, t) => m * (has(t) ? 1.25 : 1), 1);
+    const rest = s.heroes.filter((h) => !pick2.includes(h)).sort((a, b) => (roleOf(b) === "dps") - (roleOf(a) === "dps") || pw(b) * pref(b) - pw(a) * pref(a));
     pick2.push(...rest.slice(0, Math.max(0, ECONOMY.partyMax - pick2.length)));
     s.party = pick2.slice(0, ECONOMY.partyMax).map((h) => h.id);
     return partyHeroes(s);
@@ -1478,7 +1577,7 @@
     for (const h of party) applyRecommend(h, hints);
     const swapped = autoEquip(s);
     const roles = { tank: 0, heal: 0, dps: 0 };
-    party.forEach((h) => roles[CLASSES[h.cls].role]++);
+    party.forEach((h) => roles[roleOf(h)]++);
     return { roles, swapped, locked };
   }
   function takeFromStash(s) {
@@ -1612,7 +1711,7 @@
     if (!s.stats.runs) return { text: "\u958B\u59CB\u7B2C\u4E00\u5834\u6230\u9B25", sub: "\u6309\u4E0B\u300C\u8150\u6839\u6D1E\u7A9F\u300D\u7684\u6311\u6230\uFF0C\u968A\u4F0D\u6703\u81EA\u5DF1\u6253\u3002", btn: { label: "\u6311\u6230", act: "fight", d: 0 } };
     if (hasUpgrade(s)) return { text: "\u80CC\u5305\u6709\u66F4\u597D\u7684\u88DD\u5099", sub: "\u4E00\u9375\u66FF\u51FA\u6230\u968A\u54E1\u63DB\u4E0A\u5206\u6578\u66F4\u9AD8\u7684\u88DD\u5099\u3002", btn: { label: "\u4E00\u9375\u914D\u88DD", act: "autoequip" } };
     if (s.idle == null && party.length < ECONOMY.partyMax && s.heroes.length < ECONOMY.rosterMax && s.tavern.some((h) => s.gold >= hireCost(h))) {
-      const have = new Set(party.map((h) => CLASSES[h.cls].role));
+      const have = new Set(party.map(roleOf));
       const need = ["tank", "heal"].find((r) => !have.has(r)) || "dps";
       return { text: `\u968A\u4F0D\u9084\u6709 ${ECONOMY.partyMax - party.length} \u500B\u7A7A\u4F4D`, sub: `\u53BB\u9152\u9928\u62DB\u52DF\uFF0C\u5EFA\u8B70\u88DC${ROLE_NAME2[need]}\u3002`, btn: { label: "\u524D\u5F80\u9152\u9928", tab: "tavern" } };
     }
@@ -1710,7 +1809,7 @@
   }
 
   // src/core/version.js
-  var VERSION = "0.7.5";
+  var VERSION = "0.8.0";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -1935,7 +2034,7 @@
   // src/ui/views/team.js
   function roleCount() {
     const c = { tank: 0, heal: 0, dps: 0 };
-    partyHeroes(app.S).forEach((h) => c[cls(h).role]++);
+    partyHeroes(app.S).forEach((h) => c[roleOf(h)]++);
     return c;
   }
   function viewTeam() {
@@ -1944,7 +2043,7 @@
     <div class="party">${Array.from({ length: ECONOMY.partyMax }, (_, i) => {
       const x = party[i];
       if (!x) return `<div class="slot emptyslot">\u7A7A\u4F4D</div>`;
-      return `<button class="slot r-${x.rarity || 0}" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div><div class="n c${x.rarity || 0}">${x.name}</div><div class="lv num">Lv${x.level}</div><div class="rl role-${cls(x).role}"></div></button>`;
+      return `<button class="slot r-${x.rarity || 0}" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div><div class="n c${x.rarity || 0}">${x.name}</div><div class="lv num">Lv${x.level}</div><div class="rl role-${roleOf(x)}"></div></button>`;
     }).join("")}</div>
     <div class="comp"><span><b style="color:var(--tank)">\u5766\u514B</b> ${c.tank}</span><span><b style="color:var(--heal)">\u6CBB\u7642</b> ${c.heal}</span><span><b style="color:var(--dps)">\u8F38\u51FA</b> ${c.dps}</span><span>\u6230\u529B <b class="num" style="color:var(--fg)">${fmt(partyPower())}</b></span>
     ${!c.tank ? '<span style="color:var(--warn)">\u7F3A\u5766\u514B</span>' : ""}${!c.heal ? '<span style="color:var(--warn)">\u7F3A\u6CBB\u7642</span>' : ""}</div>
@@ -2018,10 +2117,10 @@
   // src/ui/views/tavern.js
   function viewTavern() {
     const S = app.S, E = ECONOMY, full = S.heroes.length >= E.rosterMax;
-    const one = scrollCost(S, 1), ten = scrollCost(S, 10), P = S.recruit, legendsLeft = legendsAvailable(S).length;
+    const one = scrollCost(S, 1), ten = scrollCost(S, 10), P5 = S.recruit, legendsLeft = legendsAvailable(S).length;
     let h = `<h2>\u9152\u9928</h2><p class="sub">\u540D\u518A <b class="num">${S.heroes.length}/${E.rosterMax}</b>\u3002\u65B0\u82F1\u96C4\u7684\u7B49\u7D1A\u6703\u63A5\u8FD1\u4F60\u968A\u4F0D\u7684\u5E73\u5747\u3002</p>
     <div class="recruit"><div><span class="label">\u62DB\u52DF\u4EE4</span><b>\u76F4\u63A5\u62BD\u4E00\u4F4D\u82F1\u96C4\u52A0\u5165\u540D\u518A</b>
-      <span class="sub num" style="margin:0">\u7B2C ${Math.max(1, RECRUIT.pityEpic - P.sinceEpic + 1)} \u62BD\u5167\u5FC5\u51FA\u53F2\u8A69\u4EE5\u4E0A${legendsLeft ? `\u30FB\u7B2C ${Math.max(1, RECRUIT.pityLegend - P.sinceLegend + 1)} \u62BD\u5167\u5FC5\u51FA\u50B3\u8AAA` : ""}</span></div>
+      <span class="sub num" style="margin:0">\u7B2C ${Math.max(1, RECRUIT.pityEpic - P5.sinceEpic + 1)} \u62BD\u5167\u5FC5\u51FA\u53F2\u8A69\u4EE5\u4E0A${legendsLeft ? `\u30FB\u7B2C ${Math.max(1, RECRUIT.pityLegend - P5.sinceLegend + 1)} \u62BD\u5167\u5FC5\u51FA\u50B3\u8AAA` : ""}</span></div>
       <div class="row"><button class="btn main grow" data-act="scroll" data-n="1" ${full || S.gold < one ? "disabled" : ""}>\u55AE\u62BD <span class="num">${fmt(one)}</span> \u91D1</button>
       <button class="btn main grow" data-act="scroll" data-n="10" ${S.heroes.length + 10 > E.rosterMax || S.gold < ten ? "disabled" : ""}>\u5341\u9023 <span class="num">${fmt(ten)}</span> \u91D1</button></div>
       ${full ? '<span class="sub" style="margin:0;color:var(--warn)">\u540D\u518A\u6EFF\u4E86\uFF0C\u5148\u5230\u300C\u5718\u968A\u300D\u89E3\u96C7\u4E00\u4E9B\u82F1\u96C4</span>' : S.heroes.length + 10 > E.rosterMax ? `<span class="sub" style="margin:0">\u5341\u9023\u9700\u8981\u540D\u518A\u9084\u6709 10 \u500B\u7A7A\u4F4D</span>` : ""}
@@ -2029,7 +2128,7 @@
     <h2 style="font-size:18px">\u4ECA\u65E5\u540D\u55AE</h2><div class="stack">`;
     for (const x of S.tavern) {
       const c = cls(x), cost = hireCost(x);
-      h += `<div class="hero r-${x.rarity || 0}"><div class="ic">${c.icon}</div><div class="nm">${heroName(x)}${rarityTag(x)}<small>${c.name}${x.spec ? `\u30FB${SPECS[x.cls][x.spec].name}` : ""}\u30FB${ROLE_NAME[c.role]}\u30FB<span class="num">Lv${x.level}</span></small></div>
+      h += `<div class="hero r-${x.rarity || 0}"><div class="ic">${c.icon}</div><div class="nm">${heroName(x)}${rarityTag(x)}<small>${c.name}${x.spec ? `\u30FB${SPECS[x.cls][x.spec].name}` : ""}\u30FB${ROLE_NAME[roleOf(x)]}\u30FB<span class="num">Lv${x.level}</span></small></div>
       <button class="btn sm main" data-act="hire" data-id="${x.id}" ${S.gold < cost || full ? "disabled" : ""} style="grid-row:span 2"><span class="num">${fmt(cost)}</span> \u91D1</button>
       <div class="st">${x.legend ? `<b class="c4">${LEGENDS[x.cls].pname}</b>\uFF1A${LEGENDS[x.cls].desc}` : c.desc}</div></div>`;
     }
@@ -2080,7 +2179,7 @@
     const c = cls(x), st = heroStats(x, app.S.items), view = app.modal.view || "gear", pend = pendingPicks(x);
     const sp = x.spec && SPECS[x.cls][x.spec];
     const R2 = HERO_RARITY[x.rarity || 0], L = x.legend && LEGENDS[x.cls];
-    let h = `<h3>${c.icon} ${heroName(x)} ${rarityTag(x)}</h3><div class="sub" style="margin:0">${c.name}${sp ? `\u30FB${sp.name}` : ""}\u30FB${ROLE_NAME[c.role]}\u3000${c.desc}</div>
+    let h = `<h3>${c.icon} ${heroName(x)} ${rarityTag(x)}</h3><div class="sub" style="margin:0">${c.name}${sp ? `\u30FB${sp.name}` : ""}\u30FB${ROLE_NAME[roleOf(x)]}\u3000${c.desc}</div>
     ${x.rarity ? `<div class="raritycard r-${x.rarity}"><b class="c${x.rarity}">${R2.name}\u52A0\u6210</b><span>\u57FA\u790E\u5C6C\u6027 \xD7${R2.mult.toFixed(2)}${R2.crit ? `\u30FB\u66B4\u64CA +${Math.round(R2.crit * 100)}%` : ""}${R2.baseCdMult ? "\u30FB\u57FA\u790E\u6280\u80FD\u51B7\u537B \u221210%" : ""}</span>${L ? `<span><b class="c4">${L.pname}</b>\uFF1A${L.desc}</span>` : ""}</div>` : ""}
     <div class="statgrid num"><div><b>${x.level}</b><span>\u7B49\u7D1A</span></div><div><b>${fmt(st.hp)}</b><span>\u751F\u547D</span></div><div><b>${st.pow}</b><span>\u5A01\u529B</span></div><div><b>${Math.round(st.crit * 100)}%</b><span>\u66B4\u64CA</span></div></div>
     <div class="sub" style="margin:0">${x.level >= HERO.maxLevel ? `<b style="color:var(--brass)">\u5DD4\u5CF0 ${x.para || 0}</b>\uFF08\u751F\u547D\uFF0F\u5A01\u529B +${x.para || 0}%\uFF09<span class="num">${fmt(x.paraXp || 0)} / ${fmt(paraNeed(x.para || 0))}</span>` : `\u7D93\u9A57 <span class="num">${fmt(x.xp)} / ${fmt(xpNeed(x.level))}</span>`}\u30FB\u8B77\u7532\u6E1B\u50B7 ${Math.round(st.armor * 100)}%</div>

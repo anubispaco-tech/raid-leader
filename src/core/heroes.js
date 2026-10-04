@@ -3,12 +3,13 @@ import { CLASSES, HERO, SLOTS, GEAR, HERO_RARITY, LEGENDS } from './config.js';
 import { pick, uid } from './rng.js';
 import { itemPow, itemSta } from './items.js';
 import { heroMods } from './talents.js';
+export { roleOf } from './classes/index.js';
 
 export const xpNeed = L => Math.round(HERO.xpBase * Math.pow(L, HERO.xpExp));
 
 // rarity：0 普通 … 4 傳說（傳說用該職業固定的傳奇英雄名字）
 export function makeHero(cls, level = 1, rarity = 0) {
-  const legend = rarity === 4 ? LEGENDS[cls] : null;
+  const legend = rarity === 4 ? CLASSES[cls].legend : null;
   return { id: uid(), cls, name: legend ? legend.name : pick(HERO.names), level, xp: 0, rarity, legend: !!legend,
     spec: null, talents: {}, gear: { weapon: null, armor: null, trinket: null } };
 }
@@ -16,7 +17,7 @@ export function makeHero(cls, level = 1, rarity = 0) {
 export function rarityMods(h) {
   const r = HERO_RARITY[h.rarity || 0], m = {};
   if (r.baseCdMult) m.baseCdMult = r.baseCdMult;
-  if (h.legend) m.legend = LEGENDS[h.cls].passive;
+  if (h.legend) m.legend = CLASSES[h.cls].legend.passive;
   return m;
 }
 const gearOf = (h, items) => Object.keys(SLOTS).map(s => h.gear[s] && items[h.gear[s]]).filter(Boolean);

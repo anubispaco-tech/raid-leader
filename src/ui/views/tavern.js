@@ -16,7 +16,7 @@ export function viewTavern() {
     <h2 style="font-size:18px">今日名單</h2><div class="stack">`;
   for (const x of S.tavern) {
     const c = cls(x), cost = G.hireCost(x);
-    h += `<div class="hero r-${x.rarity || 0}"><div class="ic">${c.icon}</div><div class="nm">${heroName(x)}${rarityTag(x)}<small>${c.name}${x.spec ? `・${G.SPECS[x.cls][x.spec].name}` : ''}・${G.ROLE_NAME[c.role]}・<span class="num">Lv${x.level}</span></small></div>
+    h += `<div class="hero r-${x.rarity || 0}"><div class="ic">${c.icon}</div><div class="nm">${heroName(x)}${rarityTag(x)}<small>${c.name}${x.spec ? `・${G.SPECS[x.cls][x.spec].name}` : ''}・${G.ROLE_NAME[G.roleOf(x)]}・<span class="num">Lv${x.level}</span></small></div>
       <button class="btn sm main" data-act="hire" data-id="${x.id}" ${S.gold < cost || full ? 'disabled' : ''} style="grid-row:span 2"><span class="num">${fmt(cost)}</span> 金</button>
       <div class="st">${x.legend ? `<b class="c4">${G.LEGENDS[x.cls].pname}</b>：${G.LEGENDS[x.cls].desc}` : c.desc}</div></div>`;
   }

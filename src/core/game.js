@@ -3,7 +3,7 @@
 import { CLASSES, HERO, SLOTS, DUNGEONS, REWARD, ECONOMY, GEAR, BAG_MILESTONES, BAG_PER_MILESTONE, HERO_RARITY, LEGENDS, RECRUIT } from './config.js';
 import { R, rnd, rint, pick } from './rng.js';
 import { makeItem, rollRarity, itemScore, salvageValue, salvageDust, upgradeCost, dustCost } from './items.js';
-import { makeHero, gainXp, heroPower } from './heroes.js';
+import { makeHero, gainXp, heroPower, roleOf } from './heroes.js';
 import { dungeonInfo } from './dungeons.js';
 import { SPECS, TALENT_ROWS, SPEC_LEVEL, applyRecommend } from './talents.js';
 import { MYTHIC } from './config.js';
@@ -79,7 +79,7 @@ const avgLevel = list => list.length ? list.reduce((a, h) => a + h.level, 0) / l
 
 // ---------- 招募：稀有度與保底 ----------
 const ownsLegend = (s, cls) => [...s.heroes, ...(s.tavern || [])].some(h => h.legend && h.cls === cls);
-export const legendsAvailable = s => Object.keys(LEGENDS).filter(c => !ownsLegend(s, c));
+export const legendsAvailable = s => Object.keys(CLASSES).filter(c => CLASSES[c].legend).filter(c => !ownsLegend(s, c));
 // 抽一次稀有度（酒館名單與招募令共用，都算進保底）
 function rollHeroRarity(s) {
   const P = s.recruit || (s.recruit = { sinceEpic: 0, sinceLegend: 0, total: 0 });
@@ -99,7 +99,7 @@ function newRecruit(s, level) {
   const cls = r === 4 ? pick(legendsAvailable(s)) : pick(Object.keys(CLASSES));
   const h = makeHero(cls, level, r);
   // 高等級的新英雄自帶隨機專精與天賦（招募後可以自己改）
-  if (h.level >= SPEC_LEVEL) h.spec = pick(Object.keys(SPECS[h.cls]));
+  if (h.level >= SPEC_LEVEL) h.spec = pick(Object.keys(CLASSES[h.cls].specs));
   for (const lv of TALENT_ROWS) if (h.level >= lv) h.talents[lv] = pick(['a', 'b']);
   return h;
 }
@@ -302,10 +302,11 @@ export function salvageUpTo(s, maxRarity) {
 // 坦克 1；有脈衝（全隊傷害）帶 2 補，否則 1 補；其餘輸出依機制偏好（召喚 → 法師、狂暴 → 盜賊）再比戰力
 export function recommendParty(s, hints) {
   const has = t => hints.includes(t), pw = h => heroPower(h, s.items);
-  const byRole = r => s.heroes.filter(h => CLASSES[h.cls].role === r).sort((a, b) => pw(b) - pw(a));
+  const byRole = r => s.heroes.filter(h => roleOf(h) === r).sort((a, b) => pw(b) - pw(a));
   const pick = [...byRole('tank').slice(0, 1), ...byRole('heal').slice(0, has('pulse') ? 2 : 1)];
-  const pref = h => (has('summon') && h.cls === 'mage' ? 1.25 : 1) * (has('enrage') && h.cls === 'rogue' ? 1.25 : 1);
-  const rest = s.heroes.filter(h => !pick.includes(h)).sort((a, b) => (CLASSES[b.cls].role === 'dps') - (CLASSES[a.cls].role === 'dps') || pw(b) * pref(b) - pw(a) * pref(a));
+  // 職業包的 prefers：遇到這些機制時戰力 ×1.25 優先挑選
+  const pref = h => (CLASSES[h.cls].prefers || []).reduce((m, t) => m * (has(t) ? 1.25 : 1), 1);
+  const rest = s.heroes.filter(h => !pick.includes(h)).sort((a, b) => (roleOf(b) === 'dps') - (roleOf(a) === 'dps') || pw(b) * pref(b) - pw(a) * pref(a));
   pick.push(...rest.slice(0, Math.max(0, ECONOMY.partyMax - pick.length)));
   s.party = pick.slice(0, ECONOMY.partyMax).map(h => h.id);
   return partyHeroes(s);
@@ -316,7 +317,7 @@ export function prepare(s, hints) {
   const locked = partyLocked(s), party = locked ? partyHeroes(s) : recommendParty(s, hints);
   for (const h of party) applyRecommend(h, hints);
   const swapped = autoEquip(s);
-  const roles = { tank: 0, heal: 0, dps: 0 }; party.forEach(h => roles[CLASSES[h.cls].role]++);
+  const roles = { tank: 0, heal: 0, dps: 0 }; party.forEach(h => roles[roleOf(h)]++);
   return { roles, swapped, locked };
 }
 // ---------- 戰利品箱 ----------

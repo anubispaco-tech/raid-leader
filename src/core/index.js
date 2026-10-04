@@ -9,3 +9,4 @@ export * from './game.js';
 export * from './mythic.js';
 export * from './vault.js';
 export * from './advice.js';
+export { setSeed } from './rng.js';
