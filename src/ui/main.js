@@ -16,6 +16,7 @@ import { startBattle, startMythic, startMythicIdle, startVault, runTimer, finish
 import * as T from './telemetry.js';
 import { esc, heroName } from './helpers.js';
 import { VERSION } from '../core/version.js';
+import { installIcons } from './icons.js';
 
 // ---------- 分頁 ----------
 const ICONS = {
@@ -254,6 +255,7 @@ document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preven
 // ---------- 啟動 ----------
 function start(data) {
   const saved = (data && data.S) || load();
+  installIcons(); // 職業圖示換成 SVG（在建立任何戰鬥之前）
   app.S = G.migrate(saved || G.newGame()); app.fresh = !saved;
   for (const h of [...app.S.heroes, ...(app.S.tavern || [])]) h.name = localName(h.name);
   for (const it of Object.values(app.S.items)) it.name = localName(it.name);

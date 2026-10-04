@@ -3,6 +3,7 @@ import { tx } from '../../core/i18n.js';
 import * as G from '../../core/index.js';
 import { app } from '../state.js';
 import { fmt, pct, mmss, itemStatText, itemName, firstWinLine } from '../helpers.js';
+import { enemyIcon, svg, HORN } from '../icons.js';
 
 // 敵方最多顯示 4 列、固定高度，召喚物變多時不會把下面的東西往下推
 const MAX_FOE_ROWS = 4;
@@ -15,7 +16,7 @@ function unitRow(u, enemy) {
   const dead = u.hp <= 0;
   const bar = enemy ? 'enemy-bar' : 'role-' + u.role;
   return `<div class="unit ${dead ? 'dead' : ''} ${u.boss ? 'boss' : ''}">
-    <div class="ic">${enemy ? (u.boss ? '👑' : '👾') : u.icon}</div>
+    <div class="ic">${enemy ? enemyIcon(u) : u.icon}</div>
     <div class="nm">${enemy ? u.name : `<span class="c${u.rarity || 0}">${u.name}</span><small>${G.CLASSES[u.cls].name}</small>`}</div>
     <div class="hpn num">${fmt(u.hp)} / ${fmt(u.max)}</div>
     <div class="bar"><i class="${bar}" style="width:${pct(u.hp, u.max)}%"></i></div></div>`;
@@ -43,7 +44,7 @@ function vaultBar(b) {
 }
 function hornBtn(b) {
   const on = b.hornActive(), left = b.horn.until - b.tick;
-  return tx('<button class="btn horn {0}" data-act="horn" {1} aria-label="英勇號角">📯 {2}</button>', on ? 'on' : '', b.horn.used ? 'disabled' : '', on ? `${left}s` : b.horn.used ? tx('已用') : tx('號角'));
+  return tx('<button class="btn horn {0}" data-act="horn" {1} aria-label="英勇號角">{3}{2}</button>', on ? 'on' : '', b.horn.used ? 'disabled' : '', on ? `${left}s` : b.horn.used ? tx('已用') : tx('號角'), svg(HORN));
 }
 function viewResult() {
   const r = app.lastResult, b = app.battle;

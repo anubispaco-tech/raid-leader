@@ -302,3 +302,14 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 .drow:has(.dbar){grid-template-columns:1fr 70px auto}
 .dbar{height:6px;border-radius:3px;background:var(--panel2);overflow:hidden}.dbar i{display:block;height:100%;background:var(--good)}
 .dok{color:var(--good);font-weight:700;text-align:center;min-width:32px}
+/* v0.11 圖示（game-icons.net，CC BY 3.0）：currentColor 上色 */
+.gi{width:1em;height:1em;display:inline-block;vertical-align:-.15em;fill:currentColor;flex-shrink:0}
+.ic .gi{width:1.25em;height:1.25em;vertical-align:middle}
+.gi-guardian{color:var(--tank)} .gi-cleric{color:var(--heal)} .gi-rogue{color:var(--dps)}
+.gi-mage{color:#f08a4b} .gi-druid{color:#8bc34a} .gi-shaman{color:#5fb8e8}
+.gi-boss{color:var(--brass)} .gi-foe{color:var(--muted)}
+.dg .tier .gi{display:block;margin:8px auto 0;width:30px;height:30px}
+.in .gi,.gearrow .gi,.choices .gi,.item .gi{margin-right:6px;width:1.2em;height:1.2em}
+.log .gi{width:1.05em;height:1.05em}
+.unit.boss .ic .gi{width:1.5em;height:1.5em}
+.horn .gi{width:1.2em;height:1.2em;margin-right:4px;color:var(--brass)}

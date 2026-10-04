@@ -28,6 +28,7 @@ export function sheetSettings() {
     <p class="sub" style="margin:0">${tx('遊戲不需要帳號。為了改善平衡，會匿名送出：隨機玩家 ID、暱稱、隊伍等級、最高層與秘境成績、遊玩時間與版本；以及你主動送出的意見回饋。不收集姓名、Email、位置或裝置資訊。暱稱會顯示在天梯上，請不要填真實姓名。')}</p>`;
   h += `<span class="label">${tx('關於')}</span><div class="settings">
       ${row(tx('版本'), `<span class="num">v${VERSION}</span>`)}
+      ${row(tx('圖示'), `<span><a href="https://game-icons.net" target="_blank" rel="noopener noreferrer">game-icons.net</a> <small class="sub" style="margin:0">${tx('Lorc、Delapouite 等作者・CC BY 3.0')}</small></span>`)}
       ${row(tx('故事'), `<button class="btn sm" data-act="replaystory">${tx('重看序章')}</button>`)}
     </div>
     <div class="row"><button class="btn grow" data-act="close-settings">${tx('關閉')}</button></div>`;
