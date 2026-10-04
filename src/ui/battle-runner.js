@@ -65,7 +65,12 @@ export function finishBattle() {
   for (const m of G.newBagMilestones(app.S)) setTimeout(() => toast(tx('🎒 {0}：背包 +{1} 格', m.name, G.BAG_PER_MILESTONE)), 400);
   if (b.vault) sendEvent(tx('寶庫'), tx('第 {0} 層 打倒 {1} 隻 +{2} 金', b.vault.floor + 1, r.kills, r.gold));
   else if (b.mythicIdle) { /* 掛機不送事件，避免洗版 */ }
-  else if (b.mythic) sendEvent(tx('秘境'), `${G.DUNGEONS[b.dIdx].name} +${b.mythic.level} ${r.inTime ? tx('限時') : b.win ? tx('超時') : tx('失敗')} ${mmss(b.tick)}${r.record ? tx('（新紀錄）') : ''}`);
+  else if (b.mythic) { // 秘境：破紀錄才單筆送出，其餘每 10 場彙總一筆（避免連刷洗版、吃配額）
+    const m = app.mBuf || (app.mBuf = { n: 0, timed: 0, fail: 0 });
+    m.n++; if (r.inTime) m.timed++; else if (!b.win) m.fail++;
+    if (r.record) sendEvent(tx('秘境'), `${G.DUNGEONS[b.dIdx].name} +${b.mythic.level} ${tx('限時')} ${mmss(b.tick)}${tx('（新紀錄）')}`);
+    if (m.n >= 10) { sendEvent(tx('秘境'), tx('近 {0} 場：限時 {1}・失敗 {2}・目前鑰石 +{3}', m.n, m.timed, m.fail, app.S.mythic.key)); app.mBuf = null; }
+  }
   else if (r.first) sendEvent(tx('首通'), tx('第 {0} 層 {1}', b.dIdx + 1, G.DUNGEONS[b.dIdx].name));
   if (!app.battle.mythic && !app.battle.vault && app.S.idle === app.battle.dIdx) {
     const d = app.battle.dIdx;
@@ -76,4 +81,5 @@ export function finishBattle() {
     app.pendingRepeat = setTimeout(() => { app.pendingRepeat = null; if (app.S.idleMythic === d) startMythicIdle(d); }, 3000);
   }
   app.render(true);
+  if (r.first && app.storyOnce) app.storyOnce('post' + b.dIdx); // 首次通關後的劇情
 }

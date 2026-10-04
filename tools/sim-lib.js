@@ -3,8 +3,8 @@
 // 打不過就交替刷前一層；talents=true 時每場前套用「推薦配置」。
 import * as G from '../src/core/index.js';
 
-export function playthrough({ maxRuns = 1500, talents = true, horn = false } = {}) {
-  const s = G.newGame(), log = [], first = {};
+export function playthrough({ maxRuns = 1500, talents = true, horn = false, stopAt = G.CH1_TOP, s = G.newGame() } = {}) {
+  const log = [], first = {};
   for (let run = 0; run < maxRuns; run++) {
     const want = s.party.length < 5 ? (s.heroes.some(h => h.cls === 'mage') ? 'rogue' : 'mage') : null;
     if (want) {
@@ -26,7 +26,7 @@ export function playthrough({ maxRuns = 1500, talents = true, horn = false } = {
       const p = G.partyHeroes(s);
       log.push(`D${d + 1} 首通 @run ${run} lv=${p.map(h => h.level).join('/')} ilvl=${p.map(h => G.heroIlvl(h, s.items)).join('/')} ticks=${b.tick}`);
     }
-    if (first[G.DUNGEONS.length - 1] !== undefined) break;
+    if (first[stopAt] !== undefined) break;
   }
   return { log, first, s };
 }
@@ -40,7 +40,7 @@ export function mythicRun({ runs = 300, perDay = 15, start = new Date('2026-10-0
     for (const h of G.partyHeroes(s)) for (const sl of Object.keys(G.SLOTS)) { const id = h.gear[sl]; if (id && s.gold > 500) G.upgrade(s, id); }
     G.autoEquip(s);
     for (const id of [...s.bag]) if (s.bag.length > 20) G.salvage(s, id);
-    const d = r % G.DUNGEONS.length, lvl = s.mythic.key;
+    const d = r % (G.CH1_TOP + 1), lvl = s.mythic.key;
     const o = G.mythicBattleOpts(d, lvl, date);
     const hints = [...G.DUNGEONS[d].mech.map(m => m.t), ...G.affixHints(o.mythic.affixes)];
     for (const h of G.partyHeroes(s)) G.applyRecommend(h, hints);

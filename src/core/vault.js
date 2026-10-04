@@ -1,6 +1,6 @@
 // ===== 寶庫：每日 3 次、60 秒打寶藏哥布林換金幣 =====
 import { tx } from './i18n.js';
-import { REWARD, VAULT } from './config.js';
+import { REWARD, VAULT, CH1_TOP } from './config.js';
 import { buildWaves } from './dungeons.js';
 import { dayKey } from './mythic.js';
 import { gainXp } from './heroes.js';
@@ -13,7 +13,7 @@ export function vaultToday(s) {
   return v;
 }
 export const vaultLeft = s => Math.max(0, VAULT.daily - vaultToday(s).used);
-export const vaultFloors = s => Object.keys(s.clears).filter(k => s.clears[k]).map(Number).sort((a, b) => a - b);
+export const vaultFloors = s => Object.keys(s.clears).filter(k => s.clears[k]).map(Number).filter(f => f <= CH1_TOP).sort((a, b) => a - b);
 const floorGold = f => REWARD.goldBase + REWARD.goldPerTier * f;
 export const vaultGoldPerKill = f => Math.round(floorGold(f) * VAULT.parRuns / VAULT.par[f]);
 export const vaultMaxKills = f => Math.round(VAULT.par[f] * VAULT.capMult);

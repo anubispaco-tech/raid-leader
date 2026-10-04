@@ -15,6 +15,7 @@ const P = {
   hp: 126, hpL: 22, pow: 9, powL: 2.07, armor: 0.2, crit: 0.12,
   desc: tx('依專精化身熊、樹人或獵豹，可以當坦克、治療或輸出；單一職責比專職職業弱一些。'),
   roleOf: h => ROLE[h.spec] || 'dps',
+  kick: u => u.spec !== 'resto', // 熊、豹形態可以打斷（重擊／迎頭痛擊）
   statsOf(h) {
     const f = FORM[h.spec] || FORM.feral;
     if (!h.legend) return f;
@@ -39,11 +40,13 @@ const P = {
     SPEC_ROW,
     { a: { name: tx('生生不息'), desc: tx('治療 +15%'), mods: { healMult: 1.15 } },
       b: { name: tx('迅捷月火'), desc: tx('月火術冷卻 6 → 4 秒'), mods: { baseCd: 4 } } },
+    { a: { name: tx('野性衝鋒'), desc: tx('打斷冷卻 12 → 8 秒'), mods: { kickCd: 8 } },
+      b: { name: tx('星辰之力'), desc: tx('暴擊傷害 ×2 → ×2.3'), mods: { critDmg: 2.3 } } },
   ],
   // 備戰不改德魯伊的職責（陣容是照目前職責挑的），只依職責配天賦
   recommend(has, h) {
     const sp = (h && h.spec) || 'feral';
-    const t = { bear: ['a', 'a', 'a', 'b', 'a'], resto: ['a', 'a', 'a', 'b', 'a'], feral: ['b', 'b', 'b', 'b', 'b'] }[sp];
+    const t = { bear: ['a', 'a', 'a', 'b', 'a', has('cast') ? 'a' : 'b'], resto: ['a', 'a', 'a', 'b', 'a', 'b'], feral: ['b', 'b', 'b', 'b', 'b', has('cast') ? 'a' : 'b'] }[sp];
     return { spec: sp, t };
   },
   legend: {

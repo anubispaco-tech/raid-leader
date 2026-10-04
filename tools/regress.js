@@ -29,7 +29,7 @@ for (let combo = 0; combo < 16; combo++) {
   G.setSpec(party[4], specs.rogue[combo & 1]);
   for (const pickT of ['a', 'b']) {
     for (const h of party) for (const lv of G.TALENT_ROWS) G.setTalent(h, lv, pickT);
-    for (let d = 0; d < G.DUNGEONS.length; d++) rec(`d${d}-c${combo}-${pickT}`, new G.Battle(party, items, d, { autoHorn: true }).runToEnd());
+    for (let d = 0; d <= G.CH1_TOP; d++) rec(`d${d}-c${combo}-${pickT}`, new G.Battle(party, items, d, { autoHorn: true }).runToEnd());
     const date = new Date(Date.UTC(2026, 9, 5 + combo));
     for (const lv of [6, 12]) rec(`m${combo}-${pickT}-${lv}`, new G.Battle(party, items, combo % 7, { ...G.mythicBattleOpts(combo % 7, lv, date), autoHorn: true }).runToEnd());
   }
@@ -39,7 +39,12 @@ rec('vault', new G.Battle(party, items, 3, G.vaultBattleOpts(3)).runToEnd());
 for (const [slot, sp] of [[0, 'bear'], [1, 'resto'], [2, 'feral']]) for (const rar of [0, 4]) {
   const d = mk('druid', rar); G.setSpec(d, sp); for (const lv of G.TALENT_ROWS) G.setTalent(d, lv, 'a');
   const p2 = party.map((h, i) => (i === slot ? d : h));
-  for (let dd = 0; dd < G.DUNGEONS.length; dd++) rec(`druid-${sp}-${rar}-d${dd}`, new G.Battle(p2, items, dd, { autoHorn: true }).runToEnd());
+  for (let dd = 0; dd <= G.CH1_TOP; dd++) rec(`druid-${sp}-${rar}-d${dd}`, new G.Battle(p2, items, dd, { autoHorn: true }).runToEnd());
+}
+// 4) 第二章（v0.9.0）：詛咒、讀條、護盾、打斷、淨化
+for (let combo = 0; combo < 4; combo++) {
+  party.slice(0, 4).forEach((h, i) => G.setSpec(h, specs[h.cls][(combo >> (i % 2)) & 1]));
+  for (let dd = G.CH1_TOP + 1; dd < G.DUNGEONS.length; dd++) rec(`ch2-d${dd}-c${combo}`, new G.Battle(party, items, dd, { autoHorn: true }).runToEnd());
 }
 G.setSeed(null);
 

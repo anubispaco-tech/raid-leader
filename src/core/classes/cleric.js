@@ -22,8 +22,10 @@ const P = {
     SPEC_ROW,
     { a: { name: tx('守護天使'), desc: tx('全隊受到的範圍傷害 −10%'), mods: { partyAoe: 0.1 } },
       b: { name: tx('慈悲'), desc: tx('暴擊率 +10%'), mods: { critAdd: 0.1 } } },
+    { a: { name: tx('淨化專精'), desc: tx('淨化冷卻 6 → 3 秒'), mods: { dispelCd: 3 } },
+      b: { name: tx('祈福'), desc: tx('全隊生命 +5%'), mods: { partyHp: 0.05 } } },
   ],
-  recommend: has => ({ spec: has('buster') && !has('pulse') ? 'disc' : 'holy', t: ['a', 'a', 'a', 'b', has('pulse') ? 'a' : 'b'] }),
+  recommend: has => ({ spec: has('buster') && !has('pulse') ? 'disc' : 'holy', t: ['a', 'a', 'a', 'b', has('pulse') ? 'a' : 'b', has('curse') ? 'a' : 'b'] }),
   legend: {
     name: tx('艾蕾娜'), title: tx('晨曦'), passive: 'overflow', pname: tx('溢光'), desc: tx('治療超出的部分轉為護盾（上限是該隊員生命的 20%）'),
     hooks: {

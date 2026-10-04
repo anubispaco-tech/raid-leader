@@ -1,5 +1,6 @@
 // v0.8.3 測試：德魯伊（三種專精切換職責、天賦頁、酒館圖鑑、戰鬥）
 import { createRequire } from 'module';
+import { nav } from './e2e-nav.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -44,7 +45,7 @@ const sv = await saved(); const g = sv.heroes.find(h => h.cls === 'guardian' && 
 await page.locator('.hero', { hasText: g.name }).first().click(); await page.click('.sheet [data-act="bench"]'); await page.click('.scrim', { position: { x: 5, y: 5 } });
 await page.locator('.hero', { hasText: '德魯測' }).click(); await page.click('.sheet [data-act="join"]'); await page.click('.scrim', { position: { x: 5, y: 5 } });
 check((await page.locator('.comp').innerText()).includes('坦克 1'), '熊德算坦克：' + (await page.locator('.comp').innerText()).split('\n')[0]);
-await page.click('[data-tab="dungeon"]'); await page.click('.dg [data-act="fight"][data-d="1"]'); await page.waitForTimeout(1500);
+await page.click('[data-tab="dungeon"]'); await nav(page, 'story0'); await page.click('.dg [data-act="fight"][data-d="1"]'); await page.waitForTimeout(1500);
 await page.click('[data-act="speed"][data-x="4"]'); await page.waitForTimeout(2500);
 const log = await page.locator('.log').innerText();
 check(log.includes('德魯測'), '德魯伊有出手：' + log.split('\n').filter(l => l.includes('德魯測')).slice(0, 2).join(' / '));

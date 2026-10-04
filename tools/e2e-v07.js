@@ -1,5 +1,6 @@
 // v0.7 測試：寶庫（三次用完）、招募令單抽/十連、保底倒數、傳奇顯示、英雄稀有度、解雇退款
 import { createRequire } from 'module';
+import { nav } from './e2e-nav.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -22,17 +23,18 @@ await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host
   return r.fulfill({ body: fs.readFileSync(f), contentType: types[path.extname(f)] }); });
 await page.goto('https://app.test/'); await page.waitForTimeout(500);
 const out = [], saved = () => page.evaluate(() => JSON.parse(localStorage.getItem('raid-leader-save-v1')));
+await nav(page, 'vault');
 out.push('寶庫區塊：' + (await page.locator('.vault .vleft').innerText()) + '｜樓層按鈕 ' + await page.locator('.vfloors button').count());
 await page.screenshot({ path: `${shots}/m7-dungeon.png` });
 await page.click('.vault [data-act="prepare-vault"]');
 for (let i = 0; i < 3; i++) {
-  await page.click('[data-tab="dungeon"]'); await page.click('.vault [data-act="vault"]'); await page.waitForTimeout(1200);
+  await page.click('[data-tab="dungeon"]'); await nav(page, 'vault'); await page.click('.vault [data-act="vault"]'); await page.waitForTimeout(1200);
   if (i === 0) { await page.click('[data-act="horn"]'); await page.click('[data-act="speed"][data-x="4"]'); await page.waitForTimeout(3000); out.push('寶庫戰鬥：' + (await page.locator('.vaultcount').innerText()).replace(/\n/g, ' ')); await page.screenshot({ path: `${shots}/m7-vault.png` }); }
   await page.click('[data-act="skip"]'); await page.waitForTimeout(300);
   out.push(`第 ${i + 1} 次：` + await page.locator('.result h3').innerText() + '｜' + (await page.locator('.rew').innerText()).replace(/\n/g, ' '));
 }
 out.push('次數用完後：' + await page.locator('.result .row').innerText());
-await page.click('[data-tab="dungeon"]'); out.push('寶庫按鈕：' + await page.locator('.vault [data-act="vault"]').innerText() + '｜停用 ' + await page.locator('.vault [data-act="vault"]').isDisabled());
+await page.click('[data-tab="dungeon"]'); await nav(page, 'vault'); out.push('寶庫按鈕：' + await page.locator('.vault [data-act="vault"]').innerText() + '｜停用 ' + await page.locator('.vault [data-act="vault"]').isDisabled());
 await page.click('[data-tab="tavern"]');
 out.push('保底倒數：' + await page.locator('.recruit .sub').first().innerText());
 await page.click('[data-act="scroll"][data-n="10"]'); await page.waitForTimeout(300);

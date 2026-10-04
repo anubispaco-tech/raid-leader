@@ -1,5 +1,6 @@
 // v0.7.1 測試：掛機中鎖定陣容（加入／移出／解雇出戰者擋下、備戰只調天賦裝備、招募不自動入隊、挑戰別層會停掛機）
 import { createRequire } from 'module';
+import { nav } from './e2e-nav.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -26,10 +27,10 @@ const fails = [], check = (ok, msg) => { console.log((ok ? '✅ ' : '❌ ') + ms
 const party0 = (await saved()).party.join(), roster0 = (await saved()).heroes.length;
 
 // 開始掛機第 1 層
-await page.click('[data-tab="dungeon"]'); await page.click('.dg [data-act="idle"][data-d="0"]'); await page.waitForTimeout(300);
+await page.click('[data-tab="dungeon"]'); await nav(page, 'story0'); await page.click('.dg [data-act="idle"][data-d="0"]'); await page.waitForTimeout(300);
 check((await saved()).idle === 0, '掛機開始');
 // 備戰第 3 層：陣容不變
-await page.click('[data-tab="dungeon"]'); await page.click('.dg [data-act="prepare"][data-d="2"]'); await page.waitForTimeout(200);
+await page.click('[data-tab="dungeon"]'); await nav(page, 'story0'); await page.click('.dg [data-act="prepare"][data-d="2"]'); await page.waitForTimeout(200);
 check((await saved()).party.join() === party0, '掛機中備戰不換陣容｜' + await toastText());
 // 團隊頁：鎖定提示、英雄抽屜按鈕停用
 await page.click('[data-tab="team"]');
@@ -45,9 +46,9 @@ let sv = await saved();
 check(sv.party.join() === party0 && sv.heroes.length === roster0 + 1, '掛機中招募只進名冊｜' + sv.heroes.length + ' ' + sv.party.length + ' ' + await toastText());
 await page.keyboard.press('Escape'); await page.goto('https://app.test/'); await page.waitForTimeout(400);
 // 挑戰別層會停掛機，之後可以換人
-await page.click('[data-tab="dungeon"]'); await page.click('.dg [data-act="fight"][data-d="1"]'); await page.waitForTimeout(300);
+await page.click('[data-tab="dungeon"]'); await nav(page, 'story0'); await page.click('.dg [data-act="fight"][data-d="1"]'); await page.waitForTimeout(300);
 sv = await saved(); check(sv.idle == null, '挑戰別層自動停止掛機｜idle=' + sv.idle + ' unlocked=' + sv.unlocked);
-await page.click('[data-tab="dungeon"]'); await page.click('.dg [data-act="prepare"][data-d="2"]'); await page.waitForTimeout(200);
+await page.click('[data-tab="dungeon"]'); await nav(page, 'story0'); await page.click('.dg [data-act="prepare"][data-d="2"]'); await page.waitForTimeout(200);
 check((await saved()).party.length === 5, '停掛機後備戰會補滿陣容');
 // 英雄抽屜：單人一鍵配裝（全部卸下後再配回來）
 await page.click('[data-tab="team"]'); await page.locator('.party .slot').first().click(); await page.waitForTimeout(200);

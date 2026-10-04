@@ -1,4 +1,4 @@
-/* 副本團長 v0.8.3 */
+/* 副本團長 v0.9.0 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -32,15 +32,23 @@
     "\u{1F525} {0} \u72C2\u66B4\u4E86\uFF01\u50B7\u5BB3\u5927\u589E": "\u{1F525} {0} enrages! Damage greatly increased",
     "\u{1F4A5} {0} \u65BD\u653E\u7BC4\u570D\u653B\u64CA": "\u{1F4A5} {0} casts an area attack",
     "\u26A1 {0} \u5C0D {1} \u91CD\u64CA": "\u26A1 {0} smashes {1}",
+    "\u2620 {0} \u8A5B\u5492\u4E86 {1}": "\u2620 {0} curses {1}",
+    "\u{1F4D6} {0} \u958B\u59CB\u8B80\u689D\uFF08{1} \u79D2\uFF09": "\u{1F4D6} {0} begins casting ({1}s)",
+    "\u{1F6E1} {0} \u5F35\u958B\u8B77\u76FE\uFF01{1} \u79D2\u5167\u6253\u7834\u5B83": "\u{1F6E1} {0} raises a shield! Break it within {1}s",
     "\u53EC\u559A\u7269": "Summon",
     "\u{1F300} {0} \u53EC\u559A\u4E86 {1} \u96BB\u5C0F\u602A": "\u{1F300} {0} summons {1} adds",
     "{0} {1}\uFF1A{2}{3}": "{0} {1}: {2}{3}",
     "\u{1F4EF} \u82F1\u52C7\u865F\u89D2\uFF01\u5168\u968A\u50B7\u5BB3\u8207\u6CBB\u7642 +{0}%\uFF0C\u6301\u7E8C {1} \u79D2": "\u{1F4EF} Heroic Horn! Party damage and healing +{0}% for {1}s",
+    "\u{1F4A5} {0} \u7684\u8B77\u76FE\u88AB\u6253\u7834\u4E86": "\u{1F4A5} {0}'s shield is broken",
     "{0} \u88AB\u64CA\u6BBA": "{0} slain",
     "\u{1F33F} \u7E41\u76DB\uFF1A\u5176\u9918 {0} \u96BB\u5C0F\u602A\u8B8A\u5F37": "\u{1F33F} Bolstering: {0} remaining adds grow stronger",
     "\u5BD2\u51B0\u5C4F\u969C": "Ice Block",
     "\u6551\u8D16": "Redemption",
     "\u{1F480} {0}\uFF08{1}\uFF09\u9663\u4EA1": "\u{1F480} {0} ({1}) has fallen",
+    "\u6253\u65B7": "Interrupt",
+    "\u6DE8\u5316": "Dispel",
+    "\u{1F49A} \u8B77\u76FE\u6C92\u88AB\u6253\u7834\uFF0C{0} \u56DE\u5FA9\u4E86 {1} \u751F\u547D": "\u{1F49A} The shield held \u2014 {0} recovers {1} HP",
+    "\u{1F4A5} {0} \u8B80\u689D\u5B8C\u6210\uFF0C\u5168\u968A\u53D7\u5230\u91CD\u5275": "\u{1F4A5} {0} finishes the cast \u2014 the party is blasted",
     "\u{1F30B} \u706B\u5C71\u7206\u767C\uFF0C{0} \u53D7\u5230\u50B7\u5BB3": "\u{1F30B} Volcanic eruption hits {0}",
     "\u23F0 \u8D85\u904E\u9650\u6642\uFF01\u4ECD\u53EF\u6253\u5B8C\uFF0C\u4F46\u9470\u77F3\u6703\u964D\u7D1A": "\u23F0 Over time! You can still finish, but the keystone will drop",
     "\u2620\uFE0F \u5718\u6EC5\u2026": "\u2620\uFE0F Wipe\u2026",
@@ -74,6 +82,10 @@
     "\u5168\u968A\u53D7\u5230\u7684\u7BC4\u570D\u50B7\u5BB3 \u221210%": "Party area damage taken \u221210%",
     "\u6148\u60B2": "Mercy",
     "\u66B4\u64CA\u7387 +10%": "Crit chance +10%",
+    "\u6DE8\u5316\u5C08\u7CBE": "Purification",
+    "\u6DE8\u5316\u51B7\u537B 6 \u2192 3 \u79D2": "Dispel cooldown 6 \u2192 3s",
+    "\u7948\u798F": "Blessing",
+    "\u5168\u968A\u751F\u547D +5%": "Party HP +5%",
     "\u827E\u857E\u5A1C": "Elena",
     "\u6668\u66E6": "Dawnlight",
     "\u6EA2\u5149": "Overflow",
@@ -101,13 +113,16 @@
     "\u91CE\u6027\u672C\u80FD": "Feral Instinct",
     "\u66B4\u64CA\u7387 +6%": "Crit chance +6%",
     "\u5171\u751F": "Symbiosis",
-    "\u5168\u968A\u751F\u547D +5%": "Party HP +5%",
     "\u539F\u59CB\u4E4B\u6012": "Primal Fury",
     "\u50B7\u5BB3 +15%": "Damage +15%",
     "\u751F\u751F\u4E0D\u606F": "Everbloom",
     "\u6CBB\u7642 +15%": "Healing +15%",
     "\u8FC5\u6377\u6708\u706B": "Swift Moonfire",
     "\u6708\u706B\u8853\u51B7\u537B 6 \u2192 4 \u79D2": "Moonfire cooldown 6 \u2192 4s",
+    "\u91CE\u6027\u885D\u92D2": "Wild Charge",
+    "\u6253\u65B7\u51B7\u537B 12 \u2192 8 \u79D2": "Interrupt cooldown 12 \u2192 8s",
+    "\u661F\u8FB0\u4E4B\u529B": "Astral Might",
+    "\u66B4\u64CA\u50B7\u5BB3 \xD72 \u2192 \xD72.3": "Crit damage \xD72 \u2192 \xD72.3",
     "\u745F\u862D\u6735": "Serando",
     "\u68EE\u8A9E": "Forestsong",
     "\u842C\u7269\u5FA9\u7526": "Renewal",
@@ -137,6 +152,10 @@
     "\u751F\u547D\u4F4E\u65BC 50% \u6642\u518D\u6E1B\u50B7 15%": "Below 50% HP, take 15% less damage",
     "\u6B63\u7FA9\u4E4B\u9318": "Hammer of Justice",
     "\u50B7\u5BB3 +20%": "Damage +20%",
+    "\u4E0D\u52D5\u5982\u5C71": "Immovable",
+    "\u53D7\u5230\u7684\u6240\u6709\u50B7\u5BB3 \u221210%": "All damage taken \u221210%",
+    "\u795E\u8056\u61A4\u6012": "Holy Fury",
+    "\u76FE\u724C\u731B\u64CA\u51B7\u537B 8 \u2192 6 \u79D2": "Shield Slam cooldown 8 \u2192 6s",
     "\u5DF4\u6D1B\u65AF": "Baros",
     "\u9435\u58C1": "Ironwall",
     "\u4E0D\u5C48": "Unbroken",
@@ -165,6 +184,9 @@
     "\u6BCF 10 \u79D2\u5C0D\u9996\u9818\u9020\u6210\u5A01\u529B \xD75": "Every 10s, Power \xD75 to the boss",
     "\u66B4\u98A8\u96EA": "Blizzard",
     "\u70C8\u7130\u98A8\u66B4\u51B7\u537B 9 \u2192 6 \u79D2": "Flamestrike cooldown 9 \u2192 6s",
+    "\u6CD5\u8853\u53CD\u5236": "Counterspell",
+    "\u53EF\u4EE5\u6253\u65B7\u9996\u9818\u8B80\u689D\uFF08\u51B7\u537B 12 \u79D2\uFF09": "Can interrupt boss casts (12s CD)",
+    "\u5967\u8853\u5C08\u7CBE": "Arcane Mastery",
     "\u8389\u8587\u4E9E": "Livia",
     "\u661F\u706B": "Starfire",
     "\u7194\u71B1": "Molten Core",
@@ -195,6 +217,9 @@
     "\u5254\u9AA8\u51B7\u537B 6 \u2192 4 \u79D2": "Eviscerate cooldown 6 \u2192 4s",
     "\u51B7\u8840": "Cold Blood",
     "\u6BCF\u6CE2\u7B2C\u4E00\u6B21\u653B\u64CA\u5FC5\u5B9A\u66B4\u64CA": "First attack each wave always crits",
+    "\u8173\u8E22\u7CBE\u901A": "Kick Mastery",
+    "\u6BD2\u5203": "Venom Blades",
+    "\u50B7\u5BB3 +12%": "Damage +12%",
     "\u5361\u897F\u6069": "Cassian",
     "\u5F71\u5203": "Shadowblade",
     "\u9023\u9396\u66B4\u64CA": "Chain Crit",
@@ -203,6 +228,26 @@
     "\u5C08\u7CBE\u6280\u80FD\u51B7\u537B \u221230%": "Spec skill cooldown \u221230%",
     "\u5C08\u7CBE\u5F37\u5316": "Spec Empowerment",
     "\u5C08\u7CBE\u6280\u80FD\u6548\u679C +30%": "Spec skill effect +30%",
+    "\u9435\u62F3": "Ironfist",
+    "\u9280\u7FBD": "Silverfeather",
+    "\u7070\u9B23": "Ashmane",
+    "\u5BD2\u661F": "Coldstar",
+    "\u8D64\u708E": "Redblaze",
+    "\u591C\u6B4C": "Nightsong",
+    "\u77F3\u5FC3": "Stoneheart",
+    "\u75BE\u98A8": "Swiftgale",
+    "\u6668\u9732": "Dewmorn",
+    "\u6697\u6B65": "Darkstride",
+    "\u6A61\u76FE": "Oakshield",
+    "\u96F7\u9CF4": "Thunderhowl",
+    "\u661F\u5875": "Stardust",
+    "\u9727\u884C": "Mistwalker",
+    "\u70AD\u706B": "Emberbrand",
+    "\u51B0\u7259": "Icefang",
+    "\u767D\u694A": "Aspen",
+    "\u834A\u68D8": "Thornwood",
+    "\u9577\u6B4C": "Longsong",
+    "\u9ED1\u7FBD": "Blackfeather",
     "\u827E\u502B": "Allen",
     "\u51F1\u8389": "Kelly",
     "\u96F7\u6069": "Rhen",
@@ -286,6 +331,22 @@
     "\u9060\u53E4\u7D05\u9F8D": "Ancient Red Dragon",
     "\u9F8D\u4EBA\u885B\u58EB": "Dragonkin Guard",
     "\u5168\u6A5F\u5236 \u2192 \u5168\u968A\u7D9C\u5408\u8003\u9A57": "Every mechanic \u2192 tests the whole party",
+    "\u5854\u5E95\u65B7\u5C64": "Spire Fault",
+    "\u77F3\u9C57\u5B88\u885B": "Stonescale Warden",
+    "\u88C2\u8C37\u722C\u884C\u8005": "Rift Crawler",
+    "\u91CD\u64CA\uFF0B\u8A5B\u5492 \u2192 \u5766\u514B\u8207\u6CBB\u7642\uFF08\u6CBB\u7642\u6703\u81EA\u52D5\u6DE8\u5316\u8A5B\u5492\uFF09": "Heavy blows + curses \u2192 tank and healing (healers dispel curses automatically)",
+    "\u8FF4\u8072\u7926\u8108": "Echoing Lode",
+    "\u9B42\u9444\u5320": "Soulsmith",
+    "\u9B42\u9444\u5080\u5121": "Soulforged Golem",
+    "\u53EC\u559A\uFF0B\u8B80\u689D \u2192 \u7BC4\u570D\u8F38\u51FA\u8207\u6253\u65B7\uFF08\u5B88\u8B77\u9A0E\u58EB\u3001\u76DC\u8CCA\u3001\u718A\uFF0F\u8C79\u5FB7\u9B6F\u4F0A\u6703\u6253\u65B7\uFF09": "Adds + casts \u2192 AoE and interrupts (Guardians, Rogues and Bear/Cat Druids interrupt)",
+    "\u71FC\u5FC3\u796D\u58C7": "Emberheart Altar",
+    "\u88C2\u8C37\u796D\u53F8": "Rift Priest",
+    "\u88C2\u8C37\u4FE1\u5F92": "Rift Acolyte",
+    "\u8108\u885D\uFF0B\u8B77\u76FE \u2192 \u6CBB\u7642\u8207\u7206\u767C\uFF0810 \u79D2\u5167\u6253\u7834\u8B77\u76FE\uFF0C\u5426\u5247\u9996\u9818\u56DE\u8840\uFF09": "Pulses + shield \u2192 healing and burst (break the shield within 10s or the boss heals)",
+    "\u7B2C\u4E00\u7AE0": "Chapter I",
+    "\u9F8D\u7720\u4E4B\u8DEF": "Dragonsleep Road",
+    "\u7B2C\u4E8C\u7AE0": "Chapter II",
+    "\u6DF1\u6DF5\u88C2\u8C37": "The Abyssal Rift",
     "\u9996\u6B21\u901A\u95DC\u7B2C 3 \u5C64": "First clear of Floor 3",
     "\u9996\u6B21\u901A\u95DC\u7B2C 5 \u5C64": "First clear of Floor 5",
     "\u9996\u6B21\u901A\u95DC\u7B2C 7 \u5C64": "First clear of Floor 7",
@@ -325,9 +386,8 @@
     "\u7B2C {0} \u5C64 \u6253\u5012 {1} \u96BB +{2} \u91D1": "Floor {0}: {1} slain, +{2} gold",
     "\u79D8\u5883": "Mythic",
     "\u9650\u6642": "timed",
-    "\u8D85\u6642": "over time",
-    "\u5931\u6557": "Failed",
     "\uFF08\u65B0\u7D00\u9304\uFF09": " (record)",
+    "\u8FD1 {0} \u5834\uFF1A\u9650\u6642 {1}\u30FB\u5931\u6557 {2}\u30FB\u76EE\u524D\u9470\u77F3 +{3}": "Last {0} runs: {1} timed \xB7 {2} failed \xB7 keystone +{3}",
     "\u9996\u901A": "First clear",
     "\u7B2C {0} \u5C64 {1}": "Floor {0} {1}",
     "\u5A01\u529B {0}": "Power {0}",
@@ -417,6 +477,21 @@
     "\u65B0\u4F86\u7684\u5718\u9577\uFF1F\u5148\u5F9E\u8150\u6839\u6D1E\u7A9F\u958B\u59CB\u5427\uFF0C\u90A3\u88E1\u7684\u8611\u83C7\u9818\u4E3B\u6700\u8FD1\u4E0D\u592A\u5B89\u5206\u3002": "You're the new raid leader? Start with Rotroot Cavern \u2014 the Mushroom Lord has been restless lately.",
     "\u968A\u4F0D\u6211\u5E6B\u4F60\u6E4A\u4E86\u4E09\u500B\u4EBA\u3002\u4EBA\u624B\u4E0D\u5920\uFF0C\u5C31\u53BB\u9152\u9928\u627E\u3002": "I've rounded up three for your party. Need more hands? Try the Tavern.",
     "\u5C0D\u4E86\u2014\u2014\u6700\u4E0A\u9762\u90A3\u5F35\u5C60\u9F8D\u4EE4\uFF0C\u7B49\u4F60\u5011\u5920\u5F37\u518D\u8AAA\u3002": "Oh, and that dragon-slaying writ at the very top? Not until you're strong enough.",
+    "\u5B88\u5854\u4EBA\u30FB\u6B50\u6797": "Orin, Spirekeeper",
+    "\u7D05\u9F8D\u5012\u4E0B\u7684\u90A3\u4E00\u523B\uFF0C\u9F8D\u7720\u9AD8\u5854\u7684\u5730\u57FA\u88C2\u958B\u4E86\u4E00\u9053\u7E2B\u3002": "The moment the red dragon fell, a crack split the foundations of Dragonsleep Spire.",
+    "\u4F60\u5011\u6BBA\u4E86\u9F8D\uFF1F\u2026\u2026\u7260\u7761\u5728\u5854\u9802\uFF0C\u662F\u70BA\u4E86\u7528\u8EAB\u9AD4\u58D3\u4F4F\u5854\u5E95\u7684\u88C2\u8C37\u3002": "You killed the dragon? \u2026It slept atop the spire to hold the rift beneath shut with its own body.",
+    "\u6211\u662F\u5B88\u5854\u4EBA\u6B50\u6797\u3002\u5C01\u5370\u5D29\u4E86\uFF0C\u88C2\u8C37\u9072\u65E9\u6703\u5168\u958B\u3002": "I'm Orin, keeper of the spire. The seal is broken \u2014 sooner or later the rift will tear wide open.",
+    "\u9084\u6709\u4E00\u4EF6\u4E8B\u2014\u2014\u90A3\u5F35\u5C60\u9F8D\u4EE4\uFF0C\u5230\u5E95\u662F\u8AB0\u8CBC\u5728\u516C\u6703\u699C\u4E0A\u7684\uFF1F": "And one more thing \u2014 who posted that dragon-slaying writ on the guild board?",
+    "\u77F3\u9C57\u5B88\u885B\u672C\u4F86\u662F\u5B88\u5C01\u5370\u7684\uFF0C\u73FE\u5728\u6C92\u4E86\u4E3B\u4EBA\uFF0C\u898B\u4EBA\u5C31\u6253\u3002": "The Stonescale Warden once guarded the seal. Masterless now, it attacks anyone.",
+    "\u5C0F\u5FC3\u7260\u7684\u8A5B\u5492\u3002\u8B93\u6CBB\u7642\u96A8\u6642\u6E96\u5099\u6DE8\u5316\u3002": "Watch for its curses. Keep your healer ready to dispel.",
+    "\u88C2\u7E2B\u9084\u5728\u5F80\u4E0B\u5EF6\u4F38\u2026\u2026\u662F\u5F9E\u7926\u8108\u90A3\u908A\u4F86\u7684\u3002": "The crack keeps going down\u2026 it's coming from the lode.",
+    "\u7B2C II \u5C64\u5931\u8E64\u7684\u7926\u5DE5\u2026\u2026\u539F\u4F86\u90FD\u5728\u9019\u88E1\u3002": "The miners who vanished from Floor II\u2026 so this is where they went.",
+    "\u9B42\u9444\u5320\u8B80\u689D\u6642\u4E00\u5B9A\u8981\u6253\u65B7\uFF0C\u4E0D\u7136\u6574\u968A\u90FD\u6703\u88AB\u9707\u98DB\u3002": "Interrupt the Soulsmith's casts, or the whole party gets blown apart.",
+    "\u796D\u53F8\u5011\u8981\u7684\u9748\u9B42\uFF0C\u6211\u5DF2\u7D93\u4EA4\u4E86\u2026\u2026\u4F60\u5011\u4F86\u665A\u4E86\u3002": "I've already delivered the souls the priests wanted\u2026 you're too late.",
+    "\u5148\u77E5\u5011\u8AAA\u4F60\u5011\u6703\u4F86\u3002\u4F60\u5011\u5DF2\u7D93\u505A\u5B8C\u4F60\u5011\u8A72\u505A\u7684\u4E8B\u4E86\u3002": "The prophets said you would come. You've already done your part.",
+    "\u4ED6\u7684\u8B77\u76FE\u5F88\u786C\u3002\u5341\u79D2\u5167\u6253\u4E0D\u7834\uFF0C\u4ED6\u5C31\u6703\u56DE\u8840\u3002": "His shield is tough. If you can't break it in ten seconds, he heals.",
+    "\u5148\u77E5\uFF1F\u2026\u2026\u61F8\u8CDE\u4EE4\u4E0A\u7684\u7F72\u540D\uFF0C\u5C31\u662F\u300C\u96D9\u6708\u300D\u3002": 'Prophets? \u2026The writ was signed "Twin Moons."',
+    "\u518D\u5F80\u4E0B\u662F\u96D9\u6708\u738B\u5EA7\u3002\u6211\u5148\u53BB\u63A2\u8DEF\uFF0C\u7B49\u6211\u6D88\u606F\u3002": "Below lies the Twin Moon Throne. I'll scout ahead \u2014 wait for word.",
     "\u533F\u540D": "Anonymous",
     "Lv{0}\u30FB\u7B2C {1} \u5C64{2}": "Lv{0} \xB7 Floor {1}{2}",
     "\u30FB\u79D8\u5883 +{0}": " \xB7 Mythic +{0}",
@@ -430,13 +505,18 @@
     "\u4EE5\u4E0B": " & below",
     "\u78BA\u5B9A\u5206\u89E3 {0} \u4EF6\uFF1F": "Salvage {0} item(s)?",
     "\u5206\u89E3\uFF08{0} \u4EF6\uFF09": "Salvage ({0})",
+    "\u6BD4\u5E73\u5747\u88DD\u7B49\u4F4E {0} \u4EE5\u4E0A": "{0}+ below avg iLvl",
+    "\u5206\u89E3\u4F4E\u88DD\u7B49\uFF08{0} \u4EF6\uFF09": "Salvage low iLvl ({0})",
     '<div class="empty">\u80CC\u5305\u662F\u7A7A\u7684\u3002\u901A\u95DC\u526F\u672C\u6703\u6389\u843D\u88DD\u5099\u3002</div>': '<div class="empty">Your bag is empty. Clearing dungeons drops gear.</div>',
-    '<h2 style="font-size:18px">\u6230\u5229\u54C1\u8A2D\u5B9A</h2><div class="settings"> <div class="set"><span>\u6389\u843D\u6642\u81EA\u52D5\u5206\u89E3</span>{0}</div> <div class="set"><span>\u80CC\u5305\u6EFF\u5F8C\u53EA\u4FDD\u7559</span>{1}</div> <p class="sub" style="margin:0">\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\uFF0C\u7B26\u5408\u54C1\u8CEA\u7684\u88DD\u5099\u6703\u5148\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF08\u6700\u591A {2} \u4EF6\uFF09\uFF0C\u5176\u4ED6\u81EA\u52D5\u63DB\u6210\u91D1\u5E63\u3002</p></div> <h2 style="font-size:18px">\u80CC\u5305\u64F4\u5145 <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>': '<h2 style="font-size:18px">Loot settings</h2><div class="settings"> <div class="set"><span>Auto-salvage drops</span>{0}</div> <div class="set"><span>When bag is full, keep</span>{1}</div> <p class="sub" style="margin:0">Once your bag is full, gear of that quality goes to the loot chest (up to {2}); the rest is turned into gold.</p></div> <h2 style="font-size:18px">Bag expansions <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>',
+    '<h2 style="font-size:18px">\u6230\u5229\u54C1\u8A2D\u5B9A</h2><div class="settings"> <div class="set"><span>\u6389\u843D\u6642\u81EA\u52D5\u5206\u89E3</span>{0}</div> <div class="set"><span>\u80CC\u5305\u6EFF\u5F8C\u53EA\u4FDD\u7559</span>{1}</div> <div class="set"><span>\u4F9D\u88DD\u7B49\u81EA\u52D5\u5206\u89E3</span>{6}</div> <p class="sub" style="margin:0">\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\uFF0C\u7B26\u5408\u54C1\u8CEA\u7684\u88DD\u5099\u6703\u5148\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF08\u6700\u591A {2} \u4EF6\uFF09\uFF0C\u5176\u4ED6\u81EA\u52D5\u63DB\u6210\u91D1\u5E63\u3002</p></div> <h2 style="font-size:18px">\u80CC\u5305\u64F4\u5145 <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>': '<h2 style="font-size:18px">Loot settings</h2><div class="settings"> <div class="set"><span>Auto-salvage drops</span>{0}</div> <div class="set"><span>When bag is full, keep</span>{1}</div> <div class="set"><span>Auto-salvage by iLvl</span>{6}</div> <p class="sub" style="margin:0">Once your bag is full, gear of that quality goes to the loot chest (up to {2}); the rest is turned into gold.</p></div> <h2 style="font-size:18px">Bag expansions <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>',
     "\u95DC\u9589": "Off",
     "\u7CBE\u826F\u4EE5\u4E0B": "Uncommon & below",
     "\u7CBE\u826F\u4EE5\u4E0A": "Uncommon+",
     "\u7A00\u6709\u4EE5\u4E0A": "Rare+",
     '<div class="set"><span class="{0}" style="margin:0">{1}{2}</span><span class="num {3}" style="margin:0">+{4} \u683C</span></div>': '<div class="set"><span class="{0}" style="margin:0">{1}{2}</span><span class="num {3}" style="margin:0">+{4} slots</span></div>',
+    "\u4F4E 10 \u4EE5\u4E0A": "10+ below",
+    "\u4F4E 20 \u4EE5\u4E0A": "20+ below",
+    "\u4F9D\u88DD\u7B49\uFF1A\u6BD4\u51FA\u6230\u968A\u54E1\u5E73\u5747\u88DD\u7B49\uFF08\u76EE\u524D {0}\uFF09\u4F4E\u9019\u9EBC\u591A\u7684\u6389\u843D\u76F4\u63A5\u5206\u89E3\uFF0C\u50B3\u8AAA\u9664\u5916\u3002": "By iLvl: drops this far below your active heroes' average iLvl (now {0}) are salvaged at once \u2014 Legendaries excepted.",
     '<div class="more">\u53E6\u5916 {0} \u96BB</div>': '<div class="more">+{0} more</div>',
     '<h2>\u6230\u9B25</h2><div class="empty">\u76EE\u524D\u6C92\u6709\u9032\u884C\u4E2D\u7684\u6230\u9B25\u3002<br>\u5230\u300C\u526F\u672C\u300D\u9078\u4E00\u5C64\u958B\u59CB\u6311\u6230\u3002<br><br><button class="btn main" data-tab="dungeon">\u524D\u5F80\u526F\u672C</button></div>': '<h2>Battle</h2><div class="empty">No battle in progress.<br>Pick a floor in Dungeons to start.<br><br><button class="btn main" data-tab="dungeon">Go to Dungeons</button></div>',
     "\u5BF6\u5EAB\u30FB\u7B2C {0} \u5C64": "Vault \xB7 Floor {0}",
@@ -457,6 +537,7 @@
     "\u79D8\u5883\u639B\u6A5F\u30FB\u5931\u6557": "Mythic idle \xB7 Failed",
     "\u9650\u6642\u901A\u95DC": "Timed",
     "\u8D85\u6642\u901A\u95DC": "Cleared (over time)",
+    "\u5931\u6557": "Failed",
     "\u901A\u95DC": "Cleared",
     '<div class="result {0}"><h3>{1}</h3>{2} {3} <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+{4}</b> \u91D1\u5E63</span><span><b class="num">+{5}</b> \u7D93\u9A57</span>{6}{7}</div>': '<div class="result {0}"><h3>{1}</h3>{2} {3} <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+{4}</b> gold</span><span><b class="num">+{5}</b> XP</span>{6}{7}</div>',
     '<span class="newrec" style="justify-self:start">\u672C\u5C64\u65B0\u7D00\u9304</span>': '<span class="newrec" style="justify-self:start">Floor record!</span>',
@@ -508,6 +589,9 @@
     "\u6539\u66B1\u7A31": "Rename",
     "\u8A2D\u5B9A\u66B1\u7A31": "Set nickname",
     '<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv{0}</b>\u30FB\u88DD\u7B49 <b class="num">{1}</b>\u30FB\u6230\u529B <b class="num">{2}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u90FD\u6709\u5F31\u9EDE\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\uFF0C\u6216\u56DE\u982D\u5237\u88DD\u5099\u3002</p>': `<h2>Dungeons</h2><p class="sub">Party avg <b class="num">Lv{0}</b> \xB7 iLvl <b class="num">{1}</b> \xB7 Rating <b class="num">{2}</b>  | Every boss has a weakness \u2014 if you can't win, change the lineup or farm gear.</p>`,
+    "\u4E3B\u7DDA": "Story",
+    "\u6D3B\u52D5": "Events",
+    "\u5373\u5C07\u63A8\u51FA\uFF1A\u7BC0\u6176\u526F\u672C\u3001\u88DD\u5099\u526F\u672C\u7B49\u9650\u6642\u6D3B\u52D5\u6703\u653E\u5728\u9019\u88E1\u3002": "Coming soon: festival dungeons, gear dungeons and other limited events will live here.",
     '<div class="dg {0}"> <div class="tier">{1}<small>\u7B2C {2} \u5C64</small></div> <h3>{3}<span class="boss">\u9996\u9818\u30FB{4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>\u5EFA\u8B70 <b class="num {6}">Lv{7}</b></span> <span>\u88DD\u7B49 <b class="num {8}">{9}</b></span> <span>\u6389\u843D <b class="num">{10}</b></span> <span>\u901A\u95DC <b class="num">{11}</b> \u6B21</span> </div> <div class="acts">{12} </div></div>': '<div class="dg {0}"> <div class="tier">{1}<small>Floor {2}</small></div> <h3>{3}<span class="boss">Boss \xB7 {4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>Rec. <b class="num {6}">Lv{7}</b></span> <span>iLvl <b class="num {8}">{9}</b></span> <span>Drops <b class="num">{10}</b></span> <span>Cleared <b class="num">{11}</b> times</span> </div> <div class="acts">{12} </div></div>',
     '<span class="sub" style="margin:0">\u5148\u901A\u95DC\u4E0A\u4E00\u5C64</span>': '<span class="sub" style="margin:0">Clear the previous floor first</span>',
     '<button class="btn main grow" data-act="fight" data-d="{0}">\u6311\u6230</button> <button class="btn {1}" data-act="idle" data-d="{2}" {3}>{4}</button> <button class="btn" data-act="prepare" data-d="{5}" aria-label="{6}">\u5099\u6230</button>': '<button class="btn main grow" data-act="fight" data-d="{0}">Fight</button> <button class="btn {1}" data-act="idle" data-d="{2}" {3}>{4}</button> <button class="btn" data-act="prepare" data-d="{5}" aria-label="{6}">Prep</button>',
@@ -547,6 +631,7 @@
     '<span><b class="c4">{0}</b>\uFF1A{1}</span>': '<span><b class="c4">{0}</b>: {1}</span>',
     '<b style="color:var(--brass)">\u5DD4\u5CF0 {0}</b>\uFF08\u751F\u547D\uFF0F\u5A01\u529B +{1}%\uFF09<span class="num">{2} / {3}</span>': '<b style="color:var(--brass)">Paragon {0}</b> (HP / Power +{1}%)<span class="num">{2} / {3}</span>',
     '\u7D93\u9A57 <span class="num">{0} / {1}</span>': 'XP <span class="num">{0} / {1}</span>',
+    "\u30FB\u5DD4\u5CF0 {0}\uFF08\u751F\u547D\uFF0F\u5A01\u529B +{1}%\uFF09": " \xB7 Paragon {0} (HP / Power +{1}%)",
     '<div class="gearrow"><span class="sl">{0}</span><span>{1}</span> <span class="row">{2} <button class="btn sm" data-act="pick" data-id="{3}" data-slot="{4}" {5}>\u66F4\u63DB</button></span></div>': '<div class="gearrow"><span class="sl">{0}</span><span>{1}</span> <span class="row">{2} <button class="btn sm" data-act="pick" data-id="{3}" data-slot="{4}" {5}>Swap</button></span></div>',
     '<span class="sub">\uFF08\u7A7A\uFF09</span>': '<span class="sub">(empty)</span>',
     '</div><div class="row"> <button class="btn grow {0}" data-act="autoequip1" data-id="{1}" {2}>{3}</button> <button class="btn" data-act="unequipall" data-id="{4}" {5}>\u5168\u90E8\u5378\u4E0B</button></div> <div class="row"> <button class="btn grow" data-act="upall" data-id="{6}" {7}>{8}</button> </div>': '</div><div class="row"> <button class="btn grow {0}" data-act="autoequip1" data-id="{1}" {2}>{3}</button> <button class="btn" data-act="unequipall" data-id="{4}" {5}>Unequip all</button></div> <div class="row"> <button class="btn grow" data-act="upall" data-id="{6}" {7}>{8}</button> </div>',
@@ -628,6 +713,10 @@
   function localName(s) {
     if (!s) return s;
     const en = DICTS.en;
+    if (s.includes("\u30FB") && lang === "en") {
+      const [a, b] = s.split("\u30FB");
+      if (en[a] && en[b]) return en[a] + " " + en[b];
+    }
     if (lang === "en") {
       if (en[s]) return en[s];
       const i = s.indexOf("\u7684");
@@ -639,6 +728,8 @@
       for (const [k, v] of Object.entries(en)) if (v.length < 24 && !(v in REV)) REV[v] = k;
     }
     if (REV[s]) return REV[s];
+    const sp = s.split(" ");
+    if (sp.length === 2 && REV[sp[0]] && REV[sp[1]]) return REV[sp[0]] + "\u30FB" + REV[sp[1]];
     const j = s.indexOf(" ");
     if (j > 0 && REV[s.slice(0, j + 1)] && REV[s.slice(j + 1)]) return REV[s.slice(0, j + 1)] + REV[s.slice(j + 1)];
     return s;
@@ -672,6 +763,8 @@
     armor: 0.45,
     crit: 0.05,
     desc: tx("\u5632\u8AF7\u6240\u6709\u6575\u4EBA\uFF0C\u627F\u53D7\u50B7\u5BB3\u3002\u8B77\u7532\u6E1B\u50B7 45%\u3002"),
+    kick: () => true,
+    // 盾牌猛擊可以打斷讀條
     ai: { hit: 0.8 },
     base: { name: tx("\u76FE\u724C\u731B\u64CA"), cd: 8, mult: 2.5, weaken: 0.3, weakenDur: 4, desc: tx("\u51B7\u537B 8 \u79D2\uFF1A\u5A01\u529B \xD72.5 \u50B7\u5BB3\uFF0C\u76EE\u6A19\u653B\u64CA \u221230% \u6301\u7E8C 4 \u79D2") },
     specs: {
@@ -695,9 +788,13 @@
       {
         a: { name: tx("\u76FE\u7246"), desc: tx("\u751F\u547D\u4F4E\u65BC 50% \u6642\u518D\u6E1B\u50B7 15%"), mods: { lowHpReduce: 0.15 } },
         b: { name: tx("\u6B63\u7FA9\u4E4B\u9318"), desc: tx("\u50B7\u5BB3 +20%"), mods: { dmgMult: 1.2 } }
+      },
+      {
+        a: { name: tx("\u4E0D\u52D5\u5982\u5C71"), desc: tx("\u53D7\u5230\u7684\u6240\u6709\u50B7\u5BB3 \u221210%"), mods: { allReduce: 0.1 } },
+        b: { name: tx("\u795E\u8056\u61A4\u6012"), desc: tx("\u76FE\u724C\u731B\u64CA\u51B7\u537B 8 \u2192 6 \u79D2"), mods: { baseCd: 6 } }
       }
     ],
-    recommend: (has) => ({ spec: has("buster") ? "prot" : "ret", t: ["a", has("buster") ? "a" : "b", "a", "b", has("enrage") ? "b" : "a"] }),
+    recommend: (has) => ({ spec: has("buster") ? "prot" : "ret", t: ["a", has("buster") ? "a" : "b", "a", "b", has("enrage") ? "b" : "a", has("enrage") ? "b" : "a"] }),
     legend: {
       name: tx("\u5DF4\u6D1B\u65AF"),
       title: tx("\u9435\u58C1"),
@@ -793,9 +890,13 @@
       {
         a: { name: tx("\u5B88\u8B77\u5929\u4F7F"), desc: tx("\u5168\u968A\u53D7\u5230\u7684\u7BC4\u570D\u50B7\u5BB3 \u221210%"), mods: { partyAoe: 0.1 } },
         b: { name: tx("\u6148\u60B2"), desc: tx("\u66B4\u64CA\u7387 +10%"), mods: { critAdd: 0.1 } }
+      },
+      {
+        a: { name: tx("\u6DE8\u5316\u5C08\u7CBE"), desc: tx("\u6DE8\u5316\u51B7\u537B 6 \u2192 3 \u79D2"), mods: { dispelCd: 3 } },
+        b: { name: tx("\u7948\u798F"), desc: tx("\u5168\u968A\u751F\u547D +5%"), mods: { partyHp: 0.05 } }
       }
     ],
-    recommend: (has) => ({ spec: has("buster") && !has("pulse") ? "disc" : "holy", t: ["a", "a", "a", "b", has("pulse") ? "a" : "b"] }),
+    recommend: (has) => ({ spec: has("buster") && !has("pulse") ? "disc" : "holy", t: ["a", "a", "a", "b", has("pulse") ? "a" : "b", has("curse") ? "a" : "b"] }),
     legend: {
       name: tx("\u827E\u857E\u5A1C"),
       title: tx("\u6668\u66E6"),
@@ -871,8 +972,9 @@
     armor: 0.2,
     crit: 0.15,
     desc: tx("\u55AE\u9AD4\u7206\u767C\uFF0C\u66B4\u64CA\u7387\u9AD8\u3002\u64C5\u9577\u6253\u738B\u3002"),
-    prefers: ["enrage"],
-    // 推薦陣容：遇到這些機制時優先帶
+    prefers: ["enrage", "cast"],
+    kick: () => true,
+    // 腳踢 // 推薦陣容：遇到這些機制時優先帶
     ai: { hit: 1.3 },
     base: { name: tx("\u5254\u9AA8"), cd: 6, mult: 3.5, desc: tx("\u51B7\u537B 6 \u79D2\uFF1A\u5C0D\u9996\u9818\u9020\u6210\u5A01\u529B \xD73.5") },
     specs: {
@@ -896,9 +998,13 @@
       {
         a: { name: tx("\u6697\u5F71\u4E4B\u821E"), desc: tx("\u5254\u9AA8\u51B7\u537B 6 \u2192 4 \u79D2"), mods: { baseCd: 4 } },
         b: { name: tx("\u51B7\u8840"), desc: tx("\u6BCF\u6CE2\u7B2C\u4E00\u6B21\u653B\u64CA\u5FC5\u5B9A\u66B4\u64CA"), mods: { coldBlood: 1 } }
+      },
+      {
+        a: { name: tx("\u8173\u8E22\u7CBE\u901A"), desc: tx("\u6253\u65B7\u51B7\u537B 12 \u2192 8 \u79D2"), mods: { kickCd: 8 } },
+        b: { name: tx("\u6BD2\u5203"), desc: tx("\u50B7\u5BB3 +12%"), mods: { dmgMult: 1.12 } }
       }
     ],
-    recommend: (has) => ({ spec: has("summon") ? "combat" : "assa", t: ["b", "b", has("summon") ? "b" : "a", "b", "a"] }),
+    recommend: (has) => ({ spec: has("summon") ? "combat" : "assa", t: ["b", "b", has("summon") ? "b" : "a", "b", "a", has("cast") ? "a" : "b"] }),
     legend: {
       name: tx("\u5361\u897F\u6069"),
       title: tx("\u5F71\u5203"),
@@ -960,7 +1066,9 @@
     armor: 0.1,
     crit: 0.08,
     desc: tx("\u7BC4\u570D\u50B7\u5BB3\uFF0C\u540C\u6642\u653B\u64CA\u6240\u6709\u6575\u4EBA\u3002\u64C5\u9577\u6E05\u5C0F\u602A\u3002"),
-    prefers: ["summon"],
+    prefers: ["summon", "shield"],
+    kick: (u) => !!u.mods.canKick,
+    // 學了「法術反制」才能打斷
     ai: { aoe: 0.72, single: 1 },
     base: { name: tx("\u70C8\u7130\u98A8\u66B4"), cd: 9, mult: 2, desc: tx("\u51B7\u537B 9 \u79D2\uFF1A\u5168\u9AD4\u6575\u4EBA\u5A01\u529B \xD72") },
     specs: {
@@ -984,9 +1092,13 @@
       {
         a: { name: tx("\u708E\u7206\u8853"), desc: tx("\u6BCF 10 \u79D2\u5C0D\u9996\u9818\u9020\u6210\u5A01\u529B \xD75"), mods: { pyro: 5 } },
         b: { name: tx("\u66B4\u98A8\u96EA"), desc: tx("\u70C8\u7130\u98A8\u66B4\u51B7\u537B 9 \u2192 6 \u79D2"), mods: { baseCd: 6 } }
+      },
+      {
+        a: { name: tx("\u6CD5\u8853\u53CD\u5236"), desc: tx("\u53EF\u4EE5\u6253\u65B7\u9996\u9818\u8B80\u689D\uFF08\u51B7\u537B 12 \u79D2\uFF09"), mods: { canKick: 1 } },
+        b: { name: tx("\u5967\u8853\u5C08\u7CBE"), desc: tx("\u66B4\u64CA\u7387 +6%"), mods: { critAdd: 0.06 } }
       }
     ],
-    recommend: (has) => ({ spec: has("summon") ? "frost" : "fire", t: ["a", "b", has("summon") ? "a" : "b", "b", "a"] }),
+    recommend: (has) => ({ spec: has("summon") ? "frost" : "fire", t: ["a", "b", has("summon") ? "a" : "b", "b", "a", has("cast") ? "a" : "b"] }),
     legend: {
       name: tx("\u8389\u8587\u4E9E"),
       title: tx("\u661F\u706B"),
@@ -1059,6 +1171,8 @@
     crit: 0.12,
     desc: tx("\u4F9D\u5C08\u7CBE\u5316\u8EAB\u718A\u3001\u6A39\u4EBA\u6216\u7375\u8C79\uFF0C\u53EF\u4EE5\u7576\u5766\u514B\u3001\u6CBB\u7642\u6216\u8F38\u51FA\uFF1B\u55AE\u4E00\u8077\u8CAC\u6BD4\u5C08\u8077\u8077\u696D\u5F31\u4E00\u4E9B\u3002"),
     roleOf: (h) => ROLE[h.spec] || "dps",
+    kick: (u) => u.spec !== "resto",
+    // 熊、豹形態可以打斷（重擊／迎頭痛擊）
     statsOf(h) {
       const f = FORM[h.spec] || FORM.feral;
       if (!h.legend) return f;
@@ -1090,12 +1204,16 @@
       {
         a: { name: tx("\u751F\u751F\u4E0D\u606F"), desc: tx("\u6CBB\u7642 +15%"), mods: { healMult: 1.15 } },
         b: { name: tx("\u8FC5\u6377\u6708\u706B"), desc: tx("\u6708\u706B\u8853\u51B7\u537B 6 \u2192 4 \u79D2"), mods: { baseCd: 4 } }
+      },
+      {
+        a: { name: tx("\u91CE\u6027\u885D\u92D2"), desc: tx("\u6253\u65B7\u51B7\u537B 12 \u2192 8 \u79D2"), mods: { kickCd: 8 } },
+        b: { name: tx("\u661F\u8FB0\u4E4B\u529B"), desc: tx("\u66B4\u64CA\u50B7\u5BB3 \xD72 \u2192 \xD72.3"), mods: { critDmg: 2.3 } }
       }
     ],
     // 備戰不改德魯伊的職責（陣容是照目前職責挑的），只依職責配天賦
     recommend(has, h) {
       const sp = h && h.spec || "feral";
-      const t = { bear: ["a", "a", "a", "b", "a"], resto: ["a", "a", "a", "b", "a"], feral: ["b", "b", "b", "b", "b"] }[sp];
+      const t = { bear: ["a", "a", "a", "b", "a", has("cast") ? "a" : "b"], resto: ["a", "a", "a", "b", "a", "b"], feral: ["b", "b", "b", "b", "b", has("cast") ? "a" : "b"] }[sp];
       return { spec: sp, t };
     },
     legend: {
@@ -1181,12 +1299,36 @@
   var CLASSES = PACKS;
   var ROLE_NAME = { tank: tx("\u5766\u514B"), heal: tx("\u6CBB\u7642"), dps: tx("\u8F38\u51FA") };
   var HERO = {
-    maxLevel: 40,
+    maxLevel: 50,
+    // v0.9.0：第二章開放 40 → 50
     paragon: { need: 2e4, growth: 0.1, bonus: 0.01 },
     // 巔峰：Lv40 後經驗轉巔峰點；第 p 級需 need×(1+growth×p)，每級生命／威力 +1%
     xpBase: 60,
     xpExp: 1.8,
     // 升級所需經驗 = xpBase × 等級^xpExp
+    // 名字＋稱號組合（24 × 20 = 480 種），招募時避開名冊與酒館裡已有的名字
+    titles: [
+      tx("\u9435\u62F3"),
+      tx("\u9280\u7FBD"),
+      tx("\u7070\u9B23"),
+      tx("\u5BD2\u661F"),
+      tx("\u8D64\u708E"),
+      tx("\u591C\u6B4C"),
+      tx("\u77F3\u5FC3"),
+      tx("\u75BE\u98A8"),
+      tx("\u6668\u9732"),
+      tx("\u6697\u6B65"),
+      tx("\u6A61\u76FE"),
+      tx("\u96F7\u9CF4"),
+      tx("\u661F\u5875"),
+      tx("\u9727\u884C"),
+      tx("\u70AD\u706B"),
+      tx("\u51B0\u7259"),
+      tx("\u767D\u694A"),
+      tx("\u834A\u68D8"),
+      tx("\u9577\u6B4C"),
+      tx("\u9ED1\u7FBD")
+    ],
     names: [
       tx("\u827E\u502B"),
       tx("\u51F1\u8389"),
@@ -1258,16 +1400,27 @@
     { name: tx("\u7070\u71FC\u8981\u585E"), boss: tx("\u7194\u706B\u7763\u8ECD"), trash: tx("\u7194\u5CA9\u885B\u5175"), mech: [{ t: "enrage", at: 55, mult: 3 }], tip: tx("55 \u79D2\u5F8C\u72C2\u66B4 \u2192 \u8003\u9A57\u8F38\u51FA") },
     { name: tx("\u971C\u8A9E\u5893\u7A74"), boss: tx("\u5BD2\u971C\u5DEB\u5996"), trash: tx("\u9AB7\u9ACF\u6230\u58EB"), mech: [{ t: "pulse", every: 6, dmg: 1 }, { t: "summon", every: 12, n: 2 }], tip: tx("\u5BD2\u51B0\u8108\u885D\uFF0B\u53EC\u559A\u9AB7\u9ACF \u2192 \u6CBB\u7642\u8207\u7BC4\u570D") },
     { name: tx("\u865B\u7A7A\u88C2\u9699"), boss: tx("\u865B\u7A7A\u541E\u566C\u8005"), trash: tx("\u865B\u7A7A\u884C\u8005"), mech: [{ t: "buster", every: 7, mult: 3.5 }, { t: "enrage", at: 60, mult: 3 }], tip: tx("\u91CD\u64CA\uFF0B\u72C2\u66B4 \u2192 \u5766\u514B\u8207\u8F38\u51FA") },
-    { name: tx("\u9F8D\u7720\u9AD8\u5854"), boss: tx("\u9060\u53E4\u7D05\u9F8D"), trash: tx("\u9F8D\u4EBA\u885B\u58EB"), mech: [{ t: "pulse", every: 7, dmg: 1 }, { t: "buster", every: 9, mult: 3.2 }, { t: "enrage", at: 70, mult: 3 }], tip: tx("\u5168\u6A5F\u5236 \u2192 \u5168\u968A\u7D9C\u5408\u8003\u9A57") }
+    { name: tx("\u9F8D\u7720\u9AD8\u5854"), boss: tx("\u9060\u53E4\u7D05\u9F8D"), trash: tx("\u9F8D\u4EBA\u885B\u58EB"), mech: [{ t: "pulse", every: 7, dmg: 1 }, { t: "buster", every: 9, mult: 3.2 }, { t: "enrage", at: 70, mult: 3 }], tip: tx("\u5168\u6A5F\u5236 \u2192 \u5168\u968A\u7D9C\u5408\u8003\u9A57") },
+    // ---- 第二章：深淵裂谷（v0.9.0：VIII~X）----
+    { name: tx("\u5854\u5E95\u65B7\u5C64"), boss: tx("\u77F3\u9C57\u5B88\u885B"), trash: tx("\u88C2\u8C37\u722C\u884C\u8005"), mech: [{ t: "buster", every: 8, mult: 3.2 }, { t: "curse", every: 9, pct: 0.04, dur: 8 }], tip: tx("\u91CD\u64CA\uFF0B\u8A5B\u5492 \u2192 \u5766\u514B\u8207\u6CBB\u7642\uFF08\u6CBB\u7642\u6703\u81EA\u52D5\u6DE8\u5316\u8A5B\u5492\uFF09") },
+    { name: tx("\u8FF4\u8072\u7926\u8108"), boss: tx("\u9B42\u9444\u5320"), trash: tx("\u9B42\u9444\u5080\u5121"), mech: [{ t: "summon", every: 11, n: 2 }, { t: "cast", every: 14, time: 3, mult: 2.2 }], tip: tx("\u53EC\u559A\uFF0B\u8B80\u689D \u2192 \u7BC4\u570D\u8F38\u51FA\u8207\u6253\u65B7\uFF08\u5B88\u8B77\u9A0E\u58EB\u3001\u76DC\u8CCA\u3001\u718A\uFF0F\u8C79\u5FB7\u9B6F\u4F0A\u6703\u6253\u65B7\uFF09") },
+    { name: tx("\u71FC\u5FC3\u796D\u58C7"), boss: tx("\u88C2\u8C37\u796D\u53F8"), trash: tx("\u88C2\u8C37\u4FE1\u5F92"), mech: [{ t: "pulse", every: 7, dmg: 0.9 }, { t: "shield", every: 20, pct: 0.08, window: 10, heal: 0.1 }], tip: tx("\u8108\u885D\uFF0B\u8B77\u76FE \u2192 \u6CBB\u7642\u8207\u7206\u767C\uFF0810 \u79D2\u5167\u6253\u7834\u8B77\u76FE\uFF0C\u5426\u5247\u9996\u9818\u56DE\u8840\uFF09") }
   ];
+  var CHAPTERS = [
+    { name: tx("\u7B2C\u4E00\u7AE0"), sub: tx("\u9F8D\u7720\u4E4B\u8DEF"), floors: [0, 6] },
+    { name: tx("\u7B2C\u4E8C\u7AE0"), sub: tx("\u6DF1\u6DF5\u88C2\u8C37"), floors: [7, 9] }
+  ];
+  var CH1_TOP = 6;
   var DUNGEON = {
     hpGrowth: 2.15,
     atkGrowth: 1.82,
     // 每層敵人生命 / 攻擊倍率（v0.3 天賦上線後調高）
-    difficulty: [1, 1.1, 1, 1.4, 1, 1.35, 1],
+    difficulty: [1, 1.1, 1, 1.4, 1, 1.35, 1, 1, 1, 1],
     // 個別層加難
-    recLevel: [1, 2, 3, 5, 10, 14, 19],
-    // 建議等級（v0.3 模擬首通時的等級）
+    recLevel: [1, 2, 3, 5, 10, 14, 19, 25, 30, 35],
+    // 建議等級（第一章為 v0.3 模擬首通時的等級）
+    // 第二章：相對第 7 層的生命／攻擊倍率（逐層列出，方便調；避免第一章 ×2.15 的成長讓數字爆掉）
+    ch2: { hp: [3.2, 2.8, 4], atk: [1.6, 1.45, 1.75], dropGrowth: 1.12 },
     dropBase: 6,
     dropGrowth: 1.5,
     // 掉落裝等 = base × growth^層
@@ -1448,7 +1601,7 @@
   var SPECS = Object.fromEntries(Object.entries(PACKS).map(([k, p]) => [k, p.specs]));
   var TALENTS = Object.fromEntries(Object.entries(PACKS).map(([k, p]) => [k, p.talents]));
   var SPEC_LEVEL = 10;
-  var TALENT_ROWS = [5, 15, 20, 25, 30];
+  var TALENT_ROWS = [5, 15, 20, 25, 30, 40];
   var unlockedRows = (h) => TALENT_ROWS.filter((lv) => h.level >= lv);
   var canPickSpec = (h) => h.level >= SPEC_LEVEL;
   function pendingPicks(h) {
@@ -1558,13 +1711,15 @@
   }
 
   // src/core/dungeons.js
-  var dropIlvl = (i) => Math.round(DUNGEON.dropBase * Math.pow(DUNGEON.dropGrowth, i));
+  var ch1Drop = (i) => Math.round(DUNGEON.dropBase * Math.pow(DUNGEON.dropGrowth, i));
+  var dropIlvl = (i) => i <= CH1_TOP ? ch1Drop(i) : Math.round(ch1Drop(CH1_TOP) * Math.pow(DUNGEON.ch2.dropGrowth, i - CH1_TOP));
   function dungeonInfo(i) {
     return { ...DUNGEONS[i], tier: i + 1, dropIlvl: dropIlvl(i), recIlvl: i === 0 ? 0 : dropIlvl(i - 1), recLevel: DUNGEON.recLevel[i] };
   }
   function buildWaves(i) {
     const d = DUNGEONS[i], diff = DUNGEON.difficulty[i];
-    const sh = Math.pow(DUNGEON.hpGrowth, i) * diff, sa = Math.pow(DUNGEON.atkGrowth, i) * Math.sqrt(diff);
+    const k = Math.min(i, CH1_TOP), c2 = i > CH1_TOP ? i - CH1_TOP - 1 : -1;
+    const sh = Math.pow(DUNGEON.hpGrowth, k) * (c2 >= 0 ? DUNGEON.ch2.hp[c2] : 1) * diff, sa = Math.pow(DUNGEON.atkGrowth, k) * (c2 >= 0 ? DUNGEON.ch2.atk[c2] : 1) * Math.sqrt(diff);
     const T = DUNGEON.trash, B = DUNGEON.boss;
     const trash = () => Array.from({ length: T.count }, () => ({ name: d.trash, hp: Math.round(T.hp * sh), atk: T.atk * sa, boss: false }));
     return [trash(), trash(), [{
@@ -1596,6 +1751,34 @@
       b.push(tx("\u26A1 {0} \u5C0D {1} \u91CD\u64CA", e.name, tgt.name), "warn");
       b.isBuster = true;
       return m.mult;
+    },
+    // ---- 第二章 ----
+    // 詛咒：隨機點名一名隊員，每秒失去最大生命的 pct，持續 dur 秒；治療職責會用「淨化」解除
+    curse(b, e, m) {
+      if (b.waveTick % m.every) return 1;
+      const pool = b.alive().filter((u2) => !(u2.curse > b.tick));
+      if (!pool.length) return 1;
+      const u = pick(pool);
+      u.curse = b.tick + m.dur;
+      u.cursePct = m.pct;
+      b.push(tx("\u2620 {0} \u8A5B\u5492\u4E86 {1}", e.name, u.name), "warn");
+      return 1;
+    },
+    // 讀條：time 秒後全隊受到魔法傷害（攻擊 × mult）；能打斷的職業會在讀條時打斷
+    cast(b, e, m) {
+      if (b.waveTick % m.every || e.casting) return 1;
+      e.casting = { until: b.tick + m.time, mult: m.mult };
+      b.push(tx("\u{1F4D6} {0} \u958B\u59CB\u8B80\u689D\uFF08{1} \u79D2\uFF09", e.name, m.time), "warn");
+      return 1;
+    },
+    // 護盾：獲得最大生命 pct 的護盾，window 秒內沒打破就回復 heal 的生命
+    shield(b, e, m) {
+      if (b.waveTick % m.every) return 1;
+      e.bshield = Math.round(e.max * m.pct);
+      e.bshieldUntil = b.tick + m.window;
+      e.bshieldHeal = m.heal;
+      b.push(tx("\u{1F6E1} {0} \u5F35\u958B\u8B77\u76FE\uFF01{1} \u79D2\u5167\u6253\u7834\u5B83", e.name, m.window), "warn");
+      return 1;
     },
     summon(b, e, m) {
       if (b.waveTick % m.every) return 1;
@@ -1725,6 +1908,12 @@
       if (crit) amt *= m.critDmg || 2;
       if (crit && !o.dot && u.lh.onCrit) u.lh.onCrit(this, u, e);
       amt = Math.min(e.hp, Math.round(amt * rnd(0.92, 1.08)));
+      if (e.bshield > 0) {
+        const ab = Math.min(e.bshield, amt);
+        e.bshield -= ab;
+        e.hp += ab;
+        if (e.bshield === 0) this.push(tx("\u{1F4A5} {0} \u7684\u8B77\u76FE\u88AB\u6253\u7834\u4E86", e.name), "good");
+      }
       e.hp -= amt;
       u.dmgDone += amt;
       if (o.skill || o.dot) u.skillDmg += amt;
@@ -1804,6 +1993,26 @@
       if (src.lh.onHeal && !raw) src.lh.onHeal(this, src, tgt, amt, h);
       return h;
     }
+    // 通用技能：能打斷的職業打斷讀條；治療職責淨化詛咒。回傳 true 表示用掉了這一秒
+    utility(u, foes) {
+      const caster = foes.find((e) => e.casting);
+      if (caster && u.pack.kick && u.pack.kick(u) && (u.cd.kick || 0) <= this.tick) {
+        caster.casting = null;
+        u.cd.kick = this.tick + (u.mods.kickCd || 12);
+        this.skillLog(u, tx("\u6253\u65B7"), caster);
+        return true;
+      }
+      if (u.role === "heal" && (u.cd.dispel || 0) <= this.tick) {
+        const c = this.alive().find((x) => x.curse > this.tick);
+        if (c) {
+          c.curse = 0;
+          u.cd.dispel = this.tick + (u.mods.dispelCd || 6);
+          this.skillLog(u, tx("\u6DE8\u5316"), c);
+          return true;
+        }
+      }
+      return false;
+    }
     enemyTarget() {
       const a = this.alive();
       if (!a.length) return null;
@@ -1815,6 +2024,13 @@
         if (e.poison && e.poisonSrc) this.hitEnemy(e.poisonSrc, e, e.poison * e.poisonPer * e.poisonSrc.pow, { dot: true });
         if (e.bleed && e.bleed.until >= this.tick && e.hp > 0) this.hitEnemy(e.bleed.src, e, e.bleed.amt, { dot: true });
       }
+      for (const e of this.foes()) if (e.bshield > 0 && this.tick >= e.bshieldUntil) {
+        e.bshield = 0;
+        const h = Math.round(e.max * e.bshieldHeal);
+        e.hp = Math.min(e.max, e.hp + h);
+        this.push(tx("\u{1F49A} \u8B77\u76FE\u6C92\u88AB\u6253\u7834\uFF0C{0} \u56DE\u5FA9\u4E86 {1} \u751F\u547D", e.name, h), "bad");
+      }
+      for (const u of this.alive()) if (u.curse > this.tick) this.hitHero(u, u.max * u.cursePct, "magic");
       for (const u of this.alive()) {
         u.hots = u.hots.filter((h) => h.until >= this.tick);
         for (const h of u.hots) this.heal(h.src, u, h.amt);
@@ -1830,6 +2046,7 @@
       for (const u of this.alive()) {
         const foes = this.foes();
         if (!foes.length) break;
+        if (this.utility(u, foes)) continue;
         u.pack.act(this, u, foes, foes.find((e) => !e.boss) || foes[0]);
       }
       for (const e of this.foes()) {
@@ -1840,6 +2057,12 @@
         if (!e.boss && this.has("raging") && e.hp < e.max * 0.3) atk *= 1.5;
         if (e.boss) for (const m of e.mech || []) atk *= BOSS_MECHS[m.t](this, e, m, tgt);
         if (tgt.hp > 0) this.hitHero(tgt, atk, this.isBuster ? "buster" : "phys", e);
+      }
+      for (const e of this.foes()) if (e.casting && this.tick >= e.casting.until) {
+        const c = e.casting;
+        e.casting = null;
+        this.push(tx("\u{1F4A5} {0} \u8B80\u689D\u5B8C\u6210\uFF0C\u5168\u968A\u53D7\u5230\u91CD\u5275", e.name), "bad");
+        for (const u of this.alive()) this.hitHero(u, e.atk * c.mult * this.weakMult(e), "magic");
       }
       if (this.has("volcanic") && this.waveTick % 8 === 0 && this.alive().length) {
         const u = pick(this.alive());
@@ -1912,7 +2135,7 @@
   var affixHints = (list) => list.map((a) => AFFIXES[a].hint);
   var mythicTimer = (dIdx) => MYTHIC.timer[dIdx];
   function buildMythicWaves(dIdx, level, affixes) {
-    const top = DUNGEONS.length - 1;
+    const top = CH1_TOP;
     const base = buildWaves(top), own = buildWaves(dIdx);
     const sh = Math.pow(MYTHIC.hpGrowth, level), sa = Math.pow(MYTHIC.atkGrowth, level);
     const fort = affixes.includes("fortified"), tyr = affixes.includes("tyrannical");
@@ -1925,7 +2148,7 @@
   }
   function mythicBattleOpts(dIdx, level, date) {
     const affixes = activeAffixes(level, date);
-    const top = DUNGEONS.length - 1;
+    const top = CH1_TOP;
     return {
       mythic: { dIdx, level, affixes, timer: mythicTimer(dIdx), volcanic: buildWaves(top)[0][0].atk * Math.pow(MYTHIC.atkGrowth, level) * 2.5 },
       waves: buildMythicWaves(dIdx, level, affixes),
@@ -1933,7 +2156,7 @@
     };
   }
   function mythicRewards(level, inTime) {
-    const top = DUNGEONS.length - 1;
+    const top = CH1_TOP;
     const gold = Math.round((REWARD.goldBase + REWARD.goldPerTier * top) * MYTHIC.goldMult * (1 + 0.05 * level) * rnd(0.9, 1.1));
     const xp = Math.round(REWARD.xpBase * Math.pow(top + 1, REWARD.xpExp) * MYTHIC.xpMult * (1 + 0.1 * level));
     const n = inTime ? 2 : 1, loot = [];
@@ -1969,7 +2192,7 @@
   }
   function decayFor(dIdx) {
     const rec = dungeonInfo(dIdx).recLevel;
-    const floor = dIdx === DUNGEONS.length - 1 ? REWARD.decayFloorTop : REWARD.decayFloor;
+    const floor = dIdx >= CH1_TOP ? REWARD.decayFloorTop : REWARD.decayFloor;
     return (L) => Math.max(floor, Math.min(1, 1 - REWARD.decayPerLevel * (L - (rec + REWARD.decayGrace))));
   }
   function newGame() {
@@ -1997,10 +2220,13 @@
       recruit: { sinceEpic: 0, sinceLegend: 0, total: 0 },
       vault: { day: "", used: 0, runs: 0, best: {} },
       dust: 0,
-      idleMythic: null
+      idleMythic: null,
+      salvageIlvlGap: 0,
+      story: { seen: [] }
     };
     for (const c of HERO.starters) {
       const h = makeHero(c);
+      h.name = uniqueName(s);
       s.heroes.push(h);
       s.party.push(h.id);
     }
@@ -2032,6 +2258,8 @@
     s.vault = s.vault || { day: "", used: 0, runs: 0, best: {} };
     if (s.dust == null) s.dust = 0;
     if (s.idleMythic === void 0) s.idleMythic = null;
+    if (s.salvageIlvlGap == null) s.salvageIlvlGap = 0;
+    s.story = s.story || { seen: [] };
     s.v = SAVE_VERSION;
     return s;
   }
@@ -2063,9 +2291,19 @@
     const r = rollHeroRarity(s);
     const cls2 = r === 4 ? pick(legendsAvailable(s)) : pick(Object.keys(CLASSES));
     const h = makeHero(cls2, level, r);
+    if (!h.legend) h.name = uniqueName(s);
     if (h.level >= SPEC_LEVEL) h.spec = pick(Object.keys(CLASSES[h.cls].specs));
     for (const lv of TALENT_ROWS) if (h.level >= lv) h.talents[lv] = pick(["a", "b"]);
     return h;
+  }
+  function uniqueName(s) {
+    const taken = new Set([...s.heroes, ...s.tavern || []].map((h) => h.name)), sep = getLang() === "en" ? " " : "\u30FB";
+    let n = "";
+    for (let i = 0; i < 30; i++) {
+      n = pick(HERO.names) + sep + pick(HERO.titles);
+      if (!taken.has(n)) break;
+    }
+    return n;
   }
   var recruitLevel = (s) => Math.max(1, Math.round(avgLevel(s.heroes)) - 1);
   function rollTavern(s) {
@@ -2157,7 +2395,21 @@
     s.bagSeen.push(...fresh.map((m) => m.id));
     return fresh;
   }
+  var partyIlvl = (s) => {
+    const p = partyHeroes(s);
+    return p.length ? p.reduce((a, h) => a + heroIlvl(h, s.items), 0) / p.length : 0;
+  };
+  function salvageLowIlvl(s, gap, dry = false) {
+    const lim = partyIlvl(s) - gap, ids = s.bag.filter((i) => s.items[i].rarity < 4 && s.items[i].ilvl < lim);
+    if (dry) return { count: ids.length };
+    return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
+  }
   function addLoot(s, it) {
+    if (s.salvageIlvlGap && it.rarity < 4 && it.ilvl < partyIlvl(s) - s.salvageIlvlGap) {
+      s.gold += salvageValue(it);
+      s.dust = (s.dust || 0) + salvageDust(it);
+      return "salvaged";
+    }
     if (it.rarity < s.autoSalvageBelow) {
       s.gold += salvageValue(it);
       s.dust = (s.dust || 0) + salvageDust(it);
@@ -2455,7 +2707,7 @@
     return v;
   }
   var vaultLeft = (s) => Math.max(0, VAULT.daily - vaultToday(s).used);
-  var vaultFloors = (s) => Object.keys(s.clears).filter((k) => s.clears[k]).map(Number).sort((a, b) => a - b);
+  var vaultFloors = (s) => Object.keys(s.clears).filter((k) => s.clears[k]).map(Number).filter((f) => f <= CH1_TOP).sort((a, b) => a - b);
   var floorGold = (f) => REWARD.goldBase + REWARD.goldPerTier * f;
   var vaultGoldPerKill = (f) => Math.round(floorGold(f) * VAULT.parRuns / VAULT.par[f]);
   var vaultMaxKills = (f) => Math.round(VAULT.par[f] * VAULT.capMult);
@@ -2591,7 +2843,7 @@
   }
 
   // src/core/version.js
-  var VERSION = "0.8.3";
+  var VERSION = "0.9.0";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -2696,13 +2948,23 @@
   function viewDungeons() {
     const lv = avgPartyLv(), il = avgPartyIlvl();
     let h = nextStepCard() + tx('<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv{0}</b>\u30FB\u88DD\u7B49 <b class="num">{1}</b>\u30FB\u6230\u529B <b class="num">{2}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u90FD\u6709\u5F31\u9EDE\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\uFF0C\u6216\u56DE\u982D\u5237\u88DD\u5099\u3002</p>', lv, il, fmt(partyPower()));
-    h += vaultSection() + mythicSection() + `<div class="dlist">`;
+    const S = app.S, mode = app.mode || "story";
+    const modes = [["story", tx("\u4E3B\u7DDA")], ["mythic", tx("\u79D8\u5883")], ["vault", tx("\u5BF6\u5EAB")], ["event", tx("\u6D3B\u52D5")]];
+    h += `<div class="seg modes">${modes.map(([k, n]) => `<button data-act="mode" data-v="${k}" class="${mode === k ? "sel" : ""}">${n}</button>`).join("")}</div>`;
+    if (mode === "mythic") return h + mythicSection() + boardCard();
+    if (mode === "vault") return h + vaultSection();
+    if (mode === "event") return h + `<div class="mythic locked"><b>${tx("\u6D3B\u52D5")}</b><span class="sub" style="margin:0">${tx("\u5373\u5C07\u63A8\u51FA\uFF1A\u7BC0\u6176\u526F\u672C\u3001\u88DD\u5099\u526F\u672C\u7B49\u9650\u6642\u6D3B\u52D5\u6703\u653E\u5728\u9019\u88E1\u3002")}</span></div>`;
+    const chs = CHAPTERS, open = (c) => S.unlocked - 1 >= chs[c].floors[0];
+    const ch = app.chapter != null && open(app.chapter) ? app.chapter : chs.reduce((a, c, i) => open(i) ? i : a, 0);
+    h += `<div class="seg chapters">${chs.map((c, i) => `<button data-act="chapter" data-v="${i}" class="${ch === i ? "sel" : ""}" ${open(i) ? "" : "disabled"}>${c.name}\u30FB${c.sub}${open(i) ? "" : " \u{1F512}"}</button>`).join("")}</div>`;
+    h += `<div class="dlist">`;
     DUNGEONS.forEach((_, i) => {
+      if (i < chs[ch].floors[0] || i > chs[ch].floors[1]) return;
       const d = dungeonInfo(i), locked = i >= app.S.unlocked, clears = app.S.clears[i] || 0;
       const idleHere = app.S.idle === i;
       h += tx('<div class="dg {0}"> <div class="tier">{1}<small>\u7B2C {2} \u5C64</small></div> <h3>{3}<span class="boss">\u9996\u9818\u30FB{4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>\u5EFA\u8B70 <b class="num {6}">Lv{7}</b></span> <span>\u88DD\u7B49 <b class="num {8}">{9}</b></span> <span>\u6389\u843D <b class="num">{10}</b></span> <span>\u901A\u95DC <b class="num">{11}</b> \u6B21</span> </div> <div class="acts">{12} </div></div>', locked ? "locked" : "", ROMAN[i], i + 1, d.name, d.boss, d.tip, lv >= d.recLevel ? "ok" : "low", d.recLevel, il >= d.recIlvl ? "ok" : "low", d.recIlvl, d.dropIlvl, clears, locked ? tx('<span class="sub" style="margin:0">\u5148\u901A\u95DC\u4E0A\u4E00\u5C64</span>') : tx('<button class="btn main grow" data-act="fight" data-d="{0}">\u6311\u6230</button> <button class="btn {1}" data-act="idle" data-d="{2}" {3}>{4}</button> <button class="btn" data-act="prepare" data-d="{5}" aria-label="{6}">\u5099\u6230</button>', i, idleHere ? "on" : "", i, clears ? "" : tx('disabled title="\u901A\u95DC\u4E00\u6B21\u5F8C\u624D\u80FD\u639B\u6A5F"'), idleHere ? tx("\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62") : tx("\u639B\u6A5F\u5237"), i, partyLocked(app.S) ? tx("\u4E00\u9375\u5099\u6230\uFF1A\u639B\u6A5F\u4E2D\u53EA\u8ABF\u5929\u8CE6\u3001\u88DD\u5099") : tx("\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099")));
     });
-    h += `</div>` + boardCard() + tx('<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u5230\u300C\u5718\u968A\u300D\u6700\u4E0B\u65B9\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>', ECONOMY.offlineCapHours);
+    h += `</div>` + tx('<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u5230\u300C\u5718\u968A\u300D\u6700\u4E0B\u65B9\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>', ECONOMY.offlineCapHours);
     return h;
   }
 
@@ -2823,8 +3085,13 @@
       h += tx('<div class="stashbox"><div class="row" style="align-items:center"><b>\u6230\u5229\u54C1\u7BB1</b><span class="sub num" style="margin:0">{0}/{1}</span> <span class="sub" style="margin:0 0 0 auto">\u80CC\u5305\u6EFF\u6642\u6389\u843D\u7684\u88DD\u5099</span></div> <div class="stack">{2} {3}</div> <div class="row"><button class="btn sm main grow" data-act="takestash" {4}>{5}</button> <button class="btn sm" data-act="salvagestash">\u5168\u90E8\u5206\u89E3</button></div></div>', S.stash.length, E.stashMax, S.stash.map((id) => S.items[id]).sort((a, b) => itemScore(b) - itemScore(a)).slice(0, 5).map((it) => itemRow(it)).join(""), S.stash.length > 5 ? tx('<div class="sub" style="margin:0">\u9084\u6709 {0} \u4EF6</div>', S.stash.length - 5) : "", full ? "disabled" : "", full ? tx("\u80CC\u5305\u5DF2\u6EFF") : tx("\u53D6\u51FA\u5230\u80CC\u5305\uFF08\u9084\u80FD\u653E {0} \u4EF6\uFF09", cap - S.bag.length));
     }
     h += tx('<div class="toolbar">{0} <button class="btn sm main" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button></div> <div class="toolbar"><label class="selwrap"><span>\u5206\u89E3</span><select id="salvSel" aria-label="\u5206\u89E3\u54C1\u8CEA">{1}</select></label> <button class="btn sm {2}" data-act="salvageupto">{3}</button></div>', seg("filter", app.invFilter, [["all", tx("\u5168\u90E8")], ["weapon", tx("\u6B66\u5668")], ["armor", tx("\u8B77\u7532")], ["trinket", tx("\u98FE\u54C1")]]), [0, 1, 2, 3].map((r) => `<option value="${r}" ${app.salvSel === r ? "selected" : ""}>${RARITY[r].name}${r ? tx("\u4EE5\u4E0B") : ""}</option>`).join(""), app.salvConfirm ? "danger" : "", app.salvConfirm ? tx("\u78BA\u5B9A\u5206\u89E3 {0} \u4EF6\uFF1F", salvCount()) : tx("\u5206\u89E3\uFF08{0} \u4EF6\uFF09", salvCount()));
+    {
+      const gap = S.salvageIlvlGap || 10, n = salvageLowIlvl(S, gap, true).count;
+      h += `<div class="toolbar"><span class="sub" style="margin:0">${tx("\u6BD4\u5E73\u5747\u88DD\u7B49\u4F4E {0} \u4EE5\u4E0A", gap)}</span><button class="btn sm" data-act="salvlow" ${n ? "" : "disabled"}>${tx("\u5206\u89E3\u4F4E\u88DD\u7B49\uFF08{0} \u4EF6\uFF09", n)}</button></div>`;
+    }
     h += items.length ? `<div class="stack">${items.map((it) => itemRow(it)).join("")}</div>` : tx('<div class="empty">\u80CC\u5305\u662F\u7A7A\u7684\u3002\u901A\u95DC\u526F\u672C\u6703\u6389\u843D\u88DD\u5099\u3002</div>');
-    h += tx('<h2 style="font-size:18px">\u6230\u5229\u54C1\u8A2D\u5B9A</h2><div class="settings"> <div class="set"><span>\u6389\u843D\u6642\u81EA\u52D5\u5206\u89E3</span>{0}</div> <div class="set"><span>\u80CC\u5305\u6EFF\u5F8C\u53EA\u4FDD\u7559</span>{1}</div> <p class="sub" style="margin:0">\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\uFF0C\u7B26\u5408\u54C1\u8CEA\u7684\u88DD\u5099\u6703\u5148\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF08\u6700\u591A {2} \u4EF6\uFF09\uFF0C\u5176\u4ED6\u81EA\u52D5\u63DB\u6210\u91D1\u5E63\u3002</p></div> <h2 style="font-size:18px">\u80CC\u5305\u64F4\u5145 <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>', seg("autosalv", S.autoSalvageBelow, [[0, tx("\u95DC\u9589")], [1, tx("\u666E\u901A")], [2, tx("\u7CBE\u826F\u4EE5\u4E0B")]]), seg("keeprar", S.keepRarity, [[1, tx("\u7CBE\u826F\u4EE5\u4E0A")], [2, tx("\u7A00\u6709\u4EE5\u4E0A")], [3, tx("\u53F2\u8A69")]]), E.stashMax, cap, E.bagMax + BAG_PER_MILESTONE * BAG_MILESTONES.length, BAG_MILESTONES.map((m) => tx('<div class="set"><span class="{0}" style="margin:0">{1}{2}</span><span class="num {3}" style="margin:0">+{4} \u683C</span></div>', m.test(S) ? "" : "sub", m.test(S) ? "\u2713 " : "", m.name, m.test(S) ? "okc" : "sub", BAG_PER_MILESTONE)).join(""));
+    h += tx('<h2 style="font-size:18px">\u6230\u5229\u54C1\u8A2D\u5B9A</h2><div class="settings"> <div class="set"><span>\u6389\u843D\u6642\u81EA\u52D5\u5206\u89E3</span>{0}</div> <div class="set"><span>\u80CC\u5305\u6EFF\u5F8C\u53EA\u4FDD\u7559</span>{1}</div> <div class="set"><span>\u4F9D\u88DD\u7B49\u81EA\u52D5\u5206\u89E3</span>{6}</div> <p class="sub" style="margin:0">\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\uFF0C\u7B26\u5408\u54C1\u8CEA\u7684\u88DD\u5099\u6703\u5148\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF08\u6700\u591A {2} \u4EF6\uFF09\uFF0C\u5176\u4ED6\u81EA\u52D5\u63DB\u6210\u91D1\u5E63\u3002</p></div> <h2 style="font-size:18px">\u80CC\u5305\u64F4\u5145 <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>', seg("autosalv", S.autoSalvageBelow, [[0, tx("\u95DC\u9589")], [1, tx("\u666E\u901A")], [2, tx("\u7CBE\u826F\u4EE5\u4E0B")]]), seg("keeprar", S.keepRarity, [[1, tx("\u7CBE\u826F\u4EE5\u4E0A")], [2, tx("\u7A00\u6709\u4EE5\u4E0A")], [3, tx("\u53F2\u8A69")]]), E.stashMax, cap, E.bagMax + BAG_PER_MILESTONE * BAG_MILESTONES.length, BAG_MILESTONES.map((m) => tx('<div class="set"><span class="{0}" style="margin:0">{1}{2}</span><span class="num {3}" style="margin:0">+{4} \u683C</span></div>', m.test(S) ? "" : "sub", m.test(S) ? "\u2713 " : "", m.name, m.test(S) ? "okc" : "sub", BAG_PER_MILESTONE)).join(""), seg("ilvlgap", S.salvageIlvlGap || 0, [[0, tx("\u95DC\u9589")], [10, tx("\u4F4E 10 \u4EE5\u4E0A")], [20, tx("\u4F4E 20 \u4EE5\u4E0A")]]));
+    h += `<p class="sub" style="margin:4px 0 0">${tx("\u4F9D\u88DD\u7B49\uFF1A\u6BD4\u51FA\u6230\u968A\u54E1\u5E73\u5747\u88DD\u7B49\uFF08\u76EE\u524D {0}\uFF09\u4F4E\u9019\u9EBC\u591A\u7684\u6389\u843D\u76F4\u63A5\u5206\u89E3\uFF0C\u50B3\u8AAA\u9664\u5916\u3002", Math.round(partyIlvl(S)))}</p>`;
     return h;
   }
 
@@ -2923,7 +3190,7 @@
     const c = cls(x), st = heroStats(x, app.S.items), view = app.modal.view || "gear", pend = pendingPicks(x);
     const sp = x.spec && SPECS[x.cls][x.spec];
     const R2 = HERO_RARITY[x.rarity || 0], L = x.legend && LEGENDS[x.cls];
-    let h = tx('<h3>{0} {1} {2}</h3><div class="sub" style="margin:0">{3}{4}\u30FB{5}\u3000{6}</div> {7} <div class="statgrid num"><div><b>{8}</b><span>\u7B49\u7D1A</span></div><div><b>{9}</b><span>\u751F\u547D</span></div><div><b>{10}</b><span>\u5A01\u529B</span></div><div><b>{11}%</b><span>\u66B4\u64CA</span></div></div> <div class="sub" style="margin:0">{12}\u30FB\u8B77\u7532\u6E1B\u50B7 {13}%</div> <div class="seg wide"><button data-act="heroview" data-id="{14}" data-v="gear" class="{15}">\u88DD\u5099</button><button data-act="heroview" data-id="{16}" data-v="talent" class="{17}">\u5929\u8CE6{18}</button></div>', c.icon, heroName(x), rarityTag(x), c.name, sp ? `\u30FB${sp.name}` : "", ROLE_NAME[roleOf(x)], c.desc, x.rarity ? tx('<div class="raritycard r-{0}"><b class="c{1}">{2}\u52A0\u6210</b><span>\u57FA\u790E\u5C6C\u6027 \xD7{3}{4}{5}</span>{6}</div>', x.rarity, x.rarity, R2.name, R2.mult.toFixed(2), R2.crit ? tx("\u30FB\u66B4\u64CA +{0}%", Math.round(R2.crit * 100)) : "", R2.baseCdMult ? tx("\u30FB\u57FA\u790E\u6280\u80FD\u51B7\u537B \u221210%") : "", L ? tx('<span><b class="c4">{0}</b>\uFF1A{1}</span>', L.pname, L.desc) : "") : "", x.level, fmt(st.hp), st.pow, Math.round(st.crit * 100), x.level >= HERO.maxLevel ? tx('<b style="color:var(--brass)">\u5DD4\u5CF0 {0}</b>\uFF08\u751F\u547D\uFF0F\u5A01\u529B +{1}%\uFF09<span class="num">{2} / {3}</span>', x.para || 0, x.para || 0, fmt(x.paraXp || 0), fmt(paraNeed(x.para || 0))) : tx('\u7D93\u9A57 <span class="num">{0} / {1}</span>', fmt(x.xp), fmt(xpNeed(x.level))), Math.round(st.armor * 100), x.id, view === "gear" ? "sel" : "", x.id, view === "talent" ? "sel" : "", pend ? `<span class="pip">${pend}</span>` : "");
+    let h = tx('<h3>{0} {1} {2}</h3><div class="sub" style="margin:0">{3}{4}\u30FB{5}\u3000{6}</div> {7} <div class="statgrid num"><div><b>{8}</b><span>\u7B49\u7D1A</span></div><div><b>{9}</b><span>\u751F\u547D</span></div><div><b>{10}</b><span>\u5A01\u529B</span></div><div><b>{11}%</b><span>\u66B4\u64CA</span></div></div> <div class="sub" style="margin:0">{12}\u30FB\u8B77\u7532\u6E1B\u50B7 {13}%</div> <div class="seg wide"><button data-act="heroview" data-id="{14}" data-v="gear" class="{15}">\u88DD\u5099</button><button data-act="heroview" data-id="{16}" data-v="talent" class="{17}">\u5929\u8CE6{18}</button></div>', c.icon, heroName(x), rarityTag(x), c.name, sp ? `\u30FB${sp.name}` : "", ROLE_NAME[roleOf(x)], c.desc, x.rarity ? tx('<div class="raritycard r-{0}"><b class="c{1}">{2}\u52A0\u6210</b><span>\u57FA\u790E\u5C6C\u6027 \xD7{3}{4}{5}</span>{6}</div>', x.rarity, x.rarity, R2.name, R2.mult.toFixed(2), R2.crit ? tx("\u30FB\u66B4\u64CA +{0}%", Math.round(R2.crit * 100)) : "", R2.baseCdMult ? tx("\u30FB\u57FA\u790E\u6280\u80FD\u51B7\u537B \u221210%") : "", L ? tx('<span><b class="c4">{0}</b>\uFF1A{1}</span>', L.pname, L.desc) : "") : "", x.level, fmt(st.hp), st.pow, Math.round(st.crit * 100), x.level >= HERO.maxLevel ? tx('<b style="color:var(--brass)">\u5DD4\u5CF0 {0}</b>\uFF08\u751F\u547D\uFF0F\u5A01\u529B +{1}%\uFF09<span class="num">{2} / {3}</span>', x.para || 0, x.para || 0, fmt(x.paraXp || 0), fmt(paraNeed(x.para || 0))) : tx('\u7D93\u9A57 <span class="num">{0} / {1}</span>', fmt(x.xp), fmt(xpNeed(x.level))) + (x.para ? tx("\u30FB\u5DD4\u5CF0 {0}\uFF08\u751F\u547D\uFF0F\u5A01\u529B +{1}%\uFF09", x.para, x.para) : ""), Math.round(st.armor * 100), x.id, view === "gear" ? "sel" : "", x.id, view === "talent" ? "sel" : "", pend ? `<span class="pip">${pend}</span>` : "");
     if (view === "talent") return h + talentView(x) + heroActions(x);
     h += `<div>`;
     for (const [slot, sn] of Object.entries(SLOTS)) {
@@ -2985,6 +3252,34 @@
     { who: tx("\u516C\u6703\u66F8\u8A18"), text: tx("\u968A\u4F0D\u6211\u5E6B\u4F60\u6E4A\u4E86\u4E09\u500B\u4EBA\u3002\u4EBA\u624B\u4E0D\u5920\uFF0C\u5C31\u53BB\u9152\u9928\u627E\u3002") },
     { who: tx("\u516C\u6703\u66F8\u8A18"), text: tx("\u5C0D\u4E86\u2014\u2014\u6700\u4E0A\u9762\u90A3\u5F35\u5C60\u9F8D\u4EE4\uFF0C\u7B49\u4F60\u5011\u5920\u5F37\u518D\u8AAA\u3002") }
   ];
+  var ORIN = () => tx("\u5B88\u5854\u4EBA\u30FB\u6B50\u6797");
+  var STORY = {
+    // 打倒紅龍＝第二章序章
+    post6: [
+      { who: "", text: tx("\u7D05\u9F8D\u5012\u4E0B\u7684\u90A3\u4E00\u523B\uFF0C\u9F8D\u7720\u9AD8\u5854\u7684\u5730\u57FA\u88C2\u958B\u4E86\u4E00\u9053\u7E2B\u3002") },
+      { who: ORIN(), text: tx("\u4F60\u5011\u6BBA\u4E86\u9F8D\uFF1F\u2026\u2026\u7260\u7761\u5728\u5854\u9802\uFF0C\u662F\u70BA\u4E86\u7528\u8EAB\u9AD4\u58D3\u4F4F\u5854\u5E95\u7684\u88C2\u8C37\u3002") },
+      { who: ORIN(), text: tx("\u6211\u662F\u5B88\u5854\u4EBA\u6B50\u6797\u3002\u5C01\u5370\u5D29\u4E86\uFF0C\u88C2\u8C37\u9072\u65E9\u6703\u5168\u958B\u3002") },
+      { who: ORIN(), text: tx("\u9084\u6709\u4E00\u4EF6\u4E8B\u2014\u2014\u90A3\u5F35\u5C60\u9F8D\u4EE4\uFF0C\u5230\u5E95\u662F\u8AB0\u8CBC\u5728\u516C\u6703\u699C\u4E0A\u7684\uFF1F") }
+    ],
+    pre7: [
+      { who: ORIN(), text: tx("\u77F3\u9C57\u5B88\u885B\u672C\u4F86\u662F\u5B88\u5C01\u5370\u7684\uFF0C\u73FE\u5728\u6C92\u4E86\u4E3B\u4EBA\uFF0C\u898B\u4EBA\u5C31\u6253\u3002") },
+      { who: ORIN(), text: tx("\u5C0F\u5FC3\u7260\u7684\u8A5B\u5492\u3002\u8B93\u6CBB\u7642\u96A8\u6642\u6E96\u5099\u6DE8\u5316\u3002") }
+    ],
+    post7: [{ who: ORIN(), text: tx("\u88C2\u7E2B\u9084\u5728\u5F80\u4E0B\u5EF6\u4F38\u2026\u2026\u662F\u5F9E\u7926\u8108\u90A3\u908A\u4F86\u7684\u3002") }],
+    pre8: [
+      { who: ORIN(), text: tx("\u7B2C II \u5C64\u5931\u8E64\u7684\u7926\u5DE5\u2026\u2026\u539F\u4F86\u90FD\u5728\u9019\u88E1\u3002") },
+      { who: ORIN(), text: tx("\u9B42\u9444\u5320\u8B80\u689D\u6642\u4E00\u5B9A\u8981\u6253\u65B7\uFF0C\u4E0D\u7136\u6574\u968A\u90FD\u6703\u88AB\u9707\u98DB\u3002") }
+    ],
+    post8: [{ who: tx("\u9B42\u9444\u5320"), text: tx("\u796D\u53F8\u5011\u8981\u7684\u9748\u9B42\uFF0C\u6211\u5DF2\u7D93\u4EA4\u4E86\u2026\u2026\u4F60\u5011\u4F86\u665A\u4E86\u3002") }],
+    pre9: [
+      { who: tx("\u88C2\u8C37\u796D\u53F8"), text: tx("\u5148\u77E5\u5011\u8AAA\u4F60\u5011\u6703\u4F86\u3002\u4F60\u5011\u5DF2\u7D93\u505A\u5B8C\u4F60\u5011\u8A72\u505A\u7684\u4E8B\u4E86\u3002") },
+      { who: ORIN(), text: tx("\u4ED6\u7684\u8B77\u76FE\u5F88\u786C\u3002\u5341\u79D2\u5167\u6253\u4E0D\u7834\uFF0C\u4ED6\u5C31\u6703\u56DE\u8840\u3002") }
+    ],
+    post9: [
+      { who: ORIN(), text: tx("\u5148\u77E5\uFF1F\u2026\u2026\u61F8\u8CDE\u4EE4\u4E0A\u7684\u7F72\u540D\uFF0C\u5C31\u662F\u300C\u96D9\u6708\u300D\u3002") },
+      { who: ORIN(), text: tx("\u518D\u5F80\u4E0B\u662F\u96D9\u6708\u738B\u5EA7\u3002\u6211\u5148\u53BB\u63A2\u8DEF\uFF0C\u7B49\u6211\u6D88\u606F\u3002") }
+    ]
+  };
 
   // src/ui/battle-runner.js
   function startBattle(dIdx) {
@@ -3072,8 +3367,17 @@
     for (const m of newBagMilestones(app.S)) setTimeout(() => toast(tx("\u{1F392} {0}\uFF1A\u80CC\u5305 +{1} \u683C", m.name, BAG_PER_MILESTONE)), 400);
     if (b.vault) sendEvent(tx("\u5BF6\u5EAB"), tx("\u7B2C {0} \u5C64 \u6253\u5012 {1} \u96BB +{2} \u91D1", b.vault.floor + 1, r.kills, r.gold));
     else if (b.mythicIdle) {
-    } else if (b.mythic) sendEvent(tx("\u79D8\u5883"), `${DUNGEONS[b.dIdx].name} +${b.mythic.level} ${r.inTime ? tx("\u9650\u6642") : b.win ? tx("\u8D85\u6642") : tx("\u5931\u6557")} ${mmss(b.tick)}${r.record ? tx("\uFF08\u65B0\u7D00\u9304\uFF09") : ""}`);
-    else if (r.first) sendEvent(tx("\u9996\u901A"), tx("\u7B2C {0} \u5C64 {1}", b.dIdx + 1, DUNGEONS[b.dIdx].name));
+    } else if (b.mythic) {
+      const m = app.mBuf || (app.mBuf = { n: 0, timed: 0, fail: 0 });
+      m.n++;
+      if (r.inTime) m.timed++;
+      else if (!b.win) m.fail++;
+      if (r.record) sendEvent(tx("\u79D8\u5883"), `${DUNGEONS[b.dIdx].name} +${b.mythic.level} ${tx("\u9650\u6642")} ${mmss(b.tick)}${tx("\uFF08\u65B0\u7D00\u9304\uFF09")}`);
+      if (m.n >= 10) {
+        sendEvent(tx("\u79D8\u5883"), tx("\u8FD1 {0} \u5834\uFF1A\u9650\u6642 {1}\u30FB\u5931\u6557 {2}\u30FB\u76EE\u524D\u9470\u77F3 +{3}", m.n, m.timed, m.fail, app.S.mythic.key));
+        app.mBuf = null;
+      }
+    } else if (r.first) sendEvent(tx("\u9996\u901A"), tx("\u7B2C {0} \u5C64 {1}", b.dIdx + 1, DUNGEONS[b.dIdx].name));
     if (!app.battle.mythic && !app.battle.vault && app.S.idle === app.battle.dIdx) {
       const d = app.battle.dIdx;
       app.pendingRepeat = setTimeout(() => {
@@ -3089,6 +3393,7 @@
       }, 3e3);
     }
     app.render(true);
+    if (r.first && app.storyOnce) app.storyOnce("post" + b.dIdx);
   }
 
   // src/ui/main.js
@@ -3139,11 +3444,17 @@
     if (a !== "salvageupto") app.salvConfirm = false;
     if (a !== "firemany") app.fireConfirm = false;
     switch (a) {
-      case "fight":
-        stopIdleFor(+t.dataset.d);
-        startBattle(+t.dataset.d);
-        app.tab = "battle";
-        break;
+      case "fight": {
+        const d = +t.dataset.d;
+        stopIdleFor(d);
+        const go = () => {
+          startBattle(d);
+          app.tab = "battle";
+          render();
+        };
+        if (!storyOnce(d === CH1_TOP + 1 ? ["post" + CH1_TOP, "pre" + d] : "pre" + d, go)) go();
+        return;
+      }
       case "mythic":
         stopIdleFor(-1);
         startMythic(+t.dataset.d);
@@ -3238,6 +3549,13 @@
       case "settings":
         openModal({ type: "settings" });
         return;
+      case "mode":
+        app.mode = t.dataset.v;
+        break;
+      case "chapter":
+        app.chapter = +t.dataset.v;
+        if (app.chapter === 1) storyOnce("post6");
+        break;
       case "close-settings":
         closeModal();
         return;
@@ -3443,6 +3761,16 @@
         app.S.autoSalvageBelow = +t.dataset.v;
         save();
         break;
+      case "ilvlgap":
+        app.S.salvageIlvlGap = +t.dataset.v;
+        save();
+        break;
+      case "salvlow": {
+        const r = salvageLowIlvl(app.S, app.S.salvageIlvlGap || 10);
+        toast(tx("\u5206\u89E3 {0} \u4EF6\uFF0C\u7372\u5F97 {1} \u91D1", r.count, fmt(r.gold)));
+        save();
+        break;
+      }
       case "keeprar":
         app.S.keepRarity = +t.dataset.v;
         save();
@@ -3670,6 +3998,16 @@
     toast(tx("\u5DF2\u505C\u6B62\u639B\u6A5F"));
     save();
   }
+  function storyOnce(keys, done) {
+    const seen = app.S.story.seen, todo = [].concat(keys).filter((k) => STORY[k] && !seen.includes(k));
+    if (!todo.length) return false;
+    seen.push(...todo);
+    save();
+    playDialog(todo.flatMap((k) => STORY[k]), done || (() => {
+    }));
+    return true;
+  }
+  app.storyOnce = storyOnce;
   function resumeIdle() {
     if (app.S.idleMythic != null && mythicIdleLevel(app.S, app.S.idleMythic)) startMythicIdle(app.S.idleMythic);
     else if (app.S.idle != null && app.S.clears[app.S.idle]) startBattle(app.S.idle);

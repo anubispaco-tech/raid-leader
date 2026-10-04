@@ -1,5 +1,6 @@
 // v0.7.4 測試：秘境掛機（按鈕、鑰石不變、自動再開、鎖陣容）、巔峰顯示、精煉＋精華、離線秘境掛機結算
 import { createRequire } from 'module';
+import { nav } from './e2e-nav.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -32,7 +33,7 @@ const toastText = async () => (await page.locator('#toast').innerText().catch(()
 const fails = [], check = (ok, msg) => { console.log((ok ? '✅ ' : '❌ ') + msg); if (!ok) fails.push(msg); };
 const shot = n => (process.env.SHOTS || '/tmp/claude-0') + '/' + n;
 check(offOk, `離線秘境掛機 2 小時：${r && r.runs} 場、勝 ${r && r.wins}、+${r && r.gold} 金、鑰石仍 +${off.mythic.key}`);
-await page.click('[data-tab="dungeon"]');
+await page.click('[data-tab="dungeon"]'); await nav(page, 'mythic');
 const idleBtns = page.locator('.mythic [data-act="idlemythic"]');
 check(await idleBtns.count() === 1 && (await idleBtns.first().innerText()).includes('+2'), '只有限時過的副本有掛機按鈕：' + await idleBtns.first().innerText());
 await page.locator('.mythic').screenshot({ path: shot('m74-mythic.png') });
@@ -60,7 +61,7 @@ await page.screenshot({ path: shot('m74-hero.png') });
 await page.click('.scrim', { position: { x: 5, y: 5 } });
 await page.click('[data-tab="bag"]');
 check((await page.locator('main h2').first().innerText()).includes('精華'), '背包顯示精華');
-await page.click('[data-tab="dungeon"]'); await page.click('.mythic [data-act="idlemythic"]'); await page.waitForTimeout(200);
+await page.click('[data-tab="dungeon"]'); await nav(page, 'mythic'); await page.click('.mythic [data-act="idlemythic"]'); await page.waitForTimeout(200);
 check((await saved()).idleMythic == null, '停止秘境掛機｜' + await toastText());
 check(!errs.length, '無 JS 錯誤 ' + errs.join(';'));
 await browser.close();

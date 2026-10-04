@@ -48,13 +48,25 @@ function boardCard() {
 export function viewDungeons() {
   const lv = avgPartyLv(), il = avgPartyIlvl();
   let h = nextStepCard() + tx('<h2>副本</h2><p class="sub">隊伍平均 <b class="num">Lv{0}</b>・裝等 <b class="num">{1}</b>・戰力 <b class="num">{2}</b>　｜　每隻首領都有弱點，打不過就換陣容，或回頭刷裝備。</p>', lv, il, fmt(partyPower()));
-  h += vaultSection() + mythicSection() + `<div class="dlist">`;
+  // 遊玩分類：主線／秘境／寶庫／活動（之後的節慶、裝備副本放「活動」）
+  const S = app.S, mode = app.mode || 'story';
+  const modes = [['story', tx('主線')], ['mythic', tx('秘境')], ['vault', tx('寶庫')], ['event', tx('活動')]];
+  h += `<div class="seg modes">${modes.map(([k, n]) => `<button data-act="mode" data-v="${k}" class="${mode === k ? 'sel' : ''}">${n}</button>`).join('')}</div>`;
+  if (mode === 'mythic') return h + mythicSection() + boardCard();
+  if (mode === 'vault') return h + vaultSection();
+  if (mode === 'event') return h + `<div class="mythic locked"><b>${tx('活動')}</b><span class="sub" style="margin:0">${tx('即將推出：節慶副本、裝備副本等限時活動會放在這裡。')}</span></div>`;
+  // 主線：章節分頁
+  const chs = G.CHAPTERS, open = c => S.unlocked - 1 >= chs[c].floors[0];
+  const ch = app.chapter != null && open(app.chapter) ? app.chapter : chs.reduce((a, c, i) => (open(i) ? i : a), 0);
+  h += `<div class="seg chapters">${chs.map((c, i) => `<button data-act="chapter" data-v="${i}" class="${ch === i ? 'sel' : ''}" ${open(i) ? '' : 'disabled'}>${c.name}・${c.sub}${open(i) ? '' : ' 🔒'}</button>`).join('')}</div>`;
+  h += `<div class="dlist">`;
   G.DUNGEONS.forEach((_, i) => {
+    if (i < chs[ch].floors[0] || i > chs[ch].floors[1]) return;
     const d = G.dungeonInfo(i), locked = i >= app.S.unlocked, clears = app.S.clears[i] || 0;
     const idleHere = app.S.idle === i;
     h += tx('<div class="dg {0}"> <div class="tier">{1}<small>第 {2} 層</small></div> <h3>{3}<span class="boss">首領・{4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>建議 <b class="num {6}">Lv{7}</b></span> <span>裝等 <b class="num {8}">{9}</b></span> <span>掉落 <b class="num">{10}</b></span> <span>通關 <b class="num">{11}</b> 次</span> </div> <div class="acts">{12} </div></div>', locked ? 'locked' : '', G.ROMAN[i], i + 1, d.name, d.boss, d.tip, lv >= d.recLevel ? 'ok' : 'low', d.recLevel, il >= d.recIlvl ? 'ok' : 'low', d.recIlvl, d.dropIlvl, clears, locked ? tx('<span class="sub" style="margin:0">先通關上一層</span>') :
         tx('<button class="btn main grow" data-act="fight" data-d="{0}">挑戰</button> <button class="btn {1}" data-act="idle" data-d="{2}" {3}>{4}</button> <button class="btn" data-act="prepare" data-d="{5}" aria-label="{6}">備戰</button>', i, idleHere ? 'on' : '', i, clears ? '' : tx('disabled title="通關一次後才能掛機"'), idleHere ? tx('掛機中・停止') : tx('掛機刷'), i, G.partyLocked(app.S) ? tx('一鍵備戰：掛機中只調天賦、裝備') : tx('一鍵備戰：陣容、天賦、裝備')));
   });
-  h += `</div>` + boardCard() + tx('<div class="howto" style="margin-top:16px"><b>備戰</b>：依這層首領的弱點，自動排好陣容、天賦與裝備（掛機中陣容鎖定，只調天賦與裝備）。<br><b>掛機刷</b>：自動重複挑戰，關掉頁面也會累積（最多 {0} 小時），回來時一次結算。<br><b>存檔</b>：進度存在這支手機的瀏覽器。要換手機玩，到「團隊」最下方匯出存檔碼。</div>', G.ECONOMY.offlineCapHours);
+  h += `</div>` + tx('<div class="howto" style="margin-top:16px"><b>備戰</b>：依這層首領的弱點，自動排好陣容、天賦與裝備（掛機中陣容鎖定，只調天賦與裝備）。<br><b>掛機刷</b>：自動重複挑戰，關掉頁面也會累積（最多 {0} 小時），回來時一次結算。<br><b>存檔</b>：進度存在這支手機的瀏覽器。要換手機玩，到「團隊」最下方匯出存檔碼。</div>', G.ECONOMY.offlineCapHours);
   return h;
 }

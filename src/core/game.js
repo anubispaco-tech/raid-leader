@@ -3,10 +3,11 @@
 import { CLASSES, HERO, SLOTS, DUNGEONS, REWARD, ECONOMY, GEAR, BAG_MILESTONES, BAG_PER_MILESTONE, HERO_RARITY, LEGENDS, RECRUIT } from './config.js';
 import { R, rnd, rint, pick } from './rng.js';
 import { makeItem, rollRarity, itemScore, salvageValue, salvageDust, upgradeCost, dustCost } from './items.js';
-import { makeHero, gainXp, heroPower, roleOf } from './heroes.js';
+import { makeHero, gainXp, heroPower, roleOf, heroIlvl } from './heroes.js';
+import { getLang } from './i18n.js';
 import { dungeonInfo } from './dungeons.js';
 import { SPECS, TALENT_ROWS, SPEC_LEVEL, applyRecommend } from './talents.js';
-import { MYTHIC } from './config.js';
+import { MYTHIC, CH1_TOP } from './config.js';
 import { mythicRewards, keyChange, mythicBattleOpts } from './mythic.js';
 import { Battle } from './battle.js';
 
@@ -31,7 +32,7 @@ export function rewards(dIdx, win, firstClear) {
 // 等級壓制：等級高於建議 decayGrace 級後，經驗與金幣遞減
 function decayFor(dIdx) {
   const rec = dungeonInfo(dIdx).recLevel;
-  const floor = dIdx === DUNGEONS.length - 1 ? REWARD.decayFloorTop : REWARD.decayFloor;
+  const floor = dIdx >= CH1_TOP ? REWARD.decayFloorTop : REWARD.decayFloor; // 第 7 層與第二章：後期仍可掛機
   return L => Math.max(floor, Math.min(1, 1 - REWARD.decayPerLevel * (L - (rec + REWARD.decayGrace))));
 }
 
@@ -40,8 +41,8 @@ export function newGame() {
   const s = { v: SAVE_VERSION, gold: ECONOMY.startGold, heroes: [], items: {}, bag: [], party: [], unlocked: 1, clears: {},
     tavern: [], idle: null, lastSeen: Date.now(), stats: { runs: 0, wins: 0 }, autoSalvageBelow: 0, keepRarity: ECONOMY.defaultKeepRarity, stash: [], created: Date.now(),
     mythic: { key: MYTHIC.startKey, best: {}, runs: 0, timed: 0 }, failStreak: 0, player: newPlayer(), bagSeen: [],
-    recruit: { sinceEpic: 0, sinceLegend: 0, total: 0 }, vault: { day: '', used: 0, runs: 0, best: {} }, dust: 0, idleMythic: null };
-  for (const c of HERO.starters) { const h = makeHero(c); s.heroes.push(h); s.party.push(h.id); }
+    recruit: { sinceEpic: 0, sinceLegend: 0, total: 0 }, vault: { day: '', used: 0, runs: 0, best: {} }, dust: 0, idleMythic: null, salvageIlvlGap: 0, story: { seen: [] } };
+  for (const c of HERO.starters) { const h = makeHero(c); h.name = uniqueName(s); s.heroes.push(h); s.party.push(h.id); }
   rollTavern(s);
   return s;
 }
@@ -69,6 +70,9 @@ export function migrate(s) {
   // v0.7.4：精華（精煉材料）、秘境掛機
   if (s.dust == null) s.dust = 0;
   if (s.idleMythic === undefined) s.idleMythic = null;
+  // v0.9.0：依裝等自動分解、劇情進度
+  if (s.salvageIlvlGap == null) s.salvageIlvlGap = 0;
+  s.story = s.story || { seen: [] };
   s.v = SAVE_VERSION;
   return s;
 }
@@ -98,10 +102,18 @@ function newRecruit(s, level) {
   const r = rollHeroRarity(s);
   const cls = r === 4 ? pick(legendsAvailable(s)) : pick(Object.keys(CLASSES));
   const h = makeHero(cls, level, r);
+  if (!h.legend) h.name = uniqueName(s);
   // 高等級的新英雄自帶隨機專精與天賦（招募後可以自己改）
   if (h.level >= SPEC_LEVEL) h.spec = pick(Object.keys(CLASSES[h.cls].specs));
   for (const lv of TALENT_ROWS) if (h.level >= lv) h.talents[lv] = pick(['a', 'b']);
   return h;
+}
+// 名字・稱號，避開名冊與酒館已有的名字
+function uniqueName(s) {
+  const taken = new Set([...s.heroes, ...(s.tavern || [])].map(h => h.name)), sep = getLang() === 'en' ? ' ' : '・';
+  let n = '';
+  for (let i = 0; i < 30; i++) { n = pick(HERO.names) + sep + pick(HERO.titles); if (!taken.has(n)) break; }
+  return n;
 }
 const recruitLevel = s => Math.max(1, Math.round(avgLevel(s.heroes)) - 1);
 export function rollTavern(s) {
@@ -175,7 +187,16 @@ export function newBagMilestones(s) {
   return fresh;
 }
 // 新掉落的去向：自動分解 → 背包 → 戰利品箱（只收 keepRarity 以上）→ 分解成金幣
+// 出戰隊員的平均裝等（依裝等自動分解用）
+export const partyIlvl = s => { const p = partyHeroes(s); return p.length ? p.reduce((a, h) => a + heroIlvl(h, s.items), 0) / p.length : 0; };
+// 分解背包裡比平均裝等低 gap 以上的裝備（傳說除外）
+export function salvageLowIlvl(s, gap, dry = false) {
+  const lim = partyIlvl(s) - gap, ids = s.bag.filter(i => s.items[i].rarity < 4 && s.items[i].ilvl < lim);
+  if (dry) return { count: ids.length };
+  return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
+}
 function addLoot(s, it) {
+  if (s.salvageIlvlGap && it.rarity < 4 && it.ilvl < partyIlvl(s) - s.salvageIlvlGap) { s.gold += salvageValue(it); s.dust = (s.dust || 0) + salvageDust(it); return 'salvaged'; }
   if (it.rarity < s.autoSalvageBelow) { s.gold += salvageValue(it); s.dust = (s.dust || 0) + salvageDust(it); return 'salvaged'; }
   if (s.bag.length < bagMax(s)) { s.items[it.id] = it; s.bag.push(it.id); return 'bag'; }
   if (it.rarity >= s.keepRarity && s.stash.length < ECONOMY.stashMax) { s.items[it.id] = it; s.stash.push(it.id); return 'stash'; }

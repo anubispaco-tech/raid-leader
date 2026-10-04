@@ -10,7 +10,7 @@ import { viewTeam } from './views/team.js';
 import { viewBag } from './views/bag.js';
 import { viewTavern } from './views/tavern.js';
 import { renderModal, openModal, closeModal, playDialog } from './views/sheets.js';
-import { PROLOGUE } from './story.js';
+import { PROLOGUE, STORY } from './story.js';
 import { LANGS, getLang, setLang, localName } from '../core/i18n.js';
 import { startBattle, startMythic, startMythicIdle, startVault, runTimer, finishBattle } from './battle-runner.js';
 import * as T from './telemetry.js';
@@ -56,7 +56,8 @@ document.addEventListener('click', e => {
   if (a !== 'salvageupto') app.salvConfirm = false;
   if (a !== 'firemany') app.fireConfirm = false;
   switch (a) {
-    case 'fight': stopIdleFor(+t.dataset.d); startBattle(+t.dataset.d); app.tab = 'battle'; break;
+    case 'fight': { const d = +t.dataset.d; stopIdleFor(d); const go = () => { startBattle(d); app.tab = 'battle'; render(); };
+      if (!storyOnce(d === G.CH1_TOP + 1 ? ['post' + G.CH1_TOP, 'pre' + d] : 'pre' + d, go)) go(); return; }
     case 'mythic': stopIdleFor(-1); startMythic(+t.dataset.d); app.tab = 'battle'; window.scrollTo(0, 0); break;
     case 'vault': if (G.vaultLeft(app.S)) stopIdleFor(-1); if (startVault(+t.dataset.d)) { app.tab = 'battle'; window.scrollTo(0, 0); } break;
     case 'vaultfloor': app.vaultFloor = +t.dataset.d; break;
@@ -90,6 +91,8 @@ document.addEventListener('click', e => {
     case 'dlgnext': if (app.modal && app.modal.type === 'dialog') { if (app.modal.i < app.modal.lines.length - 1) { app.modal.i++; renderModal(); } else closeModal(); } return;
     case 'dlgskip': closeModal(); return;
     case 'settings': openModal({ type: 'settings' }); return;
+    case 'mode': app.mode = t.dataset.v; break;
+    case 'chapter': app.chapter = +t.dataset.v; if (app.chapter === 1) storyOnce('post6'); break;
     case 'close-settings': closeModal(); return;
     case 'replaystory': playDialog(PROLOGUE, () => openModal({ type: 'settings' })); return;
     case 'lang': if (t.dataset.v !== getLang()) { // 新玩家還沒按開始就換語言：不留存檔，重新載入後仍是「開始冒險」
@@ -157,6 +160,8 @@ document.addEventListener('click', e => {
       toast(r.left ? tx('背包和戰利品箱都滿了，還有 {0} 件沒卸下', r.left) : tx('已卸下 {0} 件{1}', r.moved + r.stashed, r.stashed ? tx('（{0} 件放進戰利品箱）', r.stashed) : '')); save(); break;
     }
     case 'autosalv': app.S.autoSalvageBelow = +t.dataset.v; save(); break;
+    case 'ilvlgap': app.S.salvageIlvlGap = +t.dataset.v; save(); break;
+    case 'salvlow': { const r = G.salvageLowIlvl(app.S, app.S.salvageIlvlGap || 10); toast(tx('分解 {0} 件，獲得 {1} 金', r.count, fmt(r.gold))); save(); break; }
     case 'keeprar': app.S.keepRarity = +t.dataset.v; save(); break;
     case 'takestash': { const n = G.takeFromStash(app.S); toast(n ? tx('取出 {0} 件', n) : tx('背包已滿')); save(); break; }
     case 'salvagestash': { const r = G.salvageStash(app.S); toast(tx('分解 {0} 件，獲得 {1} 金', r.count, r.gold)); save(); break; }
@@ -269,6 +274,13 @@ function stopIdleFor(d) {
   app.S.idleMythic = null; if (i) app.S.idle = null;
   clearTimeout(app.pendingRepeat); app.pendingRepeat = null; toast(tx('已停止掛機')); save();
 }
+// 劇情只播一次：沒看過就播放並記錄，回傳 true；看過了回傳 false（不呼叫 done）
+function storyOnce(keys, done) {
+  const seen = app.S.story.seen, todo = [].concat(keys).filter(k => STORY[k] && !seen.includes(k));
+  if (!todo.length) return false;
+  seen.push(...todo); save(); playDialog(todo.flatMap(k => STORY[k]), done || (() => {})); return true;
+}
+app.storyOnce = storyOnce;
 function resumeIdle() {
   if (app.S.idleMythic != null && G.mythicIdleLevel(app.S, app.S.idleMythic)) startMythicIdle(app.S.idleMythic);
   else if (app.S.idle != null && app.S.clears[app.S.idle]) startBattle(app.S.idle);

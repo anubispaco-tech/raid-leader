@@ -5,6 +5,7 @@ import { ready, specCd, fx, spec, baseCd, SPEC_ROW } from './shared.js';
 const P = {
   id: 'guardian', name: tx('守護騎士'), role: 'tank', icon: '🛡️', hp: 230, hpL: 42, pow: 6, powL: 1.5, armor: 0.45, crit: 0.05,
   desc: tx('嘲諷所有敵人，承受傷害。護甲減傷 45%。'),
+  kick: () => true, // 盾牌猛擊可以打斷讀條
   ai: { hit: 0.8 },
   base: { name: tx('盾牌猛擊'), cd: 8, mult: 2.5, weaken: 0.3, weakenDur: 4, desc: tx('冷卻 8 秒：威力 ×2.5 傷害，目標攻擊 −30% 持續 4 秒') },
   specs: {
@@ -21,8 +22,10 @@ const P = {
     SPEC_ROW,
     { a: { name: tx('盾牆'), desc: tx('生命低於 50% 時再減傷 15%'), mods: { lowHpReduce: 0.15 } },
       b: { name: tx('正義之錘'), desc: tx('傷害 +20%'), mods: { dmgMult: 1.2 } } },
+    { a: { name: tx('不動如山'), desc: tx('受到的所有傷害 −10%'), mods: { allReduce: 0.1 } },
+      b: { name: tx('神聖憤怒'), desc: tx('盾牌猛擊冷卻 8 → 6 秒'), mods: { baseCd: 6 } } },
   ],
-  recommend: has => ({ spec: has('buster') ? 'prot' : 'ret', t: ['a', has('buster') ? 'a' : 'b', 'a', 'b', has('enrage') ? 'b' : 'a'] }),
+  recommend: has => ({ spec: has('buster') ? 'prot' : 'ret', t: ['a', has('buster') ? 'a' : 'b', 'a', 'b', has('enrage') ? 'b' : 'a', has('enrage') ? 'b' : 'a'] }),
   legend: {
     name: tx('巴洛斯'), title: tx('鐵壁'), passive: 'undying', pname: tx('不屈'), desc: tx('每場第一次受到致命傷害改為剩 1 血並無敵 3 秒；在場時全隊受到的傷害 −8%'),
     hooks: {

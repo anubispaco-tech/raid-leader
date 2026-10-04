@@ -1,5 +1,6 @@
 // v0.8.1 測試：開始畫面、切換英文、序章對話、英文介面殘留中文檢查與截圖
 import { createRequire } from 'module';
+import { nav } from './e2e-nav.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -62,7 +63,7 @@ const route = p => p.route('**/*', r => { const u = new URL(r.request().url()); 
   check((await page.locator('.sheet h3').innerText()) === 'Settings', '點標題開啟設定（英文）');
   await page.screenshot({ path: `${shots}/i18n-settings.png` });
   await page.click('[data-act="close-settings"]');
-  await page.click('[data-tab="dungeon"]'); await page.click('.dg [data-act="fight"][data-d="3"]'); await page.waitForTimeout(2500); await scan('battle');
+  await page.click('[data-tab="dungeon"]'); await nav(page, 'story0'); await page.click('.dg [data-act="fight"][data-d="3"]'); await page.waitForTimeout(2500); await scan('battle');
   await page.screenshot({ path: `${shots}/i18n-battle.png` });
   await page.click('[data-act="skip"]'); await page.waitForTimeout(300); await scan('result');
   await page.screenshot({ path: `${shots}/i18n-result.png`, fullPage: true });

@@ -29,6 +29,29 @@ const BOSS_MECHS = {
     b.isBuster = true;
     return m.mult;
   },
+  // ---- 第二章 ----
+  // 詛咒：隨機點名一名隊員，每秒失去最大生命的 pct，持續 dur 秒；治療職責會用「淨化」解除
+  curse(b, e, m) {
+    if (b.waveTick % m.every) return 1;
+    const pool = b.alive().filter(u => !(u.curse > b.tick)); if (!pool.length) return 1;
+    const u = pick(pool); u.curse = b.tick + m.dur; u.cursePct = m.pct;
+    b.push(tx('☠ {0} 詛咒了 {1}', e.name, u.name), 'warn');
+    return 1;
+  },
+  // 讀條：time 秒後全隊受到魔法傷害（攻擊 × mult）；能打斷的職業會在讀條時打斷
+  cast(b, e, m) {
+    if (b.waveTick % m.every || e.casting) return 1;
+    e.casting = { until: b.tick + m.time, mult: m.mult };
+    b.push(tx('📖 {0} 開始讀條（{1} 秒）', e.name, m.time), 'warn');
+    return 1;
+  },
+  // 護盾：獲得最大生命 pct 的護盾，window 秒內沒打破就回復 heal 的生命
+  shield(b, e, m) {
+    if (b.waveTick % m.every) return 1;
+    e.bshield = Math.round(e.max * m.pct); e.bshieldUntil = b.tick + m.window; e.bshieldHeal = m.heal;
+    b.push(tx('🛡 {0} 張開護盾！{1} 秒內打破它', e.name, m.window), 'warn');
+    return 1;
+  },
   summon(b, e, m) {
     if (b.waveTick % m.every) return 1;
     for (let k = 0; k < m.n; k++) b.enemies.push({ name: tx('召喚物'), hp: e.addHp, max: e.addHp, atk: e.addAtk, boss: false, id: uid() });
@@ -101,6 +124,10 @@ export class Battle {
     if (crit) amt *= m.critDmg || 2;
     if (crit && !o.dot && u.lh.onCrit) u.lh.onCrit(this, u, e);       // 傳說掛勾：暴擊後
     amt = Math.min(e.hp, Math.round(amt * rnd(0.92, 1.08)));
+    if (e.bshield > 0) { // 首領護盾先吸收
+      const ab = Math.min(e.bshield, amt); e.bshield -= ab; e.hp += ab;
+      if (e.bshield === 0) this.push(tx('💥 {0} 的護盾被打破了', e.name), 'good');
+    }
     e.hp -= amt; u.dmgDone += amt; if (o.skill || o.dot) u.skillDmg += amt;
     if (u.hk.afterHit) u.hk.afterHit(this, u, e, amt, o);           // 掛勾：命中後（吸血、疊毒、額外目標…）
     if (e.hp === 0) {
@@ -162,6 +189,19 @@ export class Battle {
     if (src.lh.onHeal && !raw) src.lh.onHeal(this, src, tgt, amt, h); // 傳說掛勾：治療後
     return h;
   }
+  // 通用技能：能打斷的職業打斷讀條；治療職責淨化詛咒。回傳 true 表示用掉了這一秒
+  utility(u, foes) {
+    const caster = foes.find(e => e.casting);
+    if (caster && u.pack.kick && u.pack.kick(u) && (u.cd.kick || 0) <= this.tick) {
+      caster.casting = null; u.cd.kick = this.tick + (u.mods.kickCd || 12);
+      this.skillLog(u, tx('打斷'), caster); return true;
+    }
+    if (u.role === 'heal' && (u.cd.dispel || 0) <= this.tick) {
+      const c = this.alive().find(x => x.curse > this.tick);
+      if (c) { c.curse = 0; u.cd.dispel = this.tick + (u.mods.dispelCd || 6); this.skillLog(u, tx('淨化'), c); return true; }
+    }
+    return false;
+  }
   enemyTarget() {
     const a = this.alive(); if (!a.length) return null;
     return a.find(u => u.role === 'tank') || pick(a);
@@ -173,6 +213,11 @@ export class Battle {
       if (e.poison && e.poisonSrc) this.hitEnemy(e.poisonSrc, e, e.poison * e.poisonPer * e.poisonSrc.pow, { dot: true });
       if (e.bleed && e.bleed.until >= this.tick && e.hp > 0) this.hitEnemy(e.bleed.src, e, e.bleed.amt, { dot: true });
     }
+    for (const e of this.foes()) if (e.bshield > 0 && this.tick >= e.bshieldUntil) { // 護盾時間到：首領回血
+      e.bshield = 0; const h = Math.round(e.max * e.bshieldHeal); e.hp = Math.min(e.max, e.hp + h);
+      this.push(tx('💚 護盾沒被打破，{0} 回復了 {1} 生命', e.name, h), 'bad');
+    }
+    for (const u of this.alive()) if (u.curse > this.tick) this.hitHero(u, u.max * u.cursePct, 'magic');
     for (const u of this.alive()) {
       u.hots = u.hots.filter(h => h.until >= this.tick);
       for (const h of u.hots) this.heal(h.src, u, h.amt);
@@ -187,6 +232,7 @@ export class Battle {
     this.tickEffects();
     for (const u of this.alive()) {
       const foes = this.foes(); if (!foes.length) break;
+      if (this.utility(u, foes)) continue; // 打斷讀條、淨化詛咒（用掉這一秒的行動）
       u.pack.act(this, u, foes, foes.find(e => !e.boss) || foes[0]);
     }
     for (const e of this.foes()) {
@@ -196,6 +242,11 @@ export class Battle {
       if (!e.boss && this.has('raging') && e.hp < e.max * 0.3) atk *= 1.5; // 暴怒
       if (e.boss) for (const m of e.mech || []) atk *= BOSS_MECHS[m.t](this, e, m, tgt);
       if (tgt.hp > 0) this.hitHero(tgt, atk, this.isBuster ? 'buster' : 'phys', e);
+    }
+    for (const e of this.foes()) if (e.casting && this.tick >= e.casting.until) { // 讀條完成：全隊受傷
+      const c = e.casting; e.casting = null;
+      this.push(tx('💥 {0} 讀條完成，全隊受到重創', e.name), 'bad');
+      for (const u of this.alive()) this.hitHero(u, e.atk * c.mult * this.weakMult(e), 'magic');
     }
     if (this.has('volcanic') && this.waveTick % 8 === 0 && this.alive().length) { // 火山
       const u = pick(this.alive()); this.push(tx('🌋 火山爆發，{0} 受到傷害', u.name), 'warn');

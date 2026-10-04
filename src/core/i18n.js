@@ -16,6 +16,7 @@ let REV = null;
 export function localName(s) {
   if (!s) return s;
   const en = DICTS.en;
+  if (s.includes('・') && lang === 'en') { const [a, b] = s.split('・'); if (en[a] && en[b]) return en[a] + ' ' + en[b]; } // 名字・稱號
   if (lang === 'en') {
     if (en[s]) return en[s];
     const i = s.indexOf('的'); // 裝備名 = 「xx的」前綴 + 名詞
@@ -24,6 +25,7 @@ export function localName(s) {
   }
   if (!REV) { REV = {}; for (const [k, v] of Object.entries(en)) if (v.length < 24 && !(v in REV)) REV[v] = k; }
   if (REV[s]) return REV[s];
+  const sp = s.split(' '); if (sp.length === 2 && REV[sp[0]] && REV[sp[1]]) return REV[sp[0]] + '・' + REV[sp[1]]; // Name Title → 名字・稱號
   const j = s.indexOf(' ');
   if (j > 0 && REV[s.slice(0, j + 1)] && REV[s.slice(j + 1)]) return REV[s.slice(0, j + 1)] + REV[s.slice(j + 1)];
   return s;

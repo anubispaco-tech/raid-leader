@@ -1,5 +1,6 @@
 // 遊玩數據測試：用假的 GAS 回應，檢查暱稱、送出內容、排行榜、回饋、HTML 跳脫
 import { createRequire } from 'module';
+import { nav } from './e2e-nav.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -29,7 +30,7 @@ await page.fill('#nickInp', '測試員'); await page.click('[data-act="savenick"
 out.push('送出 snapshot：' + JSON.stringify(posts.find(p => p.type === 'snapshot')));
 await page.click('[data-act="fight"][data-d="0"]'); await page.click('[data-act="skip"]'); await page.waitForTimeout(500);
 out.push('首通事件：' + JSON.stringify(posts.find(p => p.type === 'event')));
-await page.click('[data-tab="dungeon"]'); await page.waitForTimeout(800);
+await page.click('[data-tab="dungeon"]'); await nav(page, 'mythic'); await page.waitForTimeout(800);
 out.push('排行榜：' + (await page.locator('.board li').allInnerTexts()).map(t => t.replace(/\n/g, ' ')).join('｜'));
 out.push('自己被標示：' + await page.locator('.board li.me').count() + '｜惡意名稱沒變成圖片：' + (await page.locator('.board img').count() === 0));
 await page.locator('.boardcard').screenshot({ path: '/tmp/claude-0/m-board.png' });

@@ -7,7 +7,7 @@ export const BASE_SKILLS = Object.fromEntries(Object.entries(PACKS).map(([k, p])
 export const SPECS = Object.fromEntries(Object.entries(PACKS).map(([k, p]) => [k, p.specs]));
 export const TALENTS = Object.fromEntries(Object.entries(PACKS).map(([k, p]) => [k, p.talents]));
 export const SPEC_LEVEL = 10;
-export const TALENT_ROWS = [5, 15, 20, 25, 30];
+export const TALENT_ROWS = [5, 15, 20, 25, 30, 40];
 
 // ---------- 英雄的天賦狀態 ----------
 export const unlockedRows = h => TALENT_ROWS.filter(lv => h.level >= lv);

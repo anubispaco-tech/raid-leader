@@ -1,6 +1,6 @@
 // ===== 傳奇秘境：鑰石、每日詞綴、敵人成長、結算 =====
 import { tx } from './i18n.js';
-import { DUNGEONS, DUNGEON, MYTHIC, REWARD, SLOTS, RARITY } from './config.js';
+import { DUNGEONS, DUNGEON, MYTHIC, REWARD, SLOTS, RARITY, CH1_TOP } from './config.js';
 import { R, rnd, rint, pick } from './rng.js';
 import { buildWaves, dropIlvl } from './dungeons.js';
 import { makeItem, rollRarity } from './items.js';
@@ -36,7 +36,7 @@ export const affixHints = list => list.map(a => AFFIXES[a].hint);
 export const mythicTimer = dIdx => MYTHIC.timer[dIdx];
 export function buildMythicWaves(dIdx, level, affixes) {
   // 以第 7 層的強度為基準，套用該副本自己的首領機制，再乘上秘境等級
-  const top = DUNGEONS.length - 1;
+  const top = CH1_TOP; // 秘境以第一章第 7 層為基準
   const base = buildWaves(top), own = buildWaves(dIdx);
   const sh = Math.pow(MYTHIC.hpGrowth, level), sa = Math.pow(MYTHIC.atkGrowth, level);
   const fort = affixes.includes('fortified'), tyr = affixes.includes('tyrannical');
@@ -49,14 +49,14 @@ export function buildMythicWaves(dIdx, level, affixes) {
 }
 export function mythicBattleOpts(dIdx, level, date) {
   const affixes = activeAffixes(level, date);
-  const top = DUNGEONS.length - 1;
+  const top = CH1_TOP; // 秘境以第一章第 7 層為基準
   return { mythic: { dIdx, level, affixes, timer: mythicTimer(dIdx), volcanic: buildWaves(top)[0][0].atk * Math.pow(MYTHIC.atkGrowth, level) * 2.5 },
     waves: buildMythicWaves(dIdx, level, affixes), maxTicks: mythicTimer(dIdx) + MYTHIC.overtime };
 }
 
 // ---------- 結算 ----------
 export function mythicRewards(level, inTime) {
-  const top = DUNGEONS.length - 1;
+  const top = CH1_TOP; // 秘境以第一章第 7 層為基準
   const gold = Math.round((REWARD.goldBase + REWARD.goldPerTier * top) * MYTHIC.goldMult * (1 + 0.05 * level) * rnd(0.9, 1.1));
   const xp = Math.round(REWARD.xpBase * Math.pow(top + 1, REWARD.xpExp) * MYTHIC.xpMult * (1 + 0.1 * level));
   const n = inTime ? 2 : 1, loot = [];

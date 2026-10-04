@@ -5,7 +5,8 @@ import { ready, specCd, spec, baseCd, SPEC_ROW } from './shared.js';
 const P = {
   id: 'rogue', name: tx('暗影盜賊'), role: 'dps', icon: '🗡️', hp: 140, hpL: 24, pow: 10, powL: 2.3, armor: 0.2, crit: 0.15,
   desc: tx('單體爆發，暴擊率高。擅長打王。'),
-  prefers: ['enrage'], // 推薦陣容：遇到這些機制時優先帶
+  prefers: ['enrage', 'cast'],
+  kick: () => true, // 腳踢 // 推薦陣容：遇到這些機制時優先帶
   ai: { hit: 1.3 },
   base: { name: tx('剔骨'), cd: 6, mult: 3.5, desc: tx('冷卻 6 秒：對首領造成威力 ×3.5') },
   specs: {
@@ -22,8 +23,10 @@ const P = {
     SPEC_ROW,
     { a: { name: tx('暗影之舞'), desc: tx('剔骨冷卻 6 → 4 秒'), mods: { baseCd: 4 } },
       b: { name: tx('冷血'), desc: tx('每波第一次攻擊必定暴擊'), mods: { coldBlood: 1 } } },
+    { a: { name: tx('腳踢精通'), desc: tx('打斷冷卻 12 → 8 秒'), mods: { kickCd: 8 } },
+      b: { name: tx('毒刃'), desc: tx('傷害 +12%'), mods: { dmgMult: 1.12 } } },
   ],
-  recommend: has => ({ spec: has('summon') ? 'combat' : 'assa', t: ['b', 'b', has('summon') ? 'b' : 'a', 'b', 'a'] }),
+  recommend: has => ({ spec: has('summon') ? 'combat' : 'assa', t: ['b', 'b', has('summon') ? 'b' : 'a', 'b', 'a', has('cast') ? 'a' : 'b'] }),
   legend: {
     name: tx('卡西恩'), title: tx('影刃'), passive: 'chain', pname: tx('連鎖暴擊'), desc: tx('暴擊後的下一次攻擊必定暴擊，每 6 秒最多一次'),
     hooks: {

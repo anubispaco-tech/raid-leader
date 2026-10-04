@@ -5,7 +5,8 @@ import { ready, specCd, fx, spec, baseCd, SPEC_ROW } from './shared.js';
 const P = {
   id: 'mage', name: tx('奧術法師'), role: 'dps', icon: '🔥', hp: 115, hpL: 19, pow: 9, powL: 2.1, armor: 0.1, crit: 0.08,
   desc: tx('範圍傷害，同時攻擊所有敵人。擅長清小怪。'),
-  prefers: ['summon'],
+  prefers: ['summon', 'shield'],
+  kick: u => !!u.mods.canKick, // 學了「法術反制」才能打斷
   ai: { aoe: 0.72, single: 1.0 },
   base: { name: tx('烈焰風暴'), cd: 9, mult: 2, desc: tx('冷卻 9 秒：全體敵人威力 ×2') },
   specs: {
@@ -22,8 +23,10 @@ const P = {
     SPEC_ROW,
     { a: { name: tx('炎爆術'), desc: tx('每 10 秒對首領造成威力 ×5'), mods: { pyro: 5 } },
       b: { name: tx('暴風雪'), desc: tx('烈焰風暴冷卻 9 → 6 秒'), mods: { baseCd: 6 } } },
+    { a: { name: tx('法術反制'), desc: tx('可以打斷首領讀條（冷卻 12 秒）'), mods: { canKick: 1 } },
+      b: { name: tx('奧術專精'), desc: tx('暴擊率 +6%'), mods: { critAdd: 0.06 } } },
   ],
-  recommend: has => ({ spec: has('summon') ? 'frost' : 'fire', t: ['a', 'b', has('summon') ? 'a' : 'b', 'b', 'a'] }),
+  recommend: has => ({ spec: has('summon') ? 'frost' : 'fire', t: ['a', 'b', has('summon') ? 'a' : 'b', 'b', 'a', has('cast') ? 'a' : 'b'] }),
   legend: {
     name: tx('莉薇亞'), title: tx('星火'), passive: 'molten', pname: tx('熔熱'), desc: tx('烈焰風暴冷卻 −50%，擊殺敵人時再減 1 秒'),
     hooks: {

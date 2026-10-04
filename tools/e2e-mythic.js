@@ -1,5 +1,6 @@
 // 秘境測試：用模擬玩到通關第 7 層的存檔 → 秘境區塊、推薦天賦、挑戰、計時、結算鑰石
 import { createRequire } from 'module';
+import { nav } from './e2e-nav.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -20,6 +21,7 @@ await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host
 await page.goto('https://app.test/'); await page.waitForTimeout(500); await page.locator('[data-act=\"skipnick\"]').click({ timeout: 1500 }).catch(() => {});
 const out = [];
 out.push('下一步卡：' + ((await page.locator('.nextstep').count()) ? (await page.locator('.nextstep b').innerText()) : '（無）'));
+await nav(page, 'mythic');
 out.push('秘境鑰石：' + await page.locator('.mhead .keystone').innerText() + '｜生效詞綴：' + (await page.locator('.affix.on b').allInnerTexts()).join('、'));
 await page.screenshot({ path: `${shots}/m-mythic.png` });
 await page.click('[data-act="recommend-mythic"][data-d="3"]');
