@@ -292,3 +292,13 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 .seg.mtiers{margin:6px 0 10px}.seg.mtiers button{flex:1;font-size:13px}
 .stamina{display:flex;align-items:baseline;gap:8px;padding:6px 10px;border-radius:10px;background:var(--panel2,rgba(127,127,127,.08))}
 .stamina .label{margin:0}.stamina b{font-size:16px}
+/* v0.9.4 每日 */
+.daily{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin:0 0 12px}
+.daily .dhead{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px}
+.daily .dhead .label{margin:0}.daily .dsum{flex:1;font-size:13px}.daily .chev{color:var(--muted)}
+.dbadge{min-width:20px;height:20px;border-radius:999px;background:var(--brass,#d4a64a);color:#111;font-size:12px;font-weight:700;display:inline-grid;place-items:center;padding:0 6px}
+.daily .dbody{display:grid;gap:8px;padding:0 12px 12px}
+.drow{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;font-size:13px}
+.drow:has(.dbar){grid-template-columns:1fr 70px auto}
+.dbar{height:6px;border-radius:3px;background:var(--panel2);overflow:hidden}.dbar i{display:block;height:100%;background:var(--good)}
+.dok{color:var(--good);font-weight:700;text-align:center;min-width:32px}

@@ -2,7 +2,7 @@
 import { tx } from '../../core/i18n.js';
 import * as G from '../../core/index.js';
 import { app } from '../state.js';
-import { fmt, pct, mmss, itemStatText, itemName } from '../helpers.js';
+import { fmt, pct, mmss, itemStatText, itemName, firstWinLine } from '../helpers.js';
 
 // 敵方最多顯示 4 列、固定高度，召喚物變多時不會把下面的東西往下推
 const MAX_FOE_ROWS = 4;
@@ -51,6 +51,7 @@ function viewResult() {
   const sec = Math.max(1, b.tick);
   const title = r.vault ? tx('打倒 {0} 隻哥布林', r.kills) : r.mythicIdle ? (b.win ? tx('秘境掛機・通關') : tx('秘境掛機・失敗')) : r.mythic ? (r.inTime ? tx('限時通關') : b.win ? tx('超時通關') : tx('失敗')) : (b.win ? tx('通關') : tx('失敗'));
   let h = tx('<div class="result {0}"><h3>{1}</h3>{2} {3} <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+{4}</b> 金幣</span><span><b class="num">+{5}</b> 經驗</span>{6}{7}</div>', (r.vault || (r.mythic ? r.inTime : b.win)) ? 'win' : 'lose', title, r.vault && r.record ? tx('<span class="newrec" style="justify-self:start">本層新紀錄</span>') : '', r.mythicIdle ? tx('<div class="sub" style="margin:0">掛機等級 +{0}・鑰石不變（目前 +{1}）・獎勵 {2}%</div>', b.mythic.level, G.keyOf(app.S, b.dIdx), Math.round(G.MYTHIC.idleMult * 100)) : r.mythic ? tx('<div class="keychange"><span class="keystone num">+{0}</span><span class="arrow">→</span><span class="keystone num {1}">+{2}</span> <span class="sub" style="margin:0">用時 <b class="num">{3}</b> / 限時 {4}</span>{5}</div>', r.prevKey, r.nextKey > r.prevKey ? 'up' : r.nextKey < r.prevKey ? 'down' : '', r.nextKey, mmss(b.tick), mmss(b.mythic.timer), r.record ? tx('<span class="newrec">新紀錄</span>') : '') : '', fmt(r.gold), fmt(r.xp), r.first ? tx('<span style="color:var(--brass)">首次通關：必掉稀有以上</span>') : '', r.decayed ? `<span style="color:var(--warn)">${b.dIdx === G.DUNGEONS.length - 1 ? tx('等級壓制：獎勵最低保留 {0}%，想要更多可以改用秘境掛機', Math.round(G.REWARD.decayFloorTop * 100)) : tx('這層對你太簡單了，經驗與金幣變少，往下一層吧')}</span>` : '');
+  h += firstWinLine(r.firstWin);
   if (r.lvUps.length) h += `<div style="color:var(--good);font-size:14px">⬆ ${r.lvUps.map(x => tx('{0} 升到 {1}', x.name, x.para ? tx('巔峰 {0}', x.para) : `Lv${x.level}`)).join(tx('、'))}</div>`;
   if (r.kept.length || r.stashed.length || r.salvaged) h += `<div class="stack">${r.kept.map(it => `<div class="item rar${it.rarity}"><div class="in">${itemName(it)}</div><div class="il">${G.SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div><div class="is">${itemStatText(it)}</div></div>`).join('')}${r.stashed.length ? tx('<div style="color:var(--brass);font-size:13px">背包已滿，{0} 件放進戰利品箱</div>', r.stashed.length) : ''}${r.salvaged ? tx('<div class="sub" style="margin:0">{0} 件自動分解為金幣與精華</div>', r.salvaged) : ''}</div>`;
   h += tx('<div class="meter"><span class="label">傷害 / 治療統計（每秒）</span>{0}</div>', b.units.map(u => {

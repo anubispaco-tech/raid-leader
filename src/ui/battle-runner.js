@@ -60,6 +60,7 @@ export function finishBattle() {
   app.lastResult = app.battle.vault ? G.applyVaultResult(app.S, app.battle, G.partyHeroes)
     : app.battle.mythicIdle ? G.applyMythicIdleResult(app.S, app.battle)
     : app.battle.mythic ? G.applyMythicResult(app.S, app.battle) : G.applyResult(app.S, app.battle.dIdx, app.battle);
+  G.dailyAfterBattle(app.S, app.battle, app.lastResult); // 每日任務進度、每日首勝（掛在 lastResult.firstWin）
   save();
   const r = app.lastResult, b = app.battle;
   for (const m of G.newBagMilestones(app.S)) setTimeout(() => toast(tx('🎒 {0}：背包 +{1} 格', m.name, G.BAG_PER_MILESTONE)), 400);

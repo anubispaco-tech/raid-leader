@@ -297,6 +297,16 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 .seg.mtiers{margin:6px 0 10px}.seg.mtiers button{flex:1;font-size:13px}
 .stamina{display:flex;align-items:baseline;gap:8px;padding:6px 10px;border-radius:10px;background:var(--panel2,rgba(127,127,127,.08))}
 .stamina .label{margin:0}.stamina b{font-size:16px}
+/* v0.9.4 每日 */
+.daily{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin:0 0 12px}
+.daily .dhead{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px}
+.daily .dhead .label{margin:0}.daily .dsum{flex:1;font-size:13px}.daily .chev{color:var(--muted)}
+.dbadge{min-width:20px;height:20px;border-radius:999px;background:var(--brass,#d4a64a);color:#111;font-size:12px;font-weight:700;display:inline-grid;place-items:center;padding:0 6px}
+.daily .dbody{display:grid;gap:8px;padding:0 12px 12px}
+.drow{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;font-size:13px}
+.drow:has(.dbar){grid-template-columns:1fr 70px auto}
+.dbar{height:6px;border-radius:3px;background:var(--panel2);overflow:hidden}.dbar i{display:block;height:100%;background:var(--good)}
+.dok{color:var(--good);font-weight:700;text-align:center;min-width:32px}
 </style>
 <div class="app">
   <header class="top">
@@ -312,7 +322,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.9.3 */
+/* 副本團長 v0.9.4 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -732,6 +742,14 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u5BF6\u5EAB\u7D2F\u8A08 30 \u6B21": "30 Vault runs",
     "\u5BF6\u5EAB\u7D2F\u8A08 60 \u6B21": "60 Vault runs",
     "\u82F1\u52C7\u865F\u89D2": "Heroic Horn",
+    "\u4E3B\u7DDA\u52DD\u5229 {0} \u5834": "Win {0} story runs",
+    "\u639B\u6A5F\u6230\u9B25\u7372\u52DD {0} \u5834\uFF08\u542B\u96E2\u7DDA\uFF09": "Win {0} idle runs (offline counts)",
+    "\u5F37\u5316\u6216\u7CBE\u7149 {0} \u6B21": "Upgrade or refine {0} times",
+    "\u5206\u89E3 {0} \u4EF6\u88DD\u5099": "Salvage {0} items",
+    "\u62DB\u52DF {0} \u540D\u82F1\u96C4": "Recruit {0} hero",
+    "\u5B8C\u6210 {0} \u5834\u79D8\u5883\u6311\u6230": "Complete {0} Mythic runs",
+    "\u79D8\u5883\u9650\u6642\u901A\u95DC {0} \u6B21": "Time {0} Mythic run",
+    "\u6311\u6230\u5BF6\u5EAB {0} \u6B21": "Run the Vault {0} times",
     "\u5F37\u97CC": "Fortified",
     "\u5C0F\u602A\u751F\u547D +30%\u3001\u653B\u64CA +20%": "Trash HP +30%, attack +20%",
     "\u7BC4\u570D\u8F38\u51FA": "AoE damage",
@@ -770,6 +788,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u5A01\u529B {0}": "Power {0}",
     "\u8010\u529B {0}": "Stamina {0}",
     "\u66B4\u64CA +{0}%": "Crit +{0}%",
+    '<div style="color:var(--brass)">\u{1F3C6} \u4ECA\u65E5\u9996\u52DD\uFF1A+{0} \u91D1\u3001{1}</div>': '<div style="color:var(--brass)">\u{1F3C6} First win of the day: +{0} gold, {1}</div>',
     "\u526F\u672C": "Dungeons",
     "\u5718\u968A": "Party",
     "\u80CC\u5305": "Bag",
@@ -803,6 +822,9 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u540D\u518A": "Roster",
     "\u66F4\u63DB\u4E86 {0} \u4EF6\u88DD\u5099": "Swapped {0} item(s)",
     "\u76EE\u524D\u5DF2\u662F\u6700\u4F73\u914D\u88DD": "Already wearing the best gear",
+    "\u4EFB\u52D9\u734E\u52F5": "Quest reward",
+    "\u6BCF\u65E5\u5BF6\u7BB1": "Daily chest",
+    "\u7C3D\u5230\u7B2C {0} \u5929": "Check-in day {0}",
     "\u5206\u89E3 {0} \u4EF6\uFF0C\u7372\u5F97 {1} \u91D1": "Salvaged {0} item(s) for {1} gold",
     "\u6C92\u6709\u7B26\u5408\u7684\u88DD\u5099": "No matching gear",
     "\u5F37\u5316 {0} \u6B21\uFF0C\u82B1\u8CBB {1} \u91D1": "Upgraded \xD7{0} for {1} gold",
@@ -824,6 +846,11 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u5DF2\u9001\u51FA\uFF0C\u8B1D\u8B1D\u56DE\u994B\uFF01": "Sent \u2014 thanks for the feedback!",
     "\u9001\u592A\u5FEB\u4E86\uFF0C\u8ACB\u4E00\u5206\u9418\u5F8C\u518D\u8A66": "Too fast \u2014 try again in a minute",
     "\u9001\u51FA\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66": "Couldn't send \u2014 try again later",
+    "+{0} \u91D1": "+{0} gold",
+    "\u7CBE\u83EF +{0}": "Essence +{0}",
+    "\u79D8\u5883\u9AD4\u529B +{0}": "Mythic stamina +{0}",
+    "\uFF08\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF09": " (sent to the loot chest)",
+    "\uFF08\u80CC\u5305\u5DF2\u6EFF\uFF0C\u81EA\u52D5\u5206\u89E3\uFF09": " (bag full, auto-salvaged)",
     "{0} \u5C0F\u6642": "{0}h",
     "{0} \u5206\u9418": "{0} min",
     '<h3>\u96E2\u7DDA\u6536\u76CA</h3><p class="sub" style="margin:0">\u4F60\u96E2\u958B\u4E86 {0}\uFF0C\u968A\u4F0D\u5728 {1} \u6301\u7E8C\u4F5C\u6230\u3002</p> <div class="statgrid num"><div><b>{2}</b><span>\u6311\u6230</span></div><div><b>{3}</b><span>\u901A\u95DC</span></div><div><b>+{4}</b><span>\u91D1\u5E63</span></div><div><b>{5}</b><span>\u88DD\u5099</span></div></div> {6} {7} <div class="row"><button class="btn main grow" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button><button class="btn" data-act="closebtn">\u597D</button></div>': '<h3>Offline rewards</h3><p class="sub" style="margin:0">You were away for {0}; your party kept fighting in {1}.</p> <div class="statgrid num"><div><b>{2}</b><span>Fight</span></div><div><b>{3}</b><span>Cleared</span></div><div><b>+{4}</b><span>gold</span></div><div><b>{5}</b><span>Gear</span></div></div> {6} {7} <div class="row"><button class="btn main grow" data-act="autoequip">Auto-equip</button><button class="btn" data-act="closebtn">OK</button></div>',
@@ -963,6 +990,19 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u63D0\u793A\uFF1A\u968A\u4F0D\u6C92\u6709\u6CBB\u7642\uFF0C\u9577\u6642\u9593\u6230\u9B25\u6490\u4E0D\u4F4F\u3002": "Tip: no healer \u2014 long fights will wear you down.",
     "\u63D0\u793A\uFF1A\u5766\u514B\u5148\u5012\uFF0C\u8A66\u8457\u5F37\u5316\u5766\u514B\u7684\u8B77\u7532\u8207\u8010\u529B\uFF0C\u6216\u591A\u5E36\u4E00\u4F4D\u6CBB\u7642\u3002": "Tip: your tank fell first. Upgrade the tank's armor and stamina, or bring a second healer.",
     "\u63D0\u793A\uFF1A\u56DE\u524D\u4E00\u5C64\u5237\u88DD\u5099\u8207\u7B49\u7D1A\uFF0C\u6216\u6309\u300C\u5099\u6230\u300D\u63DB\u500B\u9663\u5BB9\u3002": "Tip: farm the previous floor for gear and levels, or tap Prep to change the lineup.",
+    "{0} \u91D1": "{0} gold",
+    "\u7CBE\u83EF {0}": "Essence {0}",
+    "\u53F2\u8A69\u88DD\u5099 1 \u4EF6\uFF08\u7B2C\u4E8C\u7AE0\u8D77\u70BA\u5957\u88DD\uFF09": "1 epic item (a set piece from Chapter 2 on)",
+    "{0}\u88DD\u5099 1 \u4EF6": "1 {0} item",
+    '<button class="dhead" data-act="dtoggle"><span class="label">\u6BCF\u65E5</span><span class="dsum">\u4EFB\u52D9 {0}/{1}\u30FB\u9996\u52DD {2}\u30FB\u7C3D\u5230 {3}</span>{4}<span class="chev">{5}</span></button>': '<button class="dhead" data-act="dtoggle"><span class="label">Daily</span><span class="dsum">Quests {0}/{1} \xB7 First win {2} \xB7 Check-in {3}</span>{4}<span class="chev">{5}</span></button>',
+    "\u9818\u53D6": "Claim",
+    "\u6BCF\u9805\uFF1A{0} \u91D1\u3001\u7CBE\u83EF {1}": "Each: {0} gold, Essence {1}",
+    '<div class="drow"><span>\u6BCF\u65E5\u5BF6\u7BB1\uFF1A\u4E09\u9805\u90FD\u9818\u5B8C\uFF0C\u9001\u53F2\u8A69\u88DD\u5099 1 \u4EF6{0}</span>{1}</div>': '<div class="drow"><span>Daily chest: claim all three for 1 epic item{0}</span>{1}</div>',
+    "\u958B\u555F": "Open",
+    '<div class="drow"><span>\u6BCF\u65E5\u9996\u52DD\uFF1A\u4ECA\u5929\u7B2C\u4E00\u5834\u52DD\u5229\uFF0C\u52A0\u9001 {0} \u91D1\uFF0B\u7A00\u6709\u4EE5\u4E0A\u88DD\u5099 1 \u4EF6</span>{1}</div>': '<div class="drow"><span>First win of the day: +{0} gold and 1 rare-or-better item</span>{1}</div>',
+    '<div class="drow"><span>\u7D2F\u7A4D\u7C3D\u5230\u7B2C {0} \u5929\uFF1A{1}<small class="sub" style="display:block;margin:0">7 \u5929\u4E00\u8F2A\uFF0C\u65B7\u7C3D\u4E0D\u6B78\u96F6\uFF1B\u7B2C 7 \u5929\u9001\u53F2\u8A69</small></span>{2}</div>': `<div class="drow"><span>Check-in day {0}: {1}<small class="sub" style="display:block;margin:0">7-day cycle; missed days don't reset it. Day 7 gives an epic</small></span>{2}</div>`,
+    "\u7C3D\u5230": "Check in",
+    "\u6BCF\u5929 00:00\uFF08\u53F0\u7063\u6642\u9593\uFF09\u63DB\u65B0\u4EFB\u52D9\u3002": "New quests every day at 00:00 (Taiwan time).",
     '<div class="nextstep"><div><span class="label">\u4E0B\u4E00\u6B65</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>{2}</div>': '<div class="nextstep"><div><span class="label">Next step</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>{2}</div>',
     '<div class="vault locked"><b>\u5BF6\u5EAB</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 3 \u5C64\u300C\u6C89\u6C92\u795E\u6BBF\u300D\u5F8C\u958B\u653E\uFF1A\u6BCF\u5929 3 \u6B21\uFF0C\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\u8CFA\u5927\u91CF\u91D1\u5E63\u3002</span></div>': '<div class="vault locked"><b>Vault</b><span class="sub" style="margin:0">Unlocks after clearing Floor 3, Sunken Temple: 3 runs a day hunting treasure goblins for lots of gold.</span></div>',
     '<div class="vault"><div class="mhead"><div><span class="label">\u5BF6\u5EAB</span><b>60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797</b></div><span class="vleft num">\u4ECA\u5929\u5269 {0}/{1}</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">\u7B2C {3} \u5C64\uFF1A\u6BCF\u96BB <b class="num">{4}</b> \u91D1\uFF0C\u6700\u591A\u7B97 {5} \u96BB\u30FB\u6700\u4F73 {6} \u96BB\u3002\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">\u5099\u6230</button></div></div>': '<div class="vault"><div class="mhead"><div><span class="label">Vault</span><b>60s of treasure goblins</b></div><span class="vleft num">{0}/{1} left today</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">Floor {3}:  <b class="num">{4}</b>  gold each, up to {5} \xB7 best {6}. Your highest floor usually pays most.</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">Prep</button></div></div>',
@@ -1918,6 +1958,21 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     waveHeal: 0.5
     // 波與波之間回血比例
   };
+  var DAILY = {
+    questGoldRuns: 15,
+    questDust: 10,
+    // 每個任務：最高層一場金幣 × 15、精華 10
+    chestRarity: 3,
+    chestSetChance: 0.4,
+    // 三個任務都領完 → 寶箱：史詩一件（第二章起 40% 是套裝）
+    firstWinGoldRuns: 10,
+    firstWinRarity: 2,
+    // 每日首勝：最高層一場金幣 × 10 ＋ 稀有以上一件
+    // 累積簽到，7 天一輪；斷簽不歸零
+    signin: [{ t: "gold", runs: 10 }, { t: "dust", n: 30 }, { t: "sta", n: 5 }, { t: "gold", runs: 20 }, { t: "item", r: 2 }, { t: "dust", n: 60 }, { t: "item", r: 3, set: true }],
+    staminaOver: 20
+    // 獎勵給的體力可暫時超過上限，最多到 20
+  };
   var MYTHIC = {
     unlockAfter: 6,
     // 通關第 7 層（index 6）後解鎖
@@ -2703,7 +2758,6 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     const max = MYTHIC.stamina.max;
     const st = s.mythic.sta || (s.mythic.sta = { pts: max, at: now });
     if (st.pts >= max) {
-      st.pts = max;
       st.at = now;
       return st;
     }
@@ -2713,6 +2767,11 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       st.at = st.pts >= max ? now : st.at + n * STA_MS();
     }
     return st;
+  }
+  function addStamina(s, n, cap, now = Date.now()) {
+    const st = stamina(s, now);
+    st.pts = Math.min(cap, st.pts + n);
+    return st.pts;
   }
   var staminaNext = (s, now = Date.now()) => {
     const st = stamina(s, now);
@@ -2770,6 +2829,174 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     const inTime = battle.win && battle.tick <= timer;
     const delta = inTime ? battle.tick <= timer * MYTHIC.bonusAt ? 2 : 1 : -1;
     return { inTime, delta, next: Math.max(MYTHIC.startKey, level + delta) };
+  }
+
+  // src/core/vault.js
+  var vaultUnlocked = (s) => !!s.clears[VAULT.unlockAfter];
+  function vaultToday(s) {
+    const v = s.vault, today = dayKey();
+    if (v.day !== today) {
+      v.day = today;
+      v.used = 0;
+    }
+    return v;
+  }
+  var vaultLeft = (s) => Math.max(0, VAULT.daily - vaultToday(s).used);
+  var vaultFloors = (s) => Object.keys(s.clears).filter((k) => s.clears[k]).map(Number).filter((f) => f <= CH1_TOP).sort((a, b) => a - b);
+  var floorGold = (f) => REWARD.goldBase + REWARD.goldPerTier * f;
+  var vaultGoldPerKill = (f) => Math.round(floorGold(f) * VAULT.parRuns / VAULT.par[f]);
+  var vaultMaxKills = (f) => Math.round(VAULT.par[f] * VAULT.capMult);
+  function vaultBattleOpts(floor) {
+    const base = buildWaves(floor)[0][0];
+    const waves = Array.from({ length: 40 }, (_, k) => Array.from({ length: 3 }, () => ({
+      name: tx("\u5BF6\u85CF\u54E5\u5E03\u6797"),
+      boss: false,
+      goblin: true,
+      hp: Math.round(base.hp * VAULT.strength * (1 + VAULT.waveGrowth * k)),
+      atk: base.atk * VAULT.goblinAtk
+    })));
+    return { vault: { floor, dur: VAULT.dur }, waves, maxTicks: VAULT.dur };
+  }
+  function applyVaultResult(s, battle, partyHeroes2) {
+    const f = battle.vault.floor, kills = battle.kills || 0, v = vaultToday(s);
+    const gold = Math.min(kills, vaultMaxKills(f)) * vaultGoldPerKill(f);
+    const xp = Math.round(REWARD.xpBase * Math.pow(f + 1, REWARD.xpExp) * VAULT.xpMult);
+    v.used++;
+    v.runs++;
+    const record = kills > (v.best[f] || 0);
+    if (record) v.best[f] = kills;
+    s.gold += gold;
+    s.stats.runs++;
+    const lvUps = [];
+    for (const h of partyHeroes2(s)) if (gainXp(h, xp)) lvUps.push({ name: h.name, level: h.level, para: h.para || 0 });
+    return { vault: true, kills, gold, xp, record, lvUps, loot: [], kept: [], stashed: [], salvaged: 0, first: false, decayed: false };
+  }
+
+  // src/core/daily.js
+  var QUESTS = {
+    win: { name: tx("\u4E3B\u7DDA\u52DD\u5229 {0} \u5834"), n: 5 },
+    idle: { name: tx("\u639B\u6A5F\u6230\u9B25\u7372\u52DD {0} \u5834\uFF08\u542B\u96E2\u7DDA\uFF09"), n: 10 },
+    upgrade: { name: tx("\u5F37\u5316\u6216\u7CBE\u7149 {0} \u6B21"), n: 3 },
+    salvage: { name: tx("\u5206\u89E3 {0} \u4EF6\u88DD\u5099"), n: 5 },
+    recruit: { name: tx("\u62DB\u52DF {0} \u540D\u82F1\u96C4"), n: 1 },
+    mythic: { name: tx("\u5B8C\u6210 {0} \u5834\u79D8\u5883\u6311\u6230"), n: 2, need: (s) => mythicUnlocked(s) },
+    timed: { name: tx("\u79D8\u5883\u9650\u6642\u901A\u95DC {0} \u6B21"), n: 1, need: (s) => mythicUnlocked(s) },
+    vault: { name: tx("\u6311\u6230\u5BF6\u5EAB {0} \u6B21"), n: 2, need: (s) => vaultUnlocked(s) }
+  };
+  var GROUPS = [["win", "idle"], ["upgrade", "salvage", "recruit"], ["mythic", "timed", "vault"]];
+  var topCleared = (s) => Math.max(0, ...Object.keys(s.clears).filter((k) => s.clears[k]).map(Number));
+  var runGold = (s) => REWARD.goldBase + REWARD.goldPerTier * topCleared(s);
+  var topIlvl = (s) => dungeonInfo(topCleared(s)).dropIlvl;
+  var hash = (str) => [...str].reduce((a, c) => a * 31 + c.charCodeAt(0) >>> 0, 17);
+  function rollQuests(s, day) {
+    let seed = hash(day + (s.player && s.player.pid || ""));
+    const rnd2 = (n) => {
+      seed = seed * 1103515245 + 12345 >>> 0;
+      return seed % n;
+    };
+    const ok = (id) => !QUESTS[id].need || QUESTS[id].need(s);
+    const picked = [];
+    for (const g of GROUPS) {
+      const c = g.filter(ok);
+      if (c.length) picked.push(c[rnd2(c.length)]);
+    }
+    const rest = Object.keys(QUESTS).filter((id) => ok(id) && !picked.includes(id));
+    while (picked.length < 3) picked.push(rest.splice(rnd2(rest.length), 1)[0]);
+    return picked.map((id) => ({ id, n: 0, claimed: false }));
+  }
+  function dailyToday(s, now = Date.now()) {
+    const day = dayKey(new Date(now));
+    const d = s.daily || (s.daily = { day: "", q: [], firstWin: false, chest: false, signDays: 0, signed: false });
+    if (d.day !== day) Object.assign(d, { day, q: rollQuests(s, day), firstWin: false, chest: false, signed: false });
+    return d;
+  }
+  function bump(s, id, n = 1) {
+    if (!s.daily) return;
+    for (const q of dailyToday(s).q) if (q.id === id && !q.claimed) q.n = Math.min(QUESTS[id].n, q.n + n);
+  }
+  var questDone = (q) => q.n >= QUESTS[q.id].n;
+  var questText = (q) => tx(QUESTS[q.id].name, QUESTS[q.id].n);
+  var dailyPending = (s) => {
+    const d = dailyToday(s);
+    return d.q.filter((q) => questDone(q) && !q.claimed).length + (!d.signed ? 1 : 0) + (canChest(s) ? 1 : 0);
+  };
+  function giveItem(s, rarity, setChance = 0) {
+    const ch2 = topCleared(s) > CH1_TOP, party = partyHeroes(s);
+    const it = ch2 && party.length && R() < setChance ? makeSetItem(pick(party).cls, randomArmorSlot(), topIlvl(s) + 2) : makeItem(pick(Object.keys(SLOTS)), topIlvl(s) + 2, rollRarity(rarity));
+    return { item: it, dest: grantItem(s, it) };
+  }
+  function claimQuest(s, i) {
+    const q = dailyToday(s).q[i];
+    if (!q || q.claimed || !questDone(q)) return null;
+    q.claimed = true;
+    const gold = runGold(s) * DAILY.questGoldRuns, dust = DAILY.questDust;
+    s.gold += gold;
+    s.dust = (s.dust || 0) + dust;
+    return { gold, dust };
+  }
+  var canChest = (s) => {
+    const d = dailyToday(s);
+    return !d.chest && d.q.length && d.q.every((q) => q.claimed);
+  };
+  function claimChest(s) {
+    if (!canChest(s)) return null;
+    dailyToday(s).chest = true;
+    return giveItem(s, DAILY.chestRarity, DAILY.chestSetChance);
+  }
+  var signinReward = (n) => DAILY.signin[(n - 1) % DAILY.signin.length];
+  function claimSignin(s, now = Date.now()) {
+    const d = dailyToday(s, now);
+    if (d.signed) return null;
+    d.signed = true;
+    d.signDays++;
+    const r = signinReward(d.signDays), out = { day: d.signDays, t: r.t };
+    if (r.t === "gold") {
+      out.gold = runGold(s) * r.runs;
+      s.gold += out.gold;
+    }
+    if (r.t === "dust") {
+      out.dust = r.n;
+      s.dust = (s.dust || 0) + r.n;
+    }
+    if (r.t === "sta") {
+      out.sta = r.n;
+      addStamina(s, r.n, DAILY.staminaOver, now);
+    }
+    if (r.t === "item") Object.assign(out, giveItem(s, r.r, r.set ? 1 : 0));
+    return out;
+  }
+  function firstWin(s) {
+    const d = dailyToday(s);
+    if (d.firstWin) return null;
+    d.firstWin = true;
+    const gold = runGold(s) * DAILY.firstWinGoldRuns;
+    s.gold += gold;
+    return { gold, ...giveItem(s, DAILY.firstWinRarity) };
+  }
+  function dailyAfterBattle(s, b, r) {
+    dailyToday(s);
+    if (b.vault) {
+      bump(s, "vault");
+      return;
+    }
+    const win = b.win;
+    if (b.mythicIdle) {
+      if (win) bump(s, "idle");
+    } else if (b.mythic) {
+      bump(s, "mythic");
+      if (r.inTime) bump(s, "timed");
+    } else if (win) {
+      bump(s, "win");
+      if (s.idle === b.dIdx) bump(s, "idle");
+    }
+    if (win) r.firstWin = firstWin(s);
+  }
+  function dailyAfterOffline(s, off, mythicIdle) {
+    if (!off || !off.wins) return null;
+    dailyToday(s);
+    bump(s, "idle", off.wins);
+    if (!mythicIdle) bump(s, "win", off.wins);
+    return firstWin(s);
   }
 
   // src/core/game.js
@@ -2930,6 +3157,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       s.heroes.push(h);
       if (!partyLocked(s) && s.party.length < ECONOMY.partyMax) s.party.push(h.id);
     }
+    bump(s, "recruit", n);
     return { heroes: got, cost };
   }
   function hire(s, heroId) {
@@ -2938,6 +3166,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     s.gold -= cost;
     s.heroes.push(h);
     s.tavern = s.tavern.filter((x) => x.id !== heroId);
+    bump(s, "recruit");
     if (!partyLocked(s) && s.party.length < ECONOMY.partyMax) s.party.push(h.id);
     if (!s.tavern.length) rollTavern(s);
     return h;
@@ -3062,6 +3291,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     const kept = rw.loot.filter((_, i) => dest[i] === "bag"), stashed = rw.loot.filter((_, i) => dest[i] === "stash");
     return { ...rw, first, lvUps, kept, stashed, salvaged: dest.filter((d) => d === "salvaged").length };
   }
+  var grantItem = (s, it) => it.set ? addSetLoot(s, it) : addLoot(s, it);
   function addSetLoot(s, it) {
     s.items[it.id] = it;
     if (s.bag.length < bagMax(s)) {
@@ -3216,6 +3446,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     const v = salvageValue(it);
     s.gold += v;
     s.dust = (s.dust || 0) + salvageDust(it);
+    bump(s, "salvage");
     return v;
   }
   function salvageUpTo(s, maxRarity) {
@@ -3267,6 +3498,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     s.gold -= c;
     s.dust = (s.dust || 0) - d;
     it.up++;
+    bump(s, "upgrade");
     return true;
   }
   function hasUpgrade(s) {
@@ -3321,47 +3553,6 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       lv += r.lvUps.length;
     }
     return { sec: Math.round(sec), runs, wins, gold, items, stashed, lv };
-  }
-
-  // src/core/vault.js
-  var vaultUnlocked = (s) => !!s.clears[VAULT.unlockAfter];
-  function vaultToday(s) {
-    const v = s.vault, today = dayKey();
-    if (v.day !== today) {
-      v.day = today;
-      v.used = 0;
-    }
-    return v;
-  }
-  var vaultLeft = (s) => Math.max(0, VAULT.daily - vaultToday(s).used);
-  var vaultFloors = (s) => Object.keys(s.clears).filter((k) => s.clears[k]).map(Number).filter((f) => f <= CH1_TOP).sort((a, b) => a - b);
-  var floorGold = (f) => REWARD.goldBase + REWARD.goldPerTier * f;
-  var vaultGoldPerKill = (f) => Math.round(floorGold(f) * VAULT.parRuns / VAULT.par[f]);
-  var vaultMaxKills = (f) => Math.round(VAULT.par[f] * VAULT.capMult);
-  function vaultBattleOpts(floor) {
-    const base = buildWaves(floor)[0][0];
-    const waves = Array.from({ length: 40 }, (_, k) => Array.from({ length: 3 }, () => ({
-      name: tx("\u5BF6\u85CF\u54E5\u5E03\u6797"),
-      boss: false,
-      goblin: true,
-      hp: Math.round(base.hp * VAULT.strength * (1 + VAULT.waveGrowth * k)),
-      atk: base.atk * VAULT.goblinAtk
-    })));
-    return { vault: { floor, dur: VAULT.dur }, waves, maxTicks: VAULT.dur };
-  }
-  function applyVaultResult(s, battle, partyHeroes2) {
-    const f = battle.vault.floor, kills = battle.kills || 0, v = vaultToday(s);
-    const gold = Math.min(kills, vaultMaxKills(f)) * vaultGoldPerKill(f);
-    const xp = Math.round(REWARD.xpBase * Math.pow(f + 1, REWARD.xpExp) * VAULT.xpMult);
-    v.used++;
-    v.runs++;
-    const record = kills > (v.best[f] || 0);
-    if (record) v.best[f] = kills;
-    s.gold += gold;
-    s.stats.runs++;
-    const lvUps = [];
-    for (const h of partyHeroes2(s)) if (gainXp(h, xp)) lvUps.push({ name: h.name, level: h.level, para: h.para || 0 });
-    return { vault: true, kills, gold, xp, record, lvUps, loot: [], kept: [], stashed: [], salvaged: 0, first: false, decayed: false };
   }
 
   // src/core/advice.js
@@ -3468,9 +3659,11 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     const p = partyHeroes(app.S);
     return p.length ? Math.round(p.reduce((a, h) => a + h.level, 0) / p.length) : 0;
   }
+  var firstWinLine = (fw) => fw ? tx('<div style="color:var(--brass)">\u{1F3C6} \u4ECA\u65E5\u9996\u52DD\uFF1A+{0} \u91D1\u3001{1}</div>', fmt(fw.gold), itemName(fw.item)) : "";
+  var dailyOpenNow = () => app.dailyOpen != null ? app.dailyOpen : dailyPending(app.S) > 0;
 
   // src/core/version.js
-  var VERSION = "0.9.3";
+  var VERSION = "0.9.4";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -3537,6 +3730,44 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   }
 
   // src/ui/views/dungeon.js
+  function signinText(r) {
+    const g = runGold(app.S);
+    return r.t === "gold" ? tx("{0} \u91D1", fmt(g * r.runs)) : r.t === "dust" ? tx("\u7CBE\u83EF {0}", r.n) : r.t === "sta" ? tx("\u79D8\u5883\u9AD4\u529B +{0}", r.n) : r.set ? tx("\u53F2\u8A69\u88DD\u5099 1 \u4EF6\uFF08\u7B2C\u4E8C\u7AE0\u8D77\u70BA\u5957\u88DD\uFF09") : tx("{0}\u88DD\u5099 1 \u4EF6", RARITY[r.r].name);
+  }
+  function dailyCard() {
+    const S = app.S, d = dailyToday(S), pend = dailyPending(S), open = dailyOpenNow();
+    const doneN = d.q.filter((q) => q.claimed).length;
+    const head = tx(
+      '<button class="dhead" data-act="dtoggle"><span class="label">\u6BCF\u65E5</span><span class="dsum">\u4EFB\u52D9 {0}/{1}\u30FB\u9996\u52DD {2}\u30FB\u7C3D\u5230 {3}</span>{4}<span class="chev">{5}</span></button>',
+      doneN,
+      d.q.length,
+      d.firstWin ? "\u2713" : "\u2014",
+      d.signed ? "\u2713" : "\u2014",
+      pend ? `<span class="dbadge num">${pend}</span>` : "",
+      open ? "\u25B4" : "\u25BE"
+    );
+    if (!open) return `<div class="daily">${head}</div>`;
+    const rows = d.q.map((q, i) => {
+      const t = QUESTS[q.id].n, done = questDone(q);
+      const btn = q.claimed ? `<span class="dok">\u2713</span>` : done ? `<button class="btn sm main" data-act="dq" data-i="${i}">${tx("\u9818\u53D6")}</button>` : `<span class="sub num" style="margin:0">${q.n}/${t}</span>`;
+      return `<div class="drow"><span>${questText(q)}</span><span class="dbar"><i style="width:${Math.round(100 * q.n / t)}%"></i></span>${btn}</div>`;
+    }).join("");
+    const reward = tx("\u6BCF\u9805\uFF1A{0} \u91D1\u3001\u7CBE\u83EF {1}", fmt(runGold(S) * DAILY.questGoldRuns), DAILY.questDust);
+    const chest = tx(
+      '<div class="drow"><span>\u6BCF\u65E5\u5BF6\u7BB1\uFF1A\u4E09\u9805\u90FD\u9818\u5B8C\uFF0C\u9001\u53F2\u8A69\u88DD\u5099 1 \u4EF6{0}</span>{1}</div>',
+      "",
+      d.chest ? '<span class="dok">\u2713</span>' : canChest(S) ? `<button class="btn sm main" data-act="dchest">${tx("\u958B\u555F")}</button>` : `<span class="sub" style="margin:0">\u{1F512}</span>`
+    );
+    const fw = tx('<div class="drow"><span>\u6BCF\u65E5\u9996\u52DD\uFF1A\u4ECA\u5929\u7B2C\u4E00\u5834\u52DD\u5229\uFF0C\u52A0\u9001 {0} \u91D1\uFF0B\u7A00\u6709\u4EE5\u4E0A\u88DD\u5099 1 \u4EF6</span>{1}</div>', fmt(runGold(S) * DAILY.firstWinGoldRuns), d.firstWin ? '<span class="dok">\u2713</span>' : `<span class="sub" style="margin:0">\u2014</span>`);
+    const next = signinReward(d.signDays + (d.signed ? 0 : 1));
+    const sign = tx(
+      '<div class="drow"><span>\u7D2F\u7A4D\u7C3D\u5230\u7B2C {0} \u5929\uFF1A{1}<small class="sub" style="display:block;margin:0">7 \u5929\u4E00\u8F2A\uFF0C\u65B7\u7C3D\u4E0D\u6B78\u96F6\uFF1B\u7B2C 7 \u5929\u9001\u53F2\u8A69</small></span>{2}</div>',
+      d.signDays + (d.signed ? 0 : 1),
+      signinText(next),
+      d.signed ? '<span class="dok">\u2713</span>' : `<button class="btn sm main" data-act="dsign">${tx("\u7C3D\u5230")}</button>`
+    );
+    return `<div class="daily open">${head}<div class="dbody">${sign}${rows}<p class="sub" style="margin:0">${reward}</p>${chest}${fw}<p class="sub" style="margin:0">${tx("\u6BCF\u5929 00:00\uFF08\u53F0\u7063\u6642\u9593\uFF09\u63DB\u65B0\u4EFB\u52D9\u3002")}</p></div></div>`;
+  }
   function nextStepCard() {
     const n = nextStep(app.S);
     if (!n) return "";
@@ -3592,7 +3823,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   }
   function viewDungeons() {
     const lv = avgPartyLv(), il = avgPartyIlvl();
-    let h = nextStepCard() + tx('<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv{0}</b>\u30FB\u88DD\u7B49 <b class="num">{1}</b>\u30FB\u6230\u529B <b class="num">{2}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u90FD\u6709\u5F31\u9EDE\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\uFF0C\u6216\u56DE\u982D\u5237\u88DD\u5099\u3002</p>', lv, il, fmt(partyPower()));
+    let h = dailyCard() + nextStepCard() + tx('<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv{0}</b>\u30FB\u88DD\u7B49 <b class="num">{1}</b>\u30FB\u6230\u529B <b class="num">{2}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u90FD\u6709\u5F31\u9EDE\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\uFF0C\u6216\u56DE\u982D\u5237\u88DD\u5099\u3002</p>', lv, il, fmt(partyPower()));
     const S = app.S, mode = app.mode || "story";
     const modes = [["story", tx("\u4E3B\u7DDA")], ["mythic", tx("\u79D8\u5883")], ["vault", tx("\u5BF6\u5EAB")], ["event", tx("\u6D3B\u52D5")]];
     h += `<div class="seg modes">${modes.map(([k, n]) => `<button data-act="mode" data-v="${k}" class="${mode === k ? "sel" : ""}">${n}</button>`).join("")}</div>`;
@@ -3660,6 +3891,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     const sec = Math.max(1, b.tick);
     const title = r.vault ? tx("\u6253\u5012 {0} \u96BB\u54E5\u5E03\u6797", r.kills) : r.mythicIdle ? b.win ? tx("\u79D8\u5883\u639B\u6A5F\u30FB\u901A\u95DC") : tx("\u79D8\u5883\u639B\u6A5F\u30FB\u5931\u6557") : r.mythic ? r.inTime ? tx("\u9650\u6642\u901A\u95DC") : b.win ? tx("\u8D85\u6642\u901A\u95DC") : tx("\u5931\u6557") : b.win ? tx("\u901A\u95DC") : tx("\u5931\u6557");
     let h = tx('<div class="result {0}"><h3>{1}</h3>{2} {3} <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+{4}</b> \u91D1\u5E63</span><span><b class="num">+{5}</b> \u7D93\u9A57</span>{6}{7}</div>', r.vault || (r.mythic ? r.inTime : b.win) ? "win" : "lose", title, r.vault && r.record ? tx('<span class="newrec" style="justify-self:start">\u672C\u5C64\u65B0\u7D00\u9304</span>') : "", r.mythicIdle ? tx('<div class="sub" style="margin:0">\u639B\u6A5F\u7B49\u7D1A +{0}\u30FB\u9470\u77F3\u4E0D\u8B8A\uFF08\u76EE\u524D +{1}\uFF09\u30FB\u734E\u52F5 {2}%</div>', b.mythic.level, keyOf(app.S, b.dIdx), Math.round(MYTHIC.idleMult * 100)) : r.mythic ? tx('<div class="keychange"><span class="keystone num">+{0}</span><span class="arrow">\u2192</span><span class="keystone num {1}">+{2}</span> <span class="sub" style="margin:0">\u7528\u6642 <b class="num">{3}</b> / \u9650\u6642 {4}</span>{5}</div>', r.prevKey, r.nextKey > r.prevKey ? "up" : r.nextKey < r.prevKey ? "down" : "", r.nextKey, mmss(b.tick), mmss(b.mythic.timer), r.record ? tx('<span class="newrec">\u65B0\u7D00\u9304</span>') : "") : "", fmt(r.gold), fmt(r.xp), r.first ? tx('<span style="color:var(--brass)">\u9996\u6B21\u901A\u95DC\uFF1A\u5FC5\u6389\u7A00\u6709\u4EE5\u4E0A</span>') : "", r.decayed ? `<span style="color:var(--warn)">${b.dIdx === DUNGEONS.length - 1 ? tx("\u7B49\u7D1A\u58D3\u5236\uFF1A\u734E\u52F5\u6700\u4F4E\u4FDD\u7559 {0}%\uFF0C\u60F3\u8981\u66F4\u591A\u53EF\u4EE5\u6539\u7528\u79D8\u5883\u639B\u6A5F", Math.round(REWARD.decayFloorTop * 100)) : tx("\u9019\u5C64\u5C0D\u4F60\u592A\u7C21\u55AE\u4E86\uFF0C\u7D93\u9A57\u8207\u91D1\u5E63\u8B8A\u5C11\uFF0C\u5F80\u4E0B\u4E00\u5C64\u5427")}</span>` : "");
+    h += firstWinLine(r.firstWin);
     if (r.lvUps.length) h += `<div style="color:var(--good);font-size:14px">\u2B06 ${r.lvUps.map((x) => tx("{0} \u5347\u5230 {1}", x.name, x.para ? tx("\u5DD4\u5CF0 {0}", x.para) : `Lv${x.level}`)).join(tx("\u3001"))}</div>`;
     if (r.kept.length || r.stashed.length || r.salvaged) h += `<div class="stack">${r.kept.map((it) => `<div class="item rar${it.rarity}"><div class="in">${itemName(it)}</div><div class="il">${SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div><div class="is">${itemStatText(it)}</div></div>`).join("")}${r.stashed.length ? tx('<div style="color:var(--brass);font-size:13px">\u80CC\u5305\u5DF2\u6EFF\uFF0C{0} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1</div>', r.stashed.length) : ""}${r.salvaged ? tx('<div class="sub" style="margin:0">{0} \u4EF6\u81EA\u52D5\u5206\u89E3\u70BA\u91D1\u5E63\u8207\u7CBE\u83EF</div>', r.salvaged) : ""}</div>`;
     h += tx('<div class="meter"><span class="label">\u50B7\u5BB3 / \u6CBB\u7642\u7D71\u8A08\uFF08\u6BCF\u79D2\uFF09</span>{0}</div>', b.units.map((u) => {
@@ -4045,6 +4277,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   function finishBattle() {
     clearInterval(app.bTimer);
     app.lastResult = app.battle.vault ? applyVaultResult(app.S, app.battle, partyHeroes) : app.battle.mythicIdle ? applyMythicIdleResult(app.S, app.battle) : app.battle.mythic ? applyMythicResult(app.S, app.battle) : applyResult(app.S, app.battle.dIdx, app.battle);
+    dailyAfterBattle(app.S, app.battle, app.lastResult);
     save();
     const r = app.lastResult, b = app.battle;
     for (const m of newBagMilestones(app.S)) setTimeout(() => toast(tx("\u{1F392} {0}\uFF1A\u80CC\u5305 +{1} \u683C", m.name, BAG_PER_MILESTONE)), 400);
@@ -4424,6 +4657,23 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
         save();
         break;
       }
+      case "dq":
+        dailyToast(claimQuest(app.S, +t.dataset.i), tx("\u4EFB\u52D9\u734E\u52F5"));
+        save();
+        break;
+      case "dchest":
+        dailyToast(claimChest(app.S), tx("\u6BCF\u65E5\u5BF6\u7BB1"));
+        save();
+        break;
+      case "dsign": {
+        const r = claimSignin(app.S);
+        dailyToast(r, r ? tx("\u7C3D\u5230\u7B2C {0} \u5929", r.day) : "");
+        save();
+        break;
+      }
+      case "dtoggle":
+        app.dailyOpen = !dailyOpenNow();
+        break;
       case "autoequip": {
         const n = autoEquip(app.S);
         toast(n ? tx("\u66F4\u63DB\u4E86 {0} \u4EF6\u88DD\u5099", n) : tx("\u76EE\u524D\u5DF2\u662F\u6700\u4F73\u914D\u88DD"));
@@ -4573,12 +4823,22 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && app.modal) closeModal();
   });
+  function dailyToast(r, what) {
+    if (!r) return;
+    const parts = [];
+    if (r.gold) parts.push(tx("+{0} \u91D1", fmt(r.gold)));
+    if (r.dust) parts.push(tx("\u7CBE\u83EF +{0}", r.dust));
+    if (r.sta) parts.push(tx("\u79D8\u5883\u9AD4\u529B +{0}", r.sta));
+    if (r.item) parts.push(itemName(r.item) + (r.dest === "stash" ? tx("\uFF08\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF09") : r.dest === "salvaged" ? tx("\uFF08\u80CC\u5305\u5DF2\u6EFF\uFF0C\u81EA\u52D5\u5206\u89E3\uFF09") : ""));
+    toast(what + "\uFF1A" + parts.join(tx("\u3001")));
+  }
   function settleOffline() {
     const r = offlineProgress(app.S);
     if (!r || !r.runs) return;
+    const fw = dailyAfterOffline(app.S, r, app.S.idleMythic != null);
     save();
     const hrs = r.sec >= 3600 ? tx("{0} \u5C0F\u6642", (r.sec / 3600).toFixed(1)) : tx("{0} \u5206\u9418", Math.round(r.sec / 60));
-    openModal({ type: "text", html: tx('<h3>\u96E2\u7DDA\u6536\u76CA</h3><p class="sub" style="margin:0">\u4F60\u96E2\u958B\u4E86 {0}\uFF0C\u968A\u4F0D\u5728 {1} \u6301\u7E8C\u4F5C\u6230\u3002</p> <div class="statgrid num"><div><b>{2}</b><span>\u6311\u6230</span></div><div><b>{3}</b><span>\u901A\u95DC</span></div><div><b>+{4}</b><span>\u91D1\u5E63</span></div><div><b>{5}</b><span>\u88DD\u5099</span></div></div> {6} {7} <div class="row"><button class="btn main grow" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button><button class="btn" data-act="closebtn">\u597D</button></div>', hrs, app.S.idleMythic != null ? tx("\u79D8\u5883\u300C{0}\u300D+{1}", DUNGEONS[app.S.idleMythic].name, mythicIdleLevel(app.S, app.S.idleMythic)) : DUNGEONS[app.S.idle].name, r.runs, r.wins, fmt(r.gold), r.items, r.stashed ? tx('<div style="color:var(--brass)">\u80CC\u5305\u5DF2\u6EFF\uFF0C{0} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF0C\u5230\u80CC\u5305\u53D6\u51FA</div>', r.stashed) : "", r.lv ? tx('<div style="color:var(--good)">\u671F\u9593\u5171\u5347\u7D1A {0} \u6B21</div>', r.lv) : "") });
+    openModal({ type: "text", html: tx('<h3>\u96E2\u7DDA\u6536\u76CA</h3><p class="sub" style="margin:0">\u4F60\u96E2\u958B\u4E86 {0}\uFF0C\u968A\u4F0D\u5728 {1} \u6301\u7E8C\u4F5C\u6230\u3002</p> <div class="statgrid num"><div><b>{2}</b><span>\u6311\u6230</span></div><div><b>{3}</b><span>\u901A\u95DC</span></div><div><b>+{4}</b><span>\u91D1\u5E63</span></div><div><b>{5}</b><span>\u88DD\u5099</span></div></div> {6} {7} <div class="row"><button class="btn main grow" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button><button class="btn" data-act="closebtn">\u597D</button></div>', hrs, app.S.idleMythic != null ? tx("\u79D8\u5883\u300C{0}\u300D+{1}", DUNGEONS[app.S.idleMythic].name, mythicIdleLevel(app.S, app.S.idleMythic)) : DUNGEONS[app.S.idle].name, r.runs, r.wins, fmt(r.gold), r.items, r.stashed ? tx('<div style="color:var(--brass)">\u80CC\u5305\u5DF2\u6EFF\uFF0C{0} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF0C\u5230\u80CC\u5305\u53D6\u51FA</div>', r.stashed) : "", (r.lv ? tx('<div style="color:var(--good)">\u671F\u9593\u5171\u5347\u7D1A {0} \u6B21</div>', r.lv) : "") + firstWinLine(fw)) });
   }
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {

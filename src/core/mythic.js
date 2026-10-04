@@ -49,11 +49,12 @@ const STA_MS = () => MYTHIC.stamina.regenMin * 60000;
 export function stamina(s, now = Date.now()) {
   const max = MYTHIC.stamina.max;
   const st = s.mythic.sta || (s.mythic.sta = { pts: max, at: now });
-  if (st.pts >= max) { st.pts = max; st.at = now; return st; }
+  if (st.pts >= max) { st.at = now; return st; } // 獎勵給的體力可以暫時超過上限
   const n = Math.floor((now - st.at) / STA_MS());
   if (n > 0) { st.pts = Math.min(max, st.pts + n); st.at = st.pts >= max ? now : st.at + n * STA_MS(); }
   return st;
 }
+export function addStamina(s, n, cap, now = Date.now()) { const st = stamina(s, now); st.pts = Math.min(cap, st.pts + n); return st.pts; }
 // 距離下一點還要幾毫秒（滿了回 0）
 export const staminaNext = (s, now = Date.now()) => { const st = stamina(s, now); return st.pts >= MYTHIC.stamina.max ? 0 : Math.max(0, st.at + STA_MS() - now); };
 export function spendStamina(s, now = Date.now()) {

@@ -30,3 +30,6 @@ export function itemName(it) {
 export function partyPower() { return G.partyHeroes(app.S).reduce((a, h) => a + G.heroPower(h, app.S.items), 0); }
 export function avgPartyIlvl() { const p = G.partyHeroes(app.S); return p.length ? Math.round(p.reduce((a, h) => a + G.heroIlvl(h, app.S.items), 0) / p.length) : 0; }
 export function avgPartyLv() { const p = G.partyHeroes(app.S); return p.length ? Math.round(p.reduce((a, h) => a + h.level, 0) / p.length) : 0; }
+// 每日：首勝獎勵一行、每日卡是否展開（有可領的就預設展開）
+export const firstWinLine = fw => fw ? tx('<div style="color:var(--brass)">🏆 今日首勝：+{0} 金、{1}</div>', fmt(fw.gold), itemName(fw.item)) : '';
+export const dailyOpenNow = () => app.dailyOpen != null ? app.dailyOpen : G.dailyPending(app.S) > 0;

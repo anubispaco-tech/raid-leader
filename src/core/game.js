@@ -8,6 +8,7 @@ import { getLang } from './i18n.js';
 import { dungeonInfo } from './dungeons.js';
 import { SPECS, TALENT_ROWS, SPEC_LEVEL, applyRecommend } from './talents.js';
 import { MYTHIC, CH1_TOP, SET_DROP } from './config.js';
+import { bump } from './daily.js';
 import { mythicRewards, keyChange, mythicBattleOpts, keyOf, setKey, mythicTier } from './mythic.js';
 import { Battle } from './battle.js';
 
@@ -137,12 +138,13 @@ export function recruitScroll(s, n = 1) {
   s.gold -= cost;
   const got = Array.from({ length: n }, () => newRecruit(s, recruitLevel(s)));
   for (const h of got) { s.heroes.push(h); if (!partyLocked(s) && s.party.length < ECONOMY.partyMax) s.party.push(h.id); }
+  bump(s, 'recruit', n);
   return { heroes: got, cost };
 }
 export function hire(s, heroId) {
   const h = s.tavern.find(x => x.id === heroId), cost = h && hireCost(h);
   if (!h || s.gold < cost || s.heroes.length >= ECONOMY.rosterMax) return null;
-  s.gold -= cost; s.heroes.push(h); s.tavern = s.tavern.filter(x => x.id !== heroId);
+  s.gold -= cost; s.heroes.push(h); s.tavern = s.tavern.filter(x => x.id !== heroId); bump(s, 'recruit');
   if (!partyLocked(s) && s.party.length < ECONOMY.partyMax) s.party.push(h.id);
   if (!s.tavern.length) rollTavern(s);
   return h;
@@ -202,7 +204,7 @@ export function salvageLowIlvl(s, gap, dry = false) {
   if (dry) return { count: ids.length };
   return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
 }
-function addLoot(s, it) {
+export function addLoot(s, it) {
   if (s.salvageIlvlGap && it.rarity < 4 && it.ilvl < partyIlvl(s) - s.salvageIlvlGap) { s.gold += salvageValue(it); s.dust = (s.dust || 0) + salvageDust(it); return 'salvaged'; }
   if (it.rarity < s.autoSalvageBelow) { s.gold += salvageValue(it); s.dust = (s.dust || 0) + salvageDust(it); return 'salvaged'; }
   if (s.bag.length < bagMax(s)) { s.items[it.id] = it; s.bag.push(it.id); return 'bag'; }
@@ -232,8 +234,10 @@ export function applyResult(s, dIdx, battle) {
   const kept = rw.loot.filter((_, i) => dest[i] === 'bag'), stashed = rw.loot.filter((_, i) => dest[i] === 'stash');
   return { ...rw, first, lvUps, kept, stashed, salvaged: dest.filter(d => d === 'salvaged').length };
 }
+// 任務／簽到等獎勵給裝備：套裝走套裝規則，其餘走一般掉落規則
+export const grantItem = (s, it) => (it.set ? addSetLoot(s, it) : addLoot(s, it));
 // 套裝部件不會被自動分解：背包滿就進戰利品箱
-function addSetLoot(s, it) {
+export function addSetLoot(s, it) {
   s.items[it.id] = it;
   if (s.bag.length < bagMax(s)) { s.bag.push(it.id); return 'bag'; }
   if (s.stash.length < ECONOMY.stashMax) { s.stash.push(it.id); return 'stash'; }
@@ -331,7 +335,7 @@ export function upgradeAll(s, heroId, dry = false) {
 export function salvage(s, itemId) {
   const it = s.items[itemId]; if (!it) return 0;
   s.bag = s.bag.filter(id => id !== itemId); s.stash = (s.stash || []).filter(id => id !== itemId); delete s.items[itemId];
-  const v = salvageValue(it); s.gold += v; s.dust = (s.dust || 0) + salvageDust(it); return v;
+  const v = salvageValue(it); s.gold += v; s.dust = (s.dust || 0) + salvageDust(it); bump(s, 'salvage'); return v;
 }
 // 分解背包中品質 ≤ maxRarity 的裝備（0 = 普通，1 = 精良以下）
 export function salvageUpTo(s, maxRarity) {
@@ -376,7 +380,7 @@ export function salvageStash(s) {
 export function upgrade(s, itemId) {
   const it = s.items[itemId]; if (!it || it.up >= maxUpFor(s)) return false;
   const c = upgradeCost(it), d = dustCost(it); if (s.gold < c || (s.dust || 0) < d) return false;
-  s.gold -= c; s.dust = (s.dust || 0) - d; it.up++; return true;
+  s.gold -= c; s.dust = (s.dust || 0) - d; it.up++; bump(s, 'upgrade'); return true;
 }
 // 背包裡是否有比出戰隊員身上更好的裝備（下一步建議用）
 export function hasUpgrade(s) {

@@ -118,6 +118,16 @@ export const DUNGEON = {
   waveHeal: 0.5,                    // 波與波之間回血比例
 };
 
+// ---------- 每日（v0.9.4）：每日任務、每日首勝、累積簽到 ----------
+export const DAILY = {
+  questGoldRuns: 15, questDust: 10,       // 每個任務：最高層一場金幣 × 15、精華 10
+  chestRarity: 3, chestSetChance: 0.4,    // 三個任務都領完 → 寶箱：史詩一件（第二章起 40% 是套裝）
+  firstWinGoldRuns: 10, firstWinRarity: 2, // 每日首勝：最高層一場金幣 × 10 ＋ 稀有以上一件
+  // 累積簽到，7 天一輪；斷簽不歸零
+  signin: [{ t: 'gold', runs: 10 }, { t: 'dust', n: 30 }, { t: 'sta', n: 5 }, { t: 'gold', runs: 20 }, { t: 'item', r: 2 }, { t: 'dust', n: 60 }, { t: 'item', r: 3, set: true }],
+  staminaOver: 20,                        // 獎勵給的體力可暫時超過上限，最多到 20
+};
+
 // ---------- 傳奇秘境 ----------
 export const MYTHIC = {
   unlockAfter: 6,                   // 通關第 7 層（index 6）後解鎖

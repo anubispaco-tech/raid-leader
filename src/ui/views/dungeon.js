@@ -2,10 +2,36 @@
 import { tx } from '../../core/i18n.js';
 import * as G from '../../core/index.js';
 import { app } from '../state.js';
-import { fmt, mmss, esc, partyPower, avgPartyIlvl, avgPartyLv } from '../helpers.js';
+import { fmt, mmss, esc, partyPower, avgPartyIlvl, avgPartyLv, dailyOpenNow } from '../helpers.js';
 import { leaderboard } from '../telemetry.js';
 
 // ---------- 下一步建議卡 ----------
+// ---------- 每日：任務、首勝、簽到 ----------
+function signinText(r) {
+  const g = G.runGold(app.S);
+  return r.t === 'gold' ? tx('{0} 金', fmt(g * r.runs)) : r.t === 'dust' ? tx('精華 {0}', r.n) : r.t === 'sta' ? tx('秘境體力 +{0}', r.n)
+    : r.set ? tx('史詩裝備 1 件（第二章起為套裝）') : tx('{0}裝備 1 件', G.RARITY[r.r].name);
+}
+function dailyCard() {
+  const S = app.S, d = G.dailyToday(S), pend = G.dailyPending(S), open = dailyOpenNow();
+  const doneN = d.q.filter(q => q.claimed).length;
+  const head = tx('<button class="dhead" data-act="dtoggle"><span class="label">每日</span><span class="dsum">任務 {0}/{1}・首勝 {2}・簽到 {3}</span>{4}<span class="chev">{5}</span></button>',
+    doneN, d.q.length, d.firstWin ? '✓' : '—', d.signed ? '✓' : '—', pend ? `<span class="dbadge num">${pend}</span>` : '', open ? '▴' : '▾');
+  if (!open) return `<div class="daily">${head}</div>`;
+  const rows = d.q.map((q, i) => {
+    const t = G.QUESTS[q.id].n, done = G.questDone(q);
+    const btn = q.claimed ? `<span class="dok">✓</span>` : done ? `<button class="btn sm main" data-act="dq" data-i="${i}">${tx('領取')}</button>` : `<span class="sub num" style="margin:0">${q.n}/${t}</span>`;
+    return `<div class="drow"><span>${G.questText(q)}</span><span class="dbar"><i style="width:${Math.round(100 * q.n / t)}%"></i></span>${btn}</div>`;
+  }).join('');
+  const reward = tx('每項：{0} 金、精華 {1}', fmt(G.runGold(S) * G.DAILY.questGoldRuns), G.DAILY.questDust);
+  const chest = tx('<div class="drow"><span>每日寶箱：三項都領完，送史詩裝備 1 件{0}</span>{1}</div>', '',
+    d.chest ? '<span class="dok">✓</span>' : G.canChest(S) ? `<button class="btn sm main" data-act="dchest">${tx('開啟')}</button>` : `<span class="sub" style="margin:0">🔒</span>`);
+  const fw = tx('<div class="drow"><span>每日首勝：今天第一場勝利，加送 {0} 金＋稀有以上裝備 1 件</span>{1}</div>', fmt(G.runGold(S) * G.DAILY.firstWinGoldRuns), d.firstWin ? '<span class="dok">✓</span>' : `<span class="sub" style="margin:0">—</span>`);
+  const next = G.signinReward(d.signDays + (d.signed ? 0 : 1));
+  const sign = tx('<div class="drow"><span>累積簽到第 {0} 天：{1}<small class="sub" style="display:block;margin:0">7 天一輪，斷簽不歸零；第 7 天送史詩</small></span>{2}</div>',
+    d.signDays + (d.signed ? 0 : 1), signinText(next), d.signed ? '<span class="dok">✓</span>' : `<button class="btn sm main" data-act="dsign">${tx('簽到')}</button>`);
+  return `<div class="daily open">${head}<div class="dbody">${sign}${rows}<p class="sub" style="margin:0">${reward}</p>${chest}${fw}<p class="sub" style="margin:0">${tx('每天 00:00（台灣時間）換新任務。')}</p></div></div>`;
+}
 function nextStepCard() {
   const n = G.nextStep(app.S); if (!n) return '';
   const b = n.btn;
@@ -56,7 +82,7 @@ function boardCard() {
 }
 export function viewDungeons() {
   const lv = avgPartyLv(), il = avgPartyIlvl();
-  let h = nextStepCard() + tx('<h2>副本</h2><p class="sub">隊伍平均 <b class="num">Lv{0}</b>・裝等 <b class="num">{1}</b>・戰力 <b class="num">{2}</b>　｜　每隻首領都有弱點，打不過就換陣容，或回頭刷裝備。</p>', lv, il, fmt(partyPower()));
+  let h = dailyCard() + nextStepCard() + tx('<h2>副本</h2><p class="sub">隊伍平均 <b class="num">Lv{0}</b>・裝等 <b class="num">{1}</b>・戰力 <b class="num">{2}</b>　｜　每隻首領都有弱點，打不過就換陣容，或回頭刷裝備。</p>', lv, il, fmt(partyPower()));
   // 遊玩分類：主線／秘境／寶庫／活動（之後的節慶、裝備副本放「活動」）
   const S = app.S, mode = app.mode || 'story';
   const modes = [['story', tx('主線')], ['mythic', tx('秘境')], ['vault', tx('寶庫')], ['event', tx('活動')]];

@@ -3,7 +3,7 @@ import { tx } from '../core/i18n.js';
 import * as G from '../core/index.js';
 import { app, KEY } from './state.js';
 import { load, save, exportCode, importCode } from './save.js';
-import { $, fmt, toast, hero, mmss } from './helpers.js';
+import { $, fmt, toast, hero, mmss, itemName, dailyOpenNow, firstWinLine } from './helpers.js';
 import { viewDungeons } from './views/dungeon.js';
 import { viewBattle } from './views/battle.js';
 import { viewTeam } from './views/team.js';
@@ -149,6 +149,10 @@ document.addEventListener('click', e => {
     case 'reroll': if (G.refreshTavern(app.S)) save(); break;
     case 'filter': app.invFilter = t.dataset.v; break;
     case 'autoequip1': { const n = G.autoEquip(app.S, id); toast(n ? tx('更換了 {0} 件裝備', n) : tx('目前已是最佳配裝')); save(); break; }
+    case 'dq': dailyToast(G.claimQuest(app.S, +t.dataset.i), tx('任務獎勵')); save(); break;
+    case 'dchest': dailyToast(G.claimChest(app.S), tx('每日寶箱')); save(); break;
+    case 'dsign': { const r = G.claimSignin(app.S); dailyToast(r, r ? tx('簽到第 {0} 天', r.day) : ''); save(); break; }
+    case 'dtoggle': app.dailyOpen = !dailyOpenNow(); break;
     case 'autoequip': { const n = G.autoEquip(app.S); toast(n ? tx('更換了 {0} 件裝備', n) : tx('目前已是最佳配裝')); save(); break; }
     case 'salvageupto': {
       const lv = app.salvSel ?? 0;
@@ -201,13 +205,24 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && app.modal) closeModal(); });
 
+// ---------- 每日 ----------
+function dailyToast(r, what) {
+  if (!r) return;
+  const parts = [];
+  if (r.gold) parts.push(tx('+{0} 金', fmt(r.gold)));
+  if (r.dust) parts.push(tx('精華 +{0}', r.dust));
+  if (r.sta) parts.push(tx('秘境體力 +{0}', r.sta));
+  if (r.item) parts.push(itemName(r.item) + (r.dest === 'stash' ? tx('（放進戰利品箱）') : r.dest === 'salvaged' ? tx('（背包已滿，自動分解）') : ''));
+  toast(what + '：' + parts.join(tx('、')));
+}
 // ---------- 離線結算 ----------
 function settleOffline() {
   const r = G.offlineProgress(app.S);
   if (!r || !r.runs) return;
+  const fw = G.dailyAfterOffline(app.S, r, app.S.idleMythic != null);
   save();
   const hrs = r.sec >= 3600 ? tx('{0} 小時', (r.sec / 3600).toFixed(1)) : tx('{0} 分鐘', Math.round(r.sec / 60));
-  openModal({ type: 'text', html: tx('<h3>離線收益</h3><p class="sub" style="margin:0">你離開了 {0}，隊伍在 {1} 持續作戰。</p> <div class="statgrid num"><div><b>{2}</b><span>挑戰</span></div><div><b>{3}</b><span>通關</span></div><div><b>+{4}</b><span>金幣</span></div><div><b>{5}</b><span>裝備</span></div></div> {6} {7} <div class="row"><button class="btn main grow" data-act="autoequip">一鍵配裝</button><button class="btn" data-act="closebtn">好</button></div>', hrs, app.S.idleMythic != null ? tx('秘境「{0}」+{1}', G.DUNGEONS[app.S.idleMythic].name, G.mythicIdleLevel(app.S, app.S.idleMythic)) : G.DUNGEONS[app.S.idle].name, r.runs, r.wins, fmt(r.gold), r.items, r.stashed ? tx('<div style="color:var(--brass)">背包已滿，{0} 件放進戰利品箱，到背包取出</div>', r.stashed) : '', r.lv ? tx('<div style="color:var(--good)">期間共升級 {0} 次</div>', r.lv) : '') });
+  openModal({ type: 'text', html: tx('<h3>離線收益</h3><p class="sub" style="margin:0">你離開了 {0}，隊伍在 {1} 持續作戰。</p> <div class="statgrid num"><div><b>{2}</b><span>挑戰</span></div><div><b>{3}</b><span>通關</span></div><div><b>+{4}</b><span>金幣</span></div><div><b>{5}</b><span>裝備</span></div></div> {6} {7} <div class="row"><button class="btn main grow" data-act="autoequip">一鍵配裝</button><button class="btn" data-act="closebtn">好</button></div>', hrs, app.S.idleMythic != null ? tx('秘境「{0}」+{1}', G.DUNGEONS[app.S.idleMythic].name, G.mythicIdleLevel(app.S, app.S.idleMythic)) : G.DUNGEONS[app.S.idle].name, r.runs, r.wins, fmt(r.gold), r.items, r.stashed ? tx('<div style="color:var(--brass)">背包已滿，{0} 件放進戰利品箱，到背包取出</div>', r.stashed) : '', (r.lv ? tx('<div style="color:var(--good)">期間共升級 {0} 次</div>', r.lv) : '') + firstWinLine(fw)) });
 }
 // 切到背景：暫停即時戰鬥並記錄時間；回來時掛機改用離線結算，避免重複計算
 document.addEventListener('visibilitychange', () => {
