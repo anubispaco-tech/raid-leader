@@ -1,0 +1,12 @@
+{
+"雲端已有存檔": "A cloud save already exists",
+"已登入，正在建立雲端存檔": "Signed in. Creating your cloud save",
+"雲端：{1}（{2} 上傳）": "Cloud: {1} (uploaded {2})",
+"這台裝置：{3}": "This device: {3}",
+"載入雲端": "Load cloud",
+"保留這台並上傳": "Keep this device and upload",
+"兩邊都有新進度": "Both have new progress",
+"雲端在別的裝置更新過": "The cloud save was updated on another device",
+"已自動載入雲端較新的進度（{0}）": "Loaded newer cloud progress ({0})",
+"自動同步：開啟遊戲時載入較新的雲端進度；有新進度時每 {0} 分鐘、以及離開遊戲時自動上傳。": "Auto-sync: newer cloud progress loads when you open the game; new progress uploads every {0} minutes and when you leave."
+}

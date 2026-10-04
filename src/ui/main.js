@@ -49,7 +49,8 @@ function render(skipModal) {
 app.render = render;
 app.renderModal = renderModal;
 // 設定頁畫好後放 Google 登入按鈕、讀雲端狀態
-app.afterModal = () => { if (app.modal && app.modal.type === 'settings' && C.cloudEnabled()) { C.mountButton(); if (C.loggedIn() && !C.cloud.info && !C.cloud.asked) { C.cloud.asked = true; C.refreshInfo(); } } };
+app.afterModal = () => { if (app.modal && app.modal.type === 'settings' && C.cloudEnabled()) { C.mountButton(); C.check(); } };
+app.openModal = openModal;
 app.renderTabs = renderTabs;
 
 // ---------- 事件 ----------
@@ -191,8 +192,8 @@ document.addEventListener('click', e => {
     case 'doreset': clearInterval(app.bTimer); clearTimeout(app.pendingRepeat); app.S = G.newGame(); app.battle = null; app.lastResult = null; app.modal = null; app.tab = 'dungeon'; save(); render(); playDialog(PROLOGUE, () => {}); return;
     case 'closebtn': app.modal = null; break;
     case 'cloudup': C.upload(); return;
-    case 'clouddown': C.askDownload(openModal); return;
-    case 'clouddo': if (C.applyDownload()) { app.modal = null; toast(tx('已從雲端載入進度')); } break;
+    case 'clouddown': C.download(false); return;
+    case 'cloudpick': C.pick(t.dataset.v); return;
     case 'cloudout': C.logout(); toast(tx('已登出（這台裝置的進度保留）')); break;
     case 'nick': openNick(); return;
     case 'savenick': {
@@ -247,7 +248,8 @@ function settleOffline() {
 }
 // 切到背景：暫停即時戰鬥並記錄時間；回來時掛機改用離線結算，避免重複計算
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { clearInterval(app.bTimer); clearTimeout(app.pendingRepeat); app.pendingRepeat = null; save(); if (app.S.player.asked) T.sendSnapshot(true); return; }
+  if (document.hidden) { clearInterval(app.bTimer); clearTimeout(app.pendingRepeat); app.pendingRepeat = null; save(); if (app.S.player.asked) T.sendSnapshot(true); C.uploadOnHide(); return; }
+  C.check();
   if (G.partyLocked(app.S) && (Date.now() - app.S.lastSeen) > 60000) {
     app.battle = null; app.lastResult = null; settleOffline(); resumeIdle(); render();
   } else if (app.battle && !app.battle.over) runTimer();
@@ -285,6 +287,7 @@ function start(data) {
   settleOffline();
   resumeIdle();
   render();
+  setTimeout(() => C.check(true), 1500); // 雲端有較新的進度就同步
   const after = () => {
     if (T.enabled() && !app.S.player.asked && !app.modal) openNick();
     else if (app.S.player.asked) setTimeout(() => T.sendSnapshot(), 3000);

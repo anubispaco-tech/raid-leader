@@ -5,7 +5,7 @@ import * as G from '../../core/index.js';
 import { app } from '../state.js';
 import { enabled } from '../telemetry.js';
 import { esc, fmt } from '../helpers.js';
-import { cloudEnabled, loggedIn, cloud } from '../cloud.js';
+import { cloudEnabled, loggedIn, cloud, fmtTime } from '../cloud.js';
 
 function cloudBlock() {
   if (!loggedIn()) return `<span class="label">${tx('雲端存檔')}</span>
@@ -13,7 +13,7 @@ function cloudBlock() {
     <div id="gsiBtn" class="gsi"></div>`;
   const i = cloud.info;
   return `<span class="label">${tx('雲端存檔')}</span>
-    <p class="sub" style="margin:0">${cloud.busy ? tx('上傳中…') : i ? (i.updated ? tx('已登入・雲端最後備份 {0}（{1}）', esc(i.updated), esc(i.summary || '—')) : tx('已登入・雲端還沒有存檔')) : tx('已登入・讀取雲端狀態中…')}<br>${tx('登入期間每 {0} 分鐘自動上傳。', G.CLOUD.autoMin)}</p>
+    <p class="sub" style="margin:0">${cloud.busy ? tx('上傳中…') : i ? (i.updated ? tx('已登入・雲端最後備份 {0}（{1}）', fmtTime(i.updated), esc(i.summary || '—')) : tx('已登入・雲端還沒有存檔')) : tx('已登入・讀取雲端狀態中…')}<br>${tx('自動同步：開啟遊戲時載入較新的雲端進度；有新進度時每 {0} 分鐘、以及離開遊戲時自動上傳。', G.CLOUD.autoMin)}</p>
     <div class="row"><button class="btn main" data-act="cloudup" ${cloud.busy ? 'disabled' : ''}>${tx('立即上傳')}</button><button class="btn" data-act="clouddown">${tx('從雲端下載')}</button><button class="btn" data-act="cloudout">${tx('登出')}</button></div>`;
 }
 const row = (label, value) => `<div class="set"><span>${label}</span>${value}</div>`;

@@ -12,6 +12,7 @@
  * 之後改了程式：部署 → 管理部署作業 → 編輯 → 版本選「新版本」→ 部署（網址不變）
  * v0.9.3：新增「深淵最高／深淵鑰石」兩欄 → 貼上後先執行一次 setup（補表頭），再部署新版本
  * v0.10.1：新增「封鎖」欄與成績合理性檢查 → 同樣先執行 setup，再部署新版本
+ * v0.13.2：雲端存檔改成自動同步（衝突偵測）→ 貼上新版後直接部署新版本即可（不用再跑 setup）
  * v0.13：雲端存檔（Google 登入）→ 在下面 CLIENT_ID 填入 OAuth 用戶端 ID，執行一次 setup（會要求 Drive 授權），再部署新版本
  *        存檔放在你 Google Drive 的「raid-leader-saves」資料夾，一位玩家一個檔；工作表「雲端」只記 Google 帳號編號（sub），不存 Email
  */
@@ -178,33 +179,38 @@ function cloudLogin(d) {
   const lock = LockService.getScriptLock(); lock.waitLock(10000);
   try {
     const sh = cloudSheet(), row = cloudRowBy(sh, 1, sub);
-    if (row) { sh.getRange(row.r, 2, 1, 2).setValues([[token, exp]]); return { ok: true, token, updated: row.v[4] || '', summary: row.v[5] || '' }; }
+    if (row) { sh.getRange(row.r, 2, 1, 2).setValues([[token, exp]]); return { ok: true, token, updated: row.v[3] ? cloudMs(row.v[4]) : 0, summary: row.v[5] || '' }; }
     sh.appendRow([sub, token, exp, '', '', '', '']);
-    return { ok: true, token, updated: '', summary: '' };
+    return { ok: true, token, updated: 0, summary: '' };
   } finally { lock.releaseLock(); }
 }
 function cloudOp(d) {
   const sh = cloudSheet(), row = cloudRowBy(sh, 2, String(d.token || ''));
   if (!row || !row.v[1] || Number(row.v[2]) < Date.now()) return { ok: false, error: 'login' };
-  if (d.type === 'cloudinfo') return { ok: true, updated: row.v[4] || '', summary: row.v[5] || '' };
+  const cur = row.v[3] ? cloudMs(row.v[4]) : 0;
+  if (d.type === 'cloudinfo') return { ok: true, updated: cur, summary: row.v[5] || '' };
   if (d.type === 'cloudload') {
-    if (!row.v[3]) return { ok: true, save: null };
-    return { ok: true, save: DriveApp.getFileById(row.v[3]).getBlob().getDataAsString(), updated: row.v[4], summary: row.v[5] };
+    if (!row.v[3]) return { ok: true, save: null, updated: 0 };
+    return { ok: true, save: DriveApp.getFileById(row.v[3]).getBlob().getDataAsString(), updated: cur, summary: row.v[5] };
   }
   // cloudsave：存檔內容只做大小與 JSON 檢查，遊戲讀回來時會再過濾
   const text = String(d.save || '');
   if (!text || text.length > CLOUD.maxBytes) return { ok: false, error: 'size' };
   try { JSON.parse(text); } catch (e) { return { ok: false, error: 'json' }; }
+  // 衝突偵測：雲端在這台裝置上次同步之後被別台更新過 → 不覆蓋，交給玩家選（force = 玩家確認要覆蓋）
+  if (!d.force && d.base != null && cur && Number(d.base) !== cur) return { ok: false, error: 'conflict', updated: cur, summary: row.v[5] || '' };
   const lock = LockService.getScriptLock(); lock.waitLock(10000);
   try {
     let id = row.v[3];
     if (id) DriveApp.getFileById(id).setContent(text);
     else id = cloudFolder().createFile(row.v[0] + '.json', text, 'application/json').getId();
-    const at = now();
+    const at = Date.now();
     sh.getRange(row.r, 4, 1, 4).setValues([[id, at, clean(d.summary, 100), clean(d.ver, 10)]]);
     return { ok: true, updated: at };
   } finally { lock.releaseLock(); }
 }
+// 「最後上傳」一律回傳毫秒數（舊資料可能被試算表轉成日期）
+function cloudMs(v) { return v instanceof Date ? v.getTime() : (Number(v) || (v ? new Date(String(v).replace(' ', 'T') + '+08:00').getTime() : 0) || 0); }
 function cloudSheet() {
   const ss = SpreadsheetApp.getActive();
   return ss.getSheetByName(CLOUD.sheet) || (setup(), ss.getSheetByName(CLOUD.sheet));

@@ -349,7 +349,7 @@ h3 .gi{vertical-align:-.12em}
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.13.1 */
+/* 副本團長 v0.13.2 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -915,14 +915,19 @@ h3 .gi{vertical-align:-.12em}
     "\u7B2C {0} \u5C64 {1}": "Floor {0} {1}",
     "Google \u767B\u5165\u66AB\u6642\u7121\u6CD5\u8F09\u5165\uFF0C\u7A0D\u5F8C\u518D\u8A66\u3002": "Google sign-in couldn't load. Try again later.",
     "\u767B\u5165\u5931\u6557\uFF0C\u8ACB\u518D\u8A66\u4E00\u6B21": "Sign-in failed. Please try again",
-    "\u5DF2\u767B\u5165\u3002\u96F2\u7AEF\u6709 {0} \u7684\u5B58\u6A94": "Signed in. Cloud save from {0} found",
-    "\u5DF2\u767B\u5165\u3002\u76EE\u524D\u96F2\u7AEF\u9084\u6C92\u6709\u5B58\u6A94\uFF0C\u5148\u4E0A\u50B3\u4E00\u6B21\u5427": "Signed in. No cloud save yet, so upload one first",
+    "\u96F2\u7AEF\u5DF2\u6709\u5B58\u6A94": "A cloud save already exists",
+    "\u5DF2\u767B\u5165\uFF0C\u6B63\u5728\u5EFA\u7ACB\u96F2\u7AEF\u5B58\u6A94": "Signed in. Creating your cloud save",
     "\u767B\u5165\u5DF2\u904E\u671F\uFF0C\u8ACB\u91CD\u65B0\u767B\u5165": "Your sign-in expired. Please sign in again",
+    '<h3>{0}</h3><p class="sub" style="margin:0">\u96F2\u7AEF\uFF1A{1}\uFF08{2} \u4E0A\u50B3\uFF09<br>\u9019\u53F0\u88DD\u7F6E\uFF1A{3}</p><div class="row"><button class="btn main grow" data-act="cloudpick" data-v="cloud">\u8F09\u5165\u96F2\u7AEF</button><button class="btn grow" data-act="cloudpick" data-v="local">\u4FDD\u7559\u9019\u53F0\u4E26\u4E0A\u50B3</button></div>': '<h3>{0}</h3><p class="sub" style="margin:0">Cloud: {1} (uploaded {2})<br>This device: {3}</p><div class="row"><button class="btn main grow" data-act="cloudpick" data-v="cloud">Load cloud</button><button class="btn grow" data-act="cloudpick" data-v="local">Keep this device and upload</button></div>',
+    "\u5169\u908A\u90FD\u6709\u65B0\u9032\u5EA6": "Both have new progress",
     "\u5DF2\u4E0A\u50B3\u5230\u96F2\u7AEF": "Uploaded to the cloud",
+    "\u96F2\u7AEF\u5728\u5225\u7684\u88DD\u7F6E\u66F4\u65B0\u904E": "The cloud save was updated on another device",
     "\u4E0A\u50B3\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66": "Upload failed. Try again later",
     "\u4E0B\u8F09\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66": "Download failed. Try again later",
     "\u96F2\u7AEF\u9084\u6C92\u6709\u5B58\u6A94": "There's no cloud save yet",
-    '<h3>\u5F9E\u96F2\u7AEF\u4E0B\u8F09</h3><p class="sub" style="margin:0">\u96F2\u7AEF\uFF1A{0}\uFF08{1}\uFF09<br>\u9019\u53F0\u88DD\u7F6E\uFF1A{2}<br>\u4E0B\u8F09\u6703\u8986\u84CB\u9019\u53F0\u88DD\u7F6E\u7684\u9032\u5EA6\u3002</p><div class="row"><button class="btn main grow" data-act="clouddo">\u4E0B\u8F09\u4E26\u8986\u84CB</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>': '<h3>Download from cloud</h3><p class="sub" style="margin:0">Cloud: {0} ({1})<br>This device: {2}<br>Downloading replaces the progress on this device.</p><div class="row"><button class="btn main grow" data-act="clouddo">Download and replace</button><button class="btn" data-act="closebtn">Cancel</button></div>',
+    "\u5F9E\u96F2\u7AEF\u4E0B\u8F09": "Download from cloud",
+    "\u5DF2\u81EA\u52D5\u8F09\u5165\u96F2\u7AEF\u8F03\u65B0\u7684\u9032\u5EA6\uFF08{0}\uFF09": "Loaded newer cloud progress ({0})",
+    "\u5DF2\u5F9E\u96F2\u7AEF\u8F09\u5165\u9032\u5EA6": "Progress loaded from the cloud",
     "\u5A01\u529B {0}": "Power {0}",
     "\u8010\u529B {0}": "Stamina {0}",
     "\u66B4\u64CA +{0}%": "Crit +{0}%",
@@ -978,7 +983,6 @@ h3 .gi{vertical-align:-.12em}
     "\u532F\u5165\u5B8C\u6210": "Import complete",
     "\u5B58\u6A94\u78BC\u7121\u6CD5\u8B80\u53D6\uFF0C\u8ACB\u78BA\u8A8D\u662F\u5426\u5B8C\u6574\u8907\u88FD": "Couldn't read that save code \u2014 make sure you copied all of it",
     '<h3>\u91CD\u65B0\u958B\u59CB\uFF1F</h3><p class="sub" style="margin:0">\u76EE\u524D\u7684\u82F1\u96C4\u3001\u88DD\u5099\u8207\u9032\u5EA6\u90FD\u6703\u6E05\u9664\uFF0C\u7121\u6CD5\u5FA9\u539F\u3002</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">\u6E05\u9664\u4E26\u91CD\u4F86</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>': `<h3>Start over?</h3><p class="sub" style="margin:0">All heroes, gear and progress will be erased. This can't be undone.</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">Erase and restart</button><button class="btn" data-act="closebtn">Cancel</button></div>`,
-    "\u5DF2\u5F9E\u96F2\u7AEF\u8F09\u5165\u9032\u5EA6": "Progress loaded from the cloud",
     "\u5DF2\u767B\u51FA\uFF08\u9019\u53F0\u88DD\u7F6E\u7684\u9032\u5EA6\u4FDD\u7559\uFF09": "Signed out (progress on this device is kept)",
     "\u66B1\u7A31\u8A2D\u70BA\u300C{0}\u300D\uFF0C\u5929\u68AF\u7D04 1 \u5206\u9418\u5167\u66F4\u65B0": 'Nickname set to "{0}" \u2014 the Ladder updates within a minute',
     "\u4EE5\u533F\u540D\u53C3\u52A0": "Joined anonymously",
@@ -1191,9 +1195,8 @@ h3 .gi{vertical-align:-.12em}
     "\u5DF2\u767B\u5165\u30FB\u96F2\u7AEF\u6700\u5F8C\u5099\u4EFD {0}\uFF08{1}\uFF09": "Signed in \xB7 last cloud backup {0} ({1})",
     "\u5DF2\u767B\u5165\u30FB\u96F2\u7AEF\u9084\u6C92\u6709\u5B58\u6A94": "Signed in \xB7 no cloud save yet",
     "\u5DF2\u767B\u5165\u30FB\u8B80\u53D6\u96F2\u7AEF\u72C0\u614B\u4E2D\u2026": "Signed in \xB7 checking the cloud\u2026",
-    "\u767B\u5165\u671F\u9593\u6BCF {0} \u5206\u9418\u81EA\u52D5\u4E0A\u50B3\u3002": "While signed in, progress uploads every {0} minutes.",
+    "\u81EA\u52D5\u540C\u6B65\uFF1A\u958B\u555F\u904A\u6232\u6642\u8F09\u5165\u8F03\u65B0\u7684\u96F2\u7AEF\u9032\u5EA6\uFF1B\u6709\u65B0\u9032\u5EA6\u6642\u6BCF {0} \u5206\u9418\u3001\u4EE5\u53CA\u96E2\u958B\u904A\u6232\u6642\u81EA\u52D5\u4E0A\u50B3\u3002": "Auto-sync: newer cloud progress loads when you open the game; new progress uploads every {0} minutes and when you leave.",
     "\u7ACB\u5373\u4E0A\u50B3": "Upload now",
-    "\u5F9E\u96F2\u7AEF\u4E0B\u8F09": "Download from cloud",
     "\u767B\u51FA": "Sign out",
     "{0} \u5C0F\u6642 {1} \u5206": "{0}h {1}m",
     "\u5E33\u865F": "Account",
@@ -2497,17 +2500,17 @@ h3 .gi{vertical-align:-.12em}
   function heroMods(h) {
     const m = {}, t = h.talents || {};
     PACKS[h.cls].talents.forEach((row2, i) => {
-      const lv = TALENT_ROWS[i], pick2 = h.level >= lv && t[lv];
-      if (pick2 && row2[pick2]) Object.assign(m, row2[pick2].mods);
+      const lv = TALENT_ROWS[i], pick3 = h.level >= lv && t[lv];
+      if (pick3 && row2[pick3]) Object.assign(m, row2[pick3].mods);
     });
     return m;
   }
   function setSpec(h, spec2) {
     if (canPickSpec(h) && PACKS[h.cls].specs[spec2]) h.spec = spec2;
   }
-  function setTalent(h, lv, pick2) {
-    if (!TALENT_ROWS.includes(lv) || h.level < lv || !["a", "b"].includes(pick2)) return;
-    h.talents = { ...h.talents || {}, [lv]: pick2 };
+  function setTalent(h, lv, pick3) {
+    if (!TALENT_ROWS.includes(lv) || h.level < lv || !["a", "b"].includes(pick3)) return;
+    h.talents = { ...h.talents || {}, [lv]: pick3 };
   }
   function recommend(cls2, mechTypes, hero2) {
     const has = (t) => mechTypes.includes(t);
@@ -3824,11 +3827,11 @@ h3 .gi{vertical-align:-.12em}
   function recommendParty(s, hints) {
     const has = (t) => hints.includes(t), pw = (h) => heroPower(h, s.items);
     const byRole = (r) => s.heroes.filter((h) => roleOf(h) === r).sort((a, b) => pw(b) - pw(a));
-    const pick2 = [...byRole("tank").slice(0, has("twin") ? 2 : 1), ...byRole("heal").slice(0, has("pulse") ? 2 : 1)];
+    const pick3 = [...byRole("tank").slice(0, has("twin") ? 2 : 1), ...byRole("heal").slice(0, has("pulse") ? 2 : 1)];
     const pref = (h) => (CLASSES[h.cls].prefers || []).reduce((m, t) => m * (has(t) ? 1.25 : 1), 1);
-    const rest = s.heroes.filter((h) => !pick2.includes(h)).sort((a, b) => (roleOf(b) === "dps") - (roleOf(a) === "dps") || pw(b) * pref(b) - pw(a) * pref(a));
-    pick2.push(...rest.slice(0, Math.max(0, ECONOMY.partyMax - pick2.length)));
-    s.party = pick2.slice(0, ECONOMY.partyMax).map((h) => h.id);
+    const rest = s.heroes.filter((h) => !pick3.includes(h)).sort((a, b) => (roleOf(b) === "dps") - (roleOf(a) === "dps") || pw(b) * pref(b) - pw(a) * pref(a));
+    pick3.push(...rest.slice(0, Math.max(0, ECONOMY.partyMax - pick3.length)));
+    s.party = pick3.slice(0, ECONOMY.partyMax).map((h) => h.id);
     return partyHeroes(s);
   }
   function prepare(s, hints) {
@@ -4195,7 +4198,7 @@ h3 .gi{vertical-align:-.12em}
   var dailyOpenNow = () => app.dailyOpen != null ? app.dailyOpen : dailyPending(app.S) > 0;
 
   // src/core/version.js
-  var VERSION = "0.13.1";
+  var VERSION = "0.13.2";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -4524,7 +4527,7 @@ h3 .gi{vertical-align:-.12em}
   // src/ui/cloud.js
   var KEY3 = "raid-leader-cloud";
   var cloudEnabled = () => !!CLOUD.clientId && !!TELEMETRY.url;
-  var cloud = { info: null, busy: false, lastAuto: Date.now() };
+  var cloud = { info: null, busy: false, lastAuto: Date.now(), lastCheck: 0 };
   var session = () => {
     try {
       return JSON.parse(localStorage.getItem(KEY3) || "null");
@@ -4538,14 +4541,30 @@ h3 .gi{vertical-align:-.12em}
     } catch (e) {
     }
   };
+  var patch = (o) => {
+    const s = session();
+    if (s) setSession({ ...s, ...o });
+  };
   var loggedIn = () => !!(session() && session().token);
   var rerender = () => {
     if (app.modal && app.modal.type === "settings") app.renderModal();
   };
+  var toMs = (v) => typeof v === "number" ? v : v ? Date.parse(String(v).replace(" ", "T") + "+08:00") || 0 : 0;
+  var fmtTime = (ms) => {
+    if (!ms) return "\u2014";
+    const d = new Date(ms), p = (n2) => String(n2).padStart(2, "0");
+    return `${d.getMonth() + 1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  };
+  var fp = () => app.S ? `${app.S.stats.runs}:${JSON.stringify(app.S).length}` : "";
+  var dirty = () => {
+    const s = session();
+    return !!s && s.fp !== fp();
+  };
+  var synced = (updated) => patch({ base: toMs(updated), fp: fp() });
   var gis = null;
   function loadGis() {
     if (gis) return gis;
-    gis = new Promise((ok, fail2) => {
+    gis = new Promise((ok, fail) => {
       const sc = document.createElement("script");
       sc.src = "https://accounts.google.com/gsi/client";
       sc.async = true;
@@ -4555,7 +4574,7 @@ h3 .gi{vertical-align:-.12em}
       };
       sc.onerror = () => {
         gis = null;
-        fail2(new Error("gsi"));
+        fail(new Error("gsi"));
       };
       document.head.appendChild(sc);
     });
@@ -4575,12 +4594,17 @@ h3 .gi{vertical-align:-.12em}
       toast(tx("\u767B\u5165\u5931\u6557\uFF0C\u8ACB\u518D\u8A66\u4E00\u6B21"));
       return;
     }
-    setSession({ token: r.token, at: Date.now() });
-    cloud.info = { updated: r.updated, summary: r.summary };
-    toast(r.updated ? tx("\u5DF2\u767B\u5165\u3002\u96F2\u7AEF\u6709 {0} \u7684\u5B58\u6A94", r.updated) : tx("\u5DF2\u767B\u5165\u3002\u76EE\u524D\u96F2\u7AEF\u9084\u6C92\u6709\u5B58\u6A94\uFF0C\u5148\u4E0A\u50B3\u4E00\u6B21\u5427"));
+    const updated = toMs(r.updated);
+    setSession({ token: r.token, at: Date.now(), base: 0, fp: "" });
+    cloud.info = { updated, summary: r.summary };
+    if (updated) chooser(tx("\u96F2\u7AEF\u5DF2\u6709\u5B58\u6A94"), updated, r.summary);
+    else {
+      toast(tx("\u5DF2\u767B\u5165\uFF0C\u6B63\u5728\u5EFA\u7ACB\u96F2\u7AEF\u5B58\u6A94"));
+      upload(true, true);
+    }
     rerender();
   }
-  var fail = (r) => {
+  var expired = (r) => {
     if (r && r.error === "login") {
       setSession(null);
       cloud.info = null;
@@ -4590,49 +4614,81 @@ h3 .gi{vertical-align:-.12em}
     }
     return false;
   };
-  async function refreshInfo() {
-    if (!loggedIn() || cloud.busy) return;
-    const r = await post({ type: "cloudinfo", token: session().token });
-    if (r && r.ok) {
-      cloud.info = { updated: r.updated, summary: r.summary };
-      rerender();
-    } else fail(r);
+  function chooser(title, updated, summary) {
+    cloud.choosing = Date.now();
+    app.openModal({ type: "text", html: tx('<h3>{0}</h3><p class="sub" style="margin:0">\u96F2\u7AEF\uFF1A{1}\uFF08{2} \u4E0A\u50B3\uFF09<br>\u9019\u53F0\u88DD\u7F6E\uFF1A{3}</p><div class="row"><button class="btn main grow" data-act="cloudpick" data-v="cloud">\u8F09\u5165\u96F2\u7AEF</button><button class="btn grow" data-act="cloudpick" data-v="local">\u4FDD\u7559\u9019\u53F0\u4E26\u4E0A\u50B3</button></div>', title, summary || "\u2014", fmtTime(updated), progressText()) });
   }
-  async function upload(quiet = false) {
+  async function pick2(which) {
+    app.modal = null;
+    cloud.choosing = 0;
+    if (which === "cloud") await download(true);
+    else await upload(false, true);
+    app.render();
+  }
+  async function check(force = false) {
+    if (!cloudEnabled() || !loggedIn() || cloud.busy || app.fresh) return;
+    if (!force && Date.now() - cloud.lastCheck < 3e4) return;
+    if (Date.now() - (cloud.choosing || 0) < 3e5) return;
+    cloud.lastCheck = Date.now();
+    const r = await post({ type: "cloudinfo", token: session().token });
+    if (!r || !r.ok) {
+      expired(r);
+      return;
+    }
+    const updated = toMs(r.updated), base = session().base || 0;
+    cloud.info = { updated, summary: r.summary };
+    if (updated && updated !== base) {
+      if (!base) chooser(tx("\u96F2\u7AEF\u5DF2\u6709\u5B58\u6A94"), updated, r.summary);
+      else if (!dirty()) await download(true, true);
+      else chooser(tx("\u5169\u908A\u90FD\u6709\u65B0\u9032\u5EA6"), updated, r.summary);
+    }
+    rerender();
+  }
+  async function upload(quiet = false, force = false) {
     if (!loggedIn() || cloud.busy || app.fresh) return;
     cloud.busy = true;
     if (!quiet) rerender();
-    const r = await post({ type: "cloudsave", token: session().token, save: JSON.stringify(app.S), summary: progressText(), ver: VERSION });
+    const s = session();
+    const r = await post({ type: "cloudsave", token: s.token, save: JSON.stringify(app.S), summary: progressText(), ver: VERSION, base: s.base || 0, force });
     cloud.busy = false;
     cloud.lastAuto = Date.now();
     if (r && r.ok) {
-      cloud.info = { updated: r.updated, summary: progressText() };
+      synced(r.updated);
+      cloud.info = { updated: toMs(r.updated), summary: progressText() };
       if (!quiet) toast(tx("\u5DF2\u4E0A\u50B3\u5230\u96F2\u7AEF"));
-    } else if (!fail(r) && !quiet) toast(tx("\u4E0A\u50B3\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66"));
+    } else if (r && r.error === "conflict") chooser(tx("\u96F2\u7AEF\u5728\u5225\u7684\u88DD\u7F6E\u66F4\u65B0\u904E"), toMs(r.updated), r.summary);
+    else if (!expired(r) && !quiet) toast(tx("\u4E0A\u50B3\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66"));
     rerender();
   }
-  async function askDownload(openModal2) {
+  function uploadOnHide() {
+    if (!cloudEnabled() || !loggedIn() || !dirty() || app.fresh) return;
+    const s = session(), body = { type: "cloudsave", token: s.token, save: JSON.stringify(app.S), summary: progressText(), ver: VERSION, base: s.base || 0 };
+    post(body, true).then((r) => {
+      if (r && r.ok) synced(r.updated);
+    });
+  }
+  async function download(confirmed = false, auto = false) {
     if (!loggedIn()) return;
     const r = await post({ type: "cloudload", token: session().token });
     if (!r || !r.ok) {
-      if (!fail(r)) toast(tx("\u4E0B\u8F09\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66"));
+      if (!expired(r)) toast(tx("\u4E0B\u8F09\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66"));
       return;
     }
     if (!r.save) {
       toast(tx("\u96F2\u7AEF\u9084\u6C92\u6709\u5B58\u6A94"));
       return;
     }
-    cloud.pending = r.save;
-    openModal2({ type: "text", html: tx('<h3>\u5F9E\u96F2\u7AEF\u4E0B\u8F09</h3><p class="sub" style="margin:0">\u96F2\u7AEF\uFF1A{0}\uFF08{1}\uFF09<br>\u9019\u53F0\u88DD\u7F6E\uFF1A{2}<br>\u4E0B\u8F09\u6703\u8986\u84CB\u9019\u53F0\u88DD\u7F6E\u7684\u9032\u5EA6\u3002</p><div class="row"><button class="btn main grow" data-act="clouddo">\u4E0B\u8F09\u4E26\u8986\u84CB</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>', r.summary || "\u2014", r.updated || "\u2014", progressText()) });
-  }
-  function applyDownload() {
-    const raw = cloud.pending;
-    cloud.pending = null;
-    if (!raw) return false;
-    app.S = migrate(sanitizeSave(JSON.parse(raw)));
+    if (!confirmed) {
+      chooser(tx("\u5F9E\u96F2\u7AEF\u4E0B\u8F09"), toMs(r.updated), r.summary);
+      return;
+    }
+    app.S = migrate(sanitizeSave(JSON.parse(r.save)));
     app.battle = null;
     save();
-    return true;
+    synced(r.updated);
+    cloud.info = { updated: toMs(r.updated), summary: r.summary };
+    toast(auto ? tx("\u5DF2\u81EA\u52D5\u8F09\u5165\u96F2\u7AEF\u8F03\u65B0\u7684\u9032\u5EA6\uFF08{0}\uFF09", r.summary || "") : tx("\u5DF2\u5F9E\u96F2\u7AEF\u8F09\u5165\u9032\u5EA6"));
+    app.render();
   }
   function logout() {
     setSession(null);
@@ -4643,7 +4699,7 @@ h3 .gi{vertical-align:-.12em}
     }
   }
   function autoTick() {
-    if (cloudEnabled() && loggedIn() && Date.now() - cloud.lastAuto > CLOUD.autoMin * 6e4) upload(true);
+    if (cloudEnabled() && loggedIn() && dirty() && Date.now() - cloud.lastAuto > CLOUD.autoMin * 6e4) upload(true);
   }
 
   // src/ui/views/settings.js
@@ -4653,7 +4709,7 @@ h3 .gi{vertical-align:-.12em}
     <div id="gsiBtn" class="gsi"></div>`;
     const i = cloud.info;
     return `<span class="label">${tx("\u96F2\u7AEF\u5B58\u6A94")}</span>
-    <p class="sub" style="margin:0">${cloud.busy ? tx("\u4E0A\u50B3\u4E2D\u2026") : i ? i.updated ? tx("\u5DF2\u767B\u5165\u30FB\u96F2\u7AEF\u6700\u5F8C\u5099\u4EFD {0}\uFF08{1}\uFF09", esc(i.updated), esc(i.summary || "\u2014")) : tx("\u5DF2\u767B\u5165\u30FB\u96F2\u7AEF\u9084\u6C92\u6709\u5B58\u6A94") : tx("\u5DF2\u767B\u5165\u30FB\u8B80\u53D6\u96F2\u7AEF\u72C0\u614B\u4E2D\u2026")}<br>${tx("\u767B\u5165\u671F\u9593\u6BCF {0} \u5206\u9418\u81EA\u52D5\u4E0A\u50B3\u3002", CLOUD.autoMin)}</p>
+    <p class="sub" style="margin:0">${cloud.busy ? tx("\u4E0A\u50B3\u4E2D\u2026") : i ? i.updated ? tx("\u5DF2\u767B\u5165\u30FB\u96F2\u7AEF\u6700\u5F8C\u5099\u4EFD {0}\uFF08{1}\uFF09", fmtTime(i.updated), esc(i.summary || "\u2014")) : tx("\u5DF2\u767B\u5165\u30FB\u96F2\u7AEF\u9084\u6C92\u6709\u5B58\u6A94") : tx("\u5DF2\u767B\u5165\u30FB\u8B80\u53D6\u96F2\u7AEF\u72C0\u614B\u4E2D\u2026")}<br>${tx("\u81EA\u52D5\u540C\u6B65\uFF1A\u958B\u555F\u904A\u6232\u6642\u8F09\u5165\u8F03\u65B0\u7684\u96F2\u7AEF\u9032\u5EA6\uFF1B\u6709\u65B0\u9032\u5EA6\u6642\u6BCF {0} \u5206\u9418\u3001\u4EE5\u53CA\u96E2\u958B\u904A\u6232\u6642\u81EA\u52D5\u4E0A\u50B3\u3002", CLOUD.autoMin)}</p>
     <div class="row"><button class="btn main" data-act="cloudup" ${cloud.busy ? "disabled" : ""}>${tx("\u7ACB\u5373\u4E0A\u50B3")}</button><button class="btn" data-act="clouddown">${tx("\u5F9E\u96F2\u7AEF\u4E0B\u8F09")}</button><button class="btn" data-act="cloudout">${tx("\u767B\u51FA")}</button></div>`;
   }
   var row = (label, value) => `<div class="set"><span>${label}</span>${value}</div>`;
@@ -5040,12 +5096,10 @@ h3 .gi{vertical-align:-.12em}
   app.afterModal = () => {
     if (app.modal && app.modal.type === "settings" && cloudEnabled()) {
       mountButton();
-      if (loggedIn() && !cloud.info && !cloud.asked) {
-        cloud.asked = true;
-        refreshInfo();
-      }
+      check();
     }
   };
+  app.openModal = openModal;
   app.renderTabs = renderTabs;
   document.addEventListener("click", (e) => {
     const t = e.target.closest("[data-tab],[data-act]");
@@ -5495,14 +5549,11 @@ h3 .gi{vertical-align:-.12em}
         upload();
         return;
       case "clouddown":
-        askDownload(openModal);
+        download(false);
         return;
-      case "clouddo":
-        if (applyDownload()) {
-          app.modal = null;
-          toast(tx("\u5DF2\u5F9E\u96F2\u7AEF\u8F09\u5165\u9032\u5EA6"));
-        }
-        break;
+      case "cloudpick":
+        pick2(t.dataset.v);
+        return;
       case "cloudout":
         logout();
         toast(tx("\u5DF2\u767B\u51FA\uFF08\u9019\u53F0\u88DD\u7F6E\u7684\u9032\u5EA6\u4FDD\u7559\uFF09"));
@@ -5582,8 +5633,10 @@ h3 .gi{vertical-align:-.12em}
       app.pendingRepeat = null;
       save();
       if (app.S.player.asked) sendSnapshot(true);
+      uploadOnHide();
       return;
     }
+    check();
     if (partyLocked(app.S) && Date.now() - app.S.lastSeen > 6e4) {
       app.battle = null;
       app.lastResult = null;
@@ -5642,6 +5695,7 @@ h3 .gi{vertical-align:-.12em}
     settleOffline();
     resumeIdle();
     render();
+    setTimeout(() => check(true), 1500);
     const after = () => {
       if (enabled() && !app.S.player.asked && !app.modal) openNick();
       else if (app.S.player.asked) setTimeout(() => sendSnapshot(), 3e3);
