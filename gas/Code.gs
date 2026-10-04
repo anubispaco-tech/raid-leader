@@ -40,7 +40,10 @@ function setup() {
     sh.getRange(1, 1, 1, def.headers.length).setValues([def.headers]).setFontWeight('bold');
     sh.setFrozenRows(1);
   });
-  ss.getSheetByName(SHEETS.players.name).hideColumns(COL.dates); // 遊玩日期清單只給程式用
+  const ps = ss.getSheetByName(SHEETS.players.name);
+  ps.hideColumns(COL.dates); // 遊玩日期清單只給程式用
+  ps.getRange(1, COL.dates, ps.getMaxRows(), 1).setNumberFormat('@'); // 純文字，避免單一日期被自動轉成日期值
+  fixDates();
   const cs = ss.getSheetByName(CLOUD.sheet) || ss.insertSheet(CLOUD.sheet);
   cs.getRange(1, 1, 1, CLOUD_HEAD.length).setValues([CLOUD_HEAD]).setFontWeight('bold'); cs.setFrozenRows(1);
   cloudFolder(); // 第一次執行會要求 Google Drive 授權
@@ -123,11 +126,11 @@ function upsertPlayer(pid, name, d) {
   if (top < SANE.mythicTop) { d.best = 0; d.key = 0; }
   if (top < SANE.abyssTop) { d.best2 = 0; d.key2 = 0; }
   if (idx === -1) {
-    sh.appendRow([pid, name, now(), now(), 1, num(d.playMin, 1e6), num(d.level, 100), num(d.top, 99), num(d.key, 99), Math.min(num(d.best, 99), SANE.jump), clean(d.ver, 10), today, Math.min(num(d.best2, 99), SANE.jump), num(d.key2, 99), '']);
+    sh.appendRow([pid, name, now(), now(), 1, num(d.playMin, 1e6), num(d.level, 100), num(d.top, 99), num(d.key, 99), Math.min(num(d.best, 99), SANE.jump), clean(d.ver, 10), "'" + today, Math.min(num(d.best2, 99), SANE.jump), num(d.key2, 99), '']);
     return;
   }
   const r = idx + 2, row = sh.getRange(r, 1, 1, SHEETS.players.headers.length).getValues()[0];
-  const dates = String(row[COL.dates - 1] || '').split(',').filter(Boolean);
+  const dates = normDates(row[COL.dates - 1]);
   if (!dates.includes(today)) dates.push(today);
   row[COL.name - 1] = name;
   row[COL.last - 1] = now();
@@ -143,7 +146,39 @@ function upsertPlayer(pid, name, d) {
   row[COL.key2 - 1] = num(d.key2, 99);
   row[COL.ver - 1] = clean(d.ver, 10);
   row[COL.dates - 1] = dates.join(',');
+  sh.getRange(r, COL.dates).setNumberFormat('@');
   sh.getRange(r, 1, 1, row.length).setValues([row]);
+}
+
+// 遊玩日期清單 → 去重的 yyyy-MM-dd 陣列（相容被試算表轉成日期值的舊資料）
+function normDates(v) {
+  const tz = Session.getScriptTimeZone();
+  const list = v instanceof Date ? [v] : String(v || '').split(',');
+  const out = [];
+  list.forEach(x => {
+    if (!x) return;
+    let d = x;
+    if (!(x instanceof Date)) {
+      const t = String(x).trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(t)) d = t;
+      else { const p = new Date(t); if (isNaN(p)) return; d = p; }
+    }
+    if (d instanceof Date) d = Utilities.formatDate(d, tz, 'yyyy-MM-dd');
+    if (!out.includes(d)) out.push(d);
+  });
+  return out.sort();
+}
+
+// 一次性修正：重算所有玩家的遊玩日期與回訪天數（setup 會自動執行）
+function fixDates() {
+  const sh = SpreadsheetApp.getActive().getSheetByName(SHEETS.players.name);
+  const n = sh.getLastRow() - 1;
+  if (n < 1) return;
+  const rng = sh.getRange(2, COL.days, n, COL.dates - COL.days + 1);
+  const vals = rng.getValues();
+  vals.forEach(row => { const d = normDates(row[COL.dates - COL.days]); row[0] = d.length; row[COL.dates - COL.days] = d.join(','); });
+  sh.getRange(2, COL.dates, n, 1).setNumberFormat('@');
+  rng.setValues(vals);
 }
 
 // ---------- 小工具 ----------
