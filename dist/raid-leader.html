@@ -333,7 +333,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.11.0 */
+/* 副本團長 v0.11.1 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -1087,7 +1087,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
     "\u639B\u6A5F\u5237": "Idle",
     "\u4E00\u9375\u5099\u6230\uFF1A\u639B\u6A5F\u4E2D\u53EA\u8ABF\u5929\u8CE6\u3001\u88DD\u5099": "One-tap prep: talents and gear only while idling",
     "\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099": "One-tap prep: lineup, talents, gear",
-    '<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u5230\u300C\u5718\u968A\u300D\u6700\u4E0B\u65B9\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>': `<div class="howto" style="margin-top:16px"><b>Prep</b>: sets lineup, talents and gear for this boss's weakness (while idling, only talents and gear).<br><b>Idle</b>: repeats the floor automatically, even with the page closed (up to {0}h); rewards are paid when you return.<br><b>Save data</b>: progress lives in this browser. To switch devices, export a save code at the bottom of Party.</div>`,
+    '<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u9EDE\u5DE6\u4E0A\u89D2\u300C\u526F\u672C\u5718\u9577\u300D\u958B\u555F\u8A2D\u5B9A\uFF0C\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>': `<div class="howto" style="margin-top:16px"><b>Prep</b>: sets lineup, talents and gear for this boss's weakness (while idling, only talents and gear).<br><b>Idle</b>: repeats the floor automatically, even with the page closed (up to {0}h); rewards are paid when you return.<br><b>Save data</b>: progress lives in this browser. To switch devices, tap "Raid Leader" at the top left to open Settings and export a save code.</div>`,
     "{0} \u5C0F\u6642 {1} \u5206": "{0}h {1}m",
     "\u5E33\u865F": "Account",
     "\u66B1\u7A31": "Nickname",
@@ -3981,7 +3981,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
   var dailyOpenNow = () => app.dailyOpen != null ? app.dailyOpen : dailyPending(app.S) > 0;
 
   // src/core/version.js
-  var VERSION = "0.11.0";
+  var VERSION = "0.11.1";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -4158,7 +4158,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
       const idleHere = app.S.idle === i;
       h += tx('<div class="dg {0}"> <div class="tier">{1}<small>\u7B2C {2} \u5C64</small></div> <h3>{3}<span class="boss">\u9996\u9818\u30FB{4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>\u5EFA\u8B70 <b class="num {6}">Lv{7}</b></span> <span>\u88DD\u7B49 <b class="num {8}">{9}</b></span> <span>\u6389\u843D <b class="num">{10}</b></span> <span>\u901A\u95DC <b class="num">{11}</b> \u6B21</span> </div> <div class="acts">{12} </div></div>', locked ? "locked" : "", ROMAN[i] + dungeonIcon(i), i + 1, d.name, d.boss, d.tip, lv >= d.recLevel ? "ok" : "low", d.recLevel, il >= d.recIlvl ? "ok" : "low", d.recIlvl, d.dropIlvl, clears, locked ? tx('<span class="sub" style="margin:0">\u5148\u901A\u95DC\u4E0A\u4E00\u5C64</span>') : tx('<button class="btn main grow" data-act="fight" data-d="{0}">\u6311\u6230</button> <button class="btn {1}" data-act="idle" data-d="{2}" {3}>{4}</button> <button class="btn" data-act="prepare" data-d="{5}" aria-label="{6}">\u5099\u6230</button>', i, idleHere ? "on" : "", i, clears ? "" : tx('disabled title="\u901A\u95DC\u4E00\u6B21\u5F8C\u624D\u80FD\u639B\u6A5F"'), idleHere ? tx("\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62") : tx("\u639B\u6A5F\u5237"), i, partyLocked(app.S) ? tx("\u4E00\u9375\u5099\u6230\uFF1A\u639B\u6A5F\u4E2D\u53EA\u8ABF\u5929\u8CE6\u3001\u88DD\u5099") : tx("\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099")));
     });
-    h += `</div>` + tx('<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u5230\u300C\u5718\u968A\u300D\u6700\u4E0B\u65B9\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>', ECONOMY.offlineCapHours);
+    h += `</div>` + tx('<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u9EDE\u5DE6\u4E0A\u89D2\u300C\u526F\u672C\u5718\u9577\u300D\u958B\u555F\u8A2D\u5B9A\uFF0C\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>', ECONOMY.offlineCapHours);
     return h;
   }
 

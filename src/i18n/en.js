@@ -750,7 +750,7 @@ export default {
 "掛機刷": "Idle",
 "一鍵備戰：掛機中只調天賦、裝備": "One-tap prep: talents and gear only while idling",
 "一鍵備戰：陣容、天賦、裝備": "One-tap prep: lineup, talents, gear",
-"<div class=\"howto\" style=\"margin-top:16px\"><b>備戰</b>：依這層首領的弱點，自動排好陣容、天賦與裝備（掛機中陣容鎖定，只調天賦與裝備）。<br><b>掛機刷</b>：自動重複挑戰，關掉頁面也會累積（最多 {0} 小時），回來時一次結算。<br><b>存檔</b>：進度存在這支手機的瀏覽器。要換手機玩，到「團隊」最下方匯出存檔碼。</div>": "<div class=\"howto\" style=\"margin-top:16px\"><b>Prep</b>: sets lineup, talents and gear for this boss's weakness (while idling, only talents and gear).<br><b>Idle</b>: repeats the floor automatically, even with the page closed (up to {0}h); rewards are paid when you return.<br><b>Save data</b>: progress lives in this browser. To switch devices, export a save code at the bottom of Party.</div>",
+"<div class=\"howto\" style=\"margin-top:16px\"><b>備戰</b>：依這層首領的弱點，自動排好陣容、天賦與裝備（掛機中陣容鎖定，只調天賦與裝備）。<br><b>掛機刷</b>：自動重複挑戰，關掉頁面也會累積（最多 {0} 小時），回來時一次結算。<br><b>存檔</b>：進度存在這支手機的瀏覽器。要換手機玩，點左上角「副本團長」開啟設定，匯出存檔碼。</div>": "<div class=\"howto\" style=\"margin-top:16px\"><b>Prep</b>: sets lineup, talents and gear for this boss's weakness (while idling, only talents and gear).<br><b>Idle</b>: repeats the floor automatically, even with the page closed (up to {0}h); rewards are paid when you return.<br><b>Save data</b>: progress lives in this browser. To switch devices, tap \"Raid Leader\" at the top left to open Settings and export a save code.</div>",
 "{0} 小時 {1} 分": "{0}h {1}m",
 "帳號": "Account",
 "暱稱": "Nickname",
