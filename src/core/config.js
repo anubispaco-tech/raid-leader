@@ -210,7 +210,7 @@ export const TELEMETRY = {
 // ---------- 雲端存檔（v0.13，Google 登入）----------
 // clientId 留空 = 不顯示雲端存檔；填入 Google Cloud 的 OAuth 用戶端 ID 後啟用（GAS 端 CLIENT_ID 要填同一個）
 export const CLOUD = {
-  clientId: (typeof window !== 'undefined' && window.__RL_TEST_CLOUD_CID) || '', // 測試用可由 e2e 注入
+  clientId: (typeof window !== 'undefined' && window.__RL_TEST_CLOUD_CID) || '927029065806-rcr8ur1pnnp7pnsm7g1vnjloq4h6gnpo.apps.googleusercontent.com', // 測試用可由 e2e 注入
   autoMin: 10,                      // 登入後每幾分鐘自動上傳一次
 };
 

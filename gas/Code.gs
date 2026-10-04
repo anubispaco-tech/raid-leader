@@ -26,7 +26,7 @@ const COL = { pid: 1, name: 2, first: 3, last: 4, days: 5, minutes: 6, level: 7,
 const SANE = { mythicTop: 7, abyssTop: 14, jump: 15 };
 const TZ = 'Asia/Taipei';
 // ---------- 雲端存檔（v0.13）----------
-const CLIENT_ID = ''; // ← 貼上 Google Cloud 的 OAuth 用戶端 ID（xxxx.apps.googleusercontent.com）
+const CLIENT_ID = '927029065806-rcr8ur1pnnp7pnsm7g1vnjloq4h6gnpo.apps.googleusercontent.com'; // ← 貼上 Google Cloud 的 OAuth 用戶端 ID（xxxx.apps.googleusercontent.com）
 const CLOUD = { sheet: '雲端', folder: 'raid-leader-saves', sessionDays: 30, maxBytes: 2 * 1024 * 1024 };
 const CLOUD_HEAD = ['Google 帳號編號', '登入憑證', '憑證到期', '存檔檔案 ID', '最後上傳', '進度摘要', '版本'];
 const LIMIT_SEC = { snapshot: 20, event: 2, feedback: 60, login: 3, cloudsave: 15, cloudload: 3, cloudinfo: 2 }; // 同一位玩家的送出間隔下限
