@@ -2,6 +2,7 @@
 // 結構：每 tick 先結算持續效果 → 英雄行動（技能優先）→ 敵人行動 → 判定波次。
 // 職業行為與職業專屬效果都在職業包（classes/）：act() 每秒出手，hooks / legend.hooks 掛在下面標出的時機。
 // 首領機制在 BOSS_MECHS；天賦這類通用修正值（mods）在這裡統一處理。
+import { tx } from './i18n.js';
 import { DUNGEON, RAID_HORN } from './config.js';
 import { R, rnd, pick, uid } from './rng.js';
 import { heroStats, rarityMods } from './heroes.js';
@@ -13,25 +14,25 @@ import { PACKS, roleOf } from './classes/index.js';
 const BOSS_MECHS = {
   enrage(b, e, m) {
     if (b.waveTick < m.at) return 1;
-    if (b.waveTick === m.at) b.push(`🔥 ${e.name} 狂暴了！傷害大增`, 'warn');
+    if (b.waveTick === m.at) b.push(tx('🔥 {0} 狂暴了！傷害大增', e.name), 'warn');
     return m.mult;
   },
   pulse(b, e, m) {
     if (b.waveTick % m.every) return 1;
-    b.push(`💥 ${e.name} 施放範圍攻擊`, 'warn');
+    b.push(tx('💥 {0} 施放範圍攻擊', e.name), 'warn');
     for (const u of b.alive()) b.hitHero(u, e.atk * m.dmg * b.weakMult(e), 'magic');
     return 1;
   },
   buster(b, e, m, tgt) {
     if (b.waveTick % m.every) return 1;
-    b.push(`⚡ ${e.name} 對 ${tgt.name} 重擊`, 'warn');
+    b.push(tx('⚡ {0} 對 {1} 重擊', e.name, tgt.name), 'warn');
     b.isBuster = true;
     return m.mult;
   },
   summon(b, e, m) {
     if (b.waveTick % m.every) return 1;
-    for (let k = 0; k < m.n; k++) b.enemies.push({ name: '召喚物', hp: e.addHp, max: e.addHp, atk: e.addAtk, boss: false, id: uid() });
-    b.push(`🌀 ${e.name} 召喚了 ${m.n} 隻小怪`, 'warn');
+    for (let k = 0; k < m.n; k++) b.enemies.push({ name: tx('召喚物'), hp: e.addHp, max: e.addHp, atk: e.addAtk, boss: false, id: uid() });
+    b.push(tx('🌀 {0} 召喚了 {1} 隻小怪', e.name, m.n), 'warn');
     return 1;
   },
 };
@@ -72,14 +73,14 @@ export class Battle {
   alive() { return this.units.filter(u => u.hp > 0); }
   foes() { return this.enemies.filter(e => e.hp > 0); }
   push(msg, cls = '') { this.log.push({ t: this.tick, msg, cls }); if (this.log.length > 80) this.log.shift(); }
-  skillLog(u, name, t) { this.push(`${u.icon} ${u.name}：${name}${t && t.name !== u.name ? ` → ${t.name}` : ''}`, 'skill'); }
+  skillLog(u, name, t) { this.push(tx('{0} {1}：{2}{3}', u.icon, u.name, name, t && t.name !== u.name ? ` → ${t.name}` : ''), 'skill'); }
 
   // ---------- 團長指令 ----------
   hornActive() { return this.horn.until > this.tick; }
   useHorn() {
     if (this.horn.used || this.over) return false;
     this.horn.used = true; this.horn.until = this.tick + RAID_HORN.dur;
-    this.push(`📯 英勇號角！全隊傷害與治療 +${Math.round(RAID_HORN.bonus * 100)}%，持續 ${RAID_HORN.dur} 秒`, 'info');
+    this.push(tx('📯 英勇號角！全隊傷害與治療 +{0}%，持續 {1} 秒', Math.round(RAID_HORN.bonus * 100), RAID_HORN.dur), 'info');
     return true;
   }
   healMult(u) { return (u.mods.healMult || 1) * (this.hornActive() ? 1 + RAID_HORN.bonus : 1); }
@@ -105,11 +106,11 @@ export class Battle {
     if (e.hp === 0) {
       if (e.goblin) this.kills = (this.kills || 0) + 1;
       if (u.lh.onKill) u.lh.onKill(this, u, e);                     // 傳說掛勾：擊殺後
-      this.push(`${e.name} 被擊殺`, e.boss ? 'good' : '');
+      this.push(tx('{0} 被擊殺', e.name), e.boss ? 'good' : '');
       if (!e.boss && this.has('bolstering')) { // 繁盛：其他小怪變強
         const rest = this.foes().filter(x => !x.boss);
         for (const x of rest) { x.max = Math.round(x.max * 1.15); x.hp = Math.round(x.hp * 1.15); x.atk *= 1.15; }
-        if (rest.length) this.push(`🌿 繁盛：其餘 ${rest.length} 隻小怪變強`, 'warn');
+        if (rest.length) this.push(tx('🌿 繁盛：其餘 {0} 隻小怪變強', rest.length), 'warn');
       }
     }
     return amt;
@@ -145,13 +146,13 @@ export class Battle {
       u.used[key] = true; u.hp = Math.max(1, u.hp); u.buf.immune = this.tick + dur; this.skillLog(u, name);
     };
     if (u.hk.lifeSaver) u.hk.lifeSaver(this, u, save);
-    if (u.mods.iceBlock) save('ice', 0.3, u.mods.iceBlock, '寒冰屏障');
+    if (u.mods.iceBlock) save('ice', 0.3, u.mods.iceBlock, tx('寒冰屏障'));
     if (u.lh.lifeSaver) u.lh.lifeSaver(this, u);
   }
   onDeath(u) {
     const priest = this.alive().find(x => x.mods.redemption && !x.used.redemption);
-    if (priest) { priest.used.redemption = true; u.hp = Math.round(u.max * priest.mods.redemption); this.skillLog(priest, '救贖', u); return; }
-    this.push(`💀 ${u.name}（${u.pack.name}）陣亡`, 'bad');
+    if (priest) { priest.used.redemption = true; u.hp = Math.round(u.max * priest.mods.redemption); this.skillLog(priest, tx('救贖'), u); return; }
+    this.push(tx('💀 {0}（{1}）陣亡', u.name, u.pack.name), 'bad');
   }
   heal(src, tgt, amt, raw = false) {
     if (tgt.hp <= 0) return 0;
@@ -196,25 +197,25 @@ export class Battle {
       if (tgt.hp > 0) this.hitHero(tgt, atk, this.isBuster ? 'buster' : 'phys', e);
     }
     if (this.has('volcanic') && this.waveTick % 8 === 0 && this.alive().length) { // 火山
-      const u = pick(this.alive()); this.push(`🌋 火山爆發，${u.name} 受到傷害`, 'warn');
+      const u = pick(this.alive()); this.push(tx('🌋 火山爆發，{0} 受到傷害', u.name), 'warn');
       this.hitHero(u, this.mythic.volcanic, 'magic');
     }
-    if (this.mythic && this.tick === this.mythic.timer && !this.over) this.push('⏰ 超過限時！仍可打完，但鑰石會降級', 'bad');
+    if (this.mythic && this.tick === this.mythic.timer && !this.over) this.push(tx('⏰ 超過限時！仍可打完，但鑰石會降級'), 'bad');
     this.checkEnd();
   }
   checkEnd() {
-    if (!this.alive().length) { this.over = true; this.win = false; this.push('☠️ 團滅…', 'bad'); return; }
+    if (!this.alive().length) { this.over = true; this.win = false; this.push(tx('☠️ 團滅…'), 'bad'); return; }
     if (!this.foes().length) {
       if (this.waveIdx < this.waves.length - 1) {
         this.waveIdx++;
         for (const u of this.alive()) u.hp = Math.min(u.max, u.hp + Math.round(u.max * DUNGEON.waveHeal));
-        this.push(this.waveIdx === this.waves.length - 1 ? `👑 首領 ${this.waves[this.waveIdx][0].name} 現身！` : `第 ${this.waveIdx + 1} 波敵人來襲`, 'info');
+        this.push(this.waveIdx === this.waves.length - 1 ? tx('👑 首領 {0} 現身！', this.waves[this.waveIdx][0].name) : tx('第 {0} 波敵人來襲', this.waveIdx + 1), 'info');
         this.loadWave();
-      } else { this.over = true; this.win = true; this.push('🏆 副本通關！', 'good'); }
+      } else { this.over = true; this.win = true; this.push(tx('🏆 副本通關！'), 'good'); }
     }
     if (this.tick >= this.maxTicks && !this.over) {
-      if (this.vault) { this.over = true; this.win = true; this.push(`⏰ 時間到！共打倒 ${this.kills || 0} 隻寶藏哥布林`, 'good'); }
-      else { this.over = true; this.win = false; this.push('⌛ 時間耗盡，撤退', 'bad'); }
+      if (this.vault) { this.over = true; this.win = true; this.push(tx('⏰ 時間到！共打倒 {0} 隻寶藏哥布林', this.kills || 0), 'good'); }
+      else { this.over = true; this.win = false; this.push(tx('⌛ 時間耗盡，撤退'), 'bad'); }
     }
   }
   runToEnd() { while (!this.over) this.step(); return this; }

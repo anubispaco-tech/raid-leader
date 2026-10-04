@@ -13,7 +13,7 @@ const { s } = playthrough({ talents: true });
 s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0 };
 s.heroes = s.heroes.slice(0, 6); s.party = s.heroes.slice(0, 4).map(h => h.id); // 4 人出戰、2 人待命、1 空位
 
-const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } });
+const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); await page.addInitScript(() => sessionStorage.setItem('rl-title', '1'));
 const errs = []; page.on('pageerror', e => errs.push(e.message));
 await page.addInitScript(v => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('raid-leader-save-v1', v); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(s));
 await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'app.test') return r.abort();

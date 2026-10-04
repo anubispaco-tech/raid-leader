@@ -15,6 +15,7 @@ src/
       index.js          登記處：新增職業 = 放一個檔案＋在這裡登記一行
       shared.js         職業包共用工具
     rng.js              亂數（setSeed 可固定種子）
+    i18n.js             多語言：tx('中文原文', 參數…)；中文版回傳原文，英文查 src/i18n/en.js
     items.js            裝備生成、強化、分解
     talents.js          天賦狀態、推薦配置（資料來自職業包）
     heroes.js           英雄屬性與升級
@@ -33,6 +34,10 @@ src/
     helpers.js          共用小工具
     telemetry.js        遊玩數據、排行榜、意見回饋（送到 GAS）
     views/              各分頁畫面（dungeon、battle、team、bag、tavern、sheets）
+    story.js            劇情對話（序章）
+  i18n/
+    en-frags-*.json     ★ 英文翻譯（以「文字片段」為單位，HTML 標籤自動保留）
+    en.js               由 tools/i18n-build.py 產生，勿手改
   styles.css  head.html  body.html
 gas/
   Code.gs               綁定試算表 raid-leader 的 Apps Script（部署步驟寫在檔案開頭）
@@ -41,6 +46,8 @@ tools/
   sim-lib.js / sim.js   數值模擬：各層首通場次（套用推薦天賦、不吹號角）
   specs.js              選對 / 選錯專精 / 無天賦 的勝率比較
   sim-mythic.js         秘境節奏：達到各鑰石等級所需場數
+  i18n-build.py         掃描所有 tx() 產生 en.js，列出缺翻譯的片段
+  i18n-convert.py       一次性工具：把中文字串轉成 tx()（v0.8.1 已轉完）
   regress.js            回歸測試：固定種子跑 290 場戰鬥，重構前後結果要一模一樣
   e2e*.js               瀏覽器端對端測試（主流程、背包操作、天賦與號角）
 ```
@@ -59,6 +66,12 @@ tools/
 
 調整數值改 `src/core/config.js`（副本、經濟）與 `src/core/classes/`（職業），改完跑 `sim.js` 與 `specs.js` 確認節奏。
 
+### 新增或修改文字
+
+1. 程式裡寫 `tx('中文', 參數…)`，參數用 `{0}`、`{1}`。
+2. 跑 `python3 tools/i18n-build.py`，把列出的缺翻譯片段補進 `src/i18n/en-frags-*.json`，再跑一次。
+3. 漏翻不會壞：英文版會直接顯示中文。
+
 ### 新增職業
 
 1. 複製 `src/core/classes/guardian.js` 改成新職業（屬性、`act` 出手邏輯、技能、專精、天賦、`recommend`、傳說）。
@@ -68,6 +81,7 @@ tools/
 
 ## 版本
 
+- **v0.8.1** 多語言（繁中／英文）、開始畫面與語言切換、序章對話
 - **v0.8.0** 職業包重構（一職業一檔案、戰鬥掛勾點、固定種子回歸測試；玩家端行為不變）
 - **v0.7.1~0.7.5** 掛機鎖陣容、單人一鍵配裝、一鍵解雇、名冊 30、秘境掛機、巔峰等級、裝備精煉、羅馬數字樓層
 - **v0.7.0** 英雄稀有度（普通~傳說）、4 位傳奇英雄、招募令與保底、寶庫

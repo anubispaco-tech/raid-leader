@@ -1,10 +1,16 @@
 // ===== 底部抽屜：英雄、裝備、選裝、文字 =====
+import { tx } from '../../core/i18n.js';
 import * as G from '../../core/index.js';
 import { app } from '../state.js';
 import { $, fmt, pct, toast, hero, cls, inParty, itemStatText, itemName, partyPower, avgPartyIlvl, avgPartyLv, heroName, rarityTag } from '../helpers.js';
 
 export function openModal(m) { app.modal = m; renderModal(); }
-export function closeModal() { app.modal = null; renderModal(); }
+export function closeModal() {
+  const done = app.modal && app.modal.type === 'dialog' && app.modal.done;
+  app.modal = null; renderModal(); if (done) done();
+}
+// 對話：點一下下一句，最後一句或「跳過」結束後呼叫 done
+export function playDialog(lines, done) { openModal({ type: 'dialog', lines, i: 0, done }); }
 export function renderModal() {
   const el = $('#modal');
   if (!app.modal) { el.innerHTML = ''; el.dataset.key = ''; return; }
@@ -13,6 +19,7 @@ export function renderModal() {
   if (app.modal.type === 'item') body = sheetItem(app.S.items[app.modal.id]);
   if (app.modal.type === 'pick') body = sheetPick();
   if (app.modal.type === 'text') body = app.modal.html;
+  if (app.modal.type === 'dialog') body = sheetDialog(app.modal);
   if (!body) { app.modal = null; el.innerHTML = ''; return; }
   // 只有新開抽屜時播放滑入動畫；在抽屜內操作（選天賦、換頁）不重播，並保留捲動位置
   const key = app.modal.type + ':' + (app.modal.id || ''), old = el.querySelector('.sheet');
@@ -21,42 +28,37 @@ export function renderModal() {
   el.innerHTML = `<div class="scrim" data-act="close"><div class="sheet ${fresh ? 'anim' : ''}" role="dialog" aria-modal="true">${body}</div></div>`;
   if (!fresh) el.querySelector('.sheet').scrollTop = scroll;
 }
+function sheetDialog(m) {
+  const L = m.lines[m.i], last = m.i >= m.lines.length - 1;
+  return `<div class="dlg" data-act="dlgnext">${L.who ? `<b class="who">${L.who}</b>` : ''}<p class="${L.who ? '' : 'narr'}">${L.text}</p>
+    <div class="row" style="align-items:center"><span class="sub num" style="margin:0">${m.i + 1}/${m.lines.length}</span>
+    <button class="btn sm" data-act="dlgskip" style="margin-left:auto">${tx('跳過')}</button><button class="btn sm main" data-act="dlgnext">${last ? tx('開始') : tx('繼續 ▸')}</button></div></div>`;
+}
 function sheetHero(x) {
   if (!x) return '';
   const c = cls(x), st = G.heroStats(x, app.S.items), view = app.modal.view || 'gear', pend = G.pendingPicks(x);
   const sp = x.spec && G.SPECS[x.cls][x.spec];
   const R = G.HERO_RARITY[x.rarity || 0], L = x.legend && G.LEGENDS[x.cls];
-  let h = `<h3>${c.icon} ${heroName(x)} ${rarityTag(x)}</h3><div class="sub" style="margin:0">${c.name}${sp ? `・${sp.name}` : ''}・${G.ROLE_NAME[G.roleOf(x)]}　${c.desc}</div>
-    ${x.rarity ? `<div class="raritycard r-${x.rarity}"><b class="c${x.rarity}">${R.name}加成</b><span>基礎屬性 ×${R.mult.toFixed(2)}${R.crit ? `・暴擊 +${Math.round(R.crit * 100)}%` : ''}${R.baseCdMult ? '・基礎技能冷卻 −10%' : ''}</span>${L ? `<span><b class="c4">${L.pname}</b>：${L.desc}</span>` : ''}</div>` : ''}
-    <div class="statgrid num"><div><b>${x.level}</b><span>等級</span></div><div><b>${fmt(st.hp)}</b><span>生命</span></div><div><b>${st.pow}</b><span>威力</span></div><div><b>${Math.round(st.crit * 100)}%</b><span>暴擊</span></div></div>
-    <div class="sub" style="margin:0">${x.level >= G.HERO.maxLevel ? `<b style="color:var(--brass)">巔峰 ${x.para || 0}</b>（生命／威力 +${x.para || 0}%）<span class="num">${fmt(x.paraXp || 0)} / ${fmt(G.paraNeed(x.para || 0))}</span>` : `經驗 <span class="num">${fmt(x.xp)} / ${fmt(G.xpNeed(x.level))}</span>`}・護甲減傷 ${Math.round(st.armor * 100)}%</div>
-    <div class="seg wide"><button data-act="heroview" data-id="${x.id}" data-v="gear" class="${view === 'gear' ? 'sel' : ''}">裝備</button><button data-act="heroview" data-id="${x.id}" data-v="talent" class="${view === 'talent' ? 'sel' : ''}">天賦${pend ? `<span class="pip">${pend}</span>` : ''}</button></div>`;
+  let h = tx('<h3>{0} {1} {2}</h3><div class="sub" style="margin:0">{3}{4}・{5}　{6}</div> {7} <div class="statgrid num"><div><b>{8}</b><span>等級</span></div><div><b>{9}</b><span>生命</span></div><div><b>{10}</b><span>威力</span></div><div><b>{11}%</b><span>暴擊</span></div></div> <div class="sub" style="margin:0">{12}・護甲減傷 {13}%</div> <div class="seg wide"><button data-act="heroview" data-id="{14}" data-v="gear" class="{15}">裝備</button><button data-act="heroview" data-id="{16}" data-v="talent" class="{17}">天賦{18}</button></div>', c.icon, heroName(x), rarityTag(x), c.name, sp ? `・${sp.name}` : '', G.ROLE_NAME[G.roleOf(x)], c.desc, x.rarity ? tx('<div class="raritycard r-{0}"><b class="c{1}">{2}加成</b><span>基礎屬性 ×{3}{4}{5}</span>{6}</div>', x.rarity, x.rarity, R.name, R.mult.toFixed(2), R.crit ? tx('・暴擊 +{0}%', Math.round(R.crit * 100)) : '', R.baseCdMult ? tx('・基礎技能冷卻 −10%') : '', L ? tx('<span><b class="c4">{0}</b>：{1}</span>', L.pname, L.desc) : '') : '', x.level, fmt(st.hp), st.pow, Math.round(st.crit * 100), x.level >= G.HERO.maxLevel ? tx('<b style="color:var(--brass)">巔峰 {0}</b>（生命／威力 +{1}%）<span class="num">{2} / {3}</span>', x.para || 0, x.para || 0, fmt(x.paraXp || 0), fmt(G.paraNeed(x.para || 0))) : tx('經驗 <span class="num">{0} / {1}</span>', fmt(x.xp), fmt(G.xpNeed(x.level))), Math.round(st.armor * 100), x.id, view === 'gear' ? 'sel' : '', x.id, view === 'talent' ? 'sel' : '', pend ? `<span class="pip">${pend}</span>` : '');
   if (view === 'talent') return h + talentView(x) + heroActions(x);
   h += `<div>`;
   for (const [slot, sn] of Object.entries(G.SLOTS)) {
     const it = x.gear[slot] && app.S.items[x.gear[slot]];
     const n = app.S.bag.filter(id => app.S.items[id].slot === slot).length;
-    h += `<div class="gearrow"><span class="sl">${sn}</span><span>${it ? `${itemName(it)} <span class="sub num">${it.ilvl}</span><br><span class="sub num" style="font-size:12px">${itemStatText(it)}</span>` : '<span class="sub">（空）</span>'}</span>
-      <span class="row">${it ? upBtn(it, 'sm') : ''}
-      <button class="btn sm" data-act="pick" data-id="${x.id}" data-slot="${slot}" ${n ? '' : 'disabled'}>更換</button></span></div>`;
+    h += tx('<div class="gearrow"><span class="sl">{0}</span><span>{1}</span> <span class="row">{2} <button class="btn sm" data-act="pick" data-id="{3}" data-slot="{4}" {5}>更換</button></span></div>', sn, it ? `${itemName(it)} <span class="sub num">${it.ilvl}</span><br><span class="sub num" style="font-size:12px">${itemStatText(it)}</span>` : tx('<span class="sub">（空）</span>'), it ? upBtn(it, 'sm') : '', x.id, slot, n ? '' : 'disabled');
   }
   const plan = G.upgradeAll(app.S, x.id, true), hasGear = Object.values(x.gear).some(Boolean);
   const better = G.autoEquip(app.S, x.id, true);
-  h += `</div><div class="row">
-    <button class="btn grow ${better ? 'main' : ''}" data-act="autoequip1" data-id="${x.id}" ${better ? '' : 'disabled'}>${better ? `一鍵配裝（${better} 件更好）` : '已是最佳配裝'}</button>
-    <button class="btn" data-act="unequipall" data-id="${x.id}" ${hasGear ? '' : 'disabled'}>全部卸下</button></div>
-    <div class="row">
-    <button class="btn grow" data-act="upall" data-id="${x.id}" ${plan.count ? '' : 'disabled'}>${plan.empty ? '沒有裝備' : plan.count ? `一鍵強化 ${plan.count} 次（${fmt(plan.spent)} 金${plan.dustSpent ? `・${plan.dustSpent} 精華` : ''}）` : plan.maxed ? `已全部強化到 +${G.maxUpFor(app.S)}` : '金幣或精華不夠'}</button>
-</div>`;
+  h += tx('</div><div class="row"> <button class="btn grow {0}" data-act="autoequip1" data-id="{1}" {2}>{3}</button> <button class="btn" data-act="unequipall" data-id="{4}" {5}>全部卸下</button></div> <div class="row"> <button class="btn grow" data-act="upall" data-id="{6}" {7}>{8}</button> </div>', better ? 'main' : '', x.id, better ? '' : 'disabled', better ? tx('一鍵配裝（{0} 件更好）', better) : tx('已是最佳配裝'), x.id, hasGear ? '' : 'disabled', x.id, plan.count ? '' : 'disabled', plan.empty ? tx('沒有裝備') : plan.count ? tx('一鍵強化 {0} 次（{1} 金{2}）', plan.count, fmt(plan.spent), plan.dustSpent ? tx('・{0} 精華', plan.dustSpent) : '') : plan.maxed ? tx('已全部強化到 +{0}', G.maxUpFor(app.S)) : tx('金幣或精華不夠'));
   return h + heroActions(x);
 }
 function heroActions(x) {
   const locked = G.partyLocked(app.S);
-  if (locked) return `<div class="row"><button class="btn grow" disabled>${inParty(x) ? '出戰中' : '待命中'}・掛機時無法更換隊員</button></div>`;
+  if (locked) return tx('<div class="row"><button class="btn grow" disabled>{0}・掛機時無法更換隊員</button></div>', inParty(x) ? tx('出戰中') : tx('待命中'));
   return `<div class="row">${inParty(x)
-    ? `<button class="btn grow" data-act="bench" data-id="${x.id}">移出隊伍</button>`
-    : `<button class="btn main grow" data-act="join" data-id="${x.id}" ${app.S.party.length >= G.ECONOMY.partyMax ? 'disabled' : ''}>${app.S.party.length >= G.ECONOMY.partyMax ? '隊伍已滿' : '加入隊伍'}</button>`}
-    ${app.S.heroes.length > 1 ? `<button class="btn" data-act="fire" data-id="${x.id}" style="color:var(--bad)">${app.modal.confirmFire ? `確定解雇？退 ${fmt(Math.round(G.hireCost(x) * G.RECRUIT.fireRefund))} 金` : '解雇'}</button>` : ''}</div>`;
+    ? tx('<button class="btn grow" data-act="bench" data-id="{0}">移出隊伍</button>', x.id)
+    : `<button class="btn main grow" data-act="join" data-id="${x.id}" ${app.S.party.length >= G.ECONOMY.partyMax ? 'disabled' : ''}>${app.S.party.length >= G.ECONOMY.partyMax ? tx('隊伍已滿') : tx('加入隊伍')}</button>`}
+    ${app.S.heroes.length > 1 ? `<button class="btn" data-act="fire" data-id="${x.id}" style="color:var(--bad)">${app.modal.confirmFire ? tx('確定解雇？退 {0} 金', fmt(Math.round(G.hireCost(x) * G.RECRUIT.fireRefund))) : tx('解雇')}</button>` : ''}</div>`;
 }
 // ---------- 天賦頁 ----------
 function talentView(x) {
@@ -64,41 +66,35 @@ function talentView(x) {
   const top = Math.max(0, app.S.unlocked - 1), dn = G.DUNGEONS[top];
   const opt = (act, v, on, locked, name, desc, extra = '') =>
     `<button class="opt ${on ? 'sel' : ''}" data-act="${act}" data-id="${x.id}" data-v="${v}" ${extra} ${locked ? 'disabled' : ''}><b>${name}</b><span>${desc}</span></button>`;
-  const specRow = `<div class="trow ${x.level < G.SPEC_LEVEL ? 'locked' : ''}"><span class="tlv num">Lv${G.SPEC_LEVEL}<small>${x.level < G.SPEC_LEVEL ? '未解鎖' : '專精'}</small></span>
+  const specRow = `<div class="trow ${x.level < G.SPEC_LEVEL ? 'locked' : ''}"><span class="tlv num">Lv${G.SPEC_LEVEL}<small>${x.level < G.SPEC_LEVEL ? tx('未解鎖') : tx('專精')}</small></span>
       ${Object.entries(specs).map(([k, sp]) => opt('spec', k, x.spec === k, x.level < G.SPEC_LEVEL, `${sp.name}・${sp.skill}`, sp.desc)).join('')}</div>`;
-  let h = `<div class="skillcard"><span class="label">基礎技能</span><b>${B.name}</b><span class="sub" style="margin:0">${B.desc}</span></div>`;
+  let h = tx('<div class="skillcard"><span class="label">基礎技能</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>', B.name, B.desc);
   G.TALENTS[x.cls].forEach((row, i) => {
     const lv = G.TALENT_ROWS[i], locked = x.level < lv;
     if (lv > G.SPEC_LEVEL && !h.includes('data-act="spec"')) h += specRow; // 專精插在 Lv5 與 Lv15 之間
-    h += `<div class="trow ${locked ? 'locked' : ''}"><span class="tlv num">Lv${lv}${locked ? '<small>未解鎖</small>' : ''}</span>
+    h += `<div class="trow ${locked ? 'locked' : ''}"><span class="tlv num">Lv${lv}${locked ? tx('<small>未解鎖</small>') : ''}</span>
       ${['a', 'b'].map(k => opt('talent', k, t[lv] === k && !locked, locked, row[k].name, row[k].desc, `data-lv="${lv}"`)).join('')}</div>`;
   });
-  h += `<div class="row"><button class="btn grow" data-act="recommend" data-id="${x.id}" data-d="${top}">依「${dn.name}」推薦配置</button></div>
-    <p class="sub" style="margin:0">隨時可以免費更換，下一場戰鬥生效。</p>`;
+  h += tx('<div class="row"><button class="btn grow" data-act="recommend" data-id="{0}" data-d="{1}">依「{2}」推薦配置</button></div> <p class="sub" style="margin:0">隨時可以免費更換，下一場戰鬥生效。</p>', x.id, top, dn.name);
   return h;
 }
 function sheetPick() {
   const x = hero(app.modal.id), slot = app.modal.slot, cur = x.gear[slot] && app.S.items[x.gear[slot]];
   const list = app.S.bag.map(id => app.S.items[id]).filter(it => it.slot === slot).sort((a, b) => G.itemScore(b) - G.itemScore(a));
-  return `<h3>為 ${x.name} 選擇${G.SLOTS[slot]}</h3><div class="sub" style="margin:0">目前：${cur ? itemName(cur) + '・' + itemStatText(cur) : '無'}</div>
-    <div class="choices">${list.map(it => `<button class="item rar${it.rarity}" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="in">${itemName(it)}${!cur || G.itemScore(it) > G.itemScore(cur) ? '<span class="better">▲</span>' : ''}</div><div class="il"><b class="num">${it.ilvl}</b></div><div class="is num">${itemStatText(it)}</div></button>`).join('')}</div>
-    <div class="row">${cur ? `<button class="btn" data-act="unequip" data-hero="${x.id}" data-slot="${slot}">卸下</button>` : ''}<button class="btn" data-act="hero" data-id="${x.id}">返回</button></div>`;
+  return tx('<h3>為 {0} 選擇{1}</h3><div class="sub" style="margin:0">目前：{2}</div> <div class="choices">{3}</div> <div class="row">{4}<button class="btn" data-act="hero" data-id="{5}">返回</button></div>', x.name, G.SLOTS[slot], cur ? itemName(cur) + '・' + itemStatText(cur) : tx('無'), list.map(it => `<button class="item rar${it.rarity}" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="in">${itemName(it)}${!cur || G.itemScore(it) > G.itemScore(cur) ? '<span class="better">▲</span>' : ''}</div><div class="il"><b class="num">${it.ilvl}</b></div><div class="is num">${itemStatText(it)}</div></button>`).join(''), cur ? tx('<button class="btn" data-act="unequip" data-hero="{0}" data-slot="{1}">卸下</button>', x.id, slot) : '', x.id);
 }
 function sheetItem(it) {
   if (!it) return '';
   const party = G.partyHeroes(app.S);
-  return `<h3>${itemName(it)}</h3><div class="sub num" style="margin:0">${G.RARITY[it.rarity].name}${G.SLOTS[it.slot]}・裝等 ${it.ilvl}・強化 +${it.up}/${G.maxUpFor(app.S)}<br>${itemStatText(it)}</div>
-    <span class="label">裝備給</span><div class="stack">${party.map(x => {
+  return tx('<h3>{0}</h3><div class="sub num" style="margin:0">{1}{2}・裝等 {3}・強化 +{4}/{5}<br>{6}</div> <span class="label">裝備給</span><div class="stack">{7}</div> <div class="row">{8} <button class="btn" data-act="salvage" data-id="{9}">分解 +<span class="num">{10}</span> 金{11}</button></div>', itemName(it), G.RARITY[it.rarity].name, G.SLOTS[it.slot], it.ilvl, it.up, G.maxUpFor(app.S), itemStatText(it), party.map(x => {
       const cur = x.gear[it.slot] && app.S.items[x.gear[it.slot]];
       const better = !cur || G.itemScore(it) > G.itemScore(cur);
-      return `<button class="hero" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="ic">${cls(x).icon}</div><div class="nm">${x.name}<small>${cls(x).name}</small></div><span class="tag ${better ? 'in' : ''}">${better ? '▲ 提升' : '較差'}</span><div class="st">目前：${cur ? `${cur.name}（${cur.ilvl}）` : '空'}</div></button>`;
-    }).join('')}</div>
-    <div class="row">${upBtn(it, '')}
-    <button class="btn" data-act="salvage" data-id="${it.id}">分解 +<span class="num">${G.salvageValue(it)}</span> 金${G.salvageDust(it) ? `・<span class="dust num">${G.salvageDust(it)}</span> 精華` : ''}</button></div>`;
+      return tx('<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">目前：{7}</div></button>', x.id, it.id, cls(x).icon, x.name, cls(x).name, better ? 'in' : '', better ? tx('▲ 提升') : tx('較差'), cur ? tx('{0}（{1}）', cur.name, cur.ilvl) : tx('空'));
+    }).join(''), upBtn(it, ''), it.id, G.salvageValue(it), G.salvageDust(it) ? tx('・<span class="dust num">{0}</span> 精華', G.salvageDust(it)) : '');
 }
 // 強化按鈕：+5 以上叫「精煉」，額外需要精華
 function upBtn(it, size) {
-  if (it.up >= G.maxUpFor(app.S)) return `<button class="btn ${size}" disabled>強化 MAX</button>`;
+  if (it.up >= G.maxUpFor(app.S)) return tx('<button class="btn {0}" disabled>強化 MAX</button>', size);
   const g = G.upgradeCost(it), d = G.dustCost(it), ok = app.S.gold >= g && (app.S.dust || 0) >= d;
-  return `<button class="btn ${size}" data-act="up" data-id="${it.id}" ${ok ? '' : 'disabled'}>${d ? '精煉' : '強化'} <span class="num">${fmt(g)}</span>${d ? `<span class="dust num">+${d}✦</span>` : ''}</button>`;
+  return `<button class="btn ${size}" data-act="up" data-id="${it.id}" ${ok ? '' : 'disabled'}>${d ? tx('精煉') : tx('強化')} <span class="num">${fmt(g)}</span>${d ? `<span class="dust num">+${d}✦</span>` : ''}</button>`;
 }

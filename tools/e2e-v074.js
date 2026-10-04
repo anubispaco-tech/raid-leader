@@ -20,7 +20,7 @@ const off = JSON.parse(JSON.stringify(s)); off.idleMythic = 0; off.lastSeen = Da
 const G = await import('../src/core/index.js');
 const r = G.offlineProgress(off);
 const offOk = r && r.runs > 10 && off.mythic.key === 7;
-const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } });
+const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); await page.addInitScript(() => sessionStorage.setItem('rl-title', '1'));
 const errs = []; page.on('pageerror', e => errs.push(e.message));
 await page.addInitScript(v => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('raid-leader-save-v1', v); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(s));
 await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'app.test') return r.abort();

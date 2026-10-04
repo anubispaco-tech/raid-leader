@@ -8,12 +8,12 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || '/opt/npm-tools/node
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const entry = process.argv[2] || 'index.html';
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
-const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 400, height: 820 } });
+const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 400, height: 820 } }); await page.addInitScript(() => sessionStorage.setItem('rl-title', '1'));
 const errs = []; page.on('pageerror', e => errs.push(e.message));
 await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'app.test') return r.abort();
   const f = path.join(root, u.pathname === '/' ? entry : u.pathname.slice(1));
   return r.fulfill({ body: fs.readFileSync(f), contentType: types[path.extname(f)] }); });
-await page.goto('https://app.test/'); await page.waitForTimeout(400); await page.locator('[data-act=\"skipnick\"]').click({ timeout: 1500 }).catch(() => {});
+await page.goto('https://app.test/'); await page.locator('[data-act="dlgskip"]').click({ timeout: 1500 }).catch(() => {}); await page.waitForTimeout(400); await page.locator('[data-act=\"skipnick\"]').click({ timeout: 1500 }).catch(() => {});
 const out = [], gold = async () => +(await page.locator('#gold').innerText()).replace(/,/g, '');
 for (let i = 0; i < 6; i++) { await page.click('[data-act="fight"][data-d="0"]').catch(() => page.click('.result [data-act="fight"]')); await page.click('[data-act="skip"]'); }
 await page.click('[data-tab="bag"]');

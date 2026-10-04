@@ -1,4 +1,5 @@
 // ===== 畫面小工具 =====
+import { tx } from '../core/i18n.js';
 import * as G from '../core/index.js';
 import { app } from './state.js';
 
@@ -19,8 +20,8 @@ export const hero = id => app.S.heroes.find(h => h.id === id);
 export const cls = h => G.CLASSES[h.cls];
 export const inParty = h => app.S.party.includes(h.id);
 export function itemStatText(it) {
-  const p = [`威力 ${G.itemPow(it)}`, `耐力 ${G.itemSta(it)}`];
-  if (it.crit) p.push(`暴擊 +${Math.round(it.crit * 100)}%`);
+  const p = [tx('威力 {0}', G.itemPow(it)), tx('耐力 {0}', G.itemSta(it))];
+  if (it.crit) p.push(tx('暴擊 +{0}%', Math.round(it.crit * 100)));
   return p.join(' · ');
 }
 export function itemName(it) {

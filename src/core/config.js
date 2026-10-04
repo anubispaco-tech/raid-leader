@@ -3,9 +3,10 @@
 
 // ---------- 職業 ----------
 // 職業資料都在 classes/ 資料夾的職業包裡；這裡只是方便其他模組沿用舊名稱
+import { tx } from './i18n.js';
 import { PACKS } from './classes/index.js';
 export const CLASSES = PACKS;
-export const ROLE_NAME = { tank: '坦克', heal: '治療', dps: '輸出' };
+export const ROLE_NAME = { tank: tx('坦克'), heal: tx('治療'), dps: tx('輸出') };
 
 
 // ---------- 英雄 ----------
@@ -13,20 +14,20 @@ export const HERO = {
   maxLevel: 40,
   paragon: { need: 20000, growth: 0.1, bonus: 0.01 }, // 巔峰：Lv40 後經驗轉巔峰點；第 p 級需 need×(1+growth×p)，每級生命／威力 +1%
   xpBase: 60, xpExp: 1.8,          // 升級所需經驗 = xpBase × 等級^xpExp
-  names: ['艾倫', '凱莉', '雷恩', '米拉', '索恩', '伊薇', '巴頓', '妮雅', '托爾', '菲歐', '達克', '露娜',
-    '葛雷', '希拉', '奧德', '薇絲', '布蘭', '卡珊', '洛克', '艾琳', '費恩', '茉兒', '賽勒', '朵拉'],
+  names: [tx('艾倫'), tx('凱莉'), tx('雷恩'), tx('米拉'), tx('索恩'), tx('伊薇'), tx('巴頓'), tx('妮雅'), tx('托爾'), tx('菲歐'), tx('達克'), tx('露娜'),
+    tx('葛雷'), tx('希拉'), tx('奧德'), tx('薇絲'), tx('布蘭'), tx('卡珊'), tx('洛克'), tx('艾琳'), tx('費恩'), tx('茉兒'), tx('賽勒'), tx('朵拉')],
   starters: ['guardian', 'cleric', 'rogue'],
 };
 
 // ---------- 裝備 ----------
 export const RARITY = [
-  { name: '普通', mult: 1.0,  color: '#9ca3af', weight: 0.55 },
-  { name: '精良', mult: 1.2,  color: '#22c55e', weight: 0.30 },
-  { name: '稀有', mult: 1.45, color: '#3b82f6', weight: 0.12 },
-  { name: '史詩', mult: 1.75, color: '#a855f7', weight: 0.03 },
-  { name: '傳說', mult: 2.1,  color: '#f59e0b', weight: 0 },    // 只從傳奇秘境 +7 起掉落
+  { name: tx('普通'), mult: 1.0,  color: '#9ca3af', weight: 0.55 },
+  { name: tx('精良'), mult: 1.2,  color: '#22c55e', weight: 0.30 },
+  { name: tx('稀有'), mult: 1.45, color: '#3b82f6', weight: 0.12 },
+  { name: tx('史詩'), mult: 1.75, color: '#a855f7', weight: 0.03 },
+  { name: tx('傳說'), mult: 2.1,  color: '#f59e0b', weight: 0 },    // 只從傳奇秘境 +7 起掉落
 ];
-export const SLOTS = { weapon: '武器', armor: '護甲', trinket: '飾品' };
+export const SLOTS = { weapon: tx('武器'), armor: tx('護甲'), trinket: tx('飾品') };
 // 各部位屬性分配（× 裝等 × 稀有度倍率）
 export const SLOT_STATS = {
   weapon:  { pow: 0.6,  sta: 1.0 },
@@ -34,11 +35,11 @@ export const SLOT_STATS = {
   trinket: { pow: 0.35, sta: 1.0 },
 };
 export const SLOT_NAMES = {
-  weapon: ['長劍', '法杖', '匕首', '戰錘', '權杖', '短弓'],
-  armor: ['鎖甲', '法袍', '皮甲', '板甲', '斗篷'],
-  trinket: ['護符', '戒指', '徽記', '寶珠', '項鍊'],
+  weapon: [tx('長劍'), tx('法杖'), tx('匕首'), tx('戰錘'), tx('權杖'), tx('短弓')],
+  armor: [tx('鎖甲'), tx('法袍'), tx('皮甲'), tx('板甲'), tx('斗篷')],
+  trinket: [tx('護符'), tx('戒指'), tx('徽記'), tx('寶珠'), tx('項鍊')],
 };
-export const PREFIX = ['', '堅毅的', '銳利的', '灼熱的', '寒霜的', '虛空的', '遠古的', '龍鱗的'];
+export const PREFIX = ['', tx('堅毅的'), tx('銳利的'), tx('灼熱的'), tx('寒霜的'), tx('虛空的'), tx('遠古的'), tx('龍鱗的')];
 export const GEAR = {
   maxUp: 10, upBonus: 0.08,         // 每級強化屬性 +8%（+6 以上為精煉）
   refineFrom: 5, dustPerStep: 5,    // 精煉：+5 → +6 要 5 精華，之後每級多 5（+6→+7 要 10…）
@@ -51,13 +52,13 @@ export const GEAR = {
 // ---------- 副本 ----------
 // 每隻王考驗一個職責：脈衝=治療、重擊=坦克、召喚=範圍、狂暴=輸出
 export const DUNGEONS = [
-  { name: '腐根洞窟', boss: '蘑菇領主', trash: '孢子菇', mech: [{ t: 'pulse', every: 7, dmg: 0.9 }], tip: '定期噴發孢子傷害全隊 → 考驗治療' },
-  { name: '鏽蝕礦坑', boss: '礦坑巨像', trash: '礦坑狗頭人', mech: [{ t: 'buster', every: 8, mult: 3.2 }], tip: '重擊坦克 → 考驗坦克血量與護甲' },
-  { name: '沉沒神殿', boss: '潮汐祭司', trash: '深淵魚人', mech: [{ t: 'summon', every: 10, n: 2 }], tip: '不斷召喚小怪 → 考驗範圍輸出' },
-  { name: '灰燼要塞', boss: '熔火督軍', trash: '熔岩衛兵', mech: [{ t: 'enrage', at: 55, mult: 3 }], tip: '55 秒後狂暴 → 考驗輸出' },
-  { name: '霜語墓穴', boss: '寒霜巫妖', trash: '骷髏戰士', mech: [{ t: 'pulse', every: 6, dmg: 1.0 }, { t: 'summon', every: 12, n: 2 }], tip: '寒冰脈衝＋召喚骷髏 → 治療與範圍' },
-  { name: '虛空裂隙', boss: '虛空吞噬者', trash: '虛空行者', mech: [{ t: 'buster', every: 7, mult: 3.5 }, { t: 'enrage', at: 60, mult: 3 }], tip: '重擊＋狂暴 → 坦克與輸出' },
-  { name: '龍眠高塔', boss: '遠古紅龍', trash: '龍人衛士', mech: [{ t: 'pulse', every: 7, dmg: 1.0 }, { t: 'buster', every: 9, mult: 3.2 }, { t: 'enrage', at: 70, mult: 3 }], tip: '全機制 → 全隊綜合考驗' },
+  { name: tx('腐根洞窟'), boss: tx('蘑菇領主'), trash: tx('孢子菇'), mech: [{ t: 'pulse', every: 7, dmg: 0.9 }], tip: tx('定期噴發孢子傷害全隊 → 考驗治療') },
+  { name: tx('鏽蝕礦坑'), boss: tx('礦坑巨像'), trash: tx('礦坑狗頭人'), mech: [{ t: 'buster', every: 8, mult: 3.2 }], tip: tx('重擊坦克 → 考驗坦克血量與護甲') },
+  { name: tx('沉沒神殿'), boss: tx('潮汐祭司'), trash: tx('深淵魚人'), mech: [{ t: 'summon', every: 10, n: 2 }], tip: tx('不斷召喚小怪 → 考驗範圍輸出') },
+  { name: tx('灰燼要塞'), boss: tx('熔火督軍'), trash: tx('熔岩衛兵'), mech: [{ t: 'enrage', at: 55, mult: 3 }], tip: tx('55 秒後狂暴 → 考驗輸出') },
+  { name: tx('霜語墓穴'), boss: tx('寒霜巫妖'), trash: tx('骷髏戰士'), mech: [{ t: 'pulse', every: 6, dmg: 1.0 }, { t: 'summon', every: 12, n: 2 }], tip: tx('寒冰脈衝＋召喚骷髏 → 治療與範圍') },
+  { name: tx('虛空裂隙'), boss: tx('虛空吞噬者'), trash: tx('虛空行者'), mech: [{ t: 'buster', every: 7, mult: 3.5 }, { t: 'enrage', at: 60, mult: 3 }], tip: tx('重擊＋狂暴 → 坦克與輸出') },
+  { name: tx('龍眠高塔'), boss: tx('遠古紅龍'), trash: tx('龍人衛士'), mech: [{ t: 'pulse', every: 7, dmg: 1.0 }, { t: 'buster', every: 9, mult: 3.2 }, { t: 'enrage', at: 70, mult: 3 }], tip: tx('全機制 → 全隊綜合考驗') },
 ];
 export const DUNGEON = {
   hpGrowth: 2.15, atkGrowth: 1.82,  // 每層敵人生命 / 攻擊倍率（v0.3 天賦上線後調高）
@@ -88,11 +89,11 @@ export const MYTHIC = {
 // ---------- 英雄稀有度（v0.7）----------
 // mult 乘在職業基礎＋等級成長（不含裝備）；weight = 招募機率；hire = 僱用價倍率
 export const HERO_RARITY = [
-  { name: '普通', mult: 1.00, crit: 0,    weight: 0.55,  hire: 1 },
-  { name: '精良', mult: 1.08, crit: 0,    weight: 0.28,  hire: 1.5 },
-  { name: '稀有', mult: 1.16, crit: 0.02, weight: 0.12,  hire: 2.5 },
-  { name: '史詩', mult: 1.25, crit: 0.04, weight: 0.045, hire: 4, baseCdMult: 0.9 },
-  { name: '傳說', mult: 1.40, crit: 0.04, weight: 0.005, hire: 8, baseCdMult: 0.9 },
+  { name: tx('普通'), mult: 1.00, crit: 0,    weight: 0.55,  hire: 1 },
+  { name: tx('精良'), mult: 1.08, crit: 0,    weight: 0.28,  hire: 1.5 },
+  { name: tx('稀有'), mult: 1.16, crit: 0.02, weight: 0.12,  hire: 2.5 },
+  { name: tx('史詩'), mult: 1.25, crit: 0.04, weight: 0.045, hire: 4, baseCdMult: 0.9 },
+  { name: tx('傳說'), mult: 1.40, crit: 0.04, weight: 0.005, hire: 8, baseCdMult: 0.9 },
 ];
 // 每個職業唯一的傳奇英雄（名字與被動在各職業包的 legend）
 export const LEGENDS = Object.fromEntries(Object.entries(PACKS).map(([k, p]) => [k, p.legend]));
@@ -119,15 +120,15 @@ export const VAULT = {
 // ---------- 背包擴充：每達成一項 +5 格 ----------
 // test(s) 回傳是否達成；best = 秘境任一副本的最高限時等級
 export const BAG_MILESTONES = [
-  { id: 'clear3', name: '首次通關第 3 層', test: s => !!s.clears[2] },
-  { id: 'clear5', name: '首次通關第 5 層', test: s => !!s.clears[4] },
-  { id: 'clear7', name: '首次通關第 7 層', test: s => !!s.clears[6] },
-  { id: 'mythic5', name: '秘境 +5 限時通關', test: s => mythicBestLevel(s) >= 5 },
-  { id: 'mythic10', name: '秘境 +10 限時通關', test: s => mythicBestLevel(s) >= 10 },
-  { id: 'mythic15', name: '秘境 +15 限時通關', test: s => mythicBestLevel(s) >= 15 },
-  { id: 'vault10', name: '寶庫累計 10 次', test: s => ((s.vault && s.vault.runs) || 0) >= 10 },
-  { id: 'vault30', name: '寶庫累計 30 次', test: s => ((s.vault && s.vault.runs) || 0) >= 30 },
-  { id: 'vault60', name: '寶庫累計 60 次', test: s => ((s.vault && s.vault.runs) || 0) >= 60 },
+  { id: 'clear3', name: tx('首次通關第 3 層'), test: s => !!s.clears[2] },
+  { id: 'clear5', name: tx('首次通關第 5 層'), test: s => !!s.clears[4] },
+  { id: 'clear7', name: tx('首次通關第 7 層'), test: s => !!s.clears[6] },
+  { id: 'mythic5', name: tx('秘境 +5 限時通關'), test: s => mythicBestLevel(s) >= 5 },
+  { id: 'mythic10', name: tx('秘境 +10 限時通關'), test: s => mythicBestLevel(s) >= 10 },
+  { id: 'mythic15', name: tx('秘境 +15 限時通關'), test: s => mythicBestLevel(s) >= 15 },
+  { id: 'vault10', name: tx('寶庫累計 10 次'), test: s => ((s.vault && s.vault.runs) || 0) >= 10 },
+  { id: 'vault30', name: tx('寶庫累計 30 次'), test: s => ((s.vault && s.vault.runs) || 0) >= 30 },
+  { id: 'vault60', name: tx('寶庫累計 60 次'), test: s => ((s.vault && s.vault.runs) || 0) >= 60 },
 ];
 export const BAG_PER_MILESTONE = 5;
 export const mythicBestLevel = s => Math.max(0, ...Object.values((s.mythic && s.mythic.best) || {}).map(b => b.level));
@@ -140,7 +141,7 @@ export const TELEMETRY = {
 };
 
 // ---------- 團長指令 ----------
-export const RAID_HORN = { name: '英勇號角', dur: 15, bonus: 0.3 }; // 每場一次，全隊傷害與治療 +30%
+export const RAID_HORN = { name: tx('英勇號角'), dur: 15, bonus: 0.3 }; // 每場一次，全隊傷害與治療 +30%
 
 // ---------- 獎勵與經濟 ----------
 export const REWARD = {

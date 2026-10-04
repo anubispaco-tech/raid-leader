@@ -1,6 +1,7 @@
 // ===== 入口：分頁切換、事件、離線結算、啟動 =====
+import { tx } from '../core/i18n.js';
 import * as G from '../core/index.js';
-import { app } from './state.js';
+import { app, KEY } from './state.js';
 import { load, save, exportCode, importCode } from './save.js';
 import { $, fmt, toast, hero } from './helpers.js';
 import { viewDungeons } from './views/dungeon.js';
@@ -8,10 +9,13 @@ import { viewBattle } from './views/battle.js';
 import { viewTeam } from './views/team.js';
 import { viewBag } from './views/bag.js';
 import { viewTavern } from './views/tavern.js';
-import { renderModal, openModal, closeModal } from './views/sheets.js';
+import { renderModal, openModal, closeModal, playDialog } from './views/sheets.js';
+import { PROLOGUE } from './story.js';
+import { LANGS, getLang, setLang, localName } from '../core/i18n.js';
 import { startBattle, startMythic, startMythicIdle, startVault, runTimer, finishBattle } from './battle-runner.js';
 import * as T from './telemetry.js';
 import { esc, heroName } from './helpers.js';
+import { VERSION } from '../core/version.js';
 
 // ---------- 分頁 ----------
 const ICONS = {
@@ -21,7 +25,7 @@ const ICONS = {
   bag: '<path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
   tavern: '<path d="M6 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M16 5h2a2 2 0 0 1 0 4h-2M11 13v4M7 20h8"/>',
 };
-const TABS = [['dungeon', '副本'], ['battle', '戰鬥'], ['team', '團隊'], ['bag', '背包'], ['tavern', '酒館']];
+const TABS = [['dungeon', tx('副本')], ['battle', tx('戰鬥')], ['team', tx('團隊')], ['bag', tx('背包')], ['tavern', tx('酒館')]];
 function renderTabs() {
   $('#tabs').innerHTML = TABS.map(([k, n]) =>
     `<button data-tab="${k}" class="${app.tab === k ? 'sel' : ''}" aria-label="${n}"><svg viewBox="0 0 24 24">${ICONS[k]}</svg>${n}${(k === 'battle' && app.battle && !app.battle.over && app.tab !== 'battle') || (k === 'bag' && app.S.stash.length) || (k === 'team' && app.S.heroes.some(h => G.pendingPicks(h))) ? '<span class="dot"></span>' : ''}</button>`).join('');
@@ -56,119 +60,124 @@ document.addEventListener('click', e => {
     case 'mythic': stopIdleFor(-1); startMythic(+t.dataset.d); app.tab = 'battle'; window.scrollTo(0, 0); break;
     case 'vault': if (G.vaultLeft(app.S)) stopIdleFor(-1); if (startVault(+t.dataset.d)) { app.tab = 'battle'; window.scrollTo(0, 0); } break;
     case 'vaultfloor': app.vaultFloor = +t.dataset.d; break;
-    case 'prepare-vault': { const r = G.prepare(app.S, ['summon']); toast(prepMsg(r, '寶庫（偏範圍輸出）')); save(); break; }
+    case 'prepare-vault': { const r = G.prepare(app.S, ['summon']); toast(prepMsg(r, tx('寶庫（偏範圍輸出）'))); save(); break; }
     case 'scroll': {
       const n = +t.dataset.n, r = G.recruitScroll(app.S, n);
-      if (r.error) { toast(r.error === 'gold' ? '金幣不夠' : '名冊空位不夠'); break; }
+      if (r.error) { toast(r.error === 'gold' ? tx('金幣不夠') : tx('名冊空位不夠')); break; }
       save(); showDraw(r.heroes, r.cost); return;
     }
     case 'recommend-mythic': {
       const d = +t.dataset.d, r = G.prepare(app.S, [...G.DUNGEONS[d].mech.map(m => m.t), ...G.affixHints(G.activeAffixes(app.S.mythic.key))]);
-      toast(prepMsg(r, `「${G.DUNGEONS[d].name}」與今日詞綴`)); save(); break;
+      toast(prepMsg(r, tx('「{0}」與今日詞綴', G.DUNGEONS[d].name))); save(); break;
     }
     case 'idle': {
       const d = +t.dataset.d;
-      if (app.S.idle === d) { app.S.idle = null; clearTimeout(app.pendingRepeat); app.pendingRepeat = null; toast('已停止掛機'); }
-      else { const swap = app.S.idleMythic != null; app.S.idleMythic = null; app.S.idle = d; toast(`開始掛機：${G.DUNGEONS[d].name}`); if (swap || !app.battle || app.battle.over) { startBattle(d); } }
+      if (app.S.idle === d) { app.S.idle = null; clearTimeout(app.pendingRepeat); app.pendingRepeat = null; toast(tx('已停止掛機')); }
+      else { const swap = app.S.idleMythic != null; app.S.idleMythic = null; app.S.idle = d; toast(tx('開始掛機：{0}', G.DUNGEONS[d].name)); if (swap || !app.battle || app.battle.over) { startBattle(d); } }
       save(); break;
     }
     case 'idlemythic': {
       const d = +t.dataset.d, lv = G.mythicIdleLevel(app.S, d);
-      if (app.S.idleMythic === d) { app.S.idleMythic = null; clearTimeout(app.pendingRepeat); app.pendingRepeat = null; toast('已停止秘境掛機'); }
+      if (app.S.idleMythic === d) { app.S.idleMythic = null; clearTimeout(app.pendingRepeat); app.pendingRepeat = null; toast(tx('已停止秘境掛機')); }
       else if (lv) {
         const busy = app.battle && !app.battle.over && !app.battle.mythicIdle && !(app.S.idle != null && app.battle.dIdx === app.S.idle && !app.battle.mythic);
-        if (busy) { toast('目前有戰鬥進行中，打完再開始秘境掛機'); break; }
-        app.S.idle = null; app.S.idleMythic = d; toast(`開始秘境掛機：${G.DUNGEONS[d].name} +${lv}`);
+        if (busy) { toast(tx('目前有戰鬥進行中，打完再開始秘境掛機')); break; }
+        app.S.idle = null; app.S.idleMythic = d; toast(tx('開始秘境掛機：{0} +{1}', G.DUNGEONS[d].name, lv));
         startMythicIdle(d); app.tab = 'battle'; window.scrollTo(0, 0);
       }
       save(); break;
     }
+    case 'dlgnext': if (app.modal && app.modal.type === 'dialog') { if (app.modal.i < app.modal.lines.length - 1) { app.modal.i++; renderModal(); } else closeModal(); } return;
+    case 'dlgskip': closeModal(); return;
+    case 'lang': if (t.dataset.v !== getLang()) { // 新玩家還沒按開始就換語言：不留存檔，重新載入後仍是「開始冒險」
+      if (app.fresh) { try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ } } else save();
+      setLang(t.dataset.v); location.reload(); } return;
     case 'speed': app.speed = +t.dataset.x; runTimer(); break;
     case 'skip': if (app.battle && !app.battle.over) {
       const b = app.battle; b.opts.autoHorn = true; // 直接結算視同掛機：首領戰自動吹號角
       if (b.waveIdx === b.waves.length - 1) b.useHorn();
       b.runToEnd(); finishBattle(); } break;
-    case 'retreat': if (app.battle && !app.battle.over) { clearInterval(app.bTimer); app.battle.over = true; app.battle.win = false; app.battle.push('🏳 主動撤退', 'bad'); app.lastResult = app.battle.mythicIdle ? G.applyMythicIdleResult(app.S, app.battle) : G.applyResult(app.S, app.battle.dIdx, app.battle); if (app.S.idle === app.battle.dIdx) app.S.idle = null; if (app.battle.mythicIdle) app.S.idleMythic = null; save(); } break;
+    case 'retreat': if (app.battle && !app.battle.over) { clearInterval(app.bTimer); app.battle.over = true; app.battle.win = false; app.battle.push(tx('🏳 主動撤退'), 'bad'); app.lastResult = app.battle.mythicIdle ? G.applyMythicIdleResult(app.S, app.battle) : G.applyResult(app.S, app.battle.dIdx, app.battle); if (app.S.idle === app.battle.dIdx) app.S.idle = null; if (app.battle.mythicIdle) app.S.idleMythic = null; save(); } break;
     case 'hero': openModal({ type: 'hero', id, view: app.modal && app.modal.id === id ? app.modal.view : undefined }); return;
     case 'heroview': app.modal = { type: 'hero', id, view: t.dataset.v }; break;
     case 'spec': G.setSpec(hero(id), t.dataset.v); save(); break;
     case 'talent': G.setTalent(hero(id), +t.dataset.lv, t.dataset.v); save(); break;
-    case 'recommend': G.applyRecommend(hero(id), G.DUNGEONS[+t.dataset.d].mech.map(m => m.t)); toast('已套用推薦配置'); save(); break;
+    case 'recommend': G.applyRecommend(hero(id), G.DUNGEONS[+t.dataset.d].mech.map(m => m.t)); toast(tx('已套用推薦配置')); save(); break;
     case 'recommend-party': case 'prepare': {
       const d = +t.dataset.d, r = G.prepare(app.S, G.DUNGEONS[d].mech.map(m => m.t));
-      toast(prepMsg(r, `「${G.DUNGEONS[d].name}」`)); save(); break;
+      toast(prepMsg(r, tx('「{0}」', G.DUNGEONS[d].name))); save(); break;
     }
     case 'horn': if (app.battle && app.battle.useHorn()) app.render(true); return;
     case 'item': openModal({ type: 'item', id }); return;
     case 'pick': openModal({ type: 'pick', id, slot: t.dataset.slot }); return;
-    case 'equip': G.equip(app.S, t.dataset.hero, id); toast('已裝備'); save(); app.modal = { type: 'hero', id: t.dataset.hero }; break;
+    case 'equip': G.equip(app.S, t.dataset.hero, id); toast(tx('已裝備')); save(); app.modal = { type: 'hero', id: t.dataset.hero }; break;
     case 'unequip': G.unequip(app.S, t.dataset.hero, t.dataset.slot); save(); app.modal = { type: 'hero', id: t.dataset.hero }; break;
     case 'up': { const it = app.S.items[id], refine = it && it.up >= G.GEAR.refineFrom;
-      if (G.upgrade(app.S, id)) { toast(`${refine ? '精煉' : '強化'}成功 +${it.up}`); save(); } else toast(refine ? '金幣或精華不足' : '金幣不足'); break; }
-    case 'salvage': toast(`分解獲得 ${G.salvage(app.S, id)} 金`); save(); app.modal = null; break;
-    case 'join': if (G.partyLocked(app.S)) { toast('掛機中不能更換隊員，請先停止掛機'); break; } G.joinParty(app.S, id); save(); break;
-    case 'bench': if (G.partyLocked(app.S)) { toast('掛機中不能更換隊員，請先停止掛機'); break; } G.benchHero(app.S, id); save(); break;
+      if (G.upgrade(app.S, id)) { toast(tx('{0}成功 +{1}', refine ? tx('精煉') : tx('強化'), it.up)); save(); } else toast(refine ? tx('金幣或精華不足') : tx('金幣不足')); break; }
+    case 'salvage': toast(tx('分解獲得 {0} 金', G.salvage(app.S, id))); save(); app.modal = null; break;
+    case 'join': if (G.partyLocked(app.S)) { toast(tx('掛機中不能更換隊員，請先停止掛機')); break; } G.joinParty(app.S, id); save(); break;
+    case 'bench': if (G.partyLocked(app.S)) { toast(tx('掛機中不能更換隊員，請先停止掛機')); break; } G.benchHero(app.S, id); save(); break;
     case 'fire': {
-      if (G.partyLocked(app.S) && app.S.party.includes(id)) { toast('掛機中不能更換隊員，請先停止掛機'); break; }
+      if (G.partyLocked(app.S) && app.S.party.includes(id)) { toast(tx('掛機中不能更換隊員，請先停止掛機')); break; }
       if (!app.modal.confirmFire) { app.modal.confirmFire = true; break; }
-      const x = G.fireHero(app.S, id); app.modal = null; if (x) toast(`${x.name} 離開了團隊，退還 ${x.refund} 金${gearMsg(x.gear)}`); save(); break;
+      const x = G.fireHero(app.S, id); app.modal = null; if (x) toast(tx('{0} 離開了團隊，退還 {1} 金{2}', x.name, x.refund, gearMsg(x.gear))); save(); break;
     }
     case 'firemany': {
       const n = G.fireMany(app.S, app.fireSel ?? 0, true).count; if (!n) break;
       if (!app.fireConfirm) { app.fireConfirm = true; break; }
       app.fireConfirm = false;
-      const r = G.fireMany(app.S, app.fireSel ?? 0); toast(`解雇 ${r.count} 位英雄，退還 ${fmt(r.refund)} 金${gearMsg(r.gear)}`); save(); break;
+      const r = G.fireMany(app.S, app.fireSel ?? 0); toast(tx('解雇 {0} 位英雄，退還 {1} 金{2}', r.count, fmt(r.refund), gearMsg(r.gear))); save(); break;
     }
     case 'hire': {
       const x = G.hire(app.S, id);
       if (x && x.rarity >= 3) { save(); showDraw([x], G.hireCost(x)); return; }
-      if (x) { toast(`${x.name} 加入了${app.S.party.includes(x.id) ? '隊伍' : '名冊'}`); save(); }
+      if (x) { toast(tx('{0} 加入了{1}', x.name, app.S.party.includes(x.id) ? tx('隊伍') : tx('名冊'))); save(); }
       break;
     }
     case 'reroll': if (G.refreshTavern(app.S)) save(); break;
     case 'filter': app.invFilter = t.dataset.v; break;
-    case 'autoequip1': { const n = G.autoEquip(app.S, id); toast(n ? `更換了 ${n} 件裝備` : '目前已是最佳配裝'); save(); break; }
-    case 'autoequip': { const n = G.autoEquip(app.S); toast(n ? `更換了 ${n} 件裝備` : '目前已是最佳配裝'); save(); break; }
+    case 'autoequip1': { const n = G.autoEquip(app.S, id); toast(n ? tx('更換了 {0} 件裝備', n) : tx('目前已是最佳配裝')); save(); break; }
+    case 'autoequip': { const n = G.autoEquip(app.S); toast(n ? tx('更換了 {0} 件裝備', n) : tx('目前已是最佳配裝')); save(); break; }
     case 'salvageupto': {
       const lv = app.salvSel ?? 0;
       if (lv >= 2 && !app.salvConfirm) { app.salvConfirm = true; break; } // 分解稀有以上要再按一次確認
       app.salvConfirm = false;
       const r = G.salvageUpTo(app.S, lv);
-      toast(r.count ? `分解 ${r.count} 件，獲得 ${r.gold} 金` : '沒有符合的裝備'); save(); break;
+      toast(r.count ? tx('分解 {0} 件，獲得 {1} 金', r.count, r.gold) : tx('沒有符合的裝備')); save(); break;
     }
     case 'upall': {
       const r = G.upgradeAll(app.S, id);
-      toast(r.count ? `強化 ${r.count} 次，花費 ${fmt(r.spent)} 金` : '金幣不夠'); save(); break;
+      toast(r.count ? tx('強化 {0} 次，花費 {1} 金', r.count, fmt(r.spent)) : tx('金幣不夠')); save(); break;
     }
     case 'unequipall': {
       const r = G.unequipAll(app.S, id);
-      toast(r.left ? `背包和戰利品箱都滿了，還有 ${r.left} 件沒卸下` : `已卸下 ${r.moved + r.stashed} 件${r.stashed ? `（${r.stashed} 件放進戰利品箱）` : ''}`); save(); break;
+      toast(r.left ? tx('背包和戰利品箱都滿了，還有 {0} 件沒卸下', r.left) : tx('已卸下 {0} 件{1}', r.moved + r.stashed, r.stashed ? tx('（{0} 件放進戰利品箱）', r.stashed) : '')); save(); break;
     }
     case 'autosalv': app.S.autoSalvageBelow = +t.dataset.v; save(); break;
     case 'keeprar': app.S.keepRarity = +t.dataset.v; save(); break;
-    case 'takestash': { const n = G.takeFromStash(app.S); toast(n ? `取出 ${n} 件` : '背包已滿'); save(); break; }
-    case 'salvagestash': { const r = G.salvageStash(app.S); toast(`分解 ${r.count} 件，獲得 ${r.gold} 金`); save(); break; }
-    case 'export': openModal({ type: 'text', html: `<h3>匯出存檔碼</h3><p class="sub" style="margin:0">複製這段文字，到另一台裝置的「匯入」貼上。</p><textarea id="expTxt" readonly>${exportCode()}</textarea><div class="row"><button class="btn main" data-act="copy">複製</button><button class="btn" data-act="closebtn">關閉</button></div>` }); return;
-    case 'copy': { const ta = $('#expTxt'); navigator.clipboard?.writeText(ta.value).then(() => toast('已複製'), () => { ta.select(); toast('請手動複製'); }) ?? (ta.select(), toast('請手動複製')); return; }
-    case 'import': openModal({ type: 'text', html: `<h3>匯入存檔碼</h3><p class="sub" style="margin:0">會覆蓋目前進度。</p><textarea id="impTxt" placeholder="貼上存檔碼"></textarea><div class="row"><button class="btn main" data-act="doimport">匯入</button><button class="btn" data-act="closebtn">取消</button></div>` }); return;
-    case 'doimport': try { app.S = importCode($('#impTxt').value); app.battle = null; save(); app.modal = null; toast('匯入完成'); } catch (err) { toast('存檔碼無法讀取，請確認是否完整複製'); return; } break;
-    case 'reset': openModal({ type: 'text', html: `<h3>重新開始？</h3><p class="sub" style="margin:0">目前的英雄、裝備與進度都會清除，無法復原。</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">清除並重來</button><button class="btn" data-act="closebtn">取消</button></div>` }); return;
+    case 'takestash': { const n = G.takeFromStash(app.S); toast(n ? tx('取出 {0} 件', n) : tx('背包已滿')); save(); break; }
+    case 'salvagestash': { const r = G.salvageStash(app.S); toast(tx('分解 {0} 件，獲得 {1} 金', r.count, r.gold)); save(); break; }
+    case 'export': openModal({ type: 'text', html: tx('<h3>匯出存檔碼</h3><p class="sub" style="margin:0">複製這段文字，到另一台裝置的「匯入」貼上。</p><textarea id="expTxt" readonly>{0}</textarea><div class="row"><button class="btn main" data-act="copy">複製</button><button class="btn" data-act="closebtn">關閉</button></div>', exportCode()) }); return;
+    case 'copy': { const ta = $('#expTxt'); navigator.clipboard?.writeText(ta.value).then(() => toast(tx('已複製')), () => { ta.select(); toast(tx('請手動複製')); }) ?? (ta.select(), toast(tx('請手動複製'))); return; }
+    case 'import': openModal({ type: 'text', html: tx('<h3>匯入存檔碼</h3><p class="sub" style="margin:0">會覆蓋目前進度。</p><textarea id="impTxt" placeholder="貼上存檔碼"></textarea><div class="row"><button class="btn main" data-act="doimport">匯入</button><button class="btn" data-act="closebtn">取消</button></div>') }); return;
+    case 'doimport': try { app.S = importCode($('#impTxt').value); app.battle = null; save(); app.modal = null; toast(tx('匯入完成')); } catch (err) { toast(tx('存檔碼無法讀取，請確認是否完整複製')); return; } break;
+    case 'reset': openModal({ type: 'text', html: tx('<h3>重新開始？</h3><p class="sub" style="margin:0">目前的英雄、裝備與進度都會清除，無法復原。</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">清除並重來</button><button class="btn" data-act="closebtn">取消</button></div>') }); return;
     case 'doreset': clearInterval(app.bTimer); clearTimeout(app.pendingRepeat); app.S = G.newGame(); app.battle = null; app.lastResult = null; app.modal = null; app.tab = 'dungeon'; save(); break;
     case 'closebtn': app.modal = null; break;
     case 'nick': openNick(); return;
     case 'savenick': {
       const v = ($('#nickInp').value || '').trim().slice(0, 16);
       app.S.player.name = v; app.S.player.asked = true; app.modal = null; save();
-      toast(v ? `暱稱設為「${v}」，天梯約 1 分鐘內更新` : '以匿名參加'); T.sendSnapshot(true).then(r => { if (r && r.error === 'too fast') setTimeout(() => T.sendSnapshot(), 25000); }); break;
+      toast(v ? tx('暱稱設為「{0}」，天梯約 1 分鐘內更新', v) : tx('以匿名參加')); T.sendSnapshot(true).then(r => { if (r && r.error === 'too fast') setTimeout(() => T.sendSnapshot(), 25000); }); break;
     }
     case 'skipnick': app.S.player.asked = true; app.modal = null; save(); T.sendSnapshot(); break;
     case 'sendfb': {
       const ta = $('#fbText'), text = (ta.value || '').trim();
-      if (!text) { toast('請先輸入意見'); return; }
+      if (!text) { toast(tx('請先輸入意見')); return; }
       t.disabled = true;
       T.sendFeedback(text).then(r => {
-        if (r && r.ok) { app.fbDraft = ''; ta.value = ''; toast('已送出，謝謝回饋！'); }
-        else toast(r && r.error === 'too fast' ? '送太快了，請一分鐘後再試' : '送出失敗，請稍後再試');
+        if (r && r.ok) { app.fbDraft = ''; ta.value = ''; toast(tx('已送出，謝謝回饋！')); }
+        else toast(r && r.error === 'too fast' ? tx('送太快了，請一分鐘後再試') : tx('送出失敗，請稍後再試'));
         t.disabled = false;
       });
       return;
@@ -183,12 +192,8 @@ function settleOffline() {
   const r = G.offlineProgress(app.S);
   if (!r || !r.runs) return;
   save();
-  const hrs = r.sec >= 3600 ? `${(r.sec / 3600).toFixed(1)} 小時` : `${Math.round(r.sec / 60)} 分鐘`;
-  openModal({ type: 'text', html: `<h3>離線收益</h3><p class="sub" style="margin:0">你離開了 ${hrs}，隊伍在 ${app.S.idleMythic != null ? `秘境「${G.DUNGEONS[app.S.idleMythic].name}」+${G.mythicIdleLevel(app.S, app.S.idleMythic)}` : G.DUNGEONS[app.S.idle].name} 持續作戰。</p>
-    <div class="statgrid num"><div><b>${r.runs}</b><span>挑戰</span></div><div><b>${r.wins}</b><span>通關</span></div><div><b>+${fmt(r.gold)}</b><span>金幣</span></div><div><b>${r.items}</b><span>裝備</span></div></div>
-    ${r.stashed ? `<div style="color:var(--brass)">背包已滿，${r.stashed} 件放進戰利品箱，到背包取出</div>` : ''}
-    ${r.lv ? `<div style="color:var(--good)">期間共升級 ${r.lv} 次</div>` : ''}
-    <div class="row"><button class="btn main grow" data-act="autoequip">一鍵配裝</button><button class="btn" data-act="closebtn">好</button></div>` });
+  const hrs = r.sec >= 3600 ? tx('{0} 小時', (r.sec / 3600).toFixed(1)) : tx('{0} 分鐘', Math.round(r.sec / 60));
+  openModal({ type: 'text', html: tx('<h3>離線收益</h3><p class="sub" style="margin:0">你離開了 {0}，隊伍在 {1} 持續作戰。</p> <div class="statgrid num"><div><b>{2}</b><span>挑戰</span></div><div><b>{3}</b><span>通關</span></div><div><b>+{4}</b><span>金幣</span></div><div><b>{5}</b><span>裝備</span></div></div> {6} {7} <div class="row"><button class="btn main grow" data-act="autoequip">一鍵配裝</button><button class="btn" data-act="closebtn">好</button></div>', hrs, app.S.idleMythic != null ? tx('秘境「{0}」+{1}', G.DUNGEONS[app.S.idleMythic].name, G.mythicIdleLevel(app.S, app.S.idleMythic)) : G.DUNGEONS[app.S.idle].name, r.runs, r.wins, fmt(r.gold), r.items, r.stashed ? tx('<div style="color:var(--brass)">背包已滿，{0} 件放進戰利品箱，到背包取出</div>', r.stashed) : '', r.lv ? tx('<div style="color:var(--good)">期間共升級 {0} 次</div>', r.lv) : '') });
 }
 // 切到背景：暫停即時戰鬥並記錄時間；回來時掛機改用離線結算，避免重複計算
 document.addEventListener('visibilitychange', () => {
@@ -207,16 +212,11 @@ document.addEventListener('change', e => {
 // 抽卡結果：依稀有度由高到低排列，傳說與史詩特別標示
 function showDraw(list, cost) {
   const sorted = [...list].sort((a, b) => (b.rarity || 0) - (a.rarity || 0)), best = sorted[0].rarity || 0;
-  openModal({ type: 'text', html: `<h3>${best === 4 ? '✨ 傳說降臨！' : best === 3 ? '史詩英雄加入！' : '招募結果'}</h3>
-    <p class="sub" style="margin:0">花費 ${fmt(cost)} 金・已加入名冊${app.S.party.length < G.ECONOMY.partyMax ? '' : '（隊伍已滿，在待命區）'}</p>
-    <div class="drawlist">${sorted.map(x => `<div class="drawcard r-${x.rarity || 0}"><span class="ic">${G.CLASSES[x.cls].icon}</span><span>${heroName(x)}</span><span class="rtag r${x.rarity || 0}">${G.HERO_RARITY[x.rarity || 0].name}</span><small>${G.CLASSES[x.cls].name}・Lv${x.level}</small>${x.legend ? `<small class="c4">${G.LEGENDS[x.cls].pname}：${G.LEGENDS[x.cls].desc}</small>` : ''}</div>`).join('')}</div>
-    <div class="row"><button class="btn main grow" data-act="closebtn">好</button><button class="btn" data-tab="team">去團隊看看</button></div>` });
+  openModal({ type: 'text', html: tx('<h3>{0}</h3> <p class="sub" style="margin:0">花費 {1} 金・已加入名冊{2}</p> <div class="drawlist">{3}</div> <div class="row"><button class="btn main grow" data-act="closebtn">好</button><button class="btn" data-tab="team">去團隊看看</button></div>', best === 4 ? tx('✨ 傳說降臨！') : best === 3 ? tx('史詩英雄加入！') : tx('招募結果'), fmt(cost), app.S.party.length < G.ECONOMY.partyMax ? '' : tx('（隊伍已滿，在待命區）'), sorted.map(x => `<div class="drawcard r-${x.rarity || 0}"><span class="ic">${G.CLASSES[x.cls].icon}</span><span>${heroName(x)}</span><span class="rtag r${x.rarity || 0}">${G.HERO_RARITY[x.rarity || 0].name}</span><small>${G.CLASSES[x.cls].name}・Lv${x.level}</small>${x.legend ? tx('<small class="c4">{0}：{1}</small>', G.LEGENDS[x.cls].pname, G.LEGENDS[x.cls].desc) : ''}</div>`).join('')) });
 }
 // 暱稱：第一次開遊戲時詢問（可跳過），之後可在團隊分頁修改
 function openNick() {
-  openModal({ type: 'text', html: `<h3>你的暱稱</h3><p class="sub" style="margin:0">顯示在天梯上，之後隨時可以修改。遊戲會記錄暱稱、進度與遊玩時間，不會收集帳號或個人資料。</p>
-    <input id="nickInp" class="inp" maxlength="16" placeholder="例如：Yomi" value="${esc(app.S.player.name)}" autocomplete="off">
-    <div class="row"><button class="btn main grow" data-act="savenick">確定</button><button class="btn" data-act="skipnick">匿名參加</button></div>` });
+  openModal({ type: 'text', html: tx('<h3>你的暱稱</h3><p class="sub" style="margin:0">顯示在天梯上，之後隨時可以修改。遊戲會記錄暱稱、進度與遊玩時間，不會收集帳號或個人資料。</p> <input id="nickInp" class="inp" maxlength="16" placeholder="例如：Yomi" value="{0}" autocomplete="off"> <div class="row"><button class="btn main grow" data-act="savenick">確定</button><button class="btn" data-act="skipnick">匿名參加</button></div>', esc(app.S.player.name)) });
 }
 // 鎖定縮放：iOS Safari 會忽略 viewport 的 user-scalable，另外擋捏合手勢
 for (const ev of ['gesturestart', 'gesturechange']) document.addEventListener(ev, e => e.preventDefault(), { passive: false });
@@ -224,12 +224,37 @@ document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preven
 
 // ---------- 啟動 ----------
 function start(data) {
-  app.S = G.migrate((data && data.S) || load() || G.newGame());
+  const saved = (data && data.S) || load();
+  app.S = G.migrate(saved || G.newGame()); app.fresh = !saved;
+  for (const h of [...app.S.heroes, ...(app.S.tavern || [])]) h.name = localName(h.name);
+  for (const it of Object.values(app.S.items)) it.name = localName(it.name);
+  $('.brand').textContent = tx('副本團長'); $('#idleChip').textContent = tx('掛機中'); document.title = tx('副本團長');
+  document.documentElement.lang = getLang();
   settleOffline();
   resumeIdle();
   render();
-  if (T.enabled() && !app.S.player.asked && !app.modal) openNick();
-  else if (app.S.player.asked) setTimeout(() => T.sendSnapshot(), 3000);
+  const after = () => {
+    if (T.enabled() && !app.S.player.asked && !app.modal) openNick();
+    else if (app.S.player.asked) setTimeout(() => T.sendSnapshot(), 3000);
+  };
+  showTitle(!saved, () => { app.fresh = false; save(); return !saved ? playDialog(PROLOGUE, after) : after(); });
+}
+// 開始畫面：每次開啟遊戲顯示一次（同一個分頁工作階段內不重複）；可切換語言
+function showTitle(fresh, onGo) {
+  let seen = false; try { seen = sessionStorage.getItem('rl-title') === '1'; } catch (e) { /* ignore */ }
+  if (seen) { onGo(); return; }
+  const el = document.createElement('div'); el.id = 'title';
+  el.innerHTML = `<div class="tbox"><div class="tlogo">${tx('副本團長')}</div>${getLang() === 'en' ? '' : '<div class="tsub">RAID LEADER</div>'}
+    <p class="ttag">${tx('帶領你的冒險團，攻下每一座副本。')}</p>
+    <button class="btn main tgo" data-act="titlego">${fresh ? tx('開始冒險') : tx('繼續冒險')}</button>
+    <div class="seg tlang">${LANGS.map(l => `<button data-act="lang" data-v="${l.id}" class="${l.id === getLang() ? 'sel' : ''}">${l.name}</button>`).join('')}</div>
+    <div class="sub num tver">v${VERSION}</div></div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click', e => {
+    if (!e.target.closest('[data-act="titlego"]')) return;
+    try { sessionStorage.setItem('rl-title', '1'); } catch (err) { /* ignore */ }
+    el.classList.add('out'); setTimeout(() => el.remove(), 260); onGo();
+  });
 }
 window.claude?.hot?.snapshot?.(() => ({ S: app.S }));
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
@@ -239,19 +264,19 @@ function stopIdleFor(d) {
   const m = app.S.idleMythic != null, i = app.S.idle != null && app.S.idle !== d;
   if (!m && !i) return;
   app.S.idleMythic = null; if (i) app.S.idle = null;
-  clearTimeout(app.pendingRepeat); app.pendingRepeat = null; toast('已停止掛機'); save();
+  clearTimeout(app.pendingRepeat); app.pendingRepeat = null; toast(tx('已停止掛機')); save();
 }
 function resumeIdle() {
   if (app.S.idleMythic != null && G.mythicIdleLevel(app.S, app.S.idleMythic)) startMythicIdle(app.S.idleMythic);
   else if (app.S.idle != null && app.S.clears[app.S.idle]) startBattle(app.S.idle);
 }
 function prepMsg(r, what) {
-  const roles = `坦 ${r.roles.tank}・補 ${r.roles.heal}・輸出 ${r.roles.dps}`, gear = r.swapped ? `，換上 ${r.swapped} 件裝備` : '';
-  return r.locked ? `掛機中不換陣容，已依${what}調整天賦${gear}` : `已依${what}備戰：${roles}${gear}`;
+  const roles = tx('坦 {0}・補 {1}・輸出 {2}', r.roles.tank, r.roles.heal, r.roles.dps), gear = r.swapped ? tx('，換上 {0} 件裝備', r.swapped) : '';
+  return r.locked ? tx('掛機中不換陣容，已依{0}調整天賦{1}', what, gear) : tx('已依{0}備戰：{1}{2}', what, roles, gear);
 }
 
 function gearMsg(g) {
   if (!g) return '';
   const n = g.bag + g.stash + g.salvaged; if (!n) return '';
-  return `；卸下 ${n} 件裝備${g.stash ? `（${g.stash} 件進戰利品箱）` : ''}${g.salvaged ? `（${g.salvaged} 件放不下已分解 +${fmt(g.gold)} 金）` : ''}`;
+  return tx('；卸下 {0} 件裝備{1}{2}', n, g.stash ? tx('（{0} 件進戰利品箱）', g.stash) : '', g.salvaged ? tx('（{0} 件放不下已分解 +{1} 金）', g.salvaged, fmt(g.gold)) : '');
 }

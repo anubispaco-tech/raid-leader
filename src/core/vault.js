@@ -1,4 +1,5 @@
 // ===== 寶庫：每日 3 次、60 秒打寶藏哥布林換金幣 =====
+import { tx } from './i18n.js';
 import { REWARD, VAULT } from './config.js';
 import { buildWaves } from './dungeons.js';
 import { dayKey } from './mythic.js';
@@ -21,7 +22,7 @@ export const vaultMaxKills = f => Math.round(VAULT.par[f] * VAULT.capMult);
 export function vaultBattleOpts(floor) {
   const base = buildWaves(floor)[0][0];
   const waves = Array.from({ length: 40 }, (_, k) => Array.from({ length: 3 }, () => ({
-    name: '寶藏哥布林', boss: false, goblin: true,
+    name: tx('寶藏哥布林'), boss: false, goblin: true,
     hp: Math.round(base.hp * VAULT.strength * (1 + VAULT.waveGrowth * k)), atk: base.atk * VAULT.goblinAtk })));
   return { vault: { floor, dur: VAULT.dur }, waves, maxTicks: VAULT.dur };
 }

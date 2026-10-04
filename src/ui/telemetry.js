@@ -1,4 +1,5 @@
 // ===== 遊玩數據、排行榜、意見回饋（送到 GAS；失敗時安靜忽略，不影響遊戲）=====
+import { tx } from '../core/i18n.js';
 import * as G from '../core/index.js';
 import { app } from './state.js';
 import { VERSION } from '../core/version.js';
@@ -11,7 +12,7 @@ function post(body, keepalive = false) {
   if (!URL_ || !app.S) return Promise.resolve(null);
   const p = app.S.player;
   return fetch(URL_, { method: 'POST', keepalive, headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ pid: p.pid, name: p.name || '匿名', ver: VERSION, ...body }) })
+    body: JSON.stringify({ pid: p.pid, name: p.name || tx('匿名'), ver: VERSION, ...body }) })
     .then(r => r.json()).catch(() => null);
 }
 // 目前進度：隊伍平均等級、最高通關層、秘境鑰石與最高限時等級
@@ -22,7 +23,7 @@ export function progress() {
   return { level: party.length ? Math.round(party.reduce((a, h) => a + h.level, 0) / party.length) : 1,
     top, key: G.mythicUnlocked(S) ? S.mythic.key : 0, best, playMin: Math.round(S.player.playSec / 60) };
 }
-export const progressText = () => { const p = progress(); return `Lv${p.level}・第 ${p.top} 層${p.best ? `・秘境 +${p.best}` : ''}`; };
+export const progressText = () => { const p = progress(); return tx('Lv{0}・第 {1} 層{2}', p.level, p.top, p.best ? tx('・秘境 +{0}', p.best) : ''); };
 
 export const sendSnapshot = keepalive => post({ type: 'snapshot', ...progress() }, keepalive);
 export const sendEvent = (kind, detail) => post({ type: 'event', kind, detail });

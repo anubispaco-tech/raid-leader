@@ -19,7 +19,7 @@ const proto = s.heroes[0];
   s.heroes.push(h); });
 s.idle = 0; // 掛機中也能一鍵解雇待命英雄
 
-const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } });
+const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); await page.addInitScript(() => sessionStorage.setItem('rl-title', '1'));
 const errs = []; page.on('pageerror', e => errs.push(e.message));
 await page.addInitScript(v => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('raid-leader-save-v1', v); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(s));
 await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'app.test') return r.abort();

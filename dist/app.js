@@ -1,5 +1,601 @@
-/* 副本團長 v0.8.0 */
+/* 副本團長 v0.8.1 */
 (() => {
+  // src/i18n/en.js
+  var en_default = {
+    "\u5766\u514B": "Tank",
+    "\u6CBB\u7642": "Healer",
+    "\u8F38\u51FA": "DPS",
+    "\u958B\u59CB\u7B2C\u4E00\u5834\u6230\u9B25": "Start your first battle",
+    "\u6309\u4E0B\u300C\u8150\u6839\u6D1E\u7A9F\u300D\u7684\u6311\u6230\uFF0C\u968A\u4F0D\u6703\u81EA\u5DF1\u6253\u3002": "Tap Fight on Rotroot Cavern \u2014 your party fights on its own.",
+    "\u6311\u6230": "Fight",
+    "\u80CC\u5305\u6709\u66F4\u597D\u7684\u88DD\u5099": "Better gear in your bag",
+    "\u4E00\u9375\u66FF\u51FA\u6230\u968A\u54E1\u63DB\u4E0A\u5206\u6578\u66F4\u9AD8\u7684\u88DD\u5099\u3002": "Equip higher-scoring gear on your active heroes in one tap.",
+    "\u4E00\u9375\u914D\u88DD": "Auto-equip",
+    "\u968A\u4F0D\u9084\u6709 {0} \u500B\u7A7A\u4F4D": "{0} open party slot(s)",
+    "\u53BB\u9152\u9928\u62DB\u52DF\uFF0C\u5EFA\u8B70\u88DC{0}\u3002": "Recruit at the Tavern \u2014 a {0} is recommended.",
+    "\u524D\u5F80\u9152\u9928": "Go to Tavern",
+    "\u6709\u5929\u8CE6\u9084\u6C92\u9078": "Talents to pick",
+    "\u639B\u6A5F\u4E2D\u9663\u5BB9\u4E0D\u8B8A\uFF0C\u4E00\u9375\u4F9D\u300C{0}\u300D\u914D\u597D\u5929\u8CE6\u8207\u88DD\u5099\u3002": "Idling keeps the lineup \u2014 set talents and gear for {0} in one tap.",
+    "\u4E00\u9375\u4F9D\u300C{0}\u300D\u914D\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\u3002": "Set lineup, talents and gear for {0} in one tap.",
+    "\u4E00\u9375\u5099\u6230": "One-tap prep",
+    "\u300C{0}\u300D\u9023\u8F38 {1} \u5834": "{1} losses in a row at {0}",
+    "\u56DE\u524D\u4E00\u5C64\u639B\u6A5F\u5237\u88DD\u5099\u8207\u7B49\u7D1A\uFF0C\u6216\u8ABF\u6574\u9663\u5BB9\u3002": "Idle the previous floor for gear and levels, or adjust your lineup.",
+    "\u639B\u6A5F\u5237\u300C{0}\u300D": "Idle {0}",
+    "\u6230\u5229\u54C1\u7BB1\u6709 {0} \u4EF6\u88DD\u5099": "{0} item(s) in the loot chest",
+    "\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\u6389\u7684\u88DD\u5099\u653E\u5728\u9019\u88E1\uFF0C\u8A18\u5F97\u53D6\u51FA\u3002": "Drops land here when your bag is full \u2014 remember to collect them.",
+    "\u524D\u5F80\u80CC\u5305": "Go to Bag",
+    "\u4ECA\u5929\u5BF6\u5EAB\u9084\u6709 {0} \u6B21": "{0} Vault run(s) left today",
+    "60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\uFF0C\u5927\u91CF\u91D1\u5E63\u53EF\u4EE5\u62FF\u53BB\u62DB\u52DF\u82F1\u96C4\u3002": "60 seconds of treasure goblins \u2014 spend the gold on recruits.",
+    "\u9032\u5165\u5BF6\u5EAB": "Enter Vault",
+    "\u50B3\u5947\u79D8\u5883\u5DF2\u89E3\u9396": "Mythic+ unlocked",
+    "\u5C31\u5728\u4E0B\u65B9\uFF1A\u5C64\u6578\u7121\u4E0A\u9650\uFF0C\u6BCF\u5929\u8A5E\u7DB4\u4E0D\u540C\u3002": "Just below: endless levels, new affixes every day.",
+    "\u{1F525} {0} \u72C2\u66B4\u4E86\uFF01\u50B7\u5BB3\u5927\u589E": "\u{1F525} {0} enrages! Damage greatly increased",
+    "\u{1F4A5} {0} \u65BD\u653E\u7BC4\u570D\u653B\u64CA": "\u{1F4A5} {0} casts an area attack",
+    "\u26A1 {0} \u5C0D {1} \u91CD\u64CA": "\u26A1 {0} smashes {1}",
+    "\u53EC\u559A\u7269": "Summon",
+    "\u{1F300} {0} \u53EC\u559A\u4E86 {1} \u96BB\u5C0F\u602A": "\u{1F300} {0} summons {1} adds",
+    "{0} {1}\uFF1A{2}{3}": "{0} {1}: {2}{3}",
+    "\u{1F4EF} \u82F1\u52C7\u865F\u89D2\uFF01\u5168\u968A\u50B7\u5BB3\u8207\u6CBB\u7642 +{0}%\uFF0C\u6301\u7E8C {1} \u79D2": "\u{1F4EF} Heroic Horn! Party damage and healing +{0}% for {1}s",
+    "{0} \u88AB\u64CA\u6BBA": "{0} slain",
+    "\u{1F33F} \u7E41\u76DB\uFF1A\u5176\u9918 {0} \u96BB\u5C0F\u602A\u8B8A\u5F37": "\u{1F33F} Bolstering: {0} remaining adds grow stronger",
+    "\u5BD2\u51B0\u5C4F\u969C": "Ice Block",
+    "\u6551\u8D16": "Redemption",
+    "\u{1F480} {0}\uFF08{1}\uFF09\u9663\u4EA1": "\u{1F480} {0} ({1}) has fallen",
+    "\u{1F30B} \u706B\u5C71\u7206\u767C\uFF0C{0} \u53D7\u5230\u50B7\u5BB3": "\u{1F30B} Volcanic eruption hits {0}",
+    "\u23F0 \u8D85\u904E\u9650\u6642\uFF01\u4ECD\u53EF\u6253\u5B8C\uFF0C\u4F46\u9470\u77F3\u6703\u964D\u7D1A": "\u23F0 Over time! You can still finish, but the keystone will drop",
+    "\u2620\uFE0F \u5718\u6EC5\u2026": "\u2620\uFE0F Wipe\u2026",
+    "\u{1F451} \u9996\u9818 {0} \u73FE\u8EAB\uFF01": "\u{1F451} Boss {0} appears!",
+    "\u7B2C {0} \u6CE2\u6575\u4EBA\u4F86\u8972": "Wave {0} incoming",
+    "\u{1F3C6} \u526F\u672C\u901A\u95DC\uFF01": "\u{1F3C6} Dungeon cleared!",
+    "\u23F0 \u6642\u9593\u5230\uFF01\u5171\u6253\u5012 {0} \u96BB\u5BF6\u85CF\u54E5\u5E03\u6797": "\u23F0 Time's up! {0} treasure goblins slain",
+    "\u231B \u6642\u9593\u8017\u76E1\uFF0C\u64A4\u9000": "\u231B Out of time \u2014 retreat",
+    "\u8056\u5149\u7267\u5E2B": "Light Cleric",
+    "\u6CBB\u7642\u8840\u91CF\u6700\u4F4E\u7684\u968A\u53CB\uFF0C\u6BCF 5 \u79D2\u7FA4\u9AD4\u6CBB\u7642\u3002": "Heals the lowest-HP ally; group heal every 5s.",
+    "\u771F\u8A00\u8853\uFF1A\u76FE": "Power Word: Shield",
+    "\u51B7\u537B 10 \u79D2\uFF1A\u7D66\u8840\u91CF\u6700\u4F4E\u7684\u968A\u53CB\u8B77\u76FE\uFF08\u5A01\u529B \xD74\uFF09": "10s CD: shield the lowest-HP ally (Power \xD74)",
+    "\u6212\u5F8B": "Discipline",
+    "\u75DB\u82E6\u93AE\u58D3": "Pain Suppression",
+    "\u51B7\u537B 15 \u79D2\uFF1A\u5766\u514B\u53D7\u5230\u91CD\u64CA\u6642\uFF0C\u8A72\u6B21\u50B7\u5BB3 \u221260%": "15s CD: when the tank takes a heavy blow, that hit deals \u221260%",
+    "\u795E\u8056": "Holy",
+    "\u795E\u8056\u8B9A\u7F8E\u8A69": "Divine Hymn",
+    "\u51B7\u537B 30 \u79D2\uFF1A\u5168\u968A\u5E73\u5747\u8840\u91CF\u4F4E\u65BC 60% \u6642\uFF0C\u9023\u7E8C 3 \u79D2\u7FA4\u88DC\uFF08\u5A01\u529B \xD71.2\uFF09": "30s CD: when party HP averages below 60%, group heal for 3s (Power \xD71.2)",
+    "\u51A5\u60F3": "Meditation",
+    "\u6CBB\u7642 +10%": "Healing +10%",
+    "\u8FC5\u6377\u79B1\u8A00": "Swift Prayer",
+    "\u7FA4\u88DC\u9593\u9694 5 \u2192 4 \u79D2": "Group heal every 5 \u2192 4s",
+    "\u5805\u5B9A\u8B77\u76FE": "Steadfast Shield",
+    "\u8B77\u76FE +40%": "Shields +40%",
+    "\u6062\u5FA9": "Renew",
+    "\u55AE\u9AD4\u6CBB\u7642\u5F8C\u518D\u6301\u7E8C\u56DE\u8840 3 \u79D2": "Single heals also heal over 3s",
+    "\u7B2C\u4E00\u4F4D\u9663\u4EA1\u7684\u968A\u53CB\u4EE5 50% \u751F\u547D\u5FA9\u6D3B\uFF0C\u6BCF\u5834\u4E00\u6B21": "The first ally to fall returns at 50% HP (once per battle)",
+    "\u8056\u5149\u4E4B\u6012": "Holy Wrath",
+    "\u6C92\u4EBA\u9700\u8981\u6CBB\u7642\u6642\uFF0C\u653B\u64CA\u50B7\u5BB3 \xD73": "\xD73 attack damage when no one needs healing",
+    "\u5B88\u8B77\u5929\u4F7F": "Guardian Angel",
+    "\u5168\u968A\u53D7\u5230\u7684\u7BC4\u570D\u50B7\u5BB3 \u221210%": "Party area damage taken \u221210%",
+    "\u6148\u60B2": "Mercy",
+    "\u66B4\u64CA\u7387 +10%": "Crit chance +10%",
+    "\u827E\u857E\u5A1C": "Elena",
+    "\u6668\u66E6": "Dawnlight",
+    "\u6EA2\u5149": "Overflow",
+    "\u6CBB\u7642\u8D85\u51FA\u7684\u90E8\u5206\u8F49\u70BA\u8B77\u76FE\uFF08\u4E0A\u9650\u662F\u8A72\u968A\u54E1\u751F\u547D\u7684 20%\uFF09": "Overhealing becomes a shield (up to 20% of the ally's HP)",
+    "\u5B88\u8B77\u9A0E\u58EB": "Guardian Knight",
+    "\u5632\u8AF7\u6240\u6709\u6575\u4EBA\uFF0C\u627F\u53D7\u50B7\u5BB3\u3002\u8B77\u7532\u6E1B\u50B7 45%\u3002": "Taunts every enemy and soaks damage. 45% armor.",
+    "\u76FE\u724C\u731B\u64CA": "Shield Slam",
+    "\u51B7\u537B 8 \u79D2\uFF1A\u5A01\u529B \xD72.5 \u50B7\u5BB3\uFF0C\u76EE\u6A19\u653B\u64CA \u221230% \u6301\u7E8C 4 \u79D2": "8s CD: Power \xD72.5 damage; target's attack \u221230% for 4s",
+    "\u9632\u8B77": "Protection",
+    "\u8056\u76FE\u8853": "Divine Shield",
+    "\u751F\u547D\u4F4E\u65BC 30% \u6642\u81EA\u52D5 5 \u79D2\u7121\u6575\uFF0C\u6BCF\u5834\u4E00\u6B21": "Below 30% HP, become immune for 5s (once per battle)",
+    "\u61F2\u6212": "Retribution",
+    "\u5FA9\u4EC7\u4E4B\u6012": "Avenging Wrath",
+    "\u51B7\u537B 20 \u79D2\uFF1A10 \u79D2\u5167\u50B7\u5BB3 +50%\u3001\u5438\u8840 20%": "20s CD: +50% damage and 20% lifesteal for 10s",
+    "\u5805\u97CC": "Toughness",
+    "\u751F\u547D +10%": "HP +10%",
+    "\u92B3\u5229\u76FE\u724C": "Keen Shield",
+    "\u76FE\u724C\u731B\u64CA\u50B7\u5BB3 +50%": "Shield Slam damage +50%",
+    "\u683C\u64CB": "Block",
+    "\u53D7\u5230\u91CD\u64CA\u7684\u50B7\u5BB3 \u221225%": "Damage from heavy blows \u221225%",
+    "\u9B54\u6297": "Spell Ward",
+    "\u53D7\u5230\u7BC4\u570D\u653B\u64CA\u7684\u50B7\u5BB3 \u221230%": "Area damage taken \u221230%",
+    "\u9F13\u821E": "Rally",
+    "\u5168\u968A\u751F\u547D +5%": "Party HP +5%",
+    "\u53CD\u64CA": "Riposte",
+    "\u53D7\u64CA\u6642 15% \u6A5F\u7387\u53CD\u64CA\u5A01\u529B \xD71": "15% chance to counter for Power \xD71 when hit",
+    "\u76FE\u7246": "Shield Wall",
+    "\u751F\u547D\u4F4E\u65BC 50% \u6642\u518D\u6E1B\u50B7 15%": "Below 50% HP, take 15% less damage",
+    "\u6B63\u7FA9\u4E4B\u9318": "Hammer of Justice",
+    "\u50B7\u5BB3 +20%": "Damage +20%",
+    "\u5DF4\u6D1B\u65AF": "Baros",
+    "\u9435\u58C1": "Ironwall",
+    "\u4E0D\u5C48": "Unbroken",
+    "\u6BCF\u5834\u7B2C\u4E00\u6B21\u53D7\u5230\u81F4\u547D\u50B7\u5BB3\u6539\u70BA\u5269 1 \u8840\u4E26\u7121\u6575 3 \u79D2\uFF1B\u5728\u5834\u6642\u5168\u968A\u53D7\u5230\u7684\u50B7\u5BB3 \u22128%": "First lethal hit each battle leaves 1 HP and grants 3s immunity; party takes 8% less damage while present",
+    "\u5967\u8853\u6CD5\u5E2B": "Arcane Mage",
+    "\u7BC4\u570D\u50B7\u5BB3\uFF0C\u540C\u6642\u653B\u64CA\u6240\u6709\u6575\u4EBA\u3002\u64C5\u9577\u6E05\u5C0F\u602A\u3002": "Area damage that hits every enemy. Excels at clearing adds.",
+    "\u70C8\u7130\u98A8\u66B4": "Flamestrike",
+    "\u51B7\u537B 9 \u79D2\uFF1A\u5168\u9AD4\u6575\u4EBA\u5A01\u529B \xD72": "9s CD: Power \xD72 to all enemies",
+    "\u706B\u7130": "Fire",
+    "\u71C3\u71D2": "Combustion",
+    "\u51B7\u537B 30 \u79D2\uFF1A10 \u79D2\u5167\u66B4\u64CA\u7387 +40%": "30s CD: +40% crit chance for 10s",
+    "\u51B0\u971C": "Frost",
+    "\u51B0\u971C\u65B0\u661F": "Frost Nova",
+    "\u51B7\u537B 18 \u79D2\uFF1A\u5168\u9AD4\u6575\u4EBA\u653B\u64CA \u221240% \u6301\u7E8C 4 \u79D2": "18s CD: all enemies' attack \u221240% for 4s",
+    "\u5967\u8853\u667A\u6167": "Arcane Intellect",
+    "\u5A01\u529B +8%": "Power +8%",
+    "\u6CD5\u8853\u5F37\u5316": "Empowered Spells",
+    "\u70C8\u7130\u98A8\u66B4\u50B7\u5BB3 +40%": "Flamestrike damage +40%",
+    "\u751F\u547D\u4F4E\u65BC 30% \u6642\u514D\u50B7 4 \u79D2\uFF0C\u6BCF\u5834\u4E00\u6B21": "Below 30% HP, become immune for 4s (once per battle)",
+    "\u6CD5\u529B\u8B77\u76FE": "Mana Shield",
+    "\u53D7\u5230\u7684\u50B7\u5BB3 \u221215%": "Damage taken \u221215%",
+    "\u9023\u9396\u53CD\u61C9": "Chain Reaction",
+    "\u7BC4\u570D\u653B\u64CA\u6BCF\u591A 1 \u500B\u76EE\u6A19\uFF0C\u50B7\u5BB3 +5%": "Area attacks deal +5% per extra target",
+    "\u5C08\u6CE8": "Focus",
+    "\u53EA\u5269 1 \u500B\u76EE\u6A19\u6642\u50B7\u5BB3 +25%": "+25% damage when only 1 target remains",
+    "\u708E\u7206\u8853": "Pyroblast",
+    "\u6BCF 10 \u79D2\u5C0D\u9996\u9818\u9020\u6210\u5A01\u529B \xD75": "Every 10s, Power \xD75 to the boss",
+    "\u66B4\u98A8\u96EA": "Blizzard",
+    "\u70C8\u7130\u98A8\u66B4\u51B7\u537B 9 \u2192 6 \u79D2": "Flamestrike cooldown 9 \u2192 6s",
+    "\u8389\u8587\u4E9E": "Livia",
+    "\u661F\u706B": "Starfire",
+    "\u7194\u71B1": "Molten Core",
+    "\u70C8\u7130\u98A8\u66B4\u51B7\u537B \u221250%\uFF0C\u64CA\u6BBA\u6575\u4EBA\u6642\u518D\u6E1B 1 \u79D2": "Flamestrike cooldown \u221250%; each kill cuts it by another 1s",
+    "\u6697\u5F71\u76DC\u8CCA": "Shadow Rogue",
+    "\u55AE\u9AD4\u7206\u767C\uFF0C\u66B4\u64CA\u7387\u9AD8\u3002\u64C5\u9577\u6253\u738B\u3002": "Single-target burst with high crit. Excels against bosses.",
+    "\u5254\u9AA8": "Eviscerate",
+    "\u51B7\u537B 6 \u79D2\uFF1A\u5C0D\u9996\u9818\u9020\u6210\u5A01\u529B \xD73.5": "6s CD: Power \xD73.5 to the boss",
+    "\u523A\u6BBA": "Assassination",
+    "\u81F4\u547D\u6BD2\u85E5": "Deadly Poison",
+    "\u6BCF\u6B21\u653B\u64CA\u758A 1 \u5C64\u6BD2\uFF0C\u6BCF\u5C64\u6BCF\u79D2\u5A01\u529B \xD70.4\uFF0C\u6700\u591A 3 \u5C64": "Each attack adds a poison stack (Power \xD70.4 per second each, max 3)",
+    "\u6230\u9B25": "Battle",
+    "\u528D\u5203\u4E82\u821E": "Blade Flurry",
+    "\u51B7\u537B 15 \u79D2\uFF1A8 \u79D2\u5167\u6BCF\u6B21\u653B\u64CA\u984D\u5916\u6253\u4E2D 2 \u500B\u76EE\u6A19": "15s CD: for 8s, attacks also hit 2 extra targets",
+    "\u7CBE\u6E96": "Precision",
+    "\u66B4\u64CA\u7387 +5%": "Crit chance +5%",
+    "\u81F4\u547D": "Lethality",
+    "\u66B4\u64CA\u50B7\u5BB3 \xD72 \u2192 \xD72.5": "Crit damage \xD72 \u2192 \xD72.5",
+    "\u9583\u907F": "Evasion",
+    "\u53D7\u5230\u653B\u64CA\u6642 20% \u6A5F\u7387\u9583\u904E": "20% chance to dodge attacks",
+    "\u5272\u88C2": "Rupture",
+    "\u5254\u9AA8\u984D\u5916\u9020\u6210\u6D41\u8840\uFF085 \u79D2\uFF0C\u6BCF\u79D2\u5A01\u529B \xD70.5\uFF09": "Eviscerate also bleeds (5s, Power \xD70.5 per second)",
+    "\u8655\u6C7A": "Execute",
+    "\u76EE\u6A19\u751F\u547D\u4F4E\u65BC 35% \u6642\u50B7\u5BB3 +30%": "+30% damage to targets below 35% HP",
+    "\u6E05\u6383": "Sweep",
+    "\u5C0D\u5C0F\u602A\u50B7\u5BB3 +25%": "+25% damage to adds",
+    "\u6697\u5F71\u4E4B\u821E": "Shadow Dance",
+    "\u5254\u9AA8\u51B7\u537B 6 \u2192 4 \u79D2": "Eviscerate cooldown 6 \u2192 4s",
+    "\u51B7\u8840": "Cold Blood",
+    "\u6BCF\u6CE2\u7B2C\u4E00\u6B21\u653B\u64CA\u5FC5\u5B9A\u66B4\u64CA": "First attack each wave always crits",
+    "\u5361\u897F\u6069": "Cassian",
+    "\u5F71\u5203": "Shadowblade",
+    "\u9023\u9396\u66B4\u64CA": "Chain Crit",
+    "\u66B4\u64CA\u5F8C\u7684\u4E0B\u4E00\u6B21\u653B\u64CA\u5FC5\u5B9A\u66B4\u64CA\uFF0C\u6BCF 6 \u79D2\u6700\u591A\u4E00\u6B21": "After a crit, the next attack always crits (at most once per 6s)",
+    "\u5C08\u7CBE\u7CBE\u901A": "Spec Mastery",
+    "\u5C08\u7CBE\u6280\u80FD\u51B7\u537B \u221230%": "Spec skill cooldown \u221230%",
+    "\u5C08\u7CBE\u5F37\u5316": "Spec Empowerment",
+    "\u5C08\u7CBE\u6280\u80FD\u6548\u679C +30%": "Spec skill effect +30%",
+    "\u827E\u502B": "Allen",
+    "\u51F1\u8389": "Kelly",
+    "\u96F7\u6069": "Rhen",
+    "\u7C73\u62C9": "Mira",
+    "\u7D22\u6069": "Thorne",
+    "\u4F0A\u8587": "Ivy",
+    "\u5DF4\u9813": "Barton",
+    "\u59AE\u96C5": "Nia",
+    "\u6258\u723E": "Tor",
+    "\u83F2\u6B50": "Fio",
+    "\u9054\u514B": "Dirk",
+    "\u9732\u5A1C": "Luna",
+    "\u845B\u96F7": "Gray",
+    "\u5E0C\u62C9": "Hira",
+    "\u5967\u5FB7": "Aud",
+    "\u8587\u7D72": "Vess",
+    "\u5E03\u862D": "Bran",
+    "\u5361\u73CA": "Kasan",
+    "\u6D1B\u514B": "Rocke",
+    "\u827E\u7433": "Irene",
+    "\u8CBB\u6069": "Fane",
+    "\u8309\u5152": "Moll",
+    "\u8CFD\u52D2": "Seller",
+    "\u6735\u62C9": "Dora",
+    "\u666E\u901A": "Common",
+    "\u7CBE\u826F": "Uncommon",
+    "\u7A00\u6709": "Rare",
+    "\u53F2\u8A69": "Epic",
+    "\u50B3\u8AAA": "Legendary",
+    "\u6B66\u5668": "Weapon",
+    "\u8B77\u7532": "Armor",
+    "\u98FE\u54C1": "Trinket",
+    "\u9577\u528D": "Longsword",
+    "\u6CD5\u6756": "Staff",
+    "\u5315\u9996": "Dagger",
+    "\u6230\u9318": "Warhammer",
+    "\u6B0A\u6756": "Scepter",
+    "\u77ED\u5F13": "Shortbow",
+    "\u9396\u7532": "Chainmail",
+    "\u6CD5\u888D": "Robe",
+    "\u76AE\u7532": "Leathers",
+    "\u677F\u7532": "Plate",
+    "\u6597\u7BF7": "Cloak",
+    "\u8B77\u7B26": "Talisman",
+    "\u6212\u6307": "Ring",
+    "\u5FBD\u8A18": "Sigil",
+    "\u5BF6\u73E0": "Orb",
+    "\u9805\u934A": "Necklace",
+    "\u5805\u6BC5\u7684": "Steadfast ",
+    "\u92B3\u5229\u7684": "Keen ",
+    "\u707C\u71B1\u7684": "Searing ",
+    "\u5BD2\u971C\u7684": "Frostbitten ",
+    "\u865B\u7A7A\u7684": "Voidtouched ",
+    "\u9060\u53E4\u7684": "Ancient ",
+    "\u9F8D\u9C57\u7684": "Dragonscale ",
+    "\u8150\u6839\u6D1E\u7A9F": "Rotroot Cavern",
+    "\u8611\u83C7\u9818\u4E3B": "Mushroom Lord",
+    "\u5B62\u5B50\u83C7": "Sporecap",
+    "\u5B9A\u671F\u5674\u767C\u5B62\u5B50\u50B7\u5BB3\u5168\u968A \u2192 \u8003\u9A57\u6CBB\u7642": "Regular spore bursts hit the whole party \u2192 tests healing",
+    "\u93FD\u8755\u7926\u5751": "Rustworn Mine",
+    "\u7926\u5751\u5DE8\u50CF": "Mine Colossus",
+    "\u7926\u5751\u72D7\u982D\u4EBA": "Mine Kobold",
+    "\u91CD\u64CA\u5766\u514B \u2192 \u8003\u9A57\u5766\u514B\u8840\u91CF\u8207\u8B77\u7532": "Heavy blows on the tank \u2192 tests tank HP and armor",
+    "\u6C89\u6C92\u795E\u6BBF": "Sunken Temple",
+    "\u6F6E\u6C50\u796D\u53F8": "Tide Priest",
+    "\u6DF1\u6DF5\u9B5A\u4EBA": "Deepscale Fishfolk",
+    "\u4E0D\u65B7\u53EC\u559A\u5C0F\u602A \u2192 \u8003\u9A57\u7BC4\u570D\u8F38\u51FA": "Keeps summoning adds \u2192 tests AoE damage",
+    "\u7070\u71FC\u8981\u585E": "Ashen Bastion",
+    "\u7194\u706B\u7763\u8ECD": "Molten Warlord",
+    "\u7194\u5CA9\u885B\u5175": "Lava Sentry",
+    "55 \u79D2\u5F8C\u72C2\u66B4 \u2192 \u8003\u9A57\u8F38\u51FA": "Enrages after 55s \u2192 tests damage",
+    "\u971C\u8A9E\u5893\u7A74": "Frostwhisper Crypt",
+    "\u5BD2\u971C\u5DEB\u5996": "Frost Lich",
+    "\u9AB7\u9ACF\u6230\u58EB": "Skeleton Warrior",
+    "\u5BD2\u51B0\u8108\u885D\uFF0B\u53EC\u559A\u9AB7\u9ACF \u2192 \u6CBB\u7642\u8207\u7BC4\u570D": "Ice pulses + skeleton adds \u2192 healing and AoE",
+    "\u865B\u7A7A\u88C2\u9699": "Void Rift",
+    "\u865B\u7A7A\u541E\u566C\u8005": "Void Devourer",
+    "\u865B\u7A7A\u884C\u8005": "Void Stalker",
+    "\u91CD\u64CA\uFF0B\u72C2\u66B4 \u2192 \u5766\u514B\u8207\u8F38\u51FA": "Heavy blows + enrage \u2192 tank and damage",
+    "\u9F8D\u7720\u9AD8\u5854": "Dragonsleep Spire",
+    "\u9060\u53E4\u7D05\u9F8D": "Ancient Red Dragon",
+    "\u9F8D\u4EBA\u885B\u58EB": "Dragonkin Guard",
+    "\u5168\u6A5F\u5236 \u2192 \u5168\u968A\u7D9C\u5408\u8003\u9A57": "Every mechanic \u2192 tests the whole party",
+    "\u9996\u6B21\u901A\u95DC\u7B2C 3 \u5C64": "First clear of Floor 3",
+    "\u9996\u6B21\u901A\u95DC\u7B2C 5 \u5C64": "First clear of Floor 5",
+    "\u9996\u6B21\u901A\u95DC\u7B2C 7 \u5C64": "First clear of Floor 7",
+    "\u79D8\u5883 +5 \u9650\u6642\u901A\u95DC": "Time a Mythic +5",
+    "\u79D8\u5883 +10 \u9650\u6642\u901A\u95DC": "Time a Mythic +10",
+    "\u79D8\u5883 +15 \u9650\u6642\u901A\u95DC": "Time a Mythic +15",
+    "\u5BF6\u5EAB\u7D2F\u8A08 10 \u6B21": "10 Vault runs",
+    "\u5BF6\u5EAB\u7D2F\u8A08 30 \u6B21": "30 Vault runs",
+    "\u5BF6\u5EAB\u7D2F\u8A08 60 \u6B21": "60 Vault runs",
+    "\u82F1\u52C7\u865F\u89D2": "Heroic Horn",
+    "\u5F37\u97CC": "Fortified",
+    "\u5C0F\u602A\u751F\u547D +30%\u3001\u653B\u64CA +20%": "Trash HP +30%, attack +20%",
+    "\u7BC4\u570D\u8F38\u51FA": "AoE damage",
+    "\u66B4\u541B": "Tyrannical",
+    "\u9996\u9818\u751F\u547D +30%\u3001\u653B\u64CA +15%": "Boss HP +30%, attack +15%",
+    "\u55AE\u9AD4\u8F38\u51FA": "single-target damage",
+    "\u66B4\u6012": "Raging",
+    "\u5C0F\u602A\u751F\u547D\u4F4E\u65BC 30% \u6642\u50B7\u5BB3 +50%": "Trash deal +50% damage below 30% HP",
+    "\u5FEB\u901F\u6536\u5C3E": "fast finishing",
+    "\u7E41\u76DB": "Bolstering",
+    "\u5C0F\u602A\u6B7B\u4EA1\u6642\uFF0C\u5176\u4ED6\u5C0F\u602A\u751F\u547D\u8207\u653B\u64CA +15%": "When trash dies, the rest gain +15% HP and attack",
+    "\u5E73\u5747\u6253\u8840": "even damage",
+    "\u706B\u5C71": "Volcanic",
+    "\u6BCF 8 \u79D2\u96A8\u6A5F\u4E00\u540D\u968A\u54E1\u53D7\u5230\u9B54\u6CD5\u50B7\u5BB3": "Every 8s a random member takes magic damage",
+    "\u58DE\u75BD": "Necrotic",
+    "\u5766\u514B\u6BCF\u88AB\u653B\u64CA\u4E00\u6B21\uFF0C\u53D7\u5230\u7684\u6CBB\u7642 \u22122%\uFF0C\u6BCF\u6CE2\u91CD\u7F6E": "Each hit on the tank reduces healing it takes by 2%; resets each wave",
+    "\u5BF6\u85CF\u54E5\u5E03\u6797": "Treasure Goblin",
+    "\u968A\u4F0D\u6C92\u6709\u6210\u54E1": "Your party is empty",
+    "\u9032\u5165 {0}\uFF0C\u7B2C 1 \u6CE2\u6575\u4EBA\u51FA\u73FE": "Entering {0} \u2014 wave 1 incoming",
+    "\u9032\u5165\u50B3\u5947\u79D8\u5883\uFF1A{0} +{1}\uFF5C\u8A5E\u7DB4\uFF1A{2}": "Mythic: {0} +{1} | Affixes: {2}",
+    "\u3001": ", ",
+    "\u79D8\u5883\u639B\u6A5F\uFF1A{0} +{1}\uFF08\u9470\u77F3\u4E0D\u8B8A\uFF0C\u734E\u52F5 {2}%\uFF09": "Mythic idle: {0} +{1} (keystone unchanged, {2}% rewards)",
+    "\u4ECA\u5929\u7684\u5BF6\u5EAB\u6B21\u6578\u7528\u5B8C\u4E86\uFF0C\u660E\u5929 00:00 \u91CD\u7F6E": "No Vault runs left today \u2014 resets at 00:00",
+    "\u9032\u5165\u5BF6\u5EAB\u7B2C {0} \u5C64\uFF1A60 \u79D2\u5167\u6253\u5012\u8D8A\u591A\u5BF6\u85CF\u54E5\u5E03\u6797\uFF0C\u91D1\u5E63\u8D8A\u591A\uFF01": "Vault floor {0}: slay as many treasure goblins as you can in 60s!",
+    "\u{1F392} {0}\uFF1A\u80CC\u5305 +{1} \u683C": "\u{1F392} {0}: bag +{1} slots",
+    "\u5BF6\u5EAB": "Vault",
+    "\u7B2C {0} \u5C64 \u6253\u5012 {1} \u96BB +{2} \u91D1": "Floor {0}: {1} slain, +{2} gold",
+    "\u79D8\u5883": "Mythic",
+    "\u9650\u6642": "timed",
+    "\u8D85\u6642": "over time",
+    "\u5931\u6557": "Failed",
+    "\uFF08\u65B0\u7D00\u9304\uFF09": " (record)",
+    "\u9996\u901A": "First clear",
+    "\u7B2C {0} \u5C64 {1}": "Floor {0} {1}",
+    "\u5A01\u529B {0}": "Power {0}",
+    "\u8010\u529B {0}": "Stamina {0}",
+    "\u66B4\u64CA +{0}%": "Crit +{0}%",
+    "\u526F\u672C": "Dungeons",
+    "\u5718\u968A": "Party",
+    "\u80CC\u5305": "Bag",
+    "\u9152\u9928": "Tavern",
+    "\u5BF6\u5EAB\uFF08\u504F\u7BC4\u570D\u8F38\u51FA\uFF09": "the Vault (AoE focus)",
+    "\u91D1\u5E63\u4E0D\u5920": "Not enough gold",
+    "\u540D\u518A\u7A7A\u4F4D\u4E0D\u5920": "Not enough roster space",
+    "\u300C{0}\u300D\u8207\u4ECA\u65E5\u8A5E\u7DB4": "{0} and today's affixes",
+    "\u5DF2\u505C\u6B62\u639B\u6A5F": "Idling stopped",
+    "\u958B\u59CB\u639B\u6A5F\uFF1A{0}": "Idling: {0}",
+    "\u5DF2\u505C\u6B62\u79D8\u5883\u639B\u6A5F": "Mythic idle stopped",
+    "\u76EE\u524D\u6709\u6230\u9B25\u9032\u884C\u4E2D\uFF0C\u6253\u5B8C\u518D\u958B\u59CB\u79D8\u5883\u639B\u6A5F": "A battle is in progress \u2014 finish it before starting Mythic idle",
+    "\u958B\u59CB\u79D8\u5883\u639B\u6A5F\uFF1A{0} +{1}": "Mythic idle: {0} +{1}",
+    "\u{1F3F3} \u4E3B\u52D5\u64A4\u9000": "\u{1F3F3} Retreated",
+    "\u5DF2\u5957\u7528\u63A8\u85A6\u914D\u7F6E": "Recommended setup applied",
+    "\u300C{0}\u300D": "{0}",
+    "\u5DF2\u88DD\u5099": "Equipped",
+    "{0}\u6210\u529F +{1}": "{0} succeeded: +{1}",
+    "\u7CBE\u7149": "Refine",
+    "\u5F37\u5316": "Upgrade",
+    "\u91D1\u5E63\u6216\u7CBE\u83EF\u4E0D\u8DB3": "Not enough gold or essence",
+    "\u91D1\u5E63\u4E0D\u8DB3": "Not enough gold",
+    "\u5206\u89E3\u7372\u5F97 {0} \u91D1": "Salvaged for {0} gold",
+    "\u639B\u6A5F\u4E2D\u4E0D\u80FD\u66F4\u63DB\u968A\u54E1\uFF0C\u8ACB\u5148\u505C\u6B62\u639B\u6A5F": "Can't change members while idling \u2014 stop idling first",
+    "{0} \u96E2\u958B\u4E86\u5718\u968A\uFF0C\u9000\u9084 {1} \u91D1{2}": "{0} left the party, refunded {1} gold{2}",
+    "\u89E3\u96C7 {0} \u4F4D\u82F1\u96C4\uFF0C\u9000\u9084 {1} \u91D1{2}": "Dismissed {0} heroes, refunded {1} gold{2}",
+    "{0} \u52A0\u5165\u4E86{1}": "{0} joined your {1}",
+    "\u968A\u4F0D": "party",
+    "\u540D\u518A": "Roster",
+    "\u66F4\u63DB\u4E86 {0} \u4EF6\u88DD\u5099": "Swapped {0} item(s)",
+    "\u76EE\u524D\u5DF2\u662F\u6700\u4F73\u914D\u88DD": "Already wearing the best gear",
+    "\u5206\u89E3 {0} \u4EF6\uFF0C\u7372\u5F97 {1} \u91D1": "Salvaged {0} item(s) for {1} gold",
+    "\u6C92\u6709\u7B26\u5408\u7684\u88DD\u5099": "No matching gear",
+    "\u5F37\u5316 {0} \u6B21\uFF0C\u82B1\u8CBB {1} \u91D1": "Upgraded \xD7{0} for {1} gold",
+    "\u80CC\u5305\u548C\u6230\u5229\u54C1\u7BB1\u90FD\u6EFF\u4E86\uFF0C\u9084\u6709 {0} \u4EF6\u6C92\u5378\u4E0B": "Bag and loot chest are full \u2014 {0} item(s) left equipped",
+    "\u5DF2\u5378\u4E0B {0} \u4EF6{1}": "Unequipped {0} item(s){1}",
+    "\uFF08{0} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF09": " ({0} to loot chest)",
+    "\u53D6\u51FA {0} \u4EF6": "Moved {0} item(s)",
+    "\u80CC\u5305\u5DF2\u6EFF": "Bag full",
+    '<h3>\u532F\u51FA\u5B58\u6A94\u78BC</h3><p class="sub" style="margin:0">\u8907\u88FD\u9019\u6BB5\u6587\u5B57\uFF0C\u5230\u53E6\u4E00\u53F0\u88DD\u7F6E\u7684\u300C\u532F\u5165\u300D\u8CBC\u4E0A\u3002</p><textarea id="expTxt" readonly>{0}</textarea><div class="row"><button class="btn main" data-act="copy">\u8907\u88FD</button><button class="btn" data-act="closebtn">\u95DC\u9589</button></div>': '<h3>Export save code</h3><p class="sub" style="margin:0">Copy this text and paste it into Import on another device.</p><textarea id="expTxt" readonly>{0}</textarea><div class="row"><button class="btn main" data-act="copy">Copy</button><button class="btn" data-act="closebtn">Off</button></div>',
+    "\u5DF2\u8907\u88FD": "Copied",
+    "\u8ACB\u624B\u52D5\u8907\u88FD": "Please copy it manually",
+    '<h3>\u532F\u5165\u5B58\u6A94\u78BC</h3><p class="sub" style="margin:0">\u6703\u8986\u84CB\u76EE\u524D\u9032\u5EA6\u3002</p><textarea id="impTxt" placeholder="\u8CBC\u4E0A\u5B58\u6A94\u78BC"></textarea><div class="row"><button class="btn main" data-act="doimport">\u532F\u5165</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>': '<h3>Import save code</h3><p class="sub" style="margin:0">This overwrites your current progress.</p><textarea id="impTxt" placeholder="Paste save code"></textarea><div class="row"><button class="btn main" data-act="doimport">Import</button><button class="btn" data-act="closebtn">Cancel</button></div>',
+    "\u532F\u5165\u5B8C\u6210": "Import complete",
+    "\u5B58\u6A94\u78BC\u7121\u6CD5\u8B80\u53D6\uFF0C\u8ACB\u78BA\u8A8D\u662F\u5426\u5B8C\u6574\u8907\u88FD": "Couldn't read that save code \u2014 make sure you copied all of it",
+    '<h3>\u91CD\u65B0\u958B\u59CB\uFF1F</h3><p class="sub" style="margin:0">\u76EE\u524D\u7684\u82F1\u96C4\u3001\u88DD\u5099\u8207\u9032\u5EA6\u90FD\u6703\u6E05\u9664\uFF0C\u7121\u6CD5\u5FA9\u539F\u3002</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">\u6E05\u9664\u4E26\u91CD\u4F86</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>': `<h3>Start over?</h3><p class="sub" style="margin:0">All heroes, gear and progress will be erased. This can't be undone.</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">Erase and restart</button><button class="btn" data-act="closebtn">Cancel</button></div>`,
+    "\u66B1\u7A31\u8A2D\u70BA\u300C{0}\u300D\uFF0C\u5929\u68AF\u7D04 1 \u5206\u9418\u5167\u66F4\u65B0": 'Nickname set to "{0}" \u2014 the Ladder updates within a minute',
+    "\u4EE5\u533F\u540D\u53C3\u52A0": "Joined anonymously",
+    "\u8ACB\u5148\u8F38\u5165\u610F\u898B": "Please write something first",
+    "\u5DF2\u9001\u51FA\uFF0C\u8B1D\u8B1D\u56DE\u994B\uFF01": "Sent \u2014 thanks for the feedback!",
+    "\u9001\u592A\u5FEB\u4E86\uFF0C\u8ACB\u4E00\u5206\u9418\u5F8C\u518D\u8A66": "Too fast \u2014 try again in a minute",
+    "\u9001\u51FA\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66": "Couldn't send \u2014 try again later",
+    "{0} \u5C0F\u6642": "{0}h",
+    "{0} \u5206\u9418": "{0} min",
+    '<h3>\u96E2\u7DDA\u6536\u76CA</h3><p class="sub" style="margin:0">\u4F60\u96E2\u958B\u4E86 {0}\uFF0C\u968A\u4F0D\u5728 {1} \u6301\u7E8C\u4F5C\u6230\u3002</p> <div class="statgrid num"><div><b>{2}</b><span>\u6311\u6230</span></div><div><b>{3}</b><span>\u901A\u95DC</span></div><div><b>+{4}</b><span>\u91D1\u5E63</span></div><div><b>{5}</b><span>\u88DD\u5099</span></div></div> {6} {7} <div class="row"><button class="btn main grow" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button><button class="btn" data-act="closebtn">\u597D</button></div>': '<h3>Offline rewards</h3><p class="sub" style="margin:0">You were away for {0}; your party kept fighting in {1}.</p> <div class="statgrid num"><div><b>{2}</b><span>Fight</span></div><div><b>{3}</b><span>Cleared</span></div><div><b>+{4}</b><span>gold</span></div><div><b>{5}</b><span>Gear</span></div></div> {6} {7} <div class="row"><button class="btn main grow" data-act="autoequip">Auto-equip</button><button class="btn" data-act="closebtn">OK</button></div>',
+    "\u79D8\u5883\u300C{0}\u300D+{1}": "Mythic {0} +{1}",
+    '<div style="color:var(--brass)">\u80CC\u5305\u5DF2\u6EFF\uFF0C{0} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF0C\u5230\u80CC\u5305\u53D6\u51FA</div>': '<div style="color:var(--brass)">Bag full \u2014 {0} item(s) went to the loot chest; collect them in Bag</div>',
+    '<div style="color:var(--good)">\u671F\u9593\u5171\u5347\u7D1A {0} \u6B21</div>': '<div style="color:var(--good)">{0} level-ups while you were away</div>',
+    '<h3>{0}</h3> <p class="sub" style="margin:0">\u82B1\u8CBB {1} \u91D1\u30FB\u5DF2\u52A0\u5165\u540D\u518A{2}</p> <div class="drawlist">{3}</div> <div class="row"><button class="btn main grow" data-act="closebtn">\u597D</button><button class="btn" data-tab="team">\u53BB\u5718\u968A\u770B\u770B</button></div>': '<h3>{0}</h3> <p class="sub" style="margin:0">Spent {1} gold \xB7 added to roster{2}</p> <div class="drawlist">{3}</div> <div class="row"><button class="btn main grow" data-act="closebtn">OK</button><button class="btn" data-tab="team">View party</button></div>',
+    "\u2728 \u50B3\u8AAA\u964D\u81E8\uFF01": "\u2728 A Legend arrives!",
+    "\u53F2\u8A69\u82F1\u96C4\u52A0\u5165\uFF01": "An Epic hero joins!",
+    "\u62DB\u52DF\u7D50\u679C": "Recruits",
+    "\uFF08\u968A\u4F0D\u5DF2\u6EFF\uFF0C\u5728\u5F85\u547D\u5340\uFF09": " (party full \u2014 on the bench)",
+    '<small class="c4">{0}\uFF1A{1}</small>': '<small class="c4">{0}: {1}</small>',
+    '<h3>\u4F60\u7684\u66B1\u7A31</h3><p class="sub" style="margin:0">\u986F\u793A\u5728\u5929\u68AF\u4E0A\uFF0C\u4E4B\u5F8C\u96A8\u6642\u53EF\u4EE5\u4FEE\u6539\u3002\u904A\u6232\u6703\u8A18\u9304\u66B1\u7A31\u3001\u9032\u5EA6\u8207\u904A\u73A9\u6642\u9593\uFF0C\u4E0D\u6703\u6536\u96C6\u5E33\u865F\u6216\u500B\u4EBA\u8CC7\u6599\u3002</p> <input id="nickInp" class="inp" maxlength="16" placeholder="\u4F8B\u5982\uFF1AYomi" value="{0}" autocomplete="off"> <div class="row"><button class="btn main grow" data-act="savenick">\u78BA\u5B9A</button><button class="btn" data-act="skipnick">\u533F\u540D\u53C3\u52A0</button></div>': '<h3>Your nickname</h3><p class="sub" style="margin:0">Shown on the Ladder; you can change it anytime. The game records your nickname, progress and play time \u2014 no accounts or personal data.</p> <input id="nickInp" class="inp" maxlength="16" placeholder="e.g. Yomi" value="{0}" autocomplete="off"> <div class="row"><button class="btn main grow" data-act="savenick">OK</button><button class="btn" data-act="skipnick">Stay anonymous</button></div>',
+    "\u526F\u672C\u5718\u9577": "Raid Leader",
+    "\u639B\u6A5F\u4E2D": "Idling",
+    "\u5E36\u9818\u4F60\u7684\u5192\u96AA\u5718\uFF0C\u653B\u4E0B\u6BCF\u4E00\u5EA7\u526F\u672C\u3002": "Lead your party through every dungeon.",
+    "\u958B\u59CB\u5192\u96AA": "New adventure",
+    "\u7E7C\u7E8C\u5192\u96AA": "Continue",
+    "\u5766 {0}\u30FB\u88DC {1}\u30FB\u8F38\u51FA {2}": "Tank {0} \xB7 Heal {1} \xB7 DPS {2}",
+    "\uFF0C\u63DB\u4E0A {0} \u4EF6\u88DD\u5099": ", {0} item(s) swapped",
+    "\u639B\u6A5F\u4E2D\u4E0D\u63DB\u9663\u5BB9\uFF0C\u5DF2\u4F9D{0}\u8ABF\u6574\u5929\u8CE6{1}": "Idling, lineup kept \u2014 talents set for {0}{1}",
+    "\u5DF2\u4F9D{0}\u5099\u6230\uFF1A{1}{2}": "Prepped for {0}: {1}{2}",
+    "\uFF1B\u5378\u4E0B {0} \u4EF6\u88DD\u5099{1}{2}": "; {0} item(s) unequipped{1}{2}",
+    "\uFF08{0} \u4EF6\u9032\u6230\u5229\u54C1\u7BB1\uFF09": " ({0} to loot chest)",
+    "\uFF08{0} \u4EF6\u653E\u4E0D\u4E0B\u5DF2\u5206\u89E3 +{1} \u91D1\uFF09": " ({0} didn't fit, salvaged +{1} gold)",
+    "\u683C\u5F0F\u4E0D\u7B26": "Invalid format",
+    "\u908A\u5883\u516C\u6703\u7684\u61F8\u8CDE\u699C\u4E0A\uFF0C\u8CBC\u6EFF\u4E86\u526F\u672C\u7684\u59D4\u8A17\u3002": "The frontier guild's bounty board is covered in dungeon contracts.",
+    "\u516C\u6703\u66F8\u8A18": "Guild Clerk",
+    "\u65B0\u4F86\u7684\u5718\u9577\uFF1F\u5148\u5F9E\u8150\u6839\u6D1E\u7A9F\u958B\u59CB\u5427\uFF0C\u90A3\u88E1\u7684\u8611\u83C7\u9818\u4E3B\u6700\u8FD1\u4E0D\u592A\u5B89\u5206\u3002": "You're the new raid leader? Start with Rotroot Cavern \u2014 the Mushroom Lord has been restless lately.",
+    "\u968A\u4F0D\u6211\u5E6B\u4F60\u6E4A\u4E86\u4E09\u500B\u4EBA\u3002\u4EBA\u624B\u4E0D\u5920\uFF0C\u5C31\u53BB\u9152\u9928\u627E\u3002": "I've rounded up three for your party. Need more hands? Try the Tavern.",
+    "\u5C0D\u4E86\u2014\u2014\u6700\u4E0A\u9762\u90A3\u5F35\u5C60\u9F8D\u4EE4\uFF0C\u7B49\u4F60\u5011\u5920\u5F37\u518D\u8AAA\u3002": "Oh, and that dragon-slaying writ at the very top? Not until you're strong enough.",
+    "\u533F\u540D": "Anonymous",
+    "Lv{0}\u30FB\u7B2C {1} \u5C64{2}": "Lv{0} \xB7 Floor {1}{2}",
+    "\u30FB\u79D8\u5883 +{0}": " \xB7 Mythic +{0}",
+    '<span class="better">\u25B2 \u53EF\u63D0\u5347</span>': '<span class="better">\u25B2 Upgrade</span>',
+    '<h2>\u80CC\u5305 <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">\u7CBE\u83EF <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">\u5206\u89E3\u7CBE\u826F\u4EE5\u4E0A\u7684\u88DD\u5099\u6703\u5F97\u5230\u7CBE\u83EF\u3002\u901A\u95DC\u7B2C 7 \u5C64\u5F8C\uFF0C\u53EF\u7528\u7CBE\u83EF\u628A\u88DD\u5099\u7CBE\u7149\u5230 +6 ~ +{4}\u3002</p>': '<h2>Bag <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">Essence <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">Salvaging Uncommon or better gear yields essence. After clearing Floor 7, use essence to refine gear to +6 ~ +{4}.</p>',
+    '<div class="stashbox"><div class="row" style="align-items:center"><b>\u6230\u5229\u54C1\u7BB1</b><span class="sub num" style="margin:0">{0}/{1}</span> <span class="sub" style="margin:0 0 0 auto">\u80CC\u5305\u6EFF\u6642\u6389\u843D\u7684\u88DD\u5099</span></div> <div class="stack">{2} {3}</div> <div class="row"><button class="btn sm main grow" data-act="takestash" {4}>{5}</button> <button class="btn sm" data-act="salvagestash">\u5168\u90E8\u5206\u89E3</button></div></div>': '<div class="stashbox"><div class="row" style="align-items:center"><b>Loot chest</b><span class="sub num" style="margin:0">{0}/{1}</span> <span class="sub" style="margin:0 0 0 auto">Drops received while your bag was full</span></div> <div class="stack">{2} {3}</div> <div class="row"><button class="btn sm main grow" data-act="takestash" {4}>{5}</button> <button class="btn sm" data-act="salvagestash">Salvage all</button></div></div>',
+    '<div class="sub" style="margin:0">\u9084\u6709 {0} \u4EF6</div>': '<div class="sub" style="margin:0">{0} more</div>',
+    "\u53D6\u51FA\u5230\u80CC\u5305\uFF08\u9084\u80FD\u653E {0} \u4EF6\uFF09": "Move to bag ({0} slots free)",
+    '<div class="toolbar">{0} <button class="btn sm main" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button></div> <div class="toolbar"><label class="selwrap"><span>\u5206\u89E3</span><select id="salvSel" aria-label="\u5206\u89E3\u54C1\u8CEA">{1}</select></label> <button class="btn sm {2}" data-act="salvageupto">{3}</button></div>': '<div class="toolbar">{0} <button class="btn sm main" data-act="autoequip">Auto-equip</button></div> <div class="toolbar"><label class="selwrap"><span>Salvage</span><select id="salvSel" aria-label="Salvage quality">{1}</select></label> <button class="btn sm {2}" data-act="salvageupto">{3}</button></div>',
+    "\u5168\u90E8": "All",
+    "\u4EE5\u4E0B": " & below",
+    "\u78BA\u5B9A\u5206\u89E3 {0} \u4EF6\uFF1F": "Salvage {0} item(s)?",
+    "\u5206\u89E3\uFF08{0} \u4EF6\uFF09": "Salvage ({0})",
+    '<div class="empty">\u80CC\u5305\u662F\u7A7A\u7684\u3002\u901A\u95DC\u526F\u672C\u6703\u6389\u843D\u88DD\u5099\u3002</div>': '<div class="empty">Your bag is empty. Clearing dungeons drops gear.</div>',
+    '<h2 style="font-size:18px">\u6230\u5229\u54C1\u8A2D\u5B9A</h2><div class="settings"> <div class="set"><span>\u6389\u843D\u6642\u81EA\u52D5\u5206\u89E3</span>{0}</div> <div class="set"><span>\u80CC\u5305\u6EFF\u5F8C\u53EA\u4FDD\u7559</span>{1}</div> <p class="sub" style="margin:0">\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\uFF0C\u7B26\u5408\u54C1\u8CEA\u7684\u88DD\u5099\u6703\u5148\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF08\u6700\u591A {2} \u4EF6\uFF09\uFF0C\u5176\u4ED6\u81EA\u52D5\u63DB\u6210\u91D1\u5E63\u3002</p></div> <h2 style="font-size:18px">\u80CC\u5305\u64F4\u5145 <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>': '<h2 style="font-size:18px">Loot settings</h2><div class="settings"> <div class="set"><span>Auto-salvage drops</span>{0}</div> <div class="set"><span>When bag is full, keep</span>{1}</div> <p class="sub" style="margin:0">Once your bag is full, gear of that quality goes to the loot chest (up to {2}); the rest is turned into gold.</p></div> <h2 style="font-size:18px">Bag expansions <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>',
+    "\u95DC\u9589": "Off",
+    "\u7CBE\u826F\u4EE5\u4E0B": "Uncommon & below",
+    "\u7CBE\u826F\u4EE5\u4E0A": "Uncommon+",
+    "\u7A00\u6709\u4EE5\u4E0A": "Rare+",
+    '<div class="set"><span class="{0}" style="margin:0">{1}{2}</span><span class="num {3}" style="margin:0">+{4} \u683C</span></div>': '<div class="set"><span class="{0}" style="margin:0">{1}{2}</span><span class="num {3}" style="margin:0">+{4} slots</span></div>',
+    '<div class="more">\u53E6\u5916 {0} \u96BB</div>': '<div class="more">+{0} more</div>',
+    '<h2>\u6230\u9B25</h2><div class="empty">\u76EE\u524D\u6C92\u6709\u9032\u884C\u4E2D\u7684\u6230\u9B25\u3002<br>\u5230\u300C\u526F\u672C\u300D\u9078\u4E00\u5C64\u958B\u59CB\u6311\u6230\u3002<br><br><button class="btn main" data-tab="dungeon">\u524D\u5F80\u526F\u672C</button></div>': '<h2>Battle</h2><div class="empty">No battle in progress.<br>Pick a floor in Dungeons to start.<br><br><button class="btn main" data-tab="dungeon">Go to Dungeons</button></div>',
+    "\u5BF6\u5EAB\u30FB\u7B2C {0} \u5C64": "Vault \xB7 Floor {0}",
+    '<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}</div> {5}{6} <div class="arena"> <div class="side foes"><span class="label">\u6575\u65B9\u30FB{7}</span>{8}</div> <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>': '<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}</div> {5}{6} <div class="arena"> <div class="side foes"><span class="label">Enemies \xB7 {7}</span>{8}</div> <div class="side"><span class="label">Your party</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>',
+    "\u9996\u9818\u6230": "Boss",
+    "\u7B2C {0} \u6CE2": "Wave {0}",
+    '<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} <button class="btn" data-act="skip">\u76F4\u63A5\u7D50\u7B97</button> <button class="btn" data-act="retreat">\u64A4\u9000</button></div></div>': '<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} <button class="btn" data-act="skip">Skip</button> <button class="btn" data-act="retreat">Retreat</button></div></div>',
+    "\u8D85\u6642 {0}": "Over {0}",
+    "\u5269 {0}": "{0} left",
+    '<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">\u5269 {1}</span></div> <div class="vaultcount"><b class="num">{2}</b> \u96BB\u54E5\u5E03\u6797\u30FB<span class="num">+{3}</span> \u91D1{4}</div>': '<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">{1} left</span></div> <div class="vaultcount"><b class="num">{2}</b>  goblins \xB7 <span class="num">+{3}</span>  gold{4}</div>',
+    "\uFF08\u5DF2\u9054\u91D1\u5E63\u4E0A\u9650\uFF09": " (gold cap reached)",
+    '<span class="sub" style="margin:0">\u3000\u91D1\u5E63\u7B97\u5230 {0} \u96BB</span>': '<span class="sub" style="margin:0"> Gold counts up to {0}</span>',
+    '<button class="btn horn {0}" data-act="horn" {1} aria-label="\u82F1\u52C7\u865F\u89D2">\u{1F4EF} {2}</button>': '<button class="btn horn {0}" data-act="horn" {1} aria-label="Heroic Horn">\u{1F4EF} {2}</button>',
+    "\u5DF2\u7528": "Used",
+    "\u865F\u89D2": "Horn",
+    "\u6253\u5012 {0} \u96BB\u54E5\u5E03\u6797": "{0} goblins slain",
+    "\u79D8\u5883\u639B\u6A5F\u30FB\u901A\u95DC": "Mythic idle \xB7 Cleared",
+    "\u79D8\u5883\u639B\u6A5F\u30FB\u5931\u6557": "Mythic idle \xB7 Failed",
+    "\u9650\u6642\u901A\u95DC": "Timed",
+    "\u8D85\u6642\u901A\u95DC": "Cleared (over time)",
+    "\u901A\u95DC": "Cleared",
+    '<div class="result {0}"><h3>{1}</h3>{2} {3} <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+{4}</b> \u91D1\u5E63</span><span><b class="num">+{5}</b> \u7D93\u9A57</span>{6}{7}</div>': '<div class="result {0}"><h3>{1}</h3>{2} {3} <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+{4}</b> gold</span><span><b class="num">+{5}</b> XP</span>{6}{7}</div>',
+    '<span class="newrec" style="justify-self:start">\u672C\u5C64\u65B0\u7D00\u9304</span>': '<span class="newrec" style="justify-self:start">Floor record!</span>',
+    '<div class="sub" style="margin:0">\u639B\u6A5F\u7B49\u7D1A +{0}\u30FB\u9470\u77F3\u4E0D\u8B8A\uFF08\u76EE\u524D +{1}\uFF09\u30FB\u734E\u52F5 {2}%</div>': '<div class="sub" style="margin:0">Idle level +{0} \xB7 keystone unchanged (now +{1}) \xB7 {2}% rewards</div>',
+    '<div class="keychange"><span class="keystone num">+{0}</span><span class="arrow">\u2192</span><span class="keystone num {1}">+{2}</span> <span class="sub" style="margin:0">\u7528\u6642 <b class="num">{3}</b> / \u9650\u6642 {4}</span>{5}</div>': '<div class="keychange"><span class="keystone num">+{0}</span><span class="arrow">\u2192</span><span class="keystone num {1}">+{2}</span> <span class="sub" style="margin:0">Time <b class="num">{3}</b> / limit {4}</span>{5}</div>',
+    '<span class="newrec">\u65B0\u7D00\u9304</span>': '<span class="newrec">New record</span>',
+    '<span style="color:var(--brass)">\u9996\u6B21\u901A\u95DC\uFF1A\u5FC5\u6389\u7A00\u6709\u4EE5\u4E0A</span>': '<span style="color:var(--brass)">First clear: guaranteed Rare or better</span>',
+    "\u7B49\u7D1A\u58D3\u5236\uFF1A\u734E\u52F5\u6700\u4F4E\u4FDD\u7559 {0}%\uFF0C\u60F3\u8981\u66F4\u591A\u53EF\u4EE5\u6539\u7528\u79D8\u5883\u639B\u6A5F": "Level penalty: rewards floor at {0}%. Try Mythic idle for more.",
+    "\u9019\u5C64\u5C0D\u4F60\u592A\u7C21\u55AE\u4E86\uFF0C\u7D93\u9A57\u8207\u91D1\u5E63\u8B8A\u5C11\uFF0C\u5F80\u4E0B\u4E00\u5C64\u5427": "This floor is too easy for you \u2014 less XP and gold. Move on down.",
+    "{0} \u5347\u5230 {1}": "{0} reached {1}",
+    "\u5DD4\u5CF0 {0}": "Paragon {0}",
+    '<div style="color:var(--brass);font-size:13px">\u80CC\u5305\u5DF2\u6EFF\uFF0C{0} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1</div>': '<div style="color:var(--brass);font-size:13px">Bag full \u2014 {0} item(s) sent to the loot chest</div>',
+    '<div class="sub" style="margin:0">{0} \u4EF6\u81EA\u52D5\u5206\u89E3\u70BA\u91D1\u5E63\u8207\u7CBE\u83EF</div>': '<div class="sub" style="margin:0">{0} item(s) auto-salvaged into gold and essence</div>',
+    '<div class="meter"><span class="label">\u50B7\u5BB3 / \u6CBB\u7642\u7D71\u8A08\uFF08\u6BCF\u79D2\uFF09</span>{0}</div>': '<div class="meter"><span class="label">Damage / healing per second</span>{0}</div>',
+    '<small class="num">\u6280\u80FD {0}%</small>': '<small class="num">Skills {0}%</small>',
+    '<div class="row">{0} {1} {2} <button class="btn" data-tab="dungeon">\u8FD4\u56DE\u526F\u672C</button></div></div>': '<div class="row">{0} {1} {2} <button class="btn" data-tab="dungeon">Back to Dungeons</button></div></div>',
+    '<span class="sub" style="margin:0;align-self:center">\u639B\u6A5F\u4E2D\uFF0C3 \u79D2\u5F8C\u81EA\u52D5\u518D\u6230\u2026</span>': '<span class="sub" style="margin:0;align-self:center">Idling \u2014 next run in 3s\u2026</span>',
+    '<button class="btn main grow" data-act="vault" data-d="{0}">\u518D\u6253\u4E00\u6B21\uFF08\u4ECA\u5929\u5269 {1} \u6B21\uFF09</button>': '<button class="btn main grow" data-act="vault" data-d="{0}">Run again ({1} left today)</button>',
+    '<span class="sub" style="margin:0;align-self:center">\u4ECA\u5929\u7684\u5BF6\u5EAB\u6B21\u6578\u7528\u5B8C\u4E86</span>': '<span class="sub" style="margin:0;align-self:center">No Vault runs left today</span>',
+    '<button class="btn grow" data-act="idlemythic" data-d="{0}">\u505C\u6B62\u79D8\u5883\u639B\u6A5F</button>': '<button class="btn grow" data-act="idlemythic" data-d="{0}">Stop Mythic idle</button>',
+    "\u518D\u6311\u6230 +{0}": "Retry +{0}",
+    "\u518D\u6253\u4E00\u6B21": "Run again",
+    '<button class="btn" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button>': '<button class="btn" data-act="autoequip">Auto-equip</button>',
+    "\u63D0\u793A\uFF1A\u6642\u9593\u8017\u76E1\uFF0C\u8F38\u51FA\u4E0D\u8DB3\u3002\u88DC\u5F37\u8F38\u51FA\u6216\u5F37\u5316\u6B66\u5668\u3002": "Tip: out of time \u2014 not enough damage. Add DPS or upgrade weapons.",
+    "\u63D0\u793A\uFF1A\u968A\u4F0D\u6C92\u6709\u5766\u514B\uFF0C\u6575\u4EBA\u6703\u5230\u8655\u4E82\u6253\u8106\u76AE\u968A\u54E1\u3002": "Tip: no tank \u2014 enemies will hit your squishy members.",
+    "\u63D0\u793A\uFF1A\u968A\u4F0D\u6C92\u6709\u6CBB\u7642\uFF0C\u9577\u6642\u9593\u6230\u9B25\u6490\u4E0D\u4F4F\u3002": "Tip: no healer \u2014 long fights will wear you down.",
+    "\u63D0\u793A\uFF1A\u5766\u514B\u5148\u5012\uFF0C\u8A66\u8457\u5F37\u5316\u5766\u514B\u7684\u8B77\u7532\u8207\u8010\u529B\uFF0C\u6216\u591A\u5E36\u4E00\u4F4D\u6CBB\u7642\u3002": "Tip: your tank fell first. Upgrade the tank's armor and stamina, or bring a second healer.",
+    "\u63D0\u793A\uFF1A\u56DE\u524D\u4E00\u5C64\u5237\u88DD\u5099\u8207\u7B49\u7D1A\uFF0C\u6216\u6309\u300C\u5099\u6230\u300D\u63DB\u500B\u9663\u5BB9\u3002": "Tip: farm the previous floor for gear and levels, or tap Prep to change the lineup.",
+    '<div class="nextstep"><div><span class="label">\u4E0B\u4E00\u6B65</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>{2}</div>': '<div class="nextstep"><div><span class="label">Next step</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>{2}</div>',
+    '<div class="vault locked"><b>\u5BF6\u5EAB</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 3 \u5C64\u300C\u6C89\u6C92\u795E\u6BBF\u300D\u5F8C\u958B\u653E\uFF1A\u6BCF\u5929 3 \u6B21\uFF0C\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\u8CFA\u5927\u91CF\u91D1\u5E63\u3002</span></div>': '<div class="vault locked"><b>Vault</b><span class="sub" style="margin:0">Unlocks after clearing Floor 3, Sunken Temple: 3 runs a day hunting treasure goblins for lots of gold.</span></div>',
+    '<div class="vault"><div class="mhead"><div><span class="label">\u5BF6\u5EAB</span><b>60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797</b></div><span class="vleft num">\u4ECA\u5929\u5269 {0}/{1}</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">\u7B2C {3} \u5C64\uFF1A\u6BCF\u96BB <b class="num">{4}</b> \u91D1\uFF0C\u6700\u591A\u7B97 {5} \u96BB\u30FB\u6700\u4F73 {6} \u96BB\u3002\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">\u5099\u6230</button></div></div>': '<div class="vault"><div class="mhead"><div><span class="label">Vault</span><b>60s of treasure goblins</b></div><span class="vleft num">{0}/{1} left today</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">Floor {3}:  <b class="num">{4}</b>  gold each, up to {5} \xB7 best {6}. Your highest floor usually pays most.</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">Prep</button></div></div>',
+    "\u660E\u5929 00:00 \u518D\u4F86": "Come back at 00:00",
+    '<div class="mythic locked"><b>\u50B3\u5947\u79D8\u5883</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 7 \u5C64\u300C\u9F8D\u7720\u9AD8\u5854\u300D\u5F8C\u89E3\u9396\uFF1A\u7121\u9650\u5C64\u6578\u3001\u9650\u6642\u6311\u6230\u3001\u6BCF\u65E5\u8A5E\u7DB4\u3002</span></div>': '<div class="mythic locked"><b>Mythic+</b><span class="sub" style="margin:0">Unlocks after clearing Floor 7, Dragonsleep Spire: endless levels, timed runs, daily affixes.</span></div>',
+    '<div class="mythic"><div class="mhead"><div><span class="label">\u50B3\u5947\u79D8\u5883</span><b>\u76EE\u524D\u9470\u77F3</b></div><span class="keystone num">+{0}</span></div> <div class="affixes">{1}</div> <p class="sub" style="margin:0">\u4ECA\u65E5\u8A5E\u7DB4\uFF0C\u6BCF\u5929 00:00 \u66F4\u63DB\u3002\u9650\u6642\u5167\u901A\u95DC\uFF0C\u9470\u77F3 +1\uFF0C\u6253\u5F97\u5920\u5FEB +2\uFF1B\u8D85\u6642\u6216\u5931\u6557\uFF0C\u9470\u77F3 \u22121\u3002<b>\u79D8\u5883\u639B\u6A5F</b>\uFF1A\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u639B\u6A5F\uFF0C\u56FA\u5B9A\u6253\u8A72\u526F\u672C\u6700\u4F73 \u2212{2}\uFF0C\u9470\u77F3\u4E0D\u8B8A\u3001\u734E\u52F5 {3}%\uFF0C\u96E2\u7DDA\u4E5F\u6703\u7D2F\u7A4D\u3002</p> <div class="mlist">': `<div class="mythic"><div class="mhead"><div><span class="label">Mythic+</span><b>Keystone</b></div><span class="keystone num">+{0}</span></div> <div class="affixes">{1}</div> <p class="sub" style="margin:0">Today's affixes change at 00:00. Beat the timer: keystone +1 (+2 if fast). Over time or failed: \u22121.<b>Mythic idle</b>: dungeons you've timed can be idled at your best \u2212{2}. Keystone unchanged, {3}% rewards, works offline too.</p> <div class="mlist">`,
+    "\u8003\u9A57{0}": "Tests {0}",
+    "+{0} \u8D77\u751F\u6548": "From +{0}",
+    '<div class="mrow2"><div class="mname"><b>{0}</b><span class="sub num" style="margin:0">\u9650\u6642 {1}\u30FB{2}</span></div> {3} <button class="btn sm" data-act="recommend-mythic" data-d="{4}" aria-label="\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099">\u5099\u6230</button> <button class="btn sm main" data-act="mythic" data-d="{5}">\u6311\u6230 +{6}</button></div>': '<div class="mrow2"><div class="mname"><b>{0}</b><span class="sub num" style="margin:0">Limit {1} \xB7 {2}</span></div> {3} <button class="btn sm" data-act="recommend-mythic" data-d="{4}" aria-label="One-tap prep: lineup, talents, gear">Prep</button> <button class="btn sm main" data-act="mythic" data-d="{5}">Start +{6}</button></div>',
+    "\u6700\u4F73 +{0}\uFF08{1}\uFF09": "Best +{0} ({1})",
+    "\u9084\u6C92\u9650\u6642\u901A\u95DC": "Not timed yet",
+    "\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62": "Idling \xB7 Stop",
+    "\u639B\u6A5F +{0}": "Idle +{0}",
+    "\u5929\u68AF\u66AB\u6642\u8B80\u4E0D\u5230\uFF0C\u7A0D\u5F8C\u518D\u8A66\u3002": "Ladder unavailable \u2014 try again later.",
+    "\u8B80\u53D6\u4E2D\u2026": "Loading\u2026",
+    '<p class="sub" style="margin:0">\u9084\u6C92\u6709\u4EBA\u4E0A\u699C\uFF0C\u6436\u7B2C\u4E00\u5427\u3002</p>': `<p class="sub" style="margin:0">No one's on the board yet \u2014 be the first.</p>`,
+    "\u79D8\u5883 +{0}": "Mythic +{0}",
+    "\u7B2C {0} \u5C64": "Floor {0}",
+    '<div class="boardcard"><div class="row" style="align-items:baseline"><b>\u5929\u68AF</b><span class="sub" style="margin:0 0 0 auto">{0}\u30FB<button class="linkbtn" data-act="nick">{1}</button></span></div>{2} <p class="sub" style="margin:0">\u4F9D\u79D8\u5883\u6700\u9AD8\u9650\u6642\u7B49\u7D1A\u6392\u540D\u3002\u4F60\u7684\u6210\u7E3E\u6BCF 5 \u5206\u9418\u4E0A\u50B3\u4E00\u6B21\u3002</p></div>': '<div class="boardcard"><div class="row" style="align-items:baseline"><b>Ladder</b><span class="sub" style="margin:0 0 0 auto">{0}\u30FB<button class="linkbtn" data-act="nick">{1}</button></span></div>{2} <p class="sub" style="margin:0">Ranked by highest timed Mythic level. Your score uploads every 5 minutes.</p></div>',
+    "\u4F60\u662F\u300C{0}\u300D": 'You are "{0}"',
+    "\u6539\u66B1\u7A31": "Rename",
+    "\u8A2D\u5B9A\u66B1\u7A31": "Set nickname",
+    '<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv{0}</b>\u30FB\u88DD\u7B49 <b class="num">{1}</b>\u30FB\u6230\u529B <b class="num">{2}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u90FD\u6709\u5F31\u9EDE\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\uFF0C\u6216\u56DE\u982D\u5237\u88DD\u5099\u3002</p>': `<h2>Dungeons</h2><p class="sub">Party avg <b class="num">Lv{0}</b> \xB7 iLvl <b class="num">{1}</b> \xB7 Rating <b class="num">{2}</b>  | Every boss has a weakness \u2014 if you can't win, change the lineup or farm gear.</p>`,
+    '<div class="dg {0}"> <div class="tier">{1}<small>\u7B2C {2} \u5C64</small></div> <h3>{3}<span class="boss">\u9996\u9818\u30FB{4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>\u5EFA\u8B70 <b class="num {6}">Lv{7}</b></span> <span>\u88DD\u7B49 <b class="num {8}">{9}</b></span> <span>\u6389\u843D <b class="num">{10}</b></span> <span>\u901A\u95DC <b class="num">{11}</b> \u6B21</span> </div> <div class="acts">{12} </div></div>': '<div class="dg {0}"> <div class="tier">{1}<small>Floor {2}</small></div> <h3>{3}<span class="boss">Boss \xB7 {4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>Rec. <b class="num {6}">Lv{7}</b></span> <span>iLvl <b class="num {8}">{9}</b></span> <span>Drops <b class="num">{10}</b></span> <span>Cleared <b class="num">{11}</b> times</span> </div> <div class="acts">{12} </div></div>',
+    '<span class="sub" style="margin:0">\u5148\u901A\u95DC\u4E0A\u4E00\u5C64</span>': '<span class="sub" style="margin:0">Clear the previous floor first</span>',
+    '<button class="btn main grow" data-act="fight" data-d="{0}">\u6311\u6230</button> <button class="btn {1}" data-act="idle" data-d="{2}" {3}>{4}</button> <button class="btn" data-act="prepare" data-d="{5}" aria-label="{6}">\u5099\u6230</button>': '<button class="btn main grow" data-act="fight" data-d="{0}">Fight</button> <button class="btn {1}" data-act="idle" data-d="{2}" {3}>{4}</button> <button class="btn" data-act="prepare" data-d="{5}" aria-label="{6}">Prep</button>',
+    'disabled title="\u901A\u95DC\u4E00\u6B21\u5F8C\u624D\u80FD\u639B\u6A5F"': 'disabled title="Clear once to unlock idling"',
+    "\u639B\u6A5F\u5237": "Idle",
+    "\u4E00\u9375\u5099\u6230\uFF1A\u639B\u6A5F\u4E2D\u53EA\u8ABF\u5929\u8CE6\u3001\u88DD\u5099": "One-tap prep: talents and gear only while idling",
+    "\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099": "One-tap prep: lineup, talents, gear",
+    '<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u5230\u300C\u5718\u968A\u300D\u6700\u4E0B\u65B9\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>': `<div class="howto" style="margin-top:16px"><b>Prep</b>: sets lineup, talents and gear for this boss's weakness (while idling, only talents and gear).<br><b>Idle</b>: repeats the floor automatically, even with the page closed (up to {0}h); rewards are paid when you return.<br><b>Save data</b>: progress lives in this browser. To switch devices, export a save code at the bottom of Party.</div>`,
+    "\u8DF3\u904E": "Skip",
+    "\u958B\u59CB": "Begin",
+    "\u7E7C\u7E8C \u25B8": "Next \u25B8",
+    '<h3>{0} {1} {2}</h3><div class="sub" style="margin:0">{3}{4}\u30FB{5}\u3000{6}</div> {7} <div class="statgrid num"><div><b>{8}</b><span>\u7B49\u7D1A</span></div><div><b>{9}</b><span>\u751F\u547D</span></div><div><b>{10}</b><span>\u5A01\u529B</span></div><div><b>{11}%</b><span>\u66B4\u64CA</span></div></div> <div class="sub" style="margin:0">{12}\u30FB\u8B77\u7532\u6E1B\u50B7 {13}%</div> <div class="seg wide"><button data-act="heroview" data-id="{14}" data-v="gear" class="{15}">\u88DD\u5099</button><button data-act="heroview" data-id="{16}" data-v="talent" class="{17}">\u5929\u8CE6{18}</button></div>': '<h3>{0} {1} {2}</h3><div class="sub" style="margin:0">{3}{4} \xB7 {5} \u2014 {6}</div> {7} <div class="statgrid num"><div><b>{8}</b><span>Level</span></div><div><b>{9}</b><span>HP</span></div><div><b>{10}</b><span>Power</span></div><div><b>{11}%</b><span>Crit</span></div></div> <div class="sub" style="margin:0">{12} \xB7 Armor {13}%</div> <div class="seg wide"><button data-act="heroview" data-id="{14}" data-v="gear" class="{15}">Gear</button><button data-act="heroview" data-id="{16}" data-v="talent" class="{17}">Talents{18}</button></div>',
+    '<div class="raritycard r-{0}"><b class="c{1}">{2}\u52A0\u6210</b><span>\u57FA\u790E\u5C6C\u6027 \xD7{3}{4}{5}</span>{6}</div>': '<div class="raritycard r-{0}"><b class="c{1}">{2} bonus</b><span>Base stats \xD7{3}{4}{5}</span>{6}</div>',
+    "\u30FB\u66B4\u64CA +{0}%": " \xB7 Crit +{0}%",
+    "\u30FB\u57FA\u790E\u6280\u80FD\u51B7\u537B \u221210%": " \xB7 Base skill cooldown \u221210%",
+    '<span><b class="c4">{0}</b>\uFF1A{1}</span>': '<span><b class="c4">{0}</b>: {1}</span>',
+    '<b style="color:var(--brass)">\u5DD4\u5CF0 {0}</b>\uFF08\u751F\u547D\uFF0F\u5A01\u529B +{1}%\uFF09<span class="num">{2} / {3}</span>': '<b style="color:var(--brass)">Paragon {0}</b> (HP / Power +{1}%)<span class="num">{2} / {3}</span>',
+    '\u7D93\u9A57 <span class="num">{0} / {1}</span>': 'XP <span class="num">{0} / {1}</span>',
+    '<div class="gearrow"><span class="sl">{0}</span><span>{1}</span> <span class="row">{2} <button class="btn sm" data-act="pick" data-id="{3}" data-slot="{4}" {5}>\u66F4\u63DB</button></span></div>': '<div class="gearrow"><span class="sl">{0}</span><span>{1}</span> <span class="row">{2} <button class="btn sm" data-act="pick" data-id="{3}" data-slot="{4}" {5}>Swap</button></span></div>',
+    '<span class="sub">\uFF08\u7A7A\uFF09</span>': '<span class="sub">(empty)</span>',
+    '</div><div class="row"> <button class="btn grow {0}" data-act="autoequip1" data-id="{1}" {2}>{3}</button> <button class="btn" data-act="unequipall" data-id="{4}" {5}>\u5168\u90E8\u5378\u4E0B</button></div> <div class="row"> <button class="btn grow" data-act="upall" data-id="{6}" {7}>{8}</button> </div>': '</div><div class="row"> <button class="btn grow {0}" data-act="autoequip1" data-id="{1}" {2}>{3}</button> <button class="btn" data-act="unequipall" data-id="{4}" {5}>Unequip all</button></div> <div class="row"> <button class="btn grow" data-act="upall" data-id="{6}" {7}>{8}</button> </div>',
+    "\u4E00\u9375\u914D\u88DD\uFF08{0} \u4EF6\u66F4\u597D\uFF09": "Auto-equip ({0} better)",
+    "\u5DF2\u662F\u6700\u4F73\u914D\u88DD": "Best gear equipped",
+    "\u6C92\u6709\u88DD\u5099": "No gear",
+    "\u4E00\u9375\u5F37\u5316 {0} \u6B21\uFF08{1} \u91D1{2}\uFF09": "Upgrade \xD7{0} ({1} gold{2})",
+    "\u30FB{0} \u7CBE\u83EF": " \xB7 {0} essence",
+    "\u5DF2\u5168\u90E8\u5F37\u5316\u5230 +{0}": "All at +{0}",
+    "\u91D1\u5E63\u6216\u7CBE\u83EF\u4E0D\u5920": "Not enough gold or essence",
+    '<div class="row"><button class="btn grow" disabled>{0}\u30FB\u639B\u6A5F\u6642\u7121\u6CD5\u66F4\u63DB\u968A\u54E1</button></div>': `<div class="row"><button class="btn grow" disabled>{0} \xB7 can't change members while idling</button></div>`,
+    "\u51FA\u6230\u4E2D": "Active",
+    "\u5F85\u547D\u4E2D": "Benched",
+    '<button class="btn grow" data-act="bench" data-id="{0}">\u79FB\u51FA\u968A\u4F0D</button>': '<button class="btn grow" data-act="bench" data-id="{0}">Bench</button>',
+    "\u968A\u4F0D\u5DF2\u6EFF": "Party full",
+    "\u52A0\u5165\u968A\u4F0D": "Add to party",
+    "\u78BA\u5B9A\u89E3\u96C7\uFF1F\u9000 {0} \u91D1": "Dismiss? Refund {0} gold",
+    "\u89E3\u96C7": "Dismiss",
+    "\u672A\u89E3\u9396": "Locked",
+    "\u5C08\u7CBE": "Spec",
+    '<div class="skillcard"><span class="label">\u57FA\u790E\u6280\u80FD</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>': '<div class="skillcard"><span class="label">Base skill</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>',
+    "<small>\u672A\u89E3\u9396</small>": "<small>Locked</small>",
+    '<div class="row"><button class="btn grow" data-act="recommend" data-id="{0}" data-d="{1}">\u4F9D\u300C{2}\u300D\u63A8\u85A6\u914D\u7F6E</button></div> <p class="sub" style="margin:0">\u96A8\u6642\u53EF\u4EE5\u514D\u8CBB\u66F4\u63DB\uFF0C\u4E0B\u4E00\u5834\u6230\u9B25\u751F\u6548\u3002</p>': '<div class="row"><button class="btn grow" data-act="recommend" data-id="{0}" data-d="{1}">Recommended for {2}</button></div> <p class="sub" style="margin:0">Change anytime for free; applies next battle.</p>',
+    '<h3>\u70BA {0} \u9078\u64C7{1}</h3><div class="sub" style="margin:0">\u76EE\u524D\uFF1A{2}</div> <div class="choices">{3}</div> <div class="row">{4}<button class="btn" data-act="hero" data-id="{5}">\u8FD4\u56DE</button></div>': '<h3>Choose {1} for {0}</h3><div class="sub" style="margin:0">Current: {2}</div> <div class="choices">{3}</div> <div class="row">{4}<button class="btn" data-act="hero" data-id="{5}">Back</button></div>',
+    "\u7121": "None",
+    '<button class="btn" data-act="unequip" data-hero="{0}" data-slot="{1}">\u5378\u4E0B</button>': '<button class="btn" data-act="unequip" data-hero="{0}" data-slot="{1}">Unequip</button>',
+    '<h3>{0}</h3><div class="sub num" style="margin:0">{1}{2}\u30FB\u88DD\u7B49 {3}\u30FB\u5F37\u5316 +{4}/{5}<br>{6}</div> <span class="label">\u88DD\u5099\u7D66</span><div class="stack">{7}</div> <div class="row">{8} <button class="btn" data-act="salvage" data-id="{9}">\u5206\u89E3 +<span class="num">{10}</span> \u91D1{11}</button></div>': '<h3>{0}</h3><div class="sub num" style="margin:0">{1} {2} \xB7 iLvl {3} \xB7 +{4}/{5}<br>{6}</div> <span class="label">Equip on</span><div class="stack">{7}</div> <div class="row">{8} <button class="btn" data-act="salvage" data-id="{9}">Salvage +<span class="num">{10}</span>  gold{11}</button></div>',
+    '<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">\u76EE\u524D\uFF1A{7}</div></button>': '<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">Current: {7}</div></button>',
+    "\u25B2 \u63D0\u5347": "\u25B2 Better",
+    "\u8F03\u5DEE": "Worse",
+    "{0}\uFF08{1}\uFF09": "{0} ({1})",
+    "\u7A7A": "empty",
+    '\u30FB<span class="dust num">{0}</span> \u7CBE\u83EF': '\u30FB<span class="dust num">{0}</span> Essence',
+    '<button class="btn {0}" disabled>\u5F37\u5316 MAX</button>': '<button class="btn {0}" disabled>MAX</button>',
+    '<h2>\u9152\u9928</h2><p class="sub">\u540D\u518A <b class="num">{0}/{1}</b>\u3002\u65B0\u82F1\u96C4\u7684\u7B49\u7D1A\u6703\u63A5\u8FD1\u4F60\u968A\u4F0D\u7684\u5E73\u5747\u3002</p> <div class="recruit"><div><span class="label">\u62DB\u52DF\u4EE4</span><b>\u76F4\u63A5\u62BD\u4E00\u4F4D\u82F1\u96C4\u52A0\u5165\u540D\u518A</b> <span class="sub num" style="margin:0">\u7B2C {2} \u62BD\u5167\u5FC5\u51FA\u53F2\u8A69\u4EE5\u4E0A{3}</span></div> <div class="row"><button class="btn main grow" data-act="scroll" data-n="1" {4}>\u55AE\u62BD <span class="num">{5}</span> \u91D1</button> <button class="btn main grow" data-act="scroll" data-n="10" {6}>\u5341\u9023 <span class="num">{7}</span> \u91D1</button></div> {8} <div class="rates">{9}</div></div> <h2 style="font-size:18px">\u4ECA\u65E5\u540D\u55AE</h2><div class="stack">': `<h2>Tavern</h2><p class="sub">Roster <b class="num">{0}/{1}</b>. New heroes join near your party's average level.</p> <div class="recruit"><div><span class="label">Recruit Scroll</span><b>Draw a hero straight into your roster</b> <span class="sub num" style="margin:0">Epic or better within {2} pulls{3}</span></div> <div class="row"><button class="btn main grow" data-act="scroll" data-n="1" {4}>\xD71 <span class="num">{5}</span> gold</button> <button class="btn main grow" data-act="scroll" data-n="10" {6}>\xD710 <span class="num">{7}</span> gold</button></div> {8} <div class="rates">{9}</div></div> <h2 style="font-size:18px">Today's recruits</h2><div class="stack">`,
+    "\u30FB\u7B2C {0} \u62BD\u5167\u5FC5\u51FA\u50B3\u8AAA": " \xB7 Legendary within {0} pulls",
+    '<span class="sub" style="margin:0;color:var(--warn)">\u540D\u518A\u6EFF\u4E86\uFF0C\u5148\u5230\u300C\u5718\u968A\u300D\u89E3\u96C7\u4E00\u4E9B\u82F1\u96C4</span>': '<span class="sub" style="margin:0;color:var(--warn)">Roster full \u2014 dismiss some heroes in Party first</span>',
+    '<span class="sub" style="margin:0">\u5341\u9023\u9700\u8981\u540D\u518A\u9084\u6709 10 \u500B\u7A7A\u4F4D</span>': '<span class="sub" style="margin:0">\xD710 needs 10 free roster slots</span>',
+    '<div class="hero r-{0}"><div class="ic">{1}</div><div class="nm">{2}{3}<small>{4}{5}\u30FB{6}\u30FB<span class="num">Lv{7}</span></small></div> <button class="btn sm main" data-act="hire" data-id="{8}" {9} style="grid-row:span 2"><span class="num">{10}</span> \u91D1</button> <div class="st">{11}</div></div>': '<div class="hero r-{0}"><div class="ic">{1}</div><div class="nm">{2}{3}<small>{4}{5}\u30FB{6}\u30FB<span class="num">Lv{7}</span></small></div> <button class="btn sm main" data-act="hire" data-id="{8}" {9} style="grid-row:span 2"><span class="num">{10}</span> gold</button> <div class="st">{11}</div></div>',
+    '<b class="c4">{0}</b>\uFF1A{1}': '<b class="c4">{0}</b>: {1}',
+    '</div><div class="row" style="margin-top:12px"><button class="btn" data-act="reroll" {0}>\u63DB\u4E00\u6279\uFF08<span class="num">{1}</span> \u91D1\uFF09</button><span class="sub" style="margin:0;align-self:center">\u63DB\u4E00\u6279\u4E5F\u7B97\u9032\u4FDD\u5E95</span></div> <h2 style="font-size:18px">\u50B3\u5947\u82F1\u96C4</h2><div class="stack">{2}</div> <h2 style="font-size:18px">\u8077\u696D\u5716\u9451</h2><div class="stack">{3}</div>': '</div><div class="row" style="margin-top:12px"><button class="btn" data-act="reroll" {0}>Refresh (<span class="num">{1}</span>  gold)</button><span class="sub" style="margin:0;align-self:center">Refreshes count toward pity</span></div> <h2 style="font-size:18px">Legendary heroes</h2><div class="stack">{2}</div> <h2 style="font-size:18px">Classes</h2><div class="stack">{3}</div>',
+    '<div class="hero {0}"><div class="ic">{1}</div><div class="nm"><span class="c4">{2}\u30FB{3}</span><small>{4}\u30FB{5}</small></div><span></span><div class="st"><b>{6}</b>\uFF1A{7}</div></div>': '<div class="hero {0}"><div class="ic">{1}</div><div class="nm"><span class="c4">{2}\u30FB{3}</span><small>{4}\u30FB{5}</small></div><span></span><div class="st"><b>{6}</b>{7}</div></div>',
+    "\u5DF2\u62DB\u52DF": "Recruited",
+    "\u672A\u62DB\u52DF": "Not recruited",
+    '<h2>\u5718\u968A</h2><p class="sub">\u51FA\u6230\u6700\u591A {0} \u4EBA\u3002{1}</p> <div class="party">{2}</div> <div class="comp"><span><b style="color:var(--tank)">\u5766\u514B</b> {3}</span><span><b style="color:var(--heal)">\u6CBB\u7642</b> {4}</span><span><b style="color:var(--dps)">\u8F38\u51FA</b> {5}</span><span>\u6230\u529B <b class="num" style="color:var(--fg)">{6}</b></span> {7}{8}</div> <h2 style="font-size:18px">\u540D\u518A <span class="sub num">{9}/{10}</span></h2>{11}<div class="stack">': '<h2>Party</h2><p class="sub">Up to {0} active heroes. {1}</p> <div class="party">{2}</div> <div class="comp"><span><b style="color:var(--tank)">Tank</b> {3}</span><span><b style="color:var(--heal)">Healer</b> {4}</span><span><b style="color:var(--dps)">DPS</b> {5}</span><span>Rating <b class="num" style="color:var(--fg)">{6}</b></span> {7}{8}</div> <h2 style="font-size:18px">Roster <span class="sub num">{9}/{10}</span></h2>{11}<div class="stack">',
+    '<b style="color:var(--warn)">\u639B\u6A5F\u4E2D\uFF0C\u9663\u5BB9\u5DF2\u9396\u5B9A</b>\uFF0C\u505C\u6B62\u639B\u6A5F\u5F8C\u624D\u80FD\u63DB\u4EBA\u3002': '<b style="color:var(--warn)">Idling \u2014 lineup locked</b>. Stop idling to change members.',
+    "\u9EDE\u82F1\u96C4\u67E5\u770B\u88DD\u5099\u8207\u8ABF\u6574\u9663\u5BB9\u3002": "Tap a hero to manage gear and lineup.",
+    '<div class="slot emptyslot">\u7A7A\u4F4D</div>': '<div class="slot emptyslot">Empty</div>',
+    '<span style="color:var(--warn)">\u7F3A\u5766\u514B</span>': '<span style="color:var(--warn)">No tank</span>',
+    '<span style="color:var(--warn)">\u7F3A\u6CBB\u7642</span>': '<span style="color:var(--warn)">No healer</span>',
+    '<h2 style="font-size:18px">\u610F\u898B\u56DE\u994B</h2><div class="settings"> <textarea id="fbText" class="fb" maxlength="1000" placeholder="\u54EA\u88E1\u597D\u73A9\u3001\u54EA\u88E1\u5361\u4F4F\u3001\u60F3\u8981\u4EC0\u9EBC\u529F\u80FD\u90FD\u53EF\u4EE5\u5BEB">{0}</textarea> <div class="row" style="align-items:center"><span class="sub" style="margin:0">\u6703\u9644\u4E0A\u66B1\u7A31\u300C{1}\u300D\u8207\u76EE\u524D\u9032\u5EA6</span><button class="btn main" data-act="sendfb" style="margin-left:auto">\u9001\u51FA</button></div></div>': `<h2 style="font-size:18px">Feedback</h2><div class="settings"> <textarea id="fbText" class="fb" maxlength="1000" placeholder="What's fun, where you got stuck, what you'd like to see\u2026">{0}</textarea> <div class="row" style="align-items:center"><span class="sub" style="margin:0">Sent with your nickname "{1}" and progress</span><button class="btn main" data-act="sendfb" style="margin-left:auto">Send</button></div></div>`,
+    '<h2 style="font-size:18px">\u66B1\u7A31</h2><div class="settings"><div class="set"><span>\u5929\u68AF\u4E0A\u986F\u793A\u70BA <b>{0}</b></span><button class="btn sm" data-act="nick">\u4FEE\u6539</button></div></div> <h2 style="font-size:18px">\u5B58\u6A94</h2><div class="row"><button class="btn" data-act="export">\u532F\u51FA\u5B58\u6A94\u78BC</button><button class="btn" data-act="import">\u532F\u5165</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">\u91CD\u65B0\u958B\u59CB</button></div> <p class="sub" style="margin-top:8px">\u5171\u6311\u6230 {1} \u6B21\u30FB\u901A\u95DC {2} \u6B21</p>': '<h2 style="font-size:18px">Nickname</h2><div class="settings"><div class="set"><span>Shown on the Ladder as <b>{0}</b></span><button class="btn sm" data-act="nick">Edit</button></div></div> <h2 style="font-size:18px">Save data</h2><div class="row"><button class="btn" data-act="export">Export save code</button><button class="btn" data-act="import">Import</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">Start over</button></div> <p class="sub" style="margin-top:8px">{1} runs \xB7 {2} clears</p>',
+    '<button class="hero r-{0}" data-act="hero" data-id="{1}"><div class="ic">{2}</div> <div class="nm">{3}{4}<small>{5}{6}\u30FB<span class="num">Lv{7}</span></small>{8}</div> <span class="tag {9}">{10}</span> <div class="st num"><span>\u751F\u547D {11}</span><span>\u5A01\u529B {12}</span><span>\u66B4\u64CA {13}%</span><span>\u88DD\u7B49 {14}</span></div> <div class="xpbar"><i style="width:{15}%"></i></div></button>': '<button class="hero r-{0}" data-act="hero" data-id="{1}"><div class="ic">{2}</div> <div class="nm">{3}{4}<small>{5}{6}\u30FB<span class="num">Lv{7}</span></small>{8}</div> <span class="tag {9}">{10}</span> <div class="st num"><span>HP {11}</span><span>Power {12}</span><span>Crit {13}%</span><span>iLvl {14}</span></div> <div class="xpbar"><i style="width:{15}%"></i></div></button>',
+    '<span class="newpick">\u53EF\u9078\u5929\u8CE6</span>': '<span class="newpick">Talent ready</span>',
+    "\u5F85\u547D": "Bench",
+    '<div class="toolbar"><label class="selwrap"><span>\u89E3\u96C7\u5F85\u547D</span><select id="fireSel" aria-label="\u89E3\u96C7\u54C1\u8CEA">{0}</select></label> <button class="btn sm {1}" data-act="firemany" {2}>{3}</button></div> <p class="sub" style="margin:4px 0 8px">\u53EA\u89E3\u96C7\u5F85\u547D\u4E2D\u7684\u82F1\u96C4\uFF0C\u50B3\u8AAA\u4E0D\u6703\u88AB\u9078\u5230\uFF1B\u8EAB\u4E0A\u88DD\u5099\u81EA\u52D5\u5378\u56DE\u80CC\u5305\u3002</p>': '<div class="toolbar"><label class="selwrap"><span>Dismiss bench</span><select id="fireSel" aria-label="Dismiss quality">{0}</select></label> <button class="btn sm {1}" data-act="firemany" {2}>{3}</button></div> <p class="sub" style="margin:4px 0 8px">Only benched heroes are dismissed, never Legendaries; their gear returns to your bag.</p>',
+    "\u6C92\u6709\u7B26\u5408\u7684\u82F1\u96C4": "No matching heroes",
+    "\u78BA\u5B9A\u89E3\u96C7 {0} \u4EBA\uFF1F\u9000 {1} \u91D1": "Dismiss {0}? Refund {1} gold",
+    "\u4E00\u9375\u89E3\u96C7\uFF08{0} \u4EBA\uFF09": "Dismiss all ({0})",
+    "\u8A9E\u8A00": "Language"
+  };
+
+  // src/core/i18n.js
+  var DICTS = { en: en_default };
+  var LANGS = [{ id: "zh-TW", name: "\u7E41\u9AD4\u4E2D\u6587" }, { id: "en", name: "English" }];
+  var KEY = "raid-leader-lang";
+  var lang = "zh-TW";
+  try {
+    const v = globalThis.localStorage && globalThis.localStorage.getItem(KEY);
+    if (v && (v === "zh-TW" || DICTS[v])) lang = v;
+  } catch (e) {
+  }
+  var getLang = () => lang;
+  function setLang(l) {
+    try {
+      globalThis.localStorage.setItem(KEY, l);
+    } catch (e) {
+    }
+  }
+  var REV = null;
+  function localName(s) {
+    if (!s) return s;
+    const en = DICTS.en;
+    if (lang === "en") {
+      if (en[s]) return en[s];
+      const i = s.indexOf("\u7684");
+      if (i > 0 && en[s.slice(0, i + 1)] && en[s.slice(i + 1)]) return en[s.slice(0, i + 1)] + en[s.slice(i + 1)];
+      return s;
+    }
+    if (!REV) {
+      REV = {};
+      for (const [k, v] of Object.entries(en)) if (v.length < 24 && !(v in REV)) REV[v] = k;
+    }
+    if (REV[s]) return REV[s];
+    const j = s.indexOf(" ");
+    if (j > 0 && REV[s.slice(0, j + 1)] && REV[s.slice(j + 1)]) return REV[s.slice(0, j + 1)] + REV[s.slice(j + 1)];
+    return s;
+  }
+  function tx(key, ...args) {
+    const d = DICTS[lang], s = d && d[key] || key;
+    return args.length ? s.replace(/\{(\d+)\}/g, (m, i) => i < args.length ? args[i] : m) : s;
+  }
+
   // src/core/classes/shared.js
   var ready = (b, u, key) => (u.cd[key] || 0) <= b.tick;
   var specCd = (u, s) => Math.round(s.cd * (u.mods.specCd || 1));
@@ -7,14 +603,14 @@
   var spec = (pack, u) => u.spec && pack.specs[u.spec];
   var baseCd = (u, def) => Math.max(1, Math.round((u.mods.baseCd || def) * (u.mods.baseCdMult || 1) * (u.legendCd || 1)));
   var SPEC_ROW = {
-    a: { name: "\u5C08\u7CBE\u7CBE\u901A", desc: "\u5C08\u7CBE\u6280\u80FD\u51B7\u537B \u221230%", mods: { specCd: 0.7 } },
-    b: { name: "\u5C08\u7CBE\u5F37\u5316", desc: "\u5C08\u7CBE\u6280\u80FD\u6548\u679C +30%", mods: { specFx: 1.3 } }
+    a: { name: tx("\u5C08\u7CBE\u7CBE\u901A"), desc: tx("\u5C08\u7CBE\u6280\u80FD\u51B7\u537B \u221230%"), mods: { specCd: 0.7 } },
+    b: { name: tx("\u5C08\u7CBE\u5F37\u5316"), desc: tx("\u5C08\u7CBE\u6280\u80FD\u6548\u679C +30%"), mods: { specFx: 1.3 } }
   };
 
   // src/core/classes/guardian.js
   var P = {
     id: "guardian",
-    name: "\u5B88\u8B77\u9A0E\u58EB",
+    name: tx("\u5B88\u8B77\u9A0E\u58EB"),
     role: "tank",
     icon: "\u{1F6E1}\uFE0F",
     hp: 230,
@@ -23,39 +619,39 @@
     powL: 1.5,
     armor: 0.45,
     crit: 0.05,
-    desc: "\u5632\u8AF7\u6240\u6709\u6575\u4EBA\uFF0C\u627F\u53D7\u50B7\u5BB3\u3002\u8B77\u7532\u6E1B\u50B7 45%\u3002",
+    desc: tx("\u5632\u8AF7\u6240\u6709\u6575\u4EBA\uFF0C\u627F\u53D7\u50B7\u5BB3\u3002\u8B77\u7532\u6E1B\u50B7 45%\u3002"),
     ai: { hit: 0.8 },
-    base: { name: "\u76FE\u724C\u731B\u64CA", cd: 8, mult: 2.5, weaken: 0.3, weakenDur: 4, desc: "\u51B7\u537B 8 \u79D2\uFF1A\u5A01\u529B \xD72.5 \u50B7\u5BB3\uFF0C\u76EE\u6A19\u653B\u64CA \u221230% \u6301\u7E8C 4 \u79D2" },
+    base: { name: tx("\u76FE\u724C\u731B\u64CA"), cd: 8, mult: 2.5, weaken: 0.3, weakenDur: 4, desc: tx("\u51B7\u537B 8 \u79D2\uFF1A\u5A01\u529B \xD72.5 \u50B7\u5BB3\uFF0C\u76EE\u6A19\u653B\u64CA \u221230% \u6301\u7E8C 4 \u79D2") },
     specs: {
-      prot: { name: "\u9632\u8B77", skill: "\u8056\u76FE\u8853", counters: "buster", desc: "\u751F\u547D\u4F4E\u65BC 30% \u6642\u81EA\u52D5 5 \u79D2\u7121\u6575\uFF0C\u6BCF\u5834\u4E00\u6B21", below: 0.3, dur: 5 },
-      ret: { name: "\u61F2\u6212", skill: "\u5FA9\u4EC7\u4E4B\u6012", counters: "enrage", desc: "\u51B7\u537B 20 \u79D2\uFF1A10 \u79D2\u5167\u50B7\u5BB3 +50%\u3001\u5438\u8840 20%", cd: 20, dur: 10, dmg: 0.5, leech: 0.2 }
+      prot: { name: tx("\u9632\u8B77"), skill: tx("\u8056\u76FE\u8853"), counters: "buster", desc: tx("\u751F\u547D\u4F4E\u65BC 30% \u6642\u81EA\u52D5 5 \u79D2\u7121\u6575\uFF0C\u6BCF\u5834\u4E00\u6B21"), below: 0.3, dur: 5 },
+      ret: { name: tx("\u61F2\u6212"), skill: tx("\u5FA9\u4EC7\u4E4B\u6012"), counters: "enrage", desc: tx("\u51B7\u537B 20 \u79D2\uFF1A10 \u79D2\u5167\u50B7\u5BB3 +50%\u3001\u5438\u8840 20%"), cd: 20, dur: 10, dmg: 0.5, leech: 0.2 }
     },
     talents: [
       {
-        a: { name: "\u5805\u97CC", desc: "\u751F\u547D +10%", mods: { hpMult: 1.1 } },
-        b: { name: "\u92B3\u5229\u76FE\u724C", desc: "\u76FE\u724C\u731B\u64CA\u50B7\u5BB3 +50%", mods: { baseMult: 1.5 } }
+        a: { name: tx("\u5805\u97CC"), desc: tx("\u751F\u547D +10%"), mods: { hpMult: 1.1 } },
+        b: { name: tx("\u92B3\u5229\u76FE\u724C"), desc: tx("\u76FE\u724C\u731B\u64CA\u50B7\u5BB3 +50%"), mods: { baseMult: 1.5 } }
       },
       {
-        a: { name: "\u683C\u64CB", desc: "\u53D7\u5230\u91CD\u64CA\u7684\u50B7\u5BB3 \u221225%", mods: { busterReduce: 0.25 } },
-        b: { name: "\u9B54\u6297", desc: "\u53D7\u5230\u7BC4\u570D\u653B\u64CA\u7684\u50B7\u5BB3 \u221230%", mods: { aoeReduce: 0.3 } }
+        a: { name: tx("\u683C\u64CB"), desc: tx("\u53D7\u5230\u91CD\u64CA\u7684\u50B7\u5BB3 \u221225%"), mods: { busterReduce: 0.25 } },
+        b: { name: tx("\u9B54\u6297"), desc: tx("\u53D7\u5230\u7BC4\u570D\u653B\u64CA\u7684\u50B7\u5BB3 \u221230%"), mods: { aoeReduce: 0.3 } }
       },
       {
-        a: { name: "\u9F13\u821E", desc: "\u5168\u968A\u751F\u547D +5%", mods: { partyHp: 0.05 } },
-        b: { name: "\u53CD\u64CA", desc: "\u53D7\u64CA\u6642 15% \u6A5F\u7387\u53CD\u64CA\u5A01\u529B \xD71", mods: { counter: 0.15 } }
+        a: { name: tx("\u9F13\u821E"), desc: tx("\u5168\u968A\u751F\u547D +5%"), mods: { partyHp: 0.05 } },
+        b: { name: tx("\u53CD\u64CA"), desc: tx("\u53D7\u64CA\u6642 15% \u6A5F\u7387\u53CD\u64CA\u5A01\u529B \xD71"), mods: { counter: 0.15 } }
       },
       SPEC_ROW,
       {
-        a: { name: "\u76FE\u7246", desc: "\u751F\u547D\u4F4E\u65BC 50% \u6642\u518D\u6E1B\u50B7 15%", mods: { lowHpReduce: 0.15 } },
-        b: { name: "\u6B63\u7FA9\u4E4B\u9318", desc: "\u50B7\u5BB3 +20%", mods: { dmgMult: 1.2 } }
+        a: { name: tx("\u76FE\u7246"), desc: tx("\u751F\u547D\u4F4E\u65BC 50% \u6642\u518D\u6E1B\u50B7 15%"), mods: { lowHpReduce: 0.15 } },
+        b: { name: tx("\u6B63\u7FA9\u4E4B\u9318"), desc: tx("\u50B7\u5BB3 +20%"), mods: { dmgMult: 1.2 } }
       }
     ],
     recommend: (has) => ({ spec: has("buster") ? "prot" : "ret", t: ["a", has("buster") ? "a" : "b", "a", "b", has("enrage") ? "b" : "a"] }),
     legend: {
-      name: "\u5DF4\u6D1B\u65AF",
-      title: "\u9435\u58C1",
+      name: tx("\u5DF4\u6D1B\u65AF"),
+      title: tx("\u9435\u58C1"),
       passive: "undying",
-      pname: "\u4E0D\u5C48",
-      desc: "\u6BCF\u5834\u7B2C\u4E00\u6B21\u53D7\u5230\u81F4\u547D\u50B7\u5BB3\u6539\u70BA\u5269 1 \u8840\u4E26\u7121\u6575 3 \u79D2\uFF1B\u5728\u5834\u6642\u5168\u968A\u53D7\u5230\u7684\u50B7\u5BB3 \u22128%",
+      pname: tx("\u4E0D\u5C48"),
+      desc: tx("\u6BCF\u5834\u7B2C\u4E00\u6B21\u53D7\u5230\u81F4\u547D\u50B7\u5BB3\u6539\u70BA\u5269 1 \u8840\u4E26\u7121\u6575 3 \u79D2\uFF1B\u5728\u5834\u6642\u5168\u968A\u53D7\u5230\u7684\u50B7\u5BB3 \u22128%"),
       hooks: {
         partyTaken: 0.92,
         // 在場時全隊受到的傷害倍率
@@ -64,7 +660,7 @@
             u.used.undying = true;
             u.hp = 1;
             u.buf.immune = b.tick + 3;
-            b.skillLog(u, "\u4E0D\u5C48");
+            b.skillLog(u, tx("\u4E0D\u5C48"));
           }
         }
       }
@@ -112,7 +708,7 @@
   // src/core/classes/cleric.js
   var P2 = {
     id: "cleric",
-    name: "\u8056\u5149\u7267\u5E2B",
+    name: tx("\u8056\u5149\u7267\u5E2B"),
     role: "heal",
     icon: "\u2728",
     hp: 130,
@@ -121,39 +717,39 @@
     powL: 2,
     armor: 0.15,
     crit: 0.05,
-    desc: "\u6CBB\u7642\u8840\u91CF\u6700\u4F4E\u7684\u968A\u53CB\uFF0C\u6BCF 5 \u79D2\u7FA4\u9AD4\u6CBB\u7642\u3002",
+    desc: tx("\u6CBB\u7642\u8840\u91CF\u6700\u4F4E\u7684\u968A\u53CB\uFF0C\u6BCF 5 \u79D2\u7FA4\u9AD4\u6CBB\u7642\u3002"),
     ai: { single: 1.9, critMult: 1.5, groupEvery: 5, group: 0.75, groupBelow: 0.9, idleHit: 0.5 },
-    base: { name: "\u771F\u8A00\u8853\uFF1A\u76FE", cd: 10, mult: 4, desc: "\u51B7\u537B 10 \u79D2\uFF1A\u7D66\u8840\u91CF\u6700\u4F4E\u7684\u968A\u53CB\u8B77\u76FE\uFF08\u5A01\u529B \xD74\uFF09" },
+    base: { name: tx("\u771F\u8A00\u8853\uFF1A\u76FE"), cd: 10, mult: 4, desc: tx("\u51B7\u537B 10 \u79D2\uFF1A\u7D66\u8840\u91CF\u6700\u4F4E\u7684\u968A\u53CB\u8B77\u76FE\uFF08\u5A01\u529B \xD74\uFF09") },
     specs: {
-      disc: { name: "\u6212\u5F8B", skill: "\u75DB\u82E6\u93AE\u58D3", counters: "buster", desc: "\u51B7\u537B 15 \u79D2\uFF1A\u5766\u514B\u53D7\u5230\u91CD\u64CA\u6642\uFF0C\u8A72\u6B21\u50B7\u5BB3 \u221260%", cd: 15, reduce: 0.6 },
-      holy: { name: "\u795E\u8056", skill: "\u795E\u8056\u8B9A\u7F8E\u8A69", counters: "pulse", desc: "\u51B7\u537B 30 \u79D2\uFF1A\u5168\u968A\u5E73\u5747\u8840\u91CF\u4F4E\u65BC 60% \u6642\uFF0C\u9023\u7E8C 3 \u79D2\u7FA4\u88DC\uFF08\u5A01\u529B \xD71.2\uFF09", cd: 30, dur: 3, mult: 1.2, below: 0.6 }
+      disc: { name: tx("\u6212\u5F8B"), skill: tx("\u75DB\u82E6\u93AE\u58D3"), counters: "buster", desc: tx("\u51B7\u537B 15 \u79D2\uFF1A\u5766\u514B\u53D7\u5230\u91CD\u64CA\u6642\uFF0C\u8A72\u6B21\u50B7\u5BB3 \u221260%"), cd: 15, reduce: 0.6 },
+      holy: { name: tx("\u795E\u8056"), skill: tx("\u795E\u8056\u8B9A\u7F8E\u8A69"), counters: "pulse", desc: tx("\u51B7\u537B 30 \u79D2\uFF1A\u5168\u968A\u5E73\u5747\u8840\u91CF\u4F4E\u65BC 60% \u6642\uFF0C\u9023\u7E8C 3 \u79D2\u7FA4\u88DC\uFF08\u5A01\u529B \xD71.2\uFF09"), cd: 30, dur: 3, mult: 1.2, below: 0.6 }
     },
     talents: [
       {
-        a: { name: "\u51A5\u60F3", desc: "\u6CBB\u7642 +10%", mods: { healMult: 1.1 } },
-        b: { name: "\u8FC5\u6377\u79B1\u8A00", desc: "\u7FA4\u88DC\u9593\u9694 5 \u2192 4 \u79D2", mods: { groupEvery: 4 } }
+        a: { name: tx("\u51A5\u60F3"), desc: tx("\u6CBB\u7642 +10%"), mods: { healMult: 1.1 } },
+        b: { name: tx("\u8FC5\u6377\u79B1\u8A00"), desc: tx("\u7FA4\u88DC\u9593\u9694 5 \u2192 4 \u79D2"), mods: { groupEvery: 4 } }
       },
       {
-        a: { name: "\u5805\u5B9A\u8B77\u76FE", desc: "\u8B77\u76FE +40%", mods: { baseMult: 1.4 } },
-        b: { name: "\u6062\u5FA9", desc: "\u55AE\u9AD4\u6CBB\u7642\u5F8C\u518D\u6301\u7E8C\u56DE\u8840 3 \u79D2", mods: { renew: 0.3 } }
+        a: { name: tx("\u5805\u5B9A\u8B77\u76FE"), desc: tx("\u8B77\u76FE +40%"), mods: { baseMult: 1.4 } },
+        b: { name: tx("\u6062\u5FA9"), desc: tx("\u55AE\u9AD4\u6CBB\u7642\u5F8C\u518D\u6301\u7E8C\u56DE\u8840 3 \u79D2"), mods: { renew: 0.3 } }
       },
       {
-        a: { name: "\u6551\u8D16", desc: "\u7B2C\u4E00\u4F4D\u9663\u4EA1\u7684\u968A\u53CB\u4EE5 50% \u751F\u547D\u5FA9\u6D3B\uFF0C\u6BCF\u5834\u4E00\u6B21", mods: { redemption: 0.5 } },
-        b: { name: "\u8056\u5149\u4E4B\u6012", desc: "\u6C92\u4EBA\u9700\u8981\u6CBB\u7642\u6642\uFF0C\u653B\u64CA\u50B7\u5BB3 \xD73", mods: { smite: 3 } }
+        a: { name: tx("\u6551\u8D16"), desc: tx("\u7B2C\u4E00\u4F4D\u9663\u4EA1\u7684\u968A\u53CB\u4EE5 50% \u751F\u547D\u5FA9\u6D3B\uFF0C\u6BCF\u5834\u4E00\u6B21"), mods: { redemption: 0.5 } },
+        b: { name: tx("\u8056\u5149\u4E4B\u6012"), desc: tx("\u6C92\u4EBA\u9700\u8981\u6CBB\u7642\u6642\uFF0C\u653B\u64CA\u50B7\u5BB3 \xD73"), mods: { smite: 3 } }
       },
       SPEC_ROW,
       {
-        a: { name: "\u5B88\u8B77\u5929\u4F7F", desc: "\u5168\u968A\u53D7\u5230\u7684\u7BC4\u570D\u50B7\u5BB3 \u221210%", mods: { partyAoe: 0.1 } },
-        b: { name: "\u6148\u60B2", desc: "\u66B4\u64CA\u7387 +10%", mods: { critAdd: 0.1 } }
+        a: { name: tx("\u5B88\u8B77\u5929\u4F7F"), desc: tx("\u5168\u968A\u53D7\u5230\u7684\u7BC4\u570D\u50B7\u5BB3 \u221210%"), mods: { partyAoe: 0.1 } },
+        b: { name: tx("\u6148\u60B2"), desc: tx("\u66B4\u64CA\u7387 +10%"), mods: { critAdd: 0.1 } }
       }
     ],
     recommend: (has) => ({ spec: has("buster") && !has("pulse") ? "disc" : "holy", t: ["a", "a", "a", "b", has("pulse") ? "a" : "b"] }),
     legend: {
-      name: "\u827E\u857E\u5A1C",
-      title: "\u6668\u66E6",
+      name: tx("\u827E\u857E\u5A1C"),
+      title: tx("\u6668\u66E6"),
       passive: "overflow",
-      pname: "\u6EA2\u5149",
-      desc: "\u6CBB\u7642\u8D85\u51FA\u7684\u90E8\u5206\u8F49\u70BA\u8B77\u76FE\uFF08\u4E0A\u9650\u662F\u8A72\u968A\u54E1\u751F\u547D\u7684 20%\uFF09",
+      pname: tx("\u6EA2\u5149"),
+      desc: tx("\u6CBB\u7642\u8D85\u51FA\u7684\u90E8\u5206\u8F49\u70BA\u8B77\u76FE\uFF08\u4E0A\u9650\u662F\u8A72\u968A\u54E1\u751F\u547D\u7684 20%\uFF09"),
       hooks: {
         onHeal(b, src, tgt, amt, h) {
           const over = Math.round(amt * b.healMult(src)) - h;
@@ -213,7 +809,7 @@
   // src/core/classes/rogue.js
   var P3 = {
     id: "rogue",
-    name: "\u6697\u5F71\u76DC\u8CCA",
+    name: tx("\u6697\u5F71\u76DC\u8CCA"),
     role: "dps",
     icon: "\u{1F5E1}\uFE0F",
     hp: 140,
@@ -222,41 +818,41 @@
     powL: 2.3,
     armor: 0.2,
     crit: 0.15,
-    desc: "\u55AE\u9AD4\u7206\u767C\uFF0C\u66B4\u64CA\u7387\u9AD8\u3002\u64C5\u9577\u6253\u738B\u3002",
+    desc: tx("\u55AE\u9AD4\u7206\u767C\uFF0C\u66B4\u64CA\u7387\u9AD8\u3002\u64C5\u9577\u6253\u738B\u3002"),
     prefers: ["enrage"],
     // 推薦陣容：遇到這些機制時優先帶
     ai: { hit: 1.3 },
-    base: { name: "\u5254\u9AA8", cd: 6, mult: 3.5, desc: "\u51B7\u537B 6 \u79D2\uFF1A\u5C0D\u9996\u9818\u9020\u6210\u5A01\u529B \xD73.5" },
+    base: { name: tx("\u5254\u9AA8"), cd: 6, mult: 3.5, desc: tx("\u51B7\u537B 6 \u79D2\uFF1A\u5C0D\u9996\u9818\u9020\u6210\u5A01\u529B \xD73.5") },
     specs: {
-      assa: { name: "\u523A\u6BBA", skill: "\u81F4\u547D\u6BD2\u85E5", counters: "enrage", desc: "\u6BCF\u6B21\u653B\u64CA\u758A 1 \u5C64\u6BD2\uFF0C\u6BCF\u5C64\u6BCF\u79D2\u5A01\u529B \xD70.4\uFF0C\u6700\u591A 3 \u5C64", perStack: 0.4, maxStacks: 3 },
-      combat: { name: "\u6230\u9B25", skill: "\u528D\u5203\u4E82\u821E", counters: "summon", desc: "\u51B7\u537B 15 \u79D2\uFF1A8 \u79D2\u5167\u6BCF\u6B21\u653B\u64CA\u984D\u5916\u6253\u4E2D 2 \u500B\u76EE\u6A19", cd: 15, dur: 8, extra: 2 }
+      assa: { name: tx("\u523A\u6BBA"), skill: tx("\u81F4\u547D\u6BD2\u85E5"), counters: "enrage", desc: tx("\u6BCF\u6B21\u653B\u64CA\u758A 1 \u5C64\u6BD2\uFF0C\u6BCF\u5C64\u6BCF\u79D2\u5A01\u529B \xD70.4\uFF0C\u6700\u591A 3 \u5C64"), perStack: 0.4, maxStacks: 3 },
+      combat: { name: tx("\u6230\u9B25"), skill: tx("\u528D\u5203\u4E82\u821E"), counters: "summon", desc: tx("\u51B7\u537B 15 \u79D2\uFF1A8 \u79D2\u5167\u6BCF\u6B21\u653B\u64CA\u984D\u5916\u6253\u4E2D 2 \u500B\u76EE\u6A19"), cd: 15, dur: 8, extra: 2 }
     },
     talents: [
       {
-        a: { name: "\u7CBE\u6E96", desc: "\u66B4\u64CA\u7387 +5%", mods: { critAdd: 0.05 } },
-        b: { name: "\u81F4\u547D", desc: "\u66B4\u64CA\u50B7\u5BB3 \xD72 \u2192 \xD72.5", mods: { critDmg: 2.5 } }
+        a: { name: tx("\u7CBE\u6E96"), desc: tx("\u66B4\u64CA\u7387 +5%"), mods: { critAdd: 0.05 } },
+        b: { name: tx("\u81F4\u547D"), desc: tx("\u66B4\u64CA\u50B7\u5BB3 \xD72 \u2192 \xD72.5"), mods: { critDmg: 2.5 } }
       },
       {
-        a: { name: "\u9583\u907F", desc: "\u53D7\u5230\u653B\u64CA\u6642 20% \u6A5F\u7387\u9583\u904E", mods: { dodge: 0.2 } },
-        b: { name: "\u5272\u88C2", desc: "\u5254\u9AA8\u984D\u5916\u9020\u6210\u6D41\u8840\uFF085 \u79D2\uFF0C\u6BCF\u79D2\u5A01\u529B \xD70.5\uFF09", mods: { bleed: 0.5 } }
+        a: { name: tx("\u9583\u907F"), desc: tx("\u53D7\u5230\u653B\u64CA\u6642 20% \u6A5F\u7387\u9583\u904E"), mods: { dodge: 0.2 } },
+        b: { name: tx("\u5272\u88C2"), desc: tx("\u5254\u9AA8\u984D\u5916\u9020\u6210\u6D41\u8840\uFF085 \u79D2\uFF0C\u6BCF\u79D2\u5A01\u529B \xD70.5\uFF09"), mods: { bleed: 0.5 } }
       },
       {
-        a: { name: "\u8655\u6C7A", desc: "\u76EE\u6A19\u751F\u547D\u4F4E\u65BC 35% \u6642\u50B7\u5BB3 +30%", mods: { execute: 0.3 } },
-        b: { name: "\u6E05\u6383", desc: "\u5C0D\u5C0F\u602A\u50B7\u5BB3 +25%", mods: { sweep: 0.25 } }
+        a: { name: tx("\u8655\u6C7A"), desc: tx("\u76EE\u6A19\u751F\u547D\u4F4E\u65BC 35% \u6642\u50B7\u5BB3 +30%"), mods: { execute: 0.3 } },
+        b: { name: tx("\u6E05\u6383"), desc: tx("\u5C0D\u5C0F\u602A\u50B7\u5BB3 +25%"), mods: { sweep: 0.25 } }
       },
       SPEC_ROW,
       {
-        a: { name: "\u6697\u5F71\u4E4B\u821E", desc: "\u5254\u9AA8\u51B7\u537B 6 \u2192 4 \u79D2", mods: { baseCd: 4 } },
-        b: { name: "\u51B7\u8840", desc: "\u6BCF\u6CE2\u7B2C\u4E00\u6B21\u653B\u64CA\u5FC5\u5B9A\u66B4\u64CA", mods: { coldBlood: 1 } }
+        a: { name: tx("\u6697\u5F71\u4E4B\u821E"), desc: tx("\u5254\u9AA8\u51B7\u537B 6 \u2192 4 \u79D2"), mods: { baseCd: 4 } },
+        b: { name: tx("\u51B7\u8840"), desc: tx("\u6BCF\u6CE2\u7B2C\u4E00\u6B21\u653B\u64CA\u5FC5\u5B9A\u66B4\u64CA"), mods: { coldBlood: 1 } }
       }
     ],
     recommend: (has) => ({ spec: has("summon") ? "combat" : "assa", t: ["b", "b", has("summon") ? "b" : "a", "b", "a"] }),
     legend: {
-      name: "\u5361\u897F\u6069",
-      title: "\u5F71\u5203",
+      name: tx("\u5361\u897F\u6069"),
+      title: tx("\u5F71\u5203"),
       passive: "chain",
-      pname: "\u9023\u9396\u66B4\u64CA",
-      desc: "\u66B4\u64CA\u5F8C\u7684\u4E0B\u4E00\u6B21\u653B\u64CA\u5FC5\u5B9A\u66B4\u64CA\uFF0C\u6BCF 6 \u79D2\u6700\u591A\u4E00\u6B21",
+      pname: tx("\u9023\u9396\u66B4\u64CA"),
+      desc: tx("\u66B4\u64CA\u5F8C\u7684\u4E0B\u4E00\u6B21\u653B\u64CA\u5FC5\u5B9A\u66B4\u64CA\uFF0C\u6BCF 6 \u79D2\u6700\u591A\u4E00\u6B21"),
       hooks: {
         onCrit(b, u) {
           if ((u.chainReady || 0) <= b.tick) {
@@ -302,7 +898,7 @@
   // src/core/classes/mage.js
   var P4 = {
     id: "mage",
-    name: "\u5967\u8853\u6CD5\u5E2B",
+    name: tx("\u5967\u8853\u6CD5\u5E2B"),
     role: "dps",
     icon: "\u{1F525}",
     hp: 115,
@@ -311,40 +907,40 @@
     powL: 2.1,
     armor: 0.1,
     crit: 0.08,
-    desc: "\u7BC4\u570D\u50B7\u5BB3\uFF0C\u540C\u6642\u653B\u64CA\u6240\u6709\u6575\u4EBA\u3002\u64C5\u9577\u6E05\u5C0F\u602A\u3002",
+    desc: tx("\u7BC4\u570D\u50B7\u5BB3\uFF0C\u540C\u6642\u653B\u64CA\u6240\u6709\u6575\u4EBA\u3002\u64C5\u9577\u6E05\u5C0F\u602A\u3002"),
     prefers: ["summon"],
     ai: { aoe: 0.72, single: 1 },
-    base: { name: "\u70C8\u7130\u98A8\u66B4", cd: 9, mult: 2, desc: "\u51B7\u537B 9 \u79D2\uFF1A\u5168\u9AD4\u6575\u4EBA\u5A01\u529B \xD72" },
+    base: { name: tx("\u70C8\u7130\u98A8\u66B4"), cd: 9, mult: 2, desc: tx("\u51B7\u537B 9 \u79D2\uFF1A\u5168\u9AD4\u6575\u4EBA\u5A01\u529B \xD72") },
     specs: {
-      fire: { name: "\u706B\u7130", skill: "\u71C3\u71D2", counters: "enrage", desc: "\u51B7\u537B 30 \u79D2\uFF1A10 \u79D2\u5167\u66B4\u64CA\u7387 +40%", cd: 30, dur: 10, crit: 0.4 },
-      frost: { name: "\u51B0\u971C", skill: "\u51B0\u971C\u65B0\u661F", counters: "summon", desc: "\u51B7\u537B 18 \u79D2\uFF1A\u5168\u9AD4\u6575\u4EBA\u653B\u64CA \u221240% \u6301\u7E8C 4 \u79D2", cd: 18, dur: 4, weaken: 0.4 }
+      fire: { name: tx("\u706B\u7130"), skill: tx("\u71C3\u71D2"), counters: "enrage", desc: tx("\u51B7\u537B 30 \u79D2\uFF1A10 \u79D2\u5167\u66B4\u64CA\u7387 +40%"), cd: 30, dur: 10, crit: 0.4 },
+      frost: { name: tx("\u51B0\u971C"), skill: tx("\u51B0\u971C\u65B0\u661F"), counters: "summon", desc: tx("\u51B7\u537B 18 \u79D2\uFF1A\u5168\u9AD4\u6575\u4EBA\u653B\u64CA \u221240% \u6301\u7E8C 4 \u79D2"), cd: 18, dur: 4, weaken: 0.4 }
     },
     talents: [
       {
-        a: { name: "\u5967\u8853\u667A\u6167", desc: "\u5A01\u529B +8%", mods: { powMult: 1.08 } },
-        b: { name: "\u6CD5\u8853\u5F37\u5316", desc: "\u70C8\u7130\u98A8\u66B4\u50B7\u5BB3 +40%", mods: { baseMult: 1.4 } }
+        a: { name: tx("\u5967\u8853\u667A\u6167"), desc: tx("\u5A01\u529B +8%"), mods: { powMult: 1.08 } },
+        b: { name: tx("\u6CD5\u8853\u5F37\u5316"), desc: tx("\u70C8\u7130\u98A8\u66B4\u50B7\u5BB3 +40%"), mods: { baseMult: 1.4 } }
       },
       {
-        a: { name: "\u5BD2\u51B0\u5C4F\u969C", desc: "\u751F\u547D\u4F4E\u65BC 30% \u6642\u514D\u50B7 4 \u79D2\uFF0C\u6BCF\u5834\u4E00\u6B21", mods: { iceBlock: 4 } },
-        b: { name: "\u6CD5\u529B\u8B77\u76FE", desc: "\u53D7\u5230\u7684\u50B7\u5BB3 \u221215%", mods: { allReduce: 0.15 } }
+        a: { name: tx("\u5BD2\u51B0\u5C4F\u969C"), desc: tx("\u751F\u547D\u4F4E\u65BC 30% \u6642\u514D\u50B7 4 \u79D2\uFF0C\u6BCF\u5834\u4E00\u6B21"), mods: { iceBlock: 4 } },
+        b: { name: tx("\u6CD5\u529B\u8B77\u76FE"), desc: tx("\u53D7\u5230\u7684\u50B7\u5BB3 \u221215%"), mods: { allReduce: 0.15 } }
       },
       {
-        a: { name: "\u9023\u9396\u53CD\u61C9", desc: "\u7BC4\u570D\u653B\u64CA\u6BCF\u591A 1 \u500B\u76EE\u6A19\uFF0C\u50B7\u5BB3 +5%", mods: { chain: 0.05 } },
-        b: { name: "\u5C08\u6CE8", desc: "\u53EA\u5269 1 \u500B\u76EE\u6A19\u6642\u50B7\u5BB3 +25%", mods: { focus: 0.25 } }
+        a: { name: tx("\u9023\u9396\u53CD\u61C9"), desc: tx("\u7BC4\u570D\u653B\u64CA\u6BCF\u591A 1 \u500B\u76EE\u6A19\uFF0C\u50B7\u5BB3 +5%"), mods: { chain: 0.05 } },
+        b: { name: tx("\u5C08\u6CE8"), desc: tx("\u53EA\u5269 1 \u500B\u76EE\u6A19\u6642\u50B7\u5BB3 +25%"), mods: { focus: 0.25 } }
       },
       SPEC_ROW,
       {
-        a: { name: "\u708E\u7206\u8853", desc: "\u6BCF 10 \u79D2\u5C0D\u9996\u9818\u9020\u6210\u5A01\u529B \xD75", mods: { pyro: 5 } },
-        b: { name: "\u66B4\u98A8\u96EA", desc: "\u70C8\u7130\u98A8\u66B4\u51B7\u537B 9 \u2192 6 \u79D2", mods: { baseCd: 6 } }
+        a: { name: tx("\u708E\u7206\u8853"), desc: tx("\u6BCF 10 \u79D2\u5C0D\u9996\u9818\u9020\u6210\u5A01\u529B \xD75"), mods: { pyro: 5 } },
+        b: { name: tx("\u66B4\u98A8\u96EA"), desc: tx("\u70C8\u7130\u98A8\u66B4\u51B7\u537B 9 \u2192 6 \u79D2"), mods: { baseCd: 6 } }
       }
     ],
     recommend: (has) => ({ spec: has("summon") ? "frost" : "fire", t: ["a", "b", has("summon") ? "a" : "b", "b", "a"] }),
     legend: {
-      name: "\u8389\u8587\u4E9E",
-      title: "\u661F\u706B",
+      name: tx("\u8389\u8587\u4E9E"),
+      title: tx("\u661F\u706B"),
       passive: "molten",
-      pname: "\u7194\u71B1",
-      desc: "\u70C8\u7130\u98A8\u66B4\u51B7\u537B \u221250%\uFF0C\u64CA\u6BBA\u6575\u4EBA\u6642\u518D\u6E1B 1 \u79D2",
+      pname: tx("\u7194\u71B1"),
+      desc: tx("\u70C8\u7130\u98A8\u66B4\u51B7\u537B \u221250%\uFF0C\u64CA\u6BBA\u6575\u4EBA\u6642\u518D\u6E1B 1 \u79D2"),
       hooks: {
         cdMult: 0.5,
         onKill(b, u) {
@@ -371,7 +967,7 @@
       if (u.mods.pyro && b.tick % 10 === 0) {
         const t = boss || foes[0];
         b.hitEnemy(u, t, u.pow * u.mods.pyro, { skill: true });
-        b.skillLog(u, "\u708E\u7206\u8853", t);
+        b.skillLog(u, tx("\u708E\u7206\u8853"), t);
       }
       const n = foes.length, chain = 1 + (u.mods.chain || 0) * (n - 1), focusM = n === 1 ? 1 + (u.mods.focus || 0) : 1;
       if (ready(b, u, "base")) {
@@ -399,7 +995,7 @@
 
   // src/core/config.js
   var CLASSES = PACKS;
-  var ROLE_NAME = { tank: "\u5766\u514B", heal: "\u6CBB\u7642", dps: "\u8F38\u51FA" };
+  var ROLE_NAME = { tank: tx("\u5766\u514B"), heal: tx("\u6CBB\u7642"), dps: tx("\u8F38\u51FA") };
   var HERO = {
     maxLevel: 40,
     paragon: { need: 2e4, growth: 0.1, bonus: 0.01 },
@@ -408,53 +1004,53 @@
     xpExp: 1.8,
     // 升級所需經驗 = xpBase × 等級^xpExp
     names: [
-      "\u827E\u502B",
-      "\u51F1\u8389",
-      "\u96F7\u6069",
-      "\u7C73\u62C9",
-      "\u7D22\u6069",
-      "\u4F0A\u8587",
-      "\u5DF4\u9813",
-      "\u59AE\u96C5",
-      "\u6258\u723E",
-      "\u83F2\u6B50",
-      "\u9054\u514B",
-      "\u9732\u5A1C",
-      "\u845B\u96F7",
-      "\u5E0C\u62C9",
-      "\u5967\u5FB7",
-      "\u8587\u7D72",
-      "\u5E03\u862D",
-      "\u5361\u73CA",
-      "\u6D1B\u514B",
-      "\u827E\u7433",
-      "\u8CBB\u6069",
-      "\u8309\u5152",
-      "\u8CFD\u52D2",
-      "\u6735\u62C9"
+      tx("\u827E\u502B"),
+      tx("\u51F1\u8389"),
+      tx("\u96F7\u6069"),
+      tx("\u7C73\u62C9"),
+      tx("\u7D22\u6069"),
+      tx("\u4F0A\u8587"),
+      tx("\u5DF4\u9813"),
+      tx("\u59AE\u96C5"),
+      tx("\u6258\u723E"),
+      tx("\u83F2\u6B50"),
+      tx("\u9054\u514B"),
+      tx("\u9732\u5A1C"),
+      tx("\u845B\u96F7"),
+      tx("\u5E0C\u62C9"),
+      tx("\u5967\u5FB7"),
+      tx("\u8587\u7D72"),
+      tx("\u5E03\u862D"),
+      tx("\u5361\u73CA"),
+      tx("\u6D1B\u514B"),
+      tx("\u827E\u7433"),
+      tx("\u8CBB\u6069"),
+      tx("\u8309\u5152"),
+      tx("\u8CFD\u52D2"),
+      tx("\u6735\u62C9")
     ],
     starters: ["guardian", "cleric", "rogue"]
   };
   var RARITY = [
-    { name: "\u666E\u901A", mult: 1, color: "#9ca3af", weight: 0.55 },
-    { name: "\u7CBE\u826F", mult: 1.2, color: "#22c55e", weight: 0.3 },
-    { name: "\u7A00\u6709", mult: 1.45, color: "#3b82f6", weight: 0.12 },
-    { name: "\u53F2\u8A69", mult: 1.75, color: "#a855f7", weight: 0.03 },
-    { name: "\u50B3\u8AAA", mult: 2.1, color: "#f59e0b", weight: 0 }
+    { name: tx("\u666E\u901A"), mult: 1, color: "#9ca3af", weight: 0.55 },
+    { name: tx("\u7CBE\u826F"), mult: 1.2, color: "#22c55e", weight: 0.3 },
+    { name: tx("\u7A00\u6709"), mult: 1.45, color: "#3b82f6", weight: 0.12 },
+    { name: tx("\u53F2\u8A69"), mult: 1.75, color: "#a855f7", weight: 0.03 },
+    { name: tx("\u50B3\u8AAA"), mult: 2.1, color: "#f59e0b", weight: 0 }
     // 只從傳奇秘境 +7 起掉落
   ];
-  var SLOTS = { weapon: "\u6B66\u5668", armor: "\u8B77\u7532", trinket: "\u98FE\u54C1" };
+  var SLOTS = { weapon: tx("\u6B66\u5668"), armor: tx("\u8B77\u7532"), trinket: tx("\u98FE\u54C1") };
   var SLOT_STATS = {
     weapon: { pow: 0.6, sta: 1 },
     armor: { pow: 0.15, sta: 3 },
     trinket: { pow: 0.35, sta: 1 }
   };
   var SLOT_NAMES = {
-    weapon: ["\u9577\u528D", "\u6CD5\u6756", "\u5315\u9996", "\u6230\u9318", "\u6B0A\u6756", "\u77ED\u5F13"],
-    armor: ["\u9396\u7532", "\u6CD5\u888D", "\u76AE\u7532", "\u677F\u7532", "\u6597\u7BF7"],
-    trinket: ["\u8B77\u7B26", "\u6212\u6307", "\u5FBD\u8A18", "\u5BF6\u73E0", "\u9805\u934A"]
+    weapon: [tx("\u9577\u528D"), tx("\u6CD5\u6756"), tx("\u5315\u9996"), tx("\u6230\u9318"), tx("\u6B0A\u6756"), tx("\u77ED\u5F13")],
+    armor: [tx("\u9396\u7532"), tx("\u6CD5\u888D"), tx("\u76AE\u7532"), tx("\u677F\u7532"), tx("\u6597\u7BF7")],
+    trinket: [tx("\u8B77\u7B26"), tx("\u6212\u6307"), tx("\u5FBD\u8A18"), tx("\u5BF6\u73E0"), tx("\u9805\u934A")]
   };
-  var PREFIX = ["", "\u5805\u6BC5\u7684", "\u92B3\u5229\u7684", "\u707C\u71B1\u7684", "\u5BD2\u971C\u7684", "\u865B\u7A7A\u7684", "\u9060\u53E4\u7684", "\u9F8D\u9C57\u7684"];
+  var PREFIX = ["", tx("\u5805\u6BC5\u7684"), tx("\u92B3\u5229\u7684"), tx("\u707C\u71B1\u7684"), tx("\u5BD2\u971C\u7684"), tx("\u865B\u7A7A\u7684"), tx("\u9060\u53E4\u7684"), tx("\u9F8D\u9C57\u7684")];
   var GEAR = {
     maxUp: 10,
     upBonus: 0.08,
@@ -472,13 +1068,13 @@
     // 1 耐力 = 2 生命
   };
   var DUNGEONS = [
-    { name: "\u8150\u6839\u6D1E\u7A9F", boss: "\u8611\u83C7\u9818\u4E3B", trash: "\u5B62\u5B50\u83C7", mech: [{ t: "pulse", every: 7, dmg: 0.9 }], tip: "\u5B9A\u671F\u5674\u767C\u5B62\u5B50\u50B7\u5BB3\u5168\u968A \u2192 \u8003\u9A57\u6CBB\u7642" },
-    { name: "\u93FD\u8755\u7926\u5751", boss: "\u7926\u5751\u5DE8\u50CF", trash: "\u7926\u5751\u72D7\u982D\u4EBA", mech: [{ t: "buster", every: 8, mult: 3.2 }], tip: "\u91CD\u64CA\u5766\u514B \u2192 \u8003\u9A57\u5766\u514B\u8840\u91CF\u8207\u8B77\u7532" },
-    { name: "\u6C89\u6C92\u795E\u6BBF", boss: "\u6F6E\u6C50\u796D\u53F8", trash: "\u6DF1\u6DF5\u9B5A\u4EBA", mech: [{ t: "summon", every: 10, n: 2 }], tip: "\u4E0D\u65B7\u53EC\u559A\u5C0F\u602A \u2192 \u8003\u9A57\u7BC4\u570D\u8F38\u51FA" },
-    { name: "\u7070\u71FC\u8981\u585E", boss: "\u7194\u706B\u7763\u8ECD", trash: "\u7194\u5CA9\u885B\u5175", mech: [{ t: "enrage", at: 55, mult: 3 }], tip: "55 \u79D2\u5F8C\u72C2\u66B4 \u2192 \u8003\u9A57\u8F38\u51FA" },
-    { name: "\u971C\u8A9E\u5893\u7A74", boss: "\u5BD2\u971C\u5DEB\u5996", trash: "\u9AB7\u9ACF\u6230\u58EB", mech: [{ t: "pulse", every: 6, dmg: 1 }, { t: "summon", every: 12, n: 2 }], tip: "\u5BD2\u51B0\u8108\u885D\uFF0B\u53EC\u559A\u9AB7\u9ACF \u2192 \u6CBB\u7642\u8207\u7BC4\u570D" },
-    { name: "\u865B\u7A7A\u88C2\u9699", boss: "\u865B\u7A7A\u541E\u566C\u8005", trash: "\u865B\u7A7A\u884C\u8005", mech: [{ t: "buster", every: 7, mult: 3.5 }, { t: "enrage", at: 60, mult: 3 }], tip: "\u91CD\u64CA\uFF0B\u72C2\u66B4 \u2192 \u5766\u514B\u8207\u8F38\u51FA" },
-    { name: "\u9F8D\u7720\u9AD8\u5854", boss: "\u9060\u53E4\u7D05\u9F8D", trash: "\u9F8D\u4EBA\u885B\u58EB", mech: [{ t: "pulse", every: 7, dmg: 1 }, { t: "buster", every: 9, mult: 3.2 }, { t: "enrage", at: 70, mult: 3 }], tip: "\u5168\u6A5F\u5236 \u2192 \u5168\u968A\u7D9C\u5408\u8003\u9A57" }
+    { name: tx("\u8150\u6839\u6D1E\u7A9F"), boss: tx("\u8611\u83C7\u9818\u4E3B"), trash: tx("\u5B62\u5B50\u83C7"), mech: [{ t: "pulse", every: 7, dmg: 0.9 }], tip: tx("\u5B9A\u671F\u5674\u767C\u5B62\u5B50\u50B7\u5BB3\u5168\u968A \u2192 \u8003\u9A57\u6CBB\u7642") },
+    { name: tx("\u93FD\u8755\u7926\u5751"), boss: tx("\u7926\u5751\u5DE8\u50CF"), trash: tx("\u7926\u5751\u72D7\u982D\u4EBA"), mech: [{ t: "buster", every: 8, mult: 3.2 }], tip: tx("\u91CD\u64CA\u5766\u514B \u2192 \u8003\u9A57\u5766\u514B\u8840\u91CF\u8207\u8B77\u7532") },
+    { name: tx("\u6C89\u6C92\u795E\u6BBF"), boss: tx("\u6F6E\u6C50\u796D\u53F8"), trash: tx("\u6DF1\u6DF5\u9B5A\u4EBA"), mech: [{ t: "summon", every: 10, n: 2 }], tip: tx("\u4E0D\u65B7\u53EC\u559A\u5C0F\u602A \u2192 \u8003\u9A57\u7BC4\u570D\u8F38\u51FA") },
+    { name: tx("\u7070\u71FC\u8981\u585E"), boss: tx("\u7194\u706B\u7763\u8ECD"), trash: tx("\u7194\u5CA9\u885B\u5175"), mech: [{ t: "enrage", at: 55, mult: 3 }], tip: tx("55 \u79D2\u5F8C\u72C2\u66B4 \u2192 \u8003\u9A57\u8F38\u51FA") },
+    { name: tx("\u971C\u8A9E\u5893\u7A74"), boss: tx("\u5BD2\u971C\u5DEB\u5996"), trash: tx("\u9AB7\u9ACF\u6230\u58EB"), mech: [{ t: "pulse", every: 6, dmg: 1 }, { t: "summon", every: 12, n: 2 }], tip: tx("\u5BD2\u51B0\u8108\u885D\uFF0B\u53EC\u559A\u9AB7\u9ACF \u2192 \u6CBB\u7642\u8207\u7BC4\u570D") },
+    { name: tx("\u865B\u7A7A\u88C2\u9699"), boss: tx("\u865B\u7A7A\u541E\u566C\u8005"), trash: tx("\u865B\u7A7A\u884C\u8005"), mech: [{ t: "buster", every: 7, mult: 3.5 }, { t: "enrage", at: 60, mult: 3 }], tip: tx("\u91CD\u64CA\uFF0B\u72C2\u66B4 \u2192 \u5766\u514B\u8207\u8F38\u51FA") },
+    { name: tx("\u9F8D\u7720\u9AD8\u5854"), boss: tx("\u9060\u53E4\u7D05\u9F8D"), trash: tx("\u9F8D\u4EBA\u885B\u58EB"), mech: [{ t: "pulse", every: 7, dmg: 1 }, { t: "buster", every: 9, mult: 3.2 }, { t: "enrage", at: 70, mult: 3 }], tip: tx("\u5168\u6A5F\u5236 \u2192 \u5168\u968A\u7D9C\u5408\u8003\u9A57") }
   ];
   var DUNGEON = {
     hpGrowth: 2.15,
@@ -528,11 +1124,11 @@
     // 秘境掛機：打「限時最高 −2」，金幣經驗 7 折、每場 1 件，鑰石不變
   };
   var HERO_RARITY = [
-    { name: "\u666E\u901A", mult: 1, crit: 0, weight: 0.55, hire: 1 },
-    { name: "\u7CBE\u826F", mult: 1.08, crit: 0, weight: 0.28, hire: 1.5 },
-    { name: "\u7A00\u6709", mult: 1.16, crit: 0.02, weight: 0.12, hire: 2.5 },
-    { name: "\u53F2\u8A69", mult: 1.25, crit: 0.04, weight: 0.045, hire: 4, baseCdMult: 0.9 },
-    { name: "\u50B3\u8AAA", mult: 1.4, crit: 0.04, weight: 5e-3, hire: 8, baseCdMult: 0.9 }
+    { name: tx("\u666E\u901A"), mult: 1, crit: 0, weight: 0.55, hire: 1 },
+    { name: tx("\u7CBE\u826F"), mult: 1.08, crit: 0, weight: 0.28, hire: 1.5 },
+    { name: tx("\u7A00\u6709"), mult: 1.16, crit: 0.02, weight: 0.12, hire: 2.5 },
+    { name: tx("\u53F2\u8A69"), mult: 1.25, crit: 0.04, weight: 0.045, hire: 4, baseCdMult: 0.9 },
+    { name: tx("\u50B3\u8AAA"), mult: 1.4, crit: 0.04, weight: 5e-3, hire: 8, baseCdMult: 0.9 }
   ];
   var LEGENDS = Object.fromEntries(Object.entries(PACKS).map(([k, p]) => [k, p.legend]));
   var RECRUIT = {
@@ -567,15 +1163,15 @@
     // 經驗 = 該層一般一場 × 0.2
   };
   var BAG_MILESTONES = [
-    { id: "clear3", name: "\u9996\u6B21\u901A\u95DC\u7B2C 3 \u5C64", test: (s) => !!s.clears[2] },
-    { id: "clear5", name: "\u9996\u6B21\u901A\u95DC\u7B2C 5 \u5C64", test: (s) => !!s.clears[4] },
-    { id: "clear7", name: "\u9996\u6B21\u901A\u95DC\u7B2C 7 \u5C64", test: (s) => !!s.clears[6] },
-    { id: "mythic5", name: "\u79D8\u5883 +5 \u9650\u6642\u901A\u95DC", test: (s) => mythicBestLevel(s) >= 5 },
-    { id: "mythic10", name: "\u79D8\u5883 +10 \u9650\u6642\u901A\u95DC", test: (s) => mythicBestLevel(s) >= 10 },
-    { id: "mythic15", name: "\u79D8\u5883 +15 \u9650\u6642\u901A\u95DC", test: (s) => mythicBestLevel(s) >= 15 },
-    { id: "vault10", name: "\u5BF6\u5EAB\u7D2F\u8A08 10 \u6B21", test: (s) => (s.vault && s.vault.runs || 0) >= 10 },
-    { id: "vault30", name: "\u5BF6\u5EAB\u7D2F\u8A08 30 \u6B21", test: (s) => (s.vault && s.vault.runs || 0) >= 30 },
-    { id: "vault60", name: "\u5BF6\u5EAB\u7D2F\u8A08 60 \u6B21", test: (s) => (s.vault && s.vault.runs || 0) >= 60 }
+    { id: "clear3", name: tx("\u9996\u6B21\u901A\u95DC\u7B2C 3 \u5C64"), test: (s) => !!s.clears[2] },
+    { id: "clear5", name: tx("\u9996\u6B21\u901A\u95DC\u7B2C 5 \u5C64"), test: (s) => !!s.clears[4] },
+    { id: "clear7", name: tx("\u9996\u6B21\u901A\u95DC\u7B2C 7 \u5C64"), test: (s) => !!s.clears[6] },
+    { id: "mythic5", name: tx("\u79D8\u5883 +5 \u9650\u6642\u901A\u95DC"), test: (s) => mythicBestLevel(s) >= 5 },
+    { id: "mythic10", name: tx("\u79D8\u5883 +10 \u9650\u6642\u901A\u95DC"), test: (s) => mythicBestLevel(s) >= 10 },
+    { id: "mythic15", name: tx("\u79D8\u5883 +15 \u9650\u6642\u901A\u95DC"), test: (s) => mythicBestLevel(s) >= 15 },
+    { id: "vault10", name: tx("\u5BF6\u5EAB\u7D2F\u8A08 10 \u6B21"), test: (s) => (s.vault && s.vault.runs || 0) >= 10 },
+    { id: "vault30", name: tx("\u5BF6\u5EAB\u7D2F\u8A08 30 \u6B21"), test: (s) => (s.vault && s.vault.runs || 0) >= 30 },
+    { id: "vault60", name: tx("\u5BF6\u5EAB\u7D2F\u8A08 60 \u6B21"), test: (s) => (s.vault && s.vault.runs || 0) >= 60 }
   ];
   var BAG_PER_MILESTONE = 5;
   var mythicBestLevel = (s) => Math.max(0, ...Object.values(s.mythic && s.mythic.best || {}).map((b) => b.level));
@@ -586,7 +1182,7 @@
     leaderboardSec: 60
     // 排行榜重新讀取間隔
   };
-  var RAID_HORN = { name: "\u82F1\u52C7\u865F\u89D2", dur: 15, bonus: 0.3 };
+  var RAID_HORN = { name: tx("\u82F1\u52C7\u865F\u89D2"), dur: 15, bonus: 0.3 };
   var REWARD = {
     goldBase: 25,
     goldPerTier: 18,
@@ -802,25 +1398,25 @@
   var BOSS_MECHS = {
     enrage(b, e, m) {
       if (b.waveTick < m.at) return 1;
-      if (b.waveTick === m.at) b.push(`\u{1F525} ${e.name} \u72C2\u66B4\u4E86\uFF01\u50B7\u5BB3\u5927\u589E`, "warn");
+      if (b.waveTick === m.at) b.push(tx("\u{1F525} {0} \u72C2\u66B4\u4E86\uFF01\u50B7\u5BB3\u5927\u589E", e.name), "warn");
       return m.mult;
     },
     pulse(b, e, m) {
       if (b.waveTick % m.every) return 1;
-      b.push(`\u{1F4A5} ${e.name} \u65BD\u653E\u7BC4\u570D\u653B\u64CA`, "warn");
+      b.push(tx("\u{1F4A5} {0} \u65BD\u653E\u7BC4\u570D\u653B\u64CA", e.name), "warn");
       for (const u of b.alive()) b.hitHero(u, e.atk * m.dmg * b.weakMult(e), "magic");
       return 1;
     },
     buster(b, e, m, tgt) {
       if (b.waveTick % m.every) return 1;
-      b.push(`\u26A1 ${e.name} \u5C0D ${tgt.name} \u91CD\u64CA`, "warn");
+      b.push(tx("\u26A1 {0} \u5C0D {1} \u91CD\u64CA", e.name, tgt.name), "warn");
       b.isBuster = true;
       return m.mult;
     },
     summon(b, e, m) {
       if (b.waveTick % m.every) return 1;
-      for (let k = 0; k < m.n; k++) b.enemies.push({ name: "\u53EC\u559A\u7269", hp: e.addHp, max: e.addHp, atk: e.addAtk, boss: false, id: uid() });
-      b.push(`\u{1F300} ${e.name} \u53EC\u559A\u4E86 ${m.n} \u96BB\u5C0F\u602A`, "warn");
+      for (let k = 0; k < m.n; k++) b.enemies.push({ name: tx("\u53EC\u559A\u7269"), hp: e.addHp, max: e.addHp, atk: e.addAtk, boss: false, id: uid() });
+      b.push(tx("\u{1F300} {0} \u53EC\u559A\u4E86 {1} \u96BB\u5C0F\u602A", e.name, m.n), "warn");
       return 1;
     }
   };
@@ -905,7 +1501,7 @@
       if (this.log.length > 80) this.log.shift();
     }
     skillLog(u, name, t) {
-      this.push(`${u.icon} ${u.name}\uFF1A${name}${t && t.name !== u.name ? ` \u2192 ${t.name}` : ""}`, "skill");
+      this.push(tx("{0} {1}\uFF1A{2}{3}", u.icon, u.name, name, t && t.name !== u.name ? ` \u2192 ${t.name}` : ""), "skill");
     }
     // ---------- 團長指令 ----------
     hornActive() {
@@ -915,7 +1511,7 @@
       if (this.horn.used || this.over) return false;
       this.horn.used = true;
       this.horn.until = this.tick + RAID_HORN.dur;
-      this.push(`\u{1F4EF} \u82F1\u52C7\u865F\u89D2\uFF01\u5168\u968A\u50B7\u5BB3\u8207\u6CBB\u7642 +${Math.round(RAID_HORN.bonus * 100)}%\uFF0C\u6301\u7E8C ${RAID_HORN.dur} \u79D2`, "info");
+      this.push(tx("\u{1F4EF} \u82F1\u52C7\u865F\u89D2\uFF01\u5168\u968A\u50B7\u5BB3\u8207\u6CBB\u7642 +{0}%\uFF0C\u6301\u7E8C {1} \u79D2", Math.round(RAID_HORN.bonus * 100), RAID_HORN.dur), "info");
       return true;
     }
     healMult(u) {
@@ -952,7 +1548,7 @@
       if (e.hp === 0) {
         if (e.goblin) this.kills = (this.kills || 0) + 1;
         if (u.lh.onKill) u.lh.onKill(this, u, e);
-        this.push(`${e.name} \u88AB\u64CA\u6BBA`, e.boss ? "good" : "");
+        this.push(tx("{0} \u88AB\u64CA\u6BBA", e.name), e.boss ? "good" : "");
         if (!e.boss && this.has("bolstering")) {
           const rest = this.foes().filter((x) => !x.boss);
           for (const x of rest) {
@@ -960,7 +1556,7 @@
             x.hp = Math.round(x.hp * 1.15);
             x.atk *= 1.15;
           }
-          if (rest.length) this.push(`\u{1F33F} \u7E41\u76DB\uFF1A\u5176\u9918 ${rest.length} \u96BB\u5C0F\u602A\u8B8A\u5F37`, "warn");
+          if (rest.length) this.push(tx("\u{1F33F} \u7E41\u76DB\uFF1A\u5176\u9918 {0} \u96BB\u5C0F\u602A\u8B8A\u5F37", rest.length), "warn");
         }
       }
       return amt;
@@ -1002,7 +1598,7 @@
         this.skillLog(u, name);
       };
       if (u.hk.lifeSaver) u.hk.lifeSaver(this, u, save2);
-      if (u.mods.iceBlock) save2("ice", 0.3, u.mods.iceBlock, "\u5BD2\u51B0\u5C4F\u969C");
+      if (u.mods.iceBlock) save2("ice", 0.3, u.mods.iceBlock, tx("\u5BD2\u51B0\u5C4F\u969C"));
       if (u.lh.lifeSaver) u.lh.lifeSaver(this, u);
     }
     onDeath(u) {
@@ -1010,10 +1606,10 @@
       if (priest) {
         priest.used.redemption = true;
         u.hp = Math.round(u.max * priest.mods.redemption);
-        this.skillLog(priest, "\u6551\u8D16", u);
+        this.skillLog(priest, tx("\u6551\u8D16"), u);
         return;
       }
-      this.push(`\u{1F480} ${u.name}\uFF08${u.pack.name}\uFF09\u9663\u4EA1`, "bad");
+      this.push(tx("\u{1F480} {0}\uFF08{1}\uFF09\u9663\u4EA1", u.name, u.pack.name), "bad");
     }
     heal(src, tgt, amt, raw = false) {
       if (tgt.hp <= 0) return 0;
@@ -1062,40 +1658,40 @@
       }
       if (this.has("volcanic") && this.waveTick % 8 === 0 && this.alive().length) {
         const u = pick(this.alive());
-        this.push(`\u{1F30B} \u706B\u5C71\u7206\u767C\uFF0C${u.name} \u53D7\u5230\u50B7\u5BB3`, "warn");
+        this.push(tx("\u{1F30B} \u706B\u5C71\u7206\u767C\uFF0C{0} \u53D7\u5230\u50B7\u5BB3", u.name), "warn");
         this.hitHero(u, this.mythic.volcanic, "magic");
       }
-      if (this.mythic && this.tick === this.mythic.timer && !this.over) this.push("\u23F0 \u8D85\u904E\u9650\u6642\uFF01\u4ECD\u53EF\u6253\u5B8C\uFF0C\u4F46\u9470\u77F3\u6703\u964D\u7D1A", "bad");
+      if (this.mythic && this.tick === this.mythic.timer && !this.over) this.push(tx("\u23F0 \u8D85\u904E\u9650\u6642\uFF01\u4ECD\u53EF\u6253\u5B8C\uFF0C\u4F46\u9470\u77F3\u6703\u964D\u7D1A"), "bad");
       this.checkEnd();
     }
     checkEnd() {
       if (!this.alive().length) {
         this.over = true;
         this.win = false;
-        this.push("\u2620\uFE0F \u5718\u6EC5\u2026", "bad");
+        this.push(tx("\u2620\uFE0F \u5718\u6EC5\u2026"), "bad");
         return;
       }
       if (!this.foes().length) {
         if (this.waveIdx < this.waves.length - 1) {
           this.waveIdx++;
           for (const u of this.alive()) u.hp = Math.min(u.max, u.hp + Math.round(u.max * DUNGEON.waveHeal));
-          this.push(this.waveIdx === this.waves.length - 1 ? `\u{1F451} \u9996\u9818 ${this.waves[this.waveIdx][0].name} \u73FE\u8EAB\uFF01` : `\u7B2C ${this.waveIdx + 1} \u6CE2\u6575\u4EBA\u4F86\u8972`, "info");
+          this.push(this.waveIdx === this.waves.length - 1 ? tx("\u{1F451} \u9996\u9818 {0} \u73FE\u8EAB\uFF01", this.waves[this.waveIdx][0].name) : tx("\u7B2C {0} \u6CE2\u6575\u4EBA\u4F86\u8972", this.waveIdx + 1), "info");
           this.loadWave();
         } else {
           this.over = true;
           this.win = true;
-          this.push("\u{1F3C6} \u526F\u672C\u901A\u95DC\uFF01", "good");
+          this.push(tx("\u{1F3C6} \u526F\u672C\u901A\u95DC\uFF01"), "good");
         }
       }
       if (this.tick >= this.maxTicks && !this.over) {
         if (this.vault) {
           this.over = true;
           this.win = true;
-          this.push(`\u23F0 \u6642\u9593\u5230\uFF01\u5171\u6253\u5012 ${this.kills || 0} \u96BB\u5BF6\u85CF\u54E5\u5E03\u6797`, "good");
+          this.push(tx("\u23F0 \u6642\u9593\u5230\uFF01\u5171\u6253\u5012 {0} \u96BB\u5BF6\u85CF\u54E5\u5E03\u6797", this.kills || 0), "good");
         } else {
           this.over = true;
           this.win = false;
-          this.push("\u231B \u6642\u9593\u8017\u76E1\uFF0C\u64A4\u9000", "bad");
+          this.push(tx("\u231B \u6642\u9593\u8017\u76E1\uFF0C\u64A4\u9000"), "bad");
         }
       }
     }
@@ -1107,12 +1703,12 @@
 
   // src/core/mythic.js
   var AFFIXES = {
-    fortified: { name: "\u5F37\u97CC", desc: "\u5C0F\u602A\u751F\u547D +30%\u3001\u653B\u64CA +20%", test: "\u7BC4\u570D\u8F38\u51FA", hint: "summon" },
-    tyrannical: { name: "\u66B4\u541B", desc: "\u9996\u9818\u751F\u547D +30%\u3001\u653B\u64CA +15%", test: "\u55AE\u9AD4\u8F38\u51FA", hint: "enrage" },
-    raging: { name: "\u66B4\u6012", desc: "\u5C0F\u602A\u751F\u547D\u4F4E\u65BC 30% \u6642\u50B7\u5BB3 +50%", test: "\u5FEB\u901F\u6536\u5C3E", hint: "enrage" },
-    bolstering: { name: "\u7E41\u76DB", desc: "\u5C0F\u602A\u6B7B\u4EA1\u6642\uFF0C\u5176\u4ED6\u5C0F\u602A\u751F\u547D\u8207\u653B\u64CA +15%", test: "\u5E73\u5747\u6253\u8840", hint: "summon" },
-    volcanic: { name: "\u706B\u5C71", desc: "\u6BCF 8 \u79D2\u96A8\u6A5F\u4E00\u540D\u968A\u54E1\u53D7\u5230\u9B54\u6CD5\u50B7\u5BB3", test: "\u6CBB\u7642", hint: "pulse" },
-    necrotic: { name: "\u58DE\u75BD", desc: "\u5766\u514B\u6BCF\u88AB\u653B\u64CA\u4E00\u6B21\uFF0C\u53D7\u5230\u7684\u6CBB\u7642 \u22122%\uFF0C\u6BCF\u6CE2\u91CD\u7F6E", test: "\u5766\u514B", hint: "buster" }
+    fortified: { name: tx("\u5F37\u97CC"), desc: tx("\u5C0F\u602A\u751F\u547D +30%\u3001\u653B\u64CA +20%"), test: tx("\u7BC4\u570D\u8F38\u51FA"), hint: "summon" },
+    tyrannical: { name: tx("\u66B4\u541B"), desc: tx("\u9996\u9818\u751F\u547D +30%\u3001\u653B\u64CA +15%"), test: tx("\u55AE\u9AD4\u8F38\u51FA"), hint: "enrage" },
+    raging: { name: tx("\u66B4\u6012"), desc: tx("\u5C0F\u602A\u751F\u547D\u4F4E\u65BC 30% \u6642\u50B7\u5BB3 +50%"), test: tx("\u5FEB\u901F\u6536\u5C3E"), hint: "enrage" },
+    bolstering: { name: tx("\u7E41\u76DB"), desc: tx("\u5C0F\u602A\u6B7B\u4EA1\u6642\uFF0C\u5176\u4ED6\u5C0F\u602A\u751F\u547D\u8207\u653B\u64CA +15%"), test: tx("\u5E73\u5747\u6253\u8840"), hint: "summon" },
+    volcanic: { name: tx("\u706B\u5C71"), desc: tx("\u6BCF 8 \u79D2\u96A8\u6A5F\u4E00\u540D\u968A\u54E1\u53D7\u5230\u9B54\u6CD5\u50B7\u5BB3"), test: tx("\u6CBB\u7642"), hint: "pulse" },
+    necrotic: { name: tx("\u58DE\u75BD"), desc: tx("\u5766\u514B\u6BCF\u88AB\u653B\u64CA\u4E00\u6B21\uFF0C\u53D7\u5230\u7684\u6CBB\u7642 \u22122%\uFF0C\u6BCF\u6CE2\u91CD\u7F6E"), test: tx("\u5766\u514B"), hint: "buster" }
   };
   var BASE_AFFIX = ["fortified", "tyrannical"];
   var EXTRA_AFFIX = ["raging", "bolstering", "volcanic", "necrotic"];
@@ -1681,7 +2277,7 @@
   function vaultBattleOpts(floor) {
     const base = buildWaves(floor)[0][0];
     const waves = Array.from({ length: 40 }, (_, k) => Array.from({ length: 3 }, () => ({
-      name: "\u5BF6\u85CF\u54E5\u5E03\u6797",
+      name: tx("\u5BF6\u85CF\u54E5\u5E03\u6797"),
       boss: false,
       goblin: true,
       hp: Math.round(base.hp * VAULT.strength * (1 + VAULT.waveGrowth * k)),
@@ -1705,26 +2301,26 @@
   }
 
   // src/core/advice.js
-  var ROLE_NAME2 = { tank: "\u5766\u514B", heal: "\u6CBB\u7642", dps: "\u8F38\u51FA" };
+  var ROLE_NAME2 = { tank: tx("\u5766\u514B"), heal: tx("\u6CBB\u7642"), dps: tx("\u8F38\u51FA") };
   function nextStep(s) {
     const party = partyHeroes(s), top = s.unlocked - 1;
-    if (!s.stats.runs) return { text: "\u958B\u59CB\u7B2C\u4E00\u5834\u6230\u9B25", sub: "\u6309\u4E0B\u300C\u8150\u6839\u6D1E\u7A9F\u300D\u7684\u6311\u6230\uFF0C\u968A\u4F0D\u6703\u81EA\u5DF1\u6253\u3002", btn: { label: "\u6311\u6230", act: "fight", d: 0 } };
-    if (hasUpgrade(s)) return { text: "\u80CC\u5305\u6709\u66F4\u597D\u7684\u88DD\u5099", sub: "\u4E00\u9375\u66FF\u51FA\u6230\u968A\u54E1\u63DB\u4E0A\u5206\u6578\u66F4\u9AD8\u7684\u88DD\u5099\u3002", btn: { label: "\u4E00\u9375\u914D\u88DD", act: "autoequip" } };
+    if (!s.stats.runs) return { text: tx("\u958B\u59CB\u7B2C\u4E00\u5834\u6230\u9B25"), sub: tx("\u6309\u4E0B\u300C\u8150\u6839\u6D1E\u7A9F\u300D\u7684\u6311\u6230\uFF0C\u968A\u4F0D\u6703\u81EA\u5DF1\u6253\u3002"), btn: { label: tx("\u6311\u6230"), act: "fight", d: 0 } };
+    if (hasUpgrade(s)) return { text: tx("\u80CC\u5305\u6709\u66F4\u597D\u7684\u88DD\u5099"), sub: tx("\u4E00\u9375\u66FF\u51FA\u6230\u968A\u54E1\u63DB\u4E0A\u5206\u6578\u66F4\u9AD8\u7684\u88DD\u5099\u3002"), btn: { label: tx("\u4E00\u9375\u914D\u88DD"), act: "autoequip" } };
     if (s.idle == null && party.length < ECONOMY.partyMax && s.heroes.length < ECONOMY.rosterMax && s.tavern.some((h) => s.gold >= hireCost(h))) {
       const have = new Set(party.map(roleOf));
       const need = ["tank", "heal"].find((r) => !have.has(r)) || "dps";
-      return { text: `\u968A\u4F0D\u9084\u6709 ${ECONOMY.partyMax - party.length} \u500B\u7A7A\u4F4D`, sub: `\u53BB\u9152\u9928\u62DB\u52DF\uFF0C\u5EFA\u8B70\u88DC${ROLE_NAME2[need]}\u3002`, btn: { label: "\u524D\u5F80\u9152\u9928", tab: "tavern" } };
+      return { text: tx("\u968A\u4F0D\u9084\u6709 {0} \u500B\u7A7A\u4F4D", ECONOMY.partyMax - party.length), sub: tx("\u53BB\u9152\u9928\u62DB\u52DF\uFF0C\u5EFA\u8B70\u88DC{0}\u3002", ROLE_NAME2[need]), btn: { label: tx("\u524D\u5F80\u9152\u9928"), tab: "tavern" } };
     }
-    if (party.some((h) => pendingPicks(h))) return { text: "\u6709\u5929\u8CE6\u9084\u6C92\u9078", sub: s.idle != null ? `\u639B\u6A5F\u4E2D\u9663\u5BB9\u4E0D\u8B8A\uFF0C\u4E00\u9375\u4F9D\u300C${DUNGEONS[top].name}\u300D\u914D\u597D\u5929\u8CE6\u8207\u88DD\u5099\u3002` : `\u4E00\u9375\u4F9D\u300C${DUNGEONS[top].name}\u300D\u914D\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\u3002`, btn: { label: "\u4E00\u9375\u5099\u6230", act: "prepare", d: top } };
-    if ((s.failStreak || 0) >= 2 && top > 0) return { text: `\u300C${DUNGEONS[top].name}\u300D\u9023\u8F38 ${s.failStreak} \u5834`, sub: "\u56DE\u524D\u4E00\u5C64\u639B\u6A5F\u5237\u88DD\u5099\u8207\u7B49\u7D1A\uFF0C\u6216\u8ABF\u6574\u9663\u5BB9\u3002", btn: { label: `\u639B\u6A5F\u5237\u300C${DUNGEONS[top - 1].name}\u300D`, act: "idle", d: top - 1 } };
-    if (s.stash && s.stash.length) return { text: `\u6230\u5229\u54C1\u7BB1\u6709 ${s.stash.length} \u4EF6\u88DD\u5099`, sub: "\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\u6389\u7684\u88DD\u5099\u653E\u5728\u9019\u88E1\uFF0C\u8A18\u5F97\u53D6\u51FA\u3002", btn: { label: "\u524D\u5F80\u80CC\u5305", tab: "bag" } };
-    if (vaultUnlocked(s) && vaultLeft(s) && s.stats.runs >= 5) return { text: `\u4ECA\u5929\u5BF6\u5EAB\u9084\u6709 ${vaultLeft(s)} \u6B21`, sub: "60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\uFF0C\u5927\u91CF\u91D1\u5E63\u53EF\u4EE5\u62FF\u53BB\u62DB\u52DF\u82F1\u96C4\u3002", btn: { label: "\u9032\u5165\u5BF6\u5EAB", act: "vault", d: Math.max(...Object.keys(s.clears).filter((k) => s.clears[k]).map(Number)) } };
-    if (mythicUnlocked(s) && !s.mythic.runs) return { text: "\u50B3\u5947\u79D8\u5883\u5DF2\u89E3\u9396", sub: "\u5C31\u5728\u4E0B\u65B9\uFF1A\u5C64\u6578\u7121\u4E0A\u9650\uFF0C\u6BCF\u5929\u8A5E\u7DB4\u4E0D\u540C\u3002", btn: null };
+    if (party.some((h) => pendingPicks(h))) return { text: tx("\u6709\u5929\u8CE6\u9084\u6C92\u9078"), sub: s.idle != null ? tx("\u639B\u6A5F\u4E2D\u9663\u5BB9\u4E0D\u8B8A\uFF0C\u4E00\u9375\u4F9D\u300C{0}\u300D\u914D\u597D\u5929\u8CE6\u8207\u88DD\u5099\u3002", DUNGEONS[top].name) : tx("\u4E00\u9375\u4F9D\u300C{0}\u300D\u914D\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\u3002", DUNGEONS[top].name), btn: { label: tx("\u4E00\u9375\u5099\u6230"), act: "prepare", d: top } };
+    if ((s.failStreak || 0) >= 2 && top > 0) return { text: tx("\u300C{0}\u300D\u9023\u8F38 {1} \u5834", DUNGEONS[top].name, s.failStreak), sub: tx("\u56DE\u524D\u4E00\u5C64\u639B\u6A5F\u5237\u88DD\u5099\u8207\u7B49\u7D1A\uFF0C\u6216\u8ABF\u6574\u9663\u5BB9\u3002"), btn: { label: tx("\u639B\u6A5F\u5237\u300C{0}\u300D", DUNGEONS[top - 1].name), act: "idle", d: top - 1 } };
+    if (s.stash && s.stash.length) return { text: tx("\u6230\u5229\u54C1\u7BB1\u6709 {0} \u4EF6\u88DD\u5099", s.stash.length), sub: tx("\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\u6389\u7684\u88DD\u5099\u653E\u5728\u9019\u88E1\uFF0C\u8A18\u5F97\u53D6\u51FA\u3002"), btn: { label: tx("\u524D\u5F80\u80CC\u5305"), tab: "bag" } };
+    if (vaultUnlocked(s) && vaultLeft(s) && s.stats.runs >= 5) return { text: tx("\u4ECA\u5929\u5BF6\u5EAB\u9084\u6709 {0} \u6B21", vaultLeft(s)), sub: tx("60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\uFF0C\u5927\u91CF\u91D1\u5E63\u53EF\u4EE5\u62FF\u53BB\u62DB\u52DF\u82F1\u96C4\u3002"), btn: { label: tx("\u9032\u5165\u5BF6\u5EAB"), act: "vault", d: Math.max(...Object.keys(s.clears).filter((k) => s.clears[k]).map(Number)) } };
+    if (mythicUnlocked(s) && !s.mythic.runs) return { text: tx("\u50B3\u5947\u79D8\u5883\u5DF2\u89E3\u9396"), sub: tx("\u5C31\u5728\u4E0B\u65B9\uFF1A\u5C64\u6578\u7121\u4E0A\u9650\uFF0C\u6BCF\u5929\u8A5E\u7DB4\u4E0D\u540C\u3002"), btn: null };
     return null;
   }
 
   // src/ui/state.js
-  var KEY = "raid-leader-save-v1";
+  var KEY2 = "raid-leader-save-v1";
   var TICK_MS = 1e3;
   var app = {
     S: null,
@@ -1749,16 +2345,17 @@
   // src/ui/save.js
   function load() {
     try {
-      const raw = localStorage.getItem(KEY);
+      const raw = localStorage.getItem(KEY2);
       if (raw) return JSON.parse(raw);
     } catch (e) {
     }
     return null;
   }
   function save() {
+    if (app.fresh) return;
     app.S.lastSeen = Date.now();
     try {
-      localStorage.setItem(KEY, JSON.stringify(app.S));
+      localStorage.setItem(KEY2, JSON.stringify(app.S));
     } catch (e) {
     }
   }
@@ -1767,7 +2364,7 @@
   }
   function importCode(code) {
     const s = JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
-    if (!s || !Array.isArray(s.heroes) || !s.items) throw new Error("\u683C\u5F0F\u4E0D\u7B26");
+    if (!s || !Array.isArray(s.heroes) || !s.items) throw new Error(tx("\u683C\u5F0F\u4E0D\u7B26"));
     return s;
   }
 
@@ -1789,8 +2386,8 @@
   var cls = (h) => CLASSES[h.cls];
   var inParty = (h) => app.S.party.includes(h.id);
   function itemStatText(it) {
-    const p = [`\u5A01\u529B ${itemPow(it)}`, `\u8010\u529B ${itemSta(it)}`];
-    if (it.crit) p.push(`\u66B4\u64CA +${Math.round(it.crit * 100)}%`);
+    const p = [tx("\u5A01\u529B {0}", itemPow(it)), tx("\u8010\u529B {0}", itemSta(it))];
+    if (it.crit) p.push(tx("\u66B4\u64CA +{0}%", Math.round(it.crit * 100)));
     return p.join(" \xB7 ");
   }
   function itemName(it) {
@@ -1809,7 +2406,7 @@
   }
 
   // src/core/version.js
-  var VERSION = "0.8.0";
+  var VERSION = "0.8.1";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -1822,7 +2419,7 @@
       method: "POST",
       keepalive,
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ pid: p.pid, name: p.name || "\u533F\u540D", ver: VERSION, ...body })
+      body: JSON.stringify({ pid: p.pid, name: p.name || tx("\u533F\u540D"), ver: VERSION, ...body })
     }).then((r) => r.json()).catch(() => null);
   }
   function progress() {
@@ -1839,7 +2436,7 @@
   }
   var progressText = () => {
     const p = progress();
-    return `Lv${p.level}\u30FB\u7B2C ${p.top} \u5C64${p.best ? `\u30FB\u79D8\u5883 +${p.best}` : ""}`;
+    return tx("Lv{0}\u30FB\u7B2C {1} \u5C64{2}", p.level, p.top, p.best ? tx("\u30FB\u79D8\u5883 +{0}", p.best) : "");
   };
   var sendSnapshot = (keepalive) => post({ type: "snapshot", ...progress() }, keepalive);
   var sendEvent = (kind, detail) => post({ type: "event", kind, detail });
@@ -1879,33 +2476,24 @@
     if (!n) return "";
     const b = n.btn;
     const btn = !b ? "" : b.tab ? `<button class="btn main" data-tab="${b.tab}">${b.label}</button>` : `<button class="btn main" data-act="${b.act}" ${b.d != null ? `data-d="${b.d}"` : ""}>${b.label}</button>`;
-    return `<div class="nextstep"><div><span class="label">\u4E0B\u4E00\u6B65</span><b>${n.text}</b><span class="sub" style="margin:0">${n.sub}</span></div>${btn}</div>`;
+    return tx('<div class="nextstep"><div><span class="label">\u4E0B\u4E00\u6B65</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>{2}</div>', n.text, n.sub, btn);
   }
   function vaultSection() {
     const S = app.S;
-    if (!vaultUnlocked(S)) return `<div class="vault locked"><b>\u5BF6\u5EAB</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 3 \u5C64\u300C\u6C89\u6C92\u795E\u6BBF\u300D\u5F8C\u958B\u653E\uFF1A\u6BCF\u5929 3 \u6B21\uFF0C\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\u8CFA\u5927\u91CF\u91D1\u5E63\u3002</span></div>`;
+    if (!vaultUnlocked(S)) return tx('<div class="vault locked"><b>\u5BF6\u5EAB</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 3 \u5C64\u300C\u6C89\u6C92\u795E\u6BBF\u300D\u5F8C\u958B\u653E\uFF1A\u6BCF\u5929 3 \u6B21\uFF0C\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\u8CFA\u5927\u91CF\u91D1\u5E63\u3002</span></div>');
     const floors = vaultFloors(S), left = vaultLeft(S);
     const f = floors.includes(app.vaultFloor) ? app.vaultFloor : floors[floors.length - 1];
     const best = S.vault.best[f] || 0;
-    return `<div class="vault"><div class="mhead"><div><span class="label">\u5BF6\u5EAB</span><b>60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797</b></div><span class="vleft num">\u4ECA\u5929\u5269 ${left}/${VAULT.daily}</span></div>
-    <div class="seg vfloors">${floors.map((i) => `<button data-act="vaultfloor" data-d="${i}" class="${i === f ? "sel" : ""}">${i + 1}</button>`).join("")}</div>
-    <p class="sub" style="margin:0">\u7B2C ${f + 1} \u5C64\uFF1A\u6BCF\u96BB <b class="num">${fmt(vaultGoldPerKill(f))}</b> \u91D1\uFF0C\u6700\u591A\u7B97 ${vaultMaxKills(f)} \u96BB\u30FB\u6700\u4F73 ${best} \u96BB\u3002\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002</p>
-    <div class="row"><button class="btn main grow" data-act="vault" data-d="${f}" ${left ? "" : "disabled"}>${left ? "\u9032\u5165\u5BF6\u5EAB" : "\u660E\u5929 00:00 \u518D\u4F86"}</button><button class="btn" data-act="prepare-vault">\u5099\u6230</button></div></div>`;
+    return tx('<div class="vault"><div class="mhead"><div><span class="label">\u5BF6\u5EAB</span><b>60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797</b></div><span class="vleft num">\u4ECA\u5929\u5269 {0}/{1}</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">\u7B2C {3} \u5C64\uFF1A\u6BCF\u96BB <b class="num">{4}</b> \u91D1\uFF0C\u6700\u591A\u7B97 {5} \u96BB\u30FB\u6700\u4F73 {6} \u96BB\u3002\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">\u5099\u6230</button></div></div>', left, VAULT.daily, floors.map((i) => `<button data-act="vaultfloor" data-d="${i}" class="${i === f ? "sel" : ""}">${i + 1}</button>`).join(""), f + 1, fmt(vaultGoldPerKill(f)), vaultMaxKills(f), best, f, left ? "" : "disabled", left ? tx("\u9032\u5165\u5BF6\u5EAB") : tx("\u660E\u5929 00:00 \u518D\u4F86"));
   }
   function mythicSection() {
     const S = app.S;
-    if (!mythicUnlocked(S)) return `<div class="mythic locked"><b>\u50B3\u5947\u79D8\u5883</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 7 \u5C64\u300C\u9F8D\u7720\u9AD8\u5854\u300D\u5F8C\u89E3\u9396\uFF1A\u7121\u9650\u5C64\u6578\u3001\u9650\u6642\u6311\u6230\u3001\u6BCF\u65E5\u8A5E\u7DB4\u3002</span></div>`;
+    if (!mythicUnlocked(S)) return tx('<div class="mythic locked"><b>\u50B3\u5947\u79D8\u5883</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 7 \u5C64\u300C\u9F8D\u7720\u9AD8\u5854\u300D\u5F8C\u89E3\u9396\uFF1A\u7121\u9650\u5C64\u6578\u3001\u9650\u6642\u6311\u6230\u3001\u6BCF\u65E5\u8A5E\u7DB4\u3002</span></div>');
     const key = S.mythic.key, today = dailyAffixes(), active = activeAffixes(key);
-    let h = `<div class="mythic"><div class="mhead"><div><span class="label">\u50B3\u5947\u79D8\u5883</span><b>\u76EE\u524D\u9470\u77F3</b></div><span class="keystone num">+${key}</span></div>
-    <div class="affixes">${today.map((a, i) => `<div class="affix ${active.includes(a) ? "on" : ""}"><b>${AFFIXES[a].name}</b><span>${AFFIXES[a].desc}</span><small>${active.includes(a) ? `\u8003\u9A57${AFFIXES[a].test}` : `+${MYTHIC.affixAt[i]} \u8D77\u751F\u6548`}</small></div>`).join("")}</div>
-    <p class="sub" style="margin:0">\u4ECA\u65E5\u8A5E\u7DB4\uFF0C\u6BCF\u5929 00:00 \u66F4\u63DB\u3002\u9650\u6642\u5167\u901A\u95DC\uFF0C\u9470\u77F3 +1\uFF0C\u6253\u5F97\u5920\u5FEB +2\uFF1B\u8D85\u6642\u6216\u5931\u6557\uFF0C\u9470\u77F3 \u22121\u3002<b>\u79D8\u5883\u639B\u6A5F</b>\uFF1A\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u639B\u6A5F\uFF0C\u56FA\u5B9A\u6253\u8A72\u526F\u672C\u6700\u4F73 \u2212${MYTHIC.idleBelow}\uFF0C\u9470\u77F3\u4E0D\u8B8A\u3001\u734E\u52F5 ${Math.round(MYTHIC.idleMult * 100)}%\uFF0C\u96E2\u7DDA\u4E5F\u6703\u7D2F\u7A4D\u3002</p>
-    <div class="mlist">`;
+    let h = tx('<div class="mythic"><div class="mhead"><div><span class="label">\u50B3\u5947\u79D8\u5883</span><b>\u76EE\u524D\u9470\u77F3</b></div><span class="keystone num">+{0}</span></div> <div class="affixes">{1}</div> <p class="sub" style="margin:0">\u4ECA\u65E5\u8A5E\u7DB4\uFF0C\u6BCF\u5929 00:00 \u66F4\u63DB\u3002\u9650\u6642\u5167\u901A\u95DC\uFF0C\u9470\u77F3 +1\uFF0C\u6253\u5F97\u5920\u5FEB +2\uFF1B\u8D85\u6642\u6216\u5931\u6557\uFF0C\u9470\u77F3 \u22121\u3002<b>\u79D8\u5883\u639B\u6A5F</b>\uFF1A\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u639B\u6A5F\uFF0C\u56FA\u5B9A\u6253\u8A72\u526F\u672C\u6700\u4F73 \u2212{2}\uFF0C\u9470\u77F3\u4E0D\u8B8A\u3001\u734E\u52F5 {3}%\uFF0C\u96E2\u7DDA\u4E5F\u6703\u7D2F\u7A4D\u3002</p> <div class="mlist">', key, today.map((a, i) => `<div class="affix ${active.includes(a) ? "on" : ""}"><b>${AFFIXES[a].name}</b><span>${AFFIXES[a].desc}</span><small>${active.includes(a) ? tx("\u8003\u9A57{0}", AFFIXES[a].test) : tx("+{0} \u8D77\u751F\u6548", MYTHIC.affixAt[i])}</small></div>`).join(""), MYTHIC.idleBelow, Math.round(MYTHIC.idleMult * 100));
     DUNGEONS.forEach((d, i) => {
       const best = S.mythic.best[i];
-      h += `<div class="mrow2"><div class="mname"><b>${d.name}</b><span class="sub num" style="margin:0">\u9650\u6642 ${mmss(mythicTimer(i))}\u30FB${best ? `\u6700\u4F73 +${best.level}\uFF08${mmss(best.time)}\uFF09` : "\u9084\u6C92\u9650\u6642\u901A\u95DC"}</span></div>
-      ${mythicIdleLevel(S, i) ? `<button class="btn sm ${S.idleMythic === i ? "on" : ""}" data-act="idlemythic" data-d="${i}">${S.idleMythic === i ? "\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62" : `\u639B\u6A5F +${mythicIdleLevel(S, i)}`}</button>` : ""}
-      <button class="btn sm" data-act="recommend-mythic" data-d="${i}" aria-label="\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099">\u5099\u6230</button>
-      <button class="btn sm main" data-act="mythic" data-d="${i}">\u6311\u6230 +${key}</button></div>`;
+      h += tx('<div class="mrow2"><div class="mname"><b>{0}</b><span class="sub num" style="margin:0">\u9650\u6642 {1}\u30FB{2}</span></div> {3} <button class="btn sm" data-act="recommend-mythic" data-d="{4}" aria-label="\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099">\u5099\u6230</button> <button class="btn sm main" data-act="mythic" data-d="{5}">\u6311\u6230 +{6}</button></div>', d.name, mmss(mythicTimer(i)), best ? tx("\u6700\u4F73 +{0}\uFF08{1}\uFF09", best.level, mmss(best.time)) : tx("\u9084\u6C92\u9650\u6642\u901A\u95DC"), mythicIdleLevel(S, i) ? `<button class="btn sm ${S.idleMythic === i ? "on" : ""}" data-act="idlemythic" data-d="${i}">${S.idleMythic === i ? tx("\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62") : tx("\u639B\u6A5F +{0}", mythicIdleLevel(S, i))}</button>` : "", i, i, key);
     });
     return h + `</div></div>`;
   }
@@ -1914,36 +2502,22 @@
     if (!lb2) return "";
     const me = app.S.player.name;
     let body;
-    if (!lb2.data) body = `<p class="sub" style="margin:0">${lb2.error ? "\u5929\u68AF\u66AB\u6642\u8B80\u4E0D\u5230\uFF0C\u7A0D\u5F8C\u518D\u8A66\u3002" : "\u8B80\u53D6\u4E2D\u2026"}</p>`;
-    else if (!lb2.data.length) body = `<p class="sub" style="margin:0">\u9084\u6C92\u6709\u4EBA\u4E0A\u699C\uFF0C\u6436\u7B2C\u4E00\u5427\u3002</p>`;
+    if (!lb2.data) body = `<p class="sub" style="margin:0">${lb2.error ? tx("\u5929\u68AF\u66AB\u6642\u8B80\u4E0D\u5230\uFF0C\u7A0D\u5F8C\u518D\u8A66\u3002") : tx("\u8B80\u53D6\u4E2D\u2026")}</p>`;
+    else if (!lb2.data.length) body = tx('<p class="sub" style="margin:0">\u9084\u6C92\u6709\u4EBA\u4E0A\u699C\uFF0C\u6436\u7B2C\u4E00\u5427\u3002</p>');
     else body = `<ol class="board">${lb2.data.map((p, i) => `<li class="${me && p.name === me ? "me" : ""}"><span class="rk num">${i + 1}</span><b>${esc(p.name)}</b>
-      <span class="num">${p.best ? `\u79D8\u5883 +${p.best}` : `\u7B2C ${p.top} \u5C64`}</span><span class="sub num" style="margin:0">Lv${p.level}</span></li>`).join("")}</ol>`;
-    return `<div class="boardcard"><div class="row" style="align-items:baseline"><b>\u5929\u68AF</b><span class="sub" style="margin:0 0 0 auto">${me ? `\u4F60\u662F\u300C${esc(me)}\u300D` : "\u533F\u540D"}\u30FB<button class="linkbtn" data-act="nick">${me ? "\u6539\u66B1\u7A31" : "\u8A2D\u5B9A\u66B1\u7A31"}</button></span></div>${body}
-    <p class="sub" style="margin:0">\u4F9D\u79D8\u5883\u6700\u9AD8\u9650\u6642\u7B49\u7D1A\u6392\u540D\u3002\u4F60\u7684\u6210\u7E3E\u6BCF 5 \u5206\u9418\u4E0A\u50B3\u4E00\u6B21\u3002</p></div>`;
+      <span class="num">${p.best ? tx("\u79D8\u5883 +{0}", p.best) : tx("\u7B2C {0} \u5C64", p.top)}</span><span class="sub num" style="margin:0">Lv${p.level}</span></li>`).join("")}</ol>`;
+    return tx('<div class="boardcard"><div class="row" style="align-items:baseline"><b>\u5929\u68AF</b><span class="sub" style="margin:0 0 0 auto">{0}\u30FB<button class="linkbtn" data-act="nick">{1}</button></span></div>{2} <p class="sub" style="margin:0">\u4F9D\u79D8\u5883\u6700\u9AD8\u9650\u6642\u7B49\u7D1A\u6392\u540D\u3002\u4F60\u7684\u6210\u7E3E\u6BCF 5 \u5206\u9418\u4E0A\u50B3\u4E00\u6B21\u3002</p></div>', me ? tx("\u4F60\u662F\u300C{0}\u300D", esc(me)) : tx("\u533F\u540D"), me ? tx("\u6539\u66B1\u7A31") : tx("\u8A2D\u5B9A\u66B1\u7A31"), body);
   }
   function viewDungeons() {
     const lv = avgPartyLv(), il = avgPartyIlvl();
-    let h = nextStepCard() + `<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv${lv}</b>\u30FB\u88DD\u7B49 <b class="num">${il}</b>\u30FB\u6230\u529B <b class="num">${fmt(partyPower())}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u90FD\u6709\u5F31\u9EDE\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\uFF0C\u6216\u56DE\u982D\u5237\u88DD\u5099\u3002</p>`;
+    let h = nextStepCard() + tx('<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv{0}</b>\u30FB\u88DD\u7B49 <b class="num">{1}</b>\u30FB\u6230\u529B <b class="num">{2}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u90FD\u6709\u5F31\u9EDE\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\uFF0C\u6216\u56DE\u982D\u5237\u88DD\u5099\u3002</p>', lv, il, fmt(partyPower()));
     h += vaultSection() + mythicSection() + `<div class="dlist">`;
     DUNGEONS.forEach((_, i) => {
       const d = dungeonInfo(i), locked = i >= app.S.unlocked, clears = app.S.clears[i] || 0;
       const idleHere = app.S.idle === i;
-      h += `<div class="dg ${locked ? "locked" : ""}">
-      <div class="tier">${ROMAN[i]}<small>\u7B2C ${i + 1} \u5C64</small></div>
-      <h3>${d.name}<span class="boss">\u9996\u9818\u30FB${d.boss}</span></h3>
-      <div class="tip">${d.tip}</div>
-      <div class="meta">
-        <span>\u5EFA\u8B70 <b class="num ${lv >= d.recLevel ? "ok" : "low"}">Lv${d.recLevel}</b></span>
-        <span>\u88DD\u7B49 <b class="num ${il >= d.recIlvl ? "ok" : "low"}">${d.recIlvl}</b></span>
-        <span>\u6389\u843D <b class="num">${d.dropIlvl}</b></span>
-        <span>\u901A\u95DC <b class="num">${clears}</b> \u6B21</span>
-      </div>
-      <div class="acts">${locked ? `<span class="sub" style="margin:0">\u5148\u901A\u95DC\u4E0A\u4E00\u5C64</span>` : `<button class="btn main grow" data-act="fight" data-d="${i}">\u6311\u6230</button>
-         <button class="btn ${idleHere ? "on" : ""}" data-act="idle" data-d="${i}" ${clears ? "" : 'disabled title="\u901A\u95DC\u4E00\u6B21\u5F8C\u624D\u80FD\u639B\u6A5F"'}>${idleHere ? "\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62" : "\u639B\u6A5F\u5237"}</button>
-         <button class="btn" data-act="prepare" data-d="${i}" aria-label="${partyLocked(app.S) ? "\u4E00\u9375\u5099\u6230\uFF1A\u639B\u6A5F\u4E2D\u53EA\u8ABF\u5929\u8CE6\u3001\u88DD\u5099" : "\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099"}">\u5099\u6230</button>`}
-      </div></div>`;
+      h += tx('<div class="dg {0}"> <div class="tier">{1}<small>\u7B2C {2} \u5C64</small></div> <h3>{3}<span class="boss">\u9996\u9818\u30FB{4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>\u5EFA\u8B70 <b class="num {6}">Lv{7}</b></span> <span>\u88DD\u7B49 <b class="num {8}">{9}</b></span> <span>\u6389\u843D <b class="num">{10}</b></span> <span>\u901A\u95DC <b class="num">{11}</b> \u6B21</span> </div> <div class="acts">{12} </div></div>', locked ? "locked" : "", ROMAN[i], i + 1, d.name, d.boss, d.tip, lv >= d.recLevel ? "ok" : "low", d.recLevel, il >= d.recIlvl ? "ok" : "low", d.recIlvl, d.dropIlvl, clears, locked ? tx('<span class="sub" style="margin:0">\u5148\u901A\u95DC\u4E0A\u4E00\u5C64</span>') : tx('<button class="btn main grow" data-act="fight" data-d="{0}">\u6311\u6230</button> <button class="btn {1}" data-act="idle" data-d="{2}" {3}>{4}</button> <button class="btn" data-act="prepare" data-d="{5}" aria-label="{6}">\u5099\u6230</button>', i, idleHere ? "on" : "", i, clears ? "" : tx('disabled title="\u901A\u95DC\u4E00\u6B21\u5F8C\u624D\u80FD\u639B\u6A5F"'), idleHere ? tx("\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62") : tx("\u639B\u6A5F\u5237"), i, partyLocked(app.S) ? tx("\u4E00\u9375\u5099\u6230\uFF1A\u639B\u6A5F\u4E2D\u53EA\u8ABF\u5929\u8CE6\u3001\u88DD\u5099") : tx("\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099")));
     });
-    h += `</div>` + boardCard() + `<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A ${ECONOMY.offlineCapHours} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u5230\u300C\u5718\u968A\u300D\u6700\u4E0B\u65B9\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>`;
+    h += `</div>` + boardCard() + tx('<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u5230\u300C\u5718\u968A\u300D\u6700\u4E0B\u65B9\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>', ECONOMY.offlineCapHours);
     return h;
   }
 
@@ -1952,7 +2526,7 @@
   function enemyRows(b) {
     const list = b.enemies.filter((e) => e.hp > 0 || e.boss).sort((x, y) => y.boss - x.boss);
     const more = list.length - MAX_FOE_ROWS;
-    return list.slice(0, MAX_FOE_ROWS).map((e) => unitRow(e, true)).join("") + (more > 0 ? `<div class="more">\u53E6\u5916 ${more} \u96BB</div>` : "");
+    return list.slice(0, MAX_FOE_ROWS).map((e) => unitRow(e, true)).join("") + (more > 0 ? tx('<div class="more">\u53E6\u5916 {0} \u96BB</div>', more) : "");
   }
   function unitRow(u, enemy) {
     const dead = u.hp <= 0;
@@ -1964,22 +2538,12 @@
     <div class="bar"><i class="${bar}" style="width:${pct(u.hp, u.max)}%"></i></div></div>`;
   }
   function viewBattle() {
-    if (!app.battle) return `<h2>\u6230\u9B25</h2><div class="empty">\u76EE\u524D\u6C92\u6709\u9032\u884C\u4E2D\u7684\u6230\u9B25\u3002<br>\u5230\u300C\u526F\u672C\u300D\u9078\u4E00\u5C64\u958B\u59CB\u6311\u6230\u3002<br><br><button class="btn main" data-tab="dungeon">\u524D\u5F80\u526F\u672C</button></div>`;
+    if (!app.battle) return tx('<h2>\u6230\u9B25</h2><div class="empty">\u76EE\u524D\u6C92\u6709\u9032\u884C\u4E2D\u7684\u6230\u9B25\u3002<br>\u5230\u300C\u526F\u672C\u300D\u9078\u4E00\u5C64\u958B\u59CB\u6311\u6230\u3002<br><br><button class="btn main" data-tab="dungeon">\u524D\u5F80\u526F\u672C</button></div>');
     const d = dungeonInfo(app.battle.dIdx), b = app.battle;
-    if (b.vault) d.name = `\u5BF6\u5EAB\u30FB\u7B2C ${b.vault.floor + 1} \u5C64`;
-    let h = `<div class="bhead"><h2>${d.name}${b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : ""}</h2><span class="sub num" style="margin:0">${b.tick}s</span>
-    ${b.vault ? "" : `<div class="waves">`}${b.vault ? "" : b.waves.map((_, i) => `<i class="${i < b.waveIdx || b.over && b.win ? "done" : i === b.waveIdx ? "cur" : ""}"></i>`).join("") + "</div>"}</div>
-    ${b.mythic ? mythicTimerBar(b) : ""}${b.vault ? vaultBar(b) : ""}
-    <div class="arena">
-      <div class="side foes"><span class="label">\u6575\u65B9\u30FB${b.waveIdx === b.waves.length - 1 ? "\u9996\u9818\u6230" : `\u7B2C ${b.waveIdx + 1} \u6CE2`}</span>${enemyRows(b)}</div>
-      <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>${b.units.map((u) => unitRow(u, false)).join("")}</div>
-    </div>
-    <div class="log" aria-live="polite">${b.log.map((l) => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, " ")}</span>${l.msg}</p>`).join("")}</div>`;
+    if (b.vault) d.name = tx("\u5BF6\u5EAB\u30FB\u7B2C {0} \u5C64", b.vault.floor + 1);
+    let h = tx('<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}</div> {5}{6} <div class="arena"> <div class="side foes"><span class="label">\u6575\u65B9\u30FB{7}</span>{8}</div> <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>', d.name, b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : "", b.tick, b.vault ? "" : `<div class="waves">`, b.vault ? "" : b.waves.map((_, i) => `<i class="${i < b.waveIdx || b.over && b.win ? "done" : i === b.waveIdx ? "cur" : ""}"></i>`).join("") + "</div>", b.mythic ? mythicTimerBar(b) : "", b.vault ? vaultBar(b) : "", b.waveIdx === b.waves.length - 1 ? tx("\u9996\u9818\u6230") : tx("\u7B2C {0} \u6CE2", b.waveIdx + 1), enemyRows(b), b.units.map((u) => unitRow(u, false)).join(""), b.log.map((l) => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, " ")}</span>${l.msg}</p>`).join(""));
     if (!b.over) {
-      h += `<div class="ctrlbar"><div class="ctrl"><div class="seg">${[1, 2, 4].map((x) => `<button data-act="speed" data-x="${x}" class="${app.speed === x ? "sel" : ""}">${x}\xD7</button>`).join("")}</div>
-      ${hornBtn(b)}
-      <button class="btn" data-act="skip">\u76F4\u63A5\u7D50\u7B97</button>
-      <button class="btn" data-act="retreat">\u64A4\u9000</button></div></div>`;
+      h += tx('<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} <button class="btn" data-act="skip">\u76F4\u63A5\u7D50\u7B97</button> <button class="btn" data-act="retreat">\u64A4\u9000</button></div></div>', [1, 2, 4].map((x) => `<button data-act="speed" data-x="${x}" class="${app.speed === x ? "sel" : ""}">${x}\xD7</button>`).join(""), hornBtn(b));
     }
     if (b.over && app.lastResult) h += viewResult();
     return h;
@@ -1987,48 +2551,41 @@
   function mythicTimerBar(b) {
     const T = b.mythic.timer, left = T - b.tick, over = left < 0;
     return `<div class="mtimer ${over ? "over" : ""}"><div class="mtrack"><i style="width:${pct(Math.min(b.tick, T), T)}%"></i><em style="left:${MYTHIC.bonusAt * 100}%"></em></div>
-    <span class="num">${over ? `\u8D85\u6642 ${mmss(-left)}` : `\u5269 ${mmss(left)}`}</span></div>
+    <span class="num">${over ? tx("\u8D85\u6642 {0}", mmss(-left)) : tx("\u5269 {0}", mmss(left))}</span></div>
     <div class="chips">${b.mythic.affixes.map((a) => `<span class="chip">${AFFIXES[a].name}</span>`).join("")}</div>`;
   }
   function vaultBar(b) {
     const left = Math.max(0, b.vault.dur - b.tick), f = b.vault.floor, cap = vaultMaxKills(f);
-    return `<div class="mtimer"><div class="mtrack"><i style="width:${pct(b.tick, b.vault.dur)}%"></i></div><span class="num">\u5269 ${mmss(left)}</span></div>
-    <div class="vaultcount"><b class="num">${b.kills}</b> \u96BB\u54E5\u5E03\u6797\u30FB<span class="num">+${fmt(Math.min(b.kills, cap) * vaultGoldPerKill(f))}</span> \u91D1${b.kills >= cap ? "\uFF08\u5DF2\u9054\u91D1\u5E63\u4E0A\u9650\uFF09" : `<span class="sub" style="margin:0">\u3000\u91D1\u5E63\u7B97\u5230 ${cap} \u96BB</span>`}</div>`;
+    return tx('<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">\u5269 {1}</span></div> <div class="vaultcount"><b class="num">{2}</b> \u96BB\u54E5\u5E03\u6797\u30FB<span class="num">+{3}</span> \u91D1{4}</div>', pct(b.tick, b.vault.dur), mmss(left), b.kills, fmt(Math.min(b.kills, cap) * vaultGoldPerKill(f)), b.kills >= cap ? tx("\uFF08\u5DF2\u9054\u91D1\u5E63\u4E0A\u9650\uFF09") : tx('<span class="sub" style="margin:0">\u3000\u91D1\u5E63\u7B97\u5230 {0} \u96BB</span>', cap));
   }
   function hornBtn(b) {
     const on = b.hornActive(), left = b.horn.until - b.tick;
-    return `<button class="btn horn ${on ? "on" : ""}" data-act="horn" ${b.horn.used ? "disabled" : ""} aria-label="\u82F1\u52C7\u865F\u89D2">\u{1F4EF} ${on ? `${left}s` : b.horn.used ? "\u5DF2\u7528" : "\u865F\u89D2"}</button>`;
+    return tx('<button class="btn horn {0}" data-act="horn" {1} aria-label="\u82F1\u52C7\u865F\u89D2">\u{1F4EF} {2}</button>', on ? "on" : "", b.horn.used ? "disabled" : "", on ? `${left}s` : b.horn.used ? tx("\u5DF2\u7528") : tx("\u865F\u89D2"));
   }
   function viewResult() {
     const r = app.lastResult, b = app.battle;
     const dmgMax = Math.max(1, ...b.units.map((u) => Math.max(u.dmgDone, u.healDone)));
     const sec = Math.max(1, b.tick);
-    const title = r.vault ? `\u6253\u5012 ${r.kills} \u96BB\u54E5\u5E03\u6797` : r.mythicIdle ? b.win ? "\u79D8\u5883\u639B\u6A5F\u30FB\u901A\u95DC" : "\u79D8\u5883\u639B\u6A5F\u30FB\u5931\u6557" : r.mythic ? r.inTime ? "\u9650\u6642\u901A\u95DC" : b.win ? "\u8D85\u6642\u901A\u95DC" : "\u5931\u6557" : b.win ? "\u901A\u95DC" : "\u5931\u6557";
-    let h = `<div class="result ${r.vault || (r.mythic ? r.inTime : b.win) ? "win" : "lose"}"><h3>${title}</h3>${r.vault && r.record ? '<span class="newrec" style="justify-self:start">\u672C\u5C64\u65B0\u7D00\u9304</span>' : ""}
-    ${r.mythicIdle ? `<div class="sub" style="margin:0">\u639B\u6A5F\u7B49\u7D1A +${b.mythic.level}\u30FB\u9470\u77F3\u4E0D\u8B8A\uFF08\u76EE\u524D +${app.S.mythic.key}\uFF09\u30FB\u734E\u52F5 ${Math.round(MYTHIC.idleMult * 100)}%</div>` : r.mythic ? `<div class="keychange"><span class="keystone num">+${r.prevKey}</span><span class="arrow">\u2192</span><span class="keystone num ${r.nextKey > r.prevKey ? "up" : r.nextKey < r.prevKey ? "down" : ""}">+${r.nextKey}</span>
-      <span class="sub" style="margin:0">\u7528\u6642 <b class="num">${mmss(b.tick)}</b> / \u9650\u6642 ${mmss(b.mythic.timer)}</span>${r.record ? '<span class="newrec">\u65B0\u7D00\u9304</span>' : ""}</div>` : ""}
-    <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+${fmt(r.gold)}</b> \u91D1\u5E63</span><span><b class="num">+${fmt(r.xp)}</b> \u7D93\u9A57</span>${r.first ? '<span style="color:var(--brass)">\u9996\u6B21\u901A\u95DC\uFF1A\u5FC5\u6389\u7A00\u6709\u4EE5\u4E0A</span>' : ""}${r.decayed ? `<span style="color:var(--warn)">${b.dIdx === DUNGEONS.length - 1 ? `\u7B49\u7D1A\u58D3\u5236\uFF1A\u734E\u52F5\u6700\u4F4E\u4FDD\u7559 ${Math.round(REWARD.decayFloorTop * 100)}%\uFF0C\u60F3\u8981\u66F4\u591A\u53EF\u4EE5\u6539\u7528\u79D8\u5883\u639B\u6A5F` : "\u9019\u5C64\u5C0D\u4F60\u592A\u7C21\u55AE\u4E86\uFF0C\u7D93\u9A57\u8207\u91D1\u5E63\u8B8A\u5C11\uFF0C\u5F80\u4E0B\u4E00\u5C64\u5427"}</span>` : ""}</div>`;
-    if (r.lvUps.length) h += `<div style="color:var(--good);font-size:14px">\u2B06 ${r.lvUps.map((x) => `${x.name} \u5347\u5230 ${x.para ? `\u5DD4\u5CF0 ${x.para}` : `Lv${x.level}`}`).join("\u3001")}</div>`;
-    if (r.kept.length || r.stashed.length || r.salvaged) h += `<div class="stack">${r.kept.map((it) => `<div class="item rar${it.rarity}"><div class="in">${itemName(it)}</div><div class="il">${SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div><div class="is">${itemStatText(it)}</div></div>`).join("")}${r.stashed.length ? `<div style="color:var(--brass);font-size:13px">\u80CC\u5305\u5DF2\u6EFF\uFF0C${r.stashed.length} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1</div>` : ""}${r.salvaged ? `<div class="sub" style="margin:0">${r.salvaged} \u4EF6\u81EA\u52D5\u5206\u89E3\u70BA\u91D1\u5E63\u8207\u7CBE\u83EF</div>` : ""}</div>`;
-    h += `<div class="meter"><span class="label">\u50B7\u5BB3 / \u6CBB\u7642\u7D71\u8A08\uFF08\u6BCF\u79D2\uFF09</span>${b.units.map((u) => {
+    const title = r.vault ? tx("\u6253\u5012 {0} \u96BB\u54E5\u5E03\u6797", r.kills) : r.mythicIdle ? b.win ? tx("\u79D8\u5883\u639B\u6A5F\u30FB\u901A\u95DC") : tx("\u79D8\u5883\u639B\u6A5F\u30FB\u5931\u6557") : r.mythic ? r.inTime ? tx("\u9650\u6642\u901A\u95DC") : b.win ? tx("\u8D85\u6642\u901A\u95DC") : tx("\u5931\u6557") : b.win ? tx("\u901A\u95DC") : tx("\u5931\u6557");
+    let h = tx('<div class="result {0}"><h3>{1}</h3>{2} {3} <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+{4}</b> \u91D1\u5E63</span><span><b class="num">+{5}</b> \u7D93\u9A57</span>{6}{7}</div>', r.vault || (r.mythic ? r.inTime : b.win) ? "win" : "lose", title, r.vault && r.record ? tx('<span class="newrec" style="justify-self:start">\u672C\u5C64\u65B0\u7D00\u9304</span>') : "", r.mythicIdle ? tx('<div class="sub" style="margin:0">\u639B\u6A5F\u7B49\u7D1A +{0}\u30FB\u9470\u77F3\u4E0D\u8B8A\uFF08\u76EE\u524D +{1}\uFF09\u30FB\u734E\u52F5 {2}%</div>', b.mythic.level, app.S.mythic.key, Math.round(MYTHIC.idleMult * 100)) : r.mythic ? tx('<div class="keychange"><span class="keystone num">+{0}</span><span class="arrow">\u2192</span><span class="keystone num {1}">+{2}</span> <span class="sub" style="margin:0">\u7528\u6642 <b class="num">{3}</b> / \u9650\u6642 {4}</span>{5}</div>', r.prevKey, r.nextKey > r.prevKey ? "up" : r.nextKey < r.prevKey ? "down" : "", r.nextKey, mmss(b.tick), mmss(b.mythic.timer), r.record ? tx('<span class="newrec">\u65B0\u7D00\u9304</span>') : "") : "", fmt(r.gold), fmt(r.xp), r.first ? tx('<span style="color:var(--brass)">\u9996\u6B21\u901A\u95DC\uFF1A\u5FC5\u6389\u7A00\u6709\u4EE5\u4E0A</span>') : "", r.decayed ? `<span style="color:var(--warn)">${b.dIdx === DUNGEONS.length - 1 ? tx("\u7B49\u7D1A\u58D3\u5236\uFF1A\u734E\u52F5\u6700\u4F4E\u4FDD\u7559 {0}%\uFF0C\u60F3\u8981\u66F4\u591A\u53EF\u4EE5\u6539\u7528\u79D8\u5883\u639B\u6A5F", Math.round(REWARD.decayFloorTop * 100)) : tx("\u9019\u5C64\u5C0D\u4F60\u592A\u7C21\u55AE\u4E86\uFF0C\u7D93\u9A57\u8207\u91D1\u5E63\u8B8A\u5C11\uFF0C\u5F80\u4E0B\u4E00\u5C64\u5427")}</span>` : "");
+    if (r.lvUps.length) h += `<div style="color:var(--good);font-size:14px">\u2B06 ${r.lvUps.map((x) => tx("{0} \u5347\u5230 {1}", x.name, x.para ? tx("\u5DD4\u5CF0 {0}", x.para) : `Lv${x.level}`)).join(tx("\u3001"))}</div>`;
+    if (r.kept.length || r.stashed.length || r.salvaged) h += `<div class="stack">${r.kept.map((it) => `<div class="item rar${it.rarity}"><div class="in">${itemName(it)}</div><div class="il">${SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div><div class="is">${itemStatText(it)}</div></div>`).join("")}${r.stashed.length ? tx('<div style="color:var(--brass);font-size:13px">\u80CC\u5305\u5DF2\u6EFF\uFF0C{0} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1</div>', r.stashed.length) : ""}${r.salvaged ? tx('<div class="sub" style="margin:0">{0} \u4EF6\u81EA\u52D5\u5206\u89E3\u70BA\u91D1\u5E63\u8207\u7CBE\u83EF</div>', r.salvaged) : ""}</div>`;
+    h += tx('<div class="meter"><span class="label">\u50B7\u5BB3 / \u6CBB\u7642\u7D71\u8A08\uFF08\u6BCF\u79D2\uFF09</span>{0}</div>', b.units.map((u) => {
       const v = u.role === "heal" ? u.healDone : u.dmgDone;
       const sk = u.dmgDone ? Math.round(100 * u.skillDmg / u.dmgDone) : 0;
-      return `<div class="mrow"><span>${u.icon} ${u.name}${u.role !== "heal" && sk ? `<small class="num">\u6280\u80FD ${sk}%</small>` : ""}</span><span class="mb"><i class="role-${u.role}" style="width:${pct(v, dmgMax)}%"></i></span><span class="num" style="text-align:right">${fmt(v / sec)}${u.role === "heal" ? " HPS" : " DPS"}</span></div>`;
-    }).join("")}</div>`;
+      return `<div class="mrow"><span>${u.icon} ${u.name}${u.role !== "heal" && sk ? tx('<small class="num">\u6280\u80FD {0}%</small>', sk) : ""}</span><span class="mb"><i class="role-${u.role}" style="width:${pct(v, dmgMax)}%"></i></span><span class="num" style="text-align:right">${fmt(v / sec)}${u.role === "heal" ? " HPS" : " DPS"}</span></div>`;
+    }).join(""));
     if (!b.win && !r.vault) h += `<div class="sub" style="margin:0">${failHint(b)}</div>`;
-    h += `<div class="row">${app.pendingRepeat ? `<span class="sub" style="margin:0;align-self:center">\u639B\u6A5F\u4E2D\uFF0C3 \u79D2\u5F8C\u81EA\u52D5\u518D\u6230\u2026</span>` : ""}
-    ${r.vault ? vaultLeft(app.S) ? `<button class="btn main grow" data-act="vault" data-d="${b.vault.floor}">\u518D\u6253\u4E00\u6B21\uFF08\u4ECA\u5929\u5269 ${vaultLeft(app.S)} \u6B21\uFF09</button>` : '<span class="sub" style="margin:0;align-self:center">\u4ECA\u5929\u7684\u5BF6\u5EAB\u6B21\u6578\u7528\u5B8C\u4E86</span>' : r.mythicIdle ? app.S.idleMythic != null ? `<button class="btn grow" data-act="idlemythic" data-d="${b.dIdx}">\u505C\u6B62\u79D8\u5883\u639B\u6A5F</button>` : "" : `<button class="btn main grow" data-act="${r.mythic ? "mythic" : "fight"}" data-d="${b.dIdx}">${r.mythic ? `\u518D\u6311\u6230 +${r.nextKey}` : "\u518D\u6253\u4E00\u6B21"}</button>`}
-    ${r.kept.length ? `<button class="btn" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button>` : ""}
-    <button class="btn" data-tab="dungeon">\u8FD4\u56DE\u526F\u672C</button></div></div>`;
+    h += tx('<div class="row">{0} {1} {2} <button class="btn" data-tab="dungeon">\u8FD4\u56DE\u526F\u672C</button></div></div>', app.pendingRepeat ? tx('<span class="sub" style="margin:0;align-self:center">\u639B\u6A5F\u4E2D\uFF0C3 \u79D2\u5F8C\u81EA\u52D5\u518D\u6230\u2026</span>') : "", r.vault ? vaultLeft(app.S) ? tx('<button class="btn main grow" data-act="vault" data-d="{0}">\u518D\u6253\u4E00\u6B21\uFF08\u4ECA\u5929\u5269 {1} \u6B21\uFF09</button>', b.vault.floor, vaultLeft(app.S)) : tx('<span class="sub" style="margin:0;align-self:center">\u4ECA\u5929\u7684\u5BF6\u5EAB\u6B21\u6578\u7528\u5B8C\u4E86</span>') : r.mythicIdle ? app.S.idleMythic != null ? tx('<button class="btn grow" data-act="idlemythic" data-d="{0}">\u505C\u6B62\u79D8\u5883\u639B\u6A5F</button>', b.dIdx) : "" : `<button class="btn main grow" data-act="${r.mythic ? "mythic" : "fight"}" data-d="${b.dIdx}">${r.mythic ? tx("\u518D\u6311\u6230 +{0}", r.nextKey) : tx("\u518D\u6253\u4E00\u6B21")}</button>`, r.kept.length ? tx('<button class="btn" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button>') : "");
     return h;
   }
   function failHint(b) {
     const tank = b.units.find((u) => u.role === "tank"), heal = b.units.find((u) => u.role === "heal");
-    if (b.tick >= DUNGEON.maxTicks) return "\u63D0\u793A\uFF1A\u6642\u9593\u8017\u76E1\uFF0C\u8F38\u51FA\u4E0D\u8DB3\u3002\u88DC\u5F37\u8F38\u51FA\u6216\u5F37\u5316\u6B66\u5668\u3002";
-    if (!tank) return "\u63D0\u793A\uFF1A\u968A\u4F0D\u6C92\u6709\u5766\u514B\uFF0C\u6575\u4EBA\u6703\u5230\u8655\u4E82\u6253\u8106\u76AE\u968A\u54E1\u3002";
-    if (!heal) return "\u63D0\u793A\uFF1A\u968A\u4F0D\u6C92\u6709\u6CBB\u7642\uFF0C\u9577\u6642\u9593\u6230\u9B25\u6490\u4E0D\u4F4F\u3002";
-    if (tank.hp <= 0 && b.units.filter((u) => u.hp > 0).length === 0 && tank.taken > tank.max) return "\u63D0\u793A\uFF1A\u5766\u514B\u5148\u5012\uFF0C\u8A66\u8457\u5F37\u5316\u5766\u514B\u7684\u8B77\u7532\u8207\u8010\u529B\uFF0C\u6216\u591A\u5E36\u4E00\u4F4D\u6CBB\u7642\u3002";
-    return "\u63D0\u793A\uFF1A\u56DE\u524D\u4E00\u5C64\u5237\u88DD\u5099\u8207\u7B49\u7D1A\uFF0C\u6216\u6309\u300C\u5099\u6230\u300D\u63DB\u500B\u9663\u5BB9\u3002";
+    if (b.tick >= DUNGEON.maxTicks) return tx("\u63D0\u793A\uFF1A\u6642\u9593\u8017\u76E1\uFF0C\u8F38\u51FA\u4E0D\u8DB3\u3002\u88DC\u5F37\u8F38\u51FA\u6216\u5F37\u5316\u6B66\u5668\u3002");
+    if (!tank) return tx("\u63D0\u793A\uFF1A\u968A\u4F0D\u6C92\u6709\u5766\u514B\uFF0C\u6575\u4EBA\u6703\u5230\u8655\u4E82\u6253\u8106\u76AE\u968A\u54E1\u3002");
+    if (!heal) return tx("\u63D0\u793A\uFF1A\u968A\u4F0D\u6C92\u6709\u6CBB\u7642\uFF0C\u9577\u6642\u9593\u6230\u9B25\u6490\u4E0D\u4F4F\u3002");
+    if (tank.hp <= 0 && b.units.filter((u) => u.hp > 0).length === 0 && tank.taken > tank.max) return tx("\u63D0\u793A\uFF1A\u5766\u514B\u5148\u5012\uFF0C\u8A66\u8457\u5F37\u5316\u5766\u514B\u7684\u8B77\u7532\u8207\u8010\u529B\uFF0C\u6216\u591A\u5E36\u4E00\u4F4D\u6CBB\u7642\u3002");
+    return tx("\u63D0\u793A\uFF1A\u56DE\u524D\u4E00\u5C64\u5237\u88DD\u5099\u8207\u7B49\u7D1A\uFF0C\u6216\u6309\u300C\u5099\u6230\u300D\u63DB\u500B\u9663\u5BB9\u3002");
   }
 
   // src/ui/views/team.js
@@ -2039,38 +2596,27 @@
   }
   function viewTeam() {
     const party = partyHeroes(app.S), c = roleCount();
-    let h = `<h2>\u5718\u968A</h2><p class="sub">\u51FA\u6230\u6700\u591A ${ECONOMY.partyMax} \u4EBA\u3002${partyLocked(app.S) ? '<b style="color:var(--warn)">\u639B\u6A5F\u4E2D\uFF0C\u9663\u5BB9\u5DF2\u9396\u5B9A</b>\uFF0C\u505C\u6B62\u639B\u6A5F\u5F8C\u624D\u80FD\u63DB\u4EBA\u3002' : "\u9EDE\u82F1\u96C4\u67E5\u770B\u88DD\u5099\u8207\u8ABF\u6574\u9663\u5BB9\u3002"}</p>
-    <div class="party">${Array.from({ length: ECONOMY.partyMax }, (_, i) => {
+    let h = tx('<h2>\u5718\u968A</h2><p class="sub">\u51FA\u6230\u6700\u591A {0} \u4EBA\u3002{1}</p> <div class="party">{2}</div> <div class="comp"><span><b style="color:var(--tank)">\u5766\u514B</b> {3}</span><span><b style="color:var(--heal)">\u6CBB\u7642</b> {4}</span><span><b style="color:var(--dps)">\u8F38\u51FA</b> {5}</span><span>\u6230\u529B <b class="num" style="color:var(--fg)">{6}</b></span> {7}{8}</div> <h2 style="font-size:18px">\u540D\u518A <span class="sub num">{9}/{10}</span></h2>{11}<div class="stack">', ECONOMY.partyMax, partyLocked(app.S) ? tx('<b style="color:var(--warn)">\u639B\u6A5F\u4E2D\uFF0C\u9663\u5BB9\u5DF2\u9396\u5B9A</b>\uFF0C\u505C\u6B62\u639B\u6A5F\u5F8C\u624D\u80FD\u63DB\u4EBA\u3002') : tx("\u9EDE\u82F1\u96C4\u67E5\u770B\u88DD\u5099\u8207\u8ABF\u6574\u9663\u5BB9\u3002"), Array.from({ length: ECONOMY.partyMax }, (_, i) => {
       const x = party[i];
-      if (!x) return `<div class="slot emptyslot">\u7A7A\u4F4D</div>`;
+      if (!x) return tx('<div class="slot emptyslot">\u7A7A\u4F4D</div>');
       return `<button class="slot r-${x.rarity || 0}" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div><div class="n c${x.rarity || 0}">${x.name}</div><div class="lv num">Lv${x.level}</div><div class="rl role-${roleOf(x)}"></div></button>`;
-    }).join("")}</div>
-    <div class="comp"><span><b style="color:var(--tank)">\u5766\u514B</b> ${c.tank}</span><span><b style="color:var(--heal)">\u6CBB\u7642</b> ${c.heal}</span><span><b style="color:var(--dps)">\u8F38\u51FA</b> ${c.dps}</span><span>\u6230\u529B <b class="num" style="color:var(--fg)">${fmt(partyPower())}</b></span>
-    ${!c.tank ? '<span style="color:var(--warn)">\u7F3A\u5766\u514B</span>' : ""}${!c.heal ? '<span style="color:var(--warn)">\u7F3A\u6CBB\u7642</span>' : ""}</div>
-    <h2 style="font-size:18px">\u540D\u518A <span class="sub num">${app.S.heroes.length}/${ECONOMY.rosterMax}</span></h2>${fireBar()}<div class="stack">`;
+    }).join(""), c.tank, c.heal, c.dps, fmt(partyPower()), !c.tank ? tx('<span style="color:var(--warn)">\u7F3A\u5766\u514B</span>') : "", !c.heal ? tx('<span style="color:var(--warn)">\u7F3A\u6CBB\u7642</span>') : "", app.S.heroes.length, ECONOMY.rosterMax, fireBar());
     const sorted = [...app.S.heroes].sort((a, b) => inParty(b) - inParty(a) || (b.rarity || 0) - (a.rarity || 0) || b.level - a.level);
     for (const x of sorted) h += heroCard(x);
-    h += `</div>` + (enabled() ? `<h2 style="font-size:18px">\u610F\u898B\u56DE\u994B</h2><div class="settings">
-    <textarea id="fbText" class="fb" maxlength="1000" placeholder="\u54EA\u88E1\u597D\u73A9\u3001\u54EA\u88E1\u5361\u4F4F\u3001\u60F3\u8981\u4EC0\u9EBC\u529F\u80FD\u90FD\u53EF\u4EE5\u5BEB">${esc(app.fbDraft || "")}</textarea>
-    <div class="row" style="align-items:center"><span class="sub" style="margin:0">\u6703\u9644\u4E0A\u66B1\u7A31\u300C${esc(app.S.player.name || "\u533F\u540D")}\u300D\u8207\u76EE\u524D\u9032\u5EA6</span><button class="btn main" data-act="sendfb" style="margin-left:auto">\u9001\u51FA</button></div></div>` : "") + `<h2 style="font-size:18px">\u66B1\u7A31</h2><div class="settings"><div class="set"><span>\u5929\u68AF\u4E0A\u986F\u793A\u70BA <b>${esc(app.S.player.name || "\u533F\u540D")}</b></span><button class="btn sm" data-act="nick">\u4FEE\u6539</button></div></div>
-    <h2 style="font-size:18px">\u5B58\u6A94</h2><div class="row"><button class="btn" data-act="export">\u532F\u51FA\u5B58\u6A94\u78BC</button><button class="btn" data-act="import">\u532F\u5165</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">\u91CD\u65B0\u958B\u59CB</button></div>
-    <p class="sub" style="margin-top:8px">\u5171\u6311\u6230 ${app.S.stats.runs} \u6B21\u30FB\u901A\u95DC ${app.S.stats.wins} \u6B21</p>`;
+    h += `</div>` + (enabled() ? tx('<h2 style="font-size:18px">\u610F\u898B\u56DE\u994B</h2><div class="settings"> <textarea id="fbText" class="fb" maxlength="1000" placeholder="\u54EA\u88E1\u597D\u73A9\u3001\u54EA\u88E1\u5361\u4F4F\u3001\u60F3\u8981\u4EC0\u9EBC\u529F\u80FD\u90FD\u53EF\u4EE5\u5BEB">{0}</textarea> <div class="row" style="align-items:center"><span class="sub" style="margin:0">\u6703\u9644\u4E0A\u66B1\u7A31\u300C{1}\u300D\u8207\u76EE\u524D\u9032\u5EA6</span><button class="btn main" data-act="sendfb" style="margin-left:auto">\u9001\u51FA</button></div></div>', esc(app.fbDraft || ""), esc(app.S.player.name || tx("\u533F\u540D"))) : "") + langBar() + tx('<h2 style="font-size:18px">\u66B1\u7A31</h2><div class="settings"><div class="set"><span>\u5929\u68AF\u4E0A\u986F\u793A\u70BA <b>{0}</b></span><button class="btn sm" data-act="nick">\u4FEE\u6539</button></div></div> <h2 style="font-size:18px">\u5B58\u6A94</h2><div class="row"><button class="btn" data-act="export">\u532F\u51FA\u5B58\u6A94\u78BC</button><button class="btn" data-act="import">\u532F\u5165</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">\u91CD\u65B0\u958B\u59CB</button></div> <p class="sub" style="margin-top:8px">\u5171\u6311\u6230 {1} \u6B21\u30FB\u901A\u95DC {2} \u6B21</p>', esc(app.S.player.name || tx("\u533F\u540D")), app.S.stats.runs, app.S.stats.wins);
     return h;
   }
   function heroCard(x) {
     const st = heroStats(x, app.S.items);
     const need = xpNeed(x.level);
-    return `<button class="hero r-${x.rarity || 0}" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div>
-    <div class="nm">${heroName(x)}${rarityTag(x)}<small>${cls(x).name}${x.spec ? `\u30FB${SPECS[x.cls][x.spec].name}` : ""}\u30FB<span class="num">Lv${x.level}</span></small>${pendingPicks(x) ? '<span class="newpick">\u53EF\u9078\u5929\u8CE6</span>' : ""}</div>
-    <span class="tag ${inParty(x) ? "in" : ""}">${inParty(x) ? "\u51FA\u6230\u4E2D" : "\u5F85\u547D"}</span>
-    <div class="st num"><span>\u751F\u547D ${fmt(st.hp)}</span><span>\u5A01\u529B ${st.pow}</span><span>\u66B4\u64CA ${Math.round(st.crit * 100)}%</span><span>\u88DD\u7B49 ${heroIlvl(x, app.S.items)}</span></div>
-    <div class="xpbar"><i style="width:${x.level >= HERO.maxLevel ? 100 : pct(x.xp, need)}%"></i></div></button>`;
+    return tx('<button class="hero r-{0}" data-act="hero" data-id="{1}"><div class="ic">{2}</div> <div class="nm">{3}{4}<small>{5}{6}\u30FB<span class="num">Lv{7}</span></small>{8}</div> <span class="tag {9}">{10}</span> <div class="st num"><span>\u751F\u547D {11}</span><span>\u5A01\u529B {12}</span><span>\u66B4\u64CA {13}%</span><span>\u88DD\u7B49 {14}</span></div> <div class="xpbar"><i style="width:{15}%"></i></div></button>', x.rarity || 0, x.id, cls(x).icon, heroName(x), rarityTag(x), cls(x).name, x.spec ? `\u30FB${SPECS[x.cls][x.spec].name}` : "", x.level, pendingPicks(x) ? tx('<span class="newpick">\u53EF\u9078\u5929\u8CE6</span>') : "", inParty(x) ? "in" : "", inParty(x) ? tx("\u51FA\u6230\u4E2D") : tx("\u5F85\u547D"), fmt(st.hp), st.pow, Math.round(st.crit * 100), heroIlvl(x, app.S.items), x.level >= HERO.maxLevel ? 100 : pct(x.xp, need));
   }
   function fireBar() {
     const sel = app.fireSel ?? 0, d = fireMany(app.S, sel, true);
-    return `<div class="toolbar"><label class="selwrap"><span>\u89E3\u96C7\u5F85\u547D</span><select id="fireSel" aria-label="\u89E3\u96C7\u54C1\u8CEA">${[0, 1, 2, 3].map((r) => `<option value="${r}" ${sel === r ? "selected" : ""}>${HERO_RARITY[r].name}${r ? "\u4EE5\u4E0B" : ""}</option>`).join("")}</select></label>
-    <button class="btn sm ${app.fireConfirm ? "danger" : ""}" data-act="firemany" ${d.count ? "" : "disabled"}>${!d.count ? "\u6C92\u6709\u7B26\u5408\u7684\u82F1\u96C4" : app.fireConfirm ? `\u78BA\u5B9A\u89E3\u96C7 ${d.count} \u4EBA\uFF1F\u9000 ${fmt(d.refund)} \u91D1` : `\u4E00\u9375\u89E3\u96C7\uFF08${d.count} \u4EBA\uFF09`}</button></div>
-    <p class="sub" style="margin:4px 0 8px">\u53EA\u89E3\u96C7\u5F85\u547D\u4E2D\u7684\u82F1\u96C4\uFF0C\u50B3\u8AAA\u4E0D\u6703\u88AB\u9078\u5230\uFF1B\u8EAB\u4E0A\u88DD\u5099\u81EA\u52D5\u5378\u56DE\u80CC\u5305\u3002</p>`;
+    return tx('<div class="toolbar"><label class="selwrap"><span>\u89E3\u96C7\u5F85\u547D</span><select id="fireSel" aria-label="\u89E3\u96C7\u54C1\u8CEA">{0}</select></label> <button class="btn sm {1}" data-act="firemany" {2}>{3}</button></div> <p class="sub" style="margin:4px 0 8px">\u53EA\u89E3\u96C7\u5F85\u547D\u4E2D\u7684\u82F1\u96C4\uFF0C\u50B3\u8AAA\u4E0D\u6703\u88AB\u9078\u5230\uFF1B\u8EAB\u4E0A\u88DD\u5099\u81EA\u52D5\u5378\u56DE\u80CC\u5305\u3002</p>', [0, 1, 2, 3].map((r) => `<option value="${r}" ${sel === r ? "selected" : ""}>${HERO_RARITY[r].name}${r ? tx("\u4EE5\u4E0B") : ""}</option>`).join(""), app.fireConfirm ? "danger" : "", d.count ? "" : "disabled", !d.count ? tx("\u6C92\u6709\u7B26\u5408\u7684\u82F1\u96C4") : app.fireConfirm ? tx("\u78BA\u5B9A\u89E3\u96C7 {0} \u4EBA\uFF1F\u9000 {1} \u91D1", d.count, fmt(d.refund)) : tx("\u4E00\u9375\u89E3\u96C7\uFF08{0} \u4EBA\uFF09", d.count));
+  }
+  function langBar() {
+    return `<h2 style="font-size:18px">${tx("\u8A9E\u8A00")} \xB7 Language</h2><div class="seg">${LANGS.map((l) => `<button data-act="lang" data-v="${l.id}" class="${l.id === getLang() ? "sel" : ""}">${l.name}</button>`).join("")}</div>`;
   }
 
   // src/ui/views/bag.js
@@ -2082,7 +2628,7 @@
   }
   var seg = (act, cur, opts) => `<div class="seg">${opts.map(([v, n]) => `<button data-act="${act}" data-v="${v}" class="${cur === v ? "sel" : ""}">${n}</button>`).join("")}</div>`;
   var itemRow = (it, act = "item") => `<button class="item rar${it.rarity}" data-act="${act}" data-id="${it.id}">
-    <div class="in">${itemName(it)}${bestUpgradeFor(it) ? '<span class="better">\u25B2 \u53EF\u63D0\u5347</span>' : ""}</div>
+    <div class="in">${itemName(it)}${bestUpgradeFor(it) ? tx('<span class="better">\u25B2 \u53EF\u63D0\u5347</span>') : ""}</div>
     <div class="il">${SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div>
     <div class="is num">${RARITY[it.rarity].name}\u30FB${itemStatText(it)}</div></button>`;
   var salvCount = () => app.S.bag.filter((id) => app.S.items[id].rarity <= (app.salvSel ?? 0)).length;
@@ -2090,27 +2636,13 @@
     const S = app.S, E = ECONOMY;
     const items = S.bag.map((id) => S.items[id]).filter(Boolean).filter((it) => app.invFilter === "all" || it.slot === app.invFilter).sort((a, b) => itemScore(b) - itemScore(a));
     const cap = bagMax(S), full = S.bag.length >= cap;
-    let h = `<h2>\u80CC\u5305 <span class="sub num ${full ? "warnc" : ""}">${S.bag.length}/${cap}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">\u7CBE\u83EF <b class="dust num">${fmt(S.dust || 0)}</b></span></h2>
-    <p class="sub" style="margin:0 0 8px">\u5206\u89E3\u7CBE\u826F\u4EE5\u4E0A\u7684\u88DD\u5099\u6703\u5F97\u5230\u7CBE\u83EF\u3002\u901A\u95DC\u7B2C 7 \u5C64\u5F8C\uFF0C\u53EF\u7528\u7CBE\u83EF\u628A\u88DD\u5099\u7CBE\u7149\u5230 +6 ~ +${GEAR.maxUp}\u3002</p>`;
+    let h = tx('<h2>\u80CC\u5305 <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">\u7CBE\u83EF <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">\u5206\u89E3\u7CBE\u826F\u4EE5\u4E0A\u7684\u88DD\u5099\u6703\u5F97\u5230\u7CBE\u83EF\u3002\u901A\u95DC\u7B2C 7 \u5C64\u5F8C\uFF0C\u53EF\u7528\u7CBE\u83EF\u628A\u88DD\u5099\u7CBE\u7149\u5230 +6 ~ +{4}\u3002</p>', full ? "warnc" : "", S.bag.length, cap, fmt(S.dust || 0), GEAR.maxUp);
     if (S.stash.length) {
-      h += `<div class="stashbox"><div class="row" style="align-items:center"><b>\u6230\u5229\u54C1\u7BB1</b><span class="sub num" style="margin:0">${S.stash.length}/${E.stashMax}</span>
-      <span class="sub" style="margin:0 0 0 auto">\u80CC\u5305\u6EFF\u6642\u6389\u843D\u7684\u88DD\u5099</span></div>
-      <div class="stack">${S.stash.map((id) => S.items[id]).sort((a, b) => itemScore(b) - itemScore(a)).slice(0, 5).map((it) => itemRow(it)).join("")}
-      ${S.stash.length > 5 ? `<div class="sub" style="margin:0">\u9084\u6709 ${S.stash.length - 5} \u4EF6</div>` : ""}</div>
-      <div class="row"><button class="btn sm main grow" data-act="takestash" ${full ? "disabled" : ""}>${full ? "\u80CC\u5305\u5DF2\u6EFF" : `\u53D6\u51FA\u5230\u80CC\u5305\uFF08\u9084\u80FD\u653E ${cap - S.bag.length} \u4EF6\uFF09`}</button>
-      <button class="btn sm" data-act="salvagestash">\u5168\u90E8\u5206\u89E3</button></div></div>`;
+      h += tx('<div class="stashbox"><div class="row" style="align-items:center"><b>\u6230\u5229\u54C1\u7BB1</b><span class="sub num" style="margin:0">{0}/{1}</span> <span class="sub" style="margin:0 0 0 auto">\u80CC\u5305\u6EFF\u6642\u6389\u843D\u7684\u88DD\u5099</span></div> <div class="stack">{2} {3}</div> <div class="row"><button class="btn sm main grow" data-act="takestash" {4}>{5}</button> <button class="btn sm" data-act="salvagestash">\u5168\u90E8\u5206\u89E3</button></div></div>', S.stash.length, E.stashMax, S.stash.map((id) => S.items[id]).sort((a, b) => itemScore(b) - itemScore(a)).slice(0, 5).map((it) => itemRow(it)).join(""), S.stash.length > 5 ? tx('<div class="sub" style="margin:0">\u9084\u6709 {0} \u4EF6</div>', S.stash.length - 5) : "", full ? "disabled" : "", full ? tx("\u80CC\u5305\u5DF2\u6EFF") : tx("\u53D6\u51FA\u5230\u80CC\u5305\uFF08\u9084\u80FD\u653E {0} \u4EF6\uFF09", cap - S.bag.length));
     }
-    h += `<div class="toolbar">${seg("filter", app.invFilter, [["all", "\u5168\u90E8"], ["weapon", "\u6B66\u5668"], ["armor", "\u8B77\u7532"], ["trinket", "\u98FE\u54C1"]])}
-    <button class="btn sm main" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button></div>
-    <div class="toolbar"><label class="selwrap"><span>\u5206\u89E3</span><select id="salvSel" aria-label="\u5206\u89E3\u54C1\u8CEA">${[0, 1, 2, 3].map((r) => `<option value="${r}" ${app.salvSel === r ? "selected" : ""}>${RARITY[r].name}${r ? "\u4EE5\u4E0B" : ""}</option>`).join("")}</select></label>
-    <button class="btn sm ${app.salvConfirm ? "danger" : ""}" data-act="salvageupto">${app.salvConfirm ? `\u78BA\u5B9A\u5206\u89E3 ${salvCount()} \u4EF6\uFF1F` : `\u5206\u89E3\uFF08${salvCount()} \u4EF6\uFF09`}</button></div>`;
-    h += items.length ? `<div class="stack">${items.map((it) => itemRow(it)).join("")}</div>` : `<div class="empty">\u80CC\u5305\u662F\u7A7A\u7684\u3002\u901A\u95DC\u526F\u672C\u6703\u6389\u843D\u88DD\u5099\u3002</div>`;
-    h += `<h2 style="font-size:18px">\u6230\u5229\u54C1\u8A2D\u5B9A</h2><div class="settings">
-    <div class="set"><span>\u6389\u843D\u6642\u81EA\u52D5\u5206\u89E3</span>${seg("autosalv", S.autoSalvageBelow, [[0, "\u95DC\u9589"], [1, "\u666E\u901A"], [2, "\u7CBE\u826F\u4EE5\u4E0B"]])}</div>
-    <div class="set"><span>\u80CC\u5305\u6EFF\u5F8C\u53EA\u4FDD\u7559</span>${seg("keeprar", S.keepRarity, [[1, "\u7CBE\u826F\u4EE5\u4E0A"], [2, "\u7A00\u6709\u4EE5\u4E0A"], [3, "\u53F2\u8A69"]])}</div>
-    <p class="sub" style="margin:0">\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\uFF0C\u7B26\u5408\u54C1\u8CEA\u7684\u88DD\u5099\u6703\u5148\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF08\u6700\u591A ${E.stashMax} \u4EF6\uFF09\uFF0C\u5176\u4ED6\u81EA\u52D5\u63DB\u6210\u91D1\u5E63\u3002</p></div>
-    <h2 style="font-size:18px">\u80CC\u5305\u64F4\u5145 <span class="sub num">${cap}/${E.bagMax + BAG_PER_MILESTONE * BAG_MILESTONES.length}</span></h2>
-    <div class="settings">${BAG_MILESTONES.map((m) => `<div class="set"><span class="${m.test(S) ? "" : "sub"}" style="margin:0">${m.test(S) ? "\u2713 " : ""}${m.name}</span><span class="num ${m.test(S) ? "okc" : "sub"}" style="margin:0">+${BAG_PER_MILESTONE} \u683C</span></div>`).join("")}</div>`;
+    h += tx('<div class="toolbar">{0} <button class="btn sm main" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button></div> <div class="toolbar"><label class="selwrap"><span>\u5206\u89E3</span><select id="salvSel" aria-label="\u5206\u89E3\u54C1\u8CEA">{1}</select></label> <button class="btn sm {2}" data-act="salvageupto">{3}</button></div>', seg("filter", app.invFilter, [["all", tx("\u5168\u90E8")], ["weapon", tx("\u6B66\u5668")], ["armor", tx("\u8B77\u7532")], ["trinket", tx("\u98FE\u54C1")]]), [0, 1, 2, 3].map((r) => `<option value="${r}" ${app.salvSel === r ? "selected" : ""}>${RARITY[r].name}${r ? tx("\u4EE5\u4E0B") : ""}</option>`).join(""), app.salvConfirm ? "danger" : "", app.salvConfirm ? tx("\u78BA\u5B9A\u5206\u89E3 {0} \u4EF6\uFF1F", salvCount()) : tx("\u5206\u89E3\uFF08{0} \u4EF6\uFF09", salvCount()));
+    h += items.length ? `<div class="stack">${items.map((it) => itemRow(it)).join("")}</div>` : tx('<div class="empty">\u80CC\u5305\u662F\u7A7A\u7684\u3002\u901A\u95DC\u526F\u672C\u6703\u6389\u843D\u88DD\u5099\u3002</div>');
+    h += tx('<h2 style="font-size:18px">\u6230\u5229\u54C1\u8A2D\u5B9A</h2><div class="settings"> <div class="set"><span>\u6389\u843D\u6642\u81EA\u52D5\u5206\u89E3</span>{0}</div> <div class="set"><span>\u80CC\u5305\u6EFF\u5F8C\u53EA\u4FDD\u7559</span>{1}</div> <p class="sub" style="margin:0">\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\uFF0C\u7B26\u5408\u54C1\u8CEA\u7684\u88DD\u5099\u6703\u5148\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF08\u6700\u591A {2} \u4EF6\uFF09\uFF0C\u5176\u4ED6\u81EA\u52D5\u63DB\u6210\u91D1\u5E63\u3002</p></div> <h2 style="font-size:18px">\u80CC\u5305\u64F4\u5145 <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>', seg("autosalv", S.autoSalvageBelow, [[0, tx("\u95DC\u9589")], [1, tx("\u666E\u901A")], [2, tx("\u7CBE\u826F\u4EE5\u4E0B")]]), seg("keeprar", S.keepRarity, [[1, tx("\u7CBE\u826F\u4EE5\u4E0A")], [2, tx("\u7A00\u6709\u4EE5\u4E0A")], [3, tx("\u53F2\u8A69")]]), E.stashMax, cap, E.bagMax + BAG_PER_MILESTONE * BAG_MILESTONES.length, BAG_MILESTONES.map((m) => tx('<div class="set"><span class="{0}" style="margin:0">{1}{2}</span><span class="num {3}" style="margin:0">+{4} \u683C</span></div>', m.test(S) ? "" : "sub", m.test(S) ? "\u2713 " : "", m.name, m.test(S) ? "okc" : "sub", BAG_PER_MILESTONE)).join(""));
     return h;
   }
 
@@ -2118,27 +2650,16 @@
   function viewTavern() {
     const S = app.S, E = ECONOMY, full = S.heroes.length >= E.rosterMax;
     const one = scrollCost(S, 1), ten = scrollCost(S, 10), P5 = S.recruit, legendsLeft = legendsAvailable(S).length;
-    let h = `<h2>\u9152\u9928</h2><p class="sub">\u540D\u518A <b class="num">${S.heroes.length}/${E.rosterMax}</b>\u3002\u65B0\u82F1\u96C4\u7684\u7B49\u7D1A\u6703\u63A5\u8FD1\u4F60\u968A\u4F0D\u7684\u5E73\u5747\u3002</p>
-    <div class="recruit"><div><span class="label">\u62DB\u52DF\u4EE4</span><b>\u76F4\u63A5\u62BD\u4E00\u4F4D\u82F1\u96C4\u52A0\u5165\u540D\u518A</b>
-      <span class="sub num" style="margin:0">\u7B2C ${Math.max(1, RECRUIT.pityEpic - P5.sinceEpic + 1)} \u62BD\u5167\u5FC5\u51FA\u53F2\u8A69\u4EE5\u4E0A${legendsLeft ? `\u30FB\u7B2C ${Math.max(1, RECRUIT.pityLegend - P5.sinceLegend + 1)} \u62BD\u5167\u5FC5\u51FA\u50B3\u8AAA` : ""}</span></div>
-      <div class="row"><button class="btn main grow" data-act="scroll" data-n="1" ${full || S.gold < one ? "disabled" : ""}>\u55AE\u62BD <span class="num">${fmt(one)}</span> \u91D1</button>
-      <button class="btn main grow" data-act="scroll" data-n="10" ${S.heroes.length + 10 > E.rosterMax || S.gold < ten ? "disabled" : ""}>\u5341\u9023 <span class="num">${fmt(ten)}</span> \u91D1</button></div>
-      ${full ? '<span class="sub" style="margin:0;color:var(--warn)">\u540D\u518A\u6EFF\u4E86\uFF0C\u5148\u5230\u300C\u5718\u968A\u300D\u89E3\u96C7\u4E00\u4E9B\u82F1\u96C4</span>' : S.heroes.length + 10 > E.rosterMax ? `<span class="sub" style="margin:0">\u5341\u9023\u9700\u8981\u540D\u518A\u9084\u6709 10 \u500B\u7A7A\u4F4D</span>` : ""}
-      <div class="rates">${HERO_RARITY.map((r, i) => `<span class="c${i}">${r.name} ${+(r.weight * 100).toFixed(1)}%</span>`).join("")}</div></div>
-    <h2 style="font-size:18px">\u4ECA\u65E5\u540D\u55AE</h2><div class="stack">`;
+    let h = tx('<h2>\u9152\u9928</h2><p class="sub">\u540D\u518A <b class="num">{0}/{1}</b>\u3002\u65B0\u82F1\u96C4\u7684\u7B49\u7D1A\u6703\u63A5\u8FD1\u4F60\u968A\u4F0D\u7684\u5E73\u5747\u3002</p> <div class="recruit"><div><span class="label">\u62DB\u52DF\u4EE4</span><b>\u76F4\u63A5\u62BD\u4E00\u4F4D\u82F1\u96C4\u52A0\u5165\u540D\u518A</b> <span class="sub num" style="margin:0">\u7B2C {2} \u62BD\u5167\u5FC5\u51FA\u53F2\u8A69\u4EE5\u4E0A{3}</span></div> <div class="row"><button class="btn main grow" data-act="scroll" data-n="1" {4}>\u55AE\u62BD <span class="num">{5}</span> \u91D1</button> <button class="btn main grow" data-act="scroll" data-n="10" {6}>\u5341\u9023 <span class="num">{7}</span> \u91D1</button></div> {8} <div class="rates">{9}</div></div> <h2 style="font-size:18px">\u4ECA\u65E5\u540D\u55AE</h2><div class="stack">', S.heroes.length, E.rosterMax, Math.max(1, RECRUIT.pityEpic - P5.sinceEpic + 1), legendsLeft ? tx("\u30FB\u7B2C {0} \u62BD\u5167\u5FC5\u51FA\u50B3\u8AAA", Math.max(1, RECRUIT.pityLegend - P5.sinceLegend + 1)) : "", full || S.gold < one ? "disabled" : "", fmt(one), S.heroes.length + 10 > E.rosterMax || S.gold < ten ? "disabled" : "", fmt(ten), full ? tx('<span class="sub" style="margin:0;color:var(--warn)">\u540D\u518A\u6EFF\u4E86\uFF0C\u5148\u5230\u300C\u5718\u968A\u300D\u89E3\u96C7\u4E00\u4E9B\u82F1\u96C4</span>') : S.heroes.length + 10 > E.rosterMax ? tx('<span class="sub" style="margin:0">\u5341\u9023\u9700\u8981\u540D\u518A\u9084\u6709 10 \u500B\u7A7A\u4F4D</span>') : "", HERO_RARITY.map((r, i) => `<span class="c${i}">${r.name} ${+(r.weight * 100).toFixed(1)}%</span>`).join(""));
     for (const x of S.tavern) {
       const c = cls(x), cost = hireCost(x);
-      h += `<div class="hero r-${x.rarity || 0}"><div class="ic">${c.icon}</div><div class="nm">${heroName(x)}${rarityTag(x)}<small>${c.name}${x.spec ? `\u30FB${SPECS[x.cls][x.spec].name}` : ""}\u30FB${ROLE_NAME[roleOf(x)]}\u30FB<span class="num">Lv${x.level}</span></small></div>
-      <button class="btn sm main" data-act="hire" data-id="${x.id}" ${S.gold < cost || full ? "disabled" : ""} style="grid-row:span 2"><span class="num">${fmt(cost)}</span> \u91D1</button>
-      <div class="st">${x.legend ? `<b class="c4">${LEGENDS[x.cls].pname}</b>\uFF1A${LEGENDS[x.cls].desc}` : c.desc}</div></div>`;
+      h += tx('<div class="hero r-{0}"><div class="ic">{1}</div><div class="nm">{2}{3}<small>{4}{5}\u30FB{6}\u30FB<span class="num">Lv{7}</span></small></div> <button class="btn sm main" data-act="hire" data-id="{8}" {9} style="grid-row:span 2"><span class="num">{10}</span> \u91D1</button> <div class="st">{11}</div></div>', x.rarity || 0, c.icon, heroName(x), rarityTag(x), c.name, x.spec ? `\u30FB${SPECS[x.cls][x.spec].name}` : "", ROLE_NAME[roleOf(x)], x.level, x.id, S.gold < cost || full ? "disabled" : "", fmt(cost), x.legend ? tx('<b class="c4">{0}</b>\uFF1A{1}', LEGENDS[x.cls].pname, LEGENDS[x.cls].desc) : c.desc);
     }
     const rc = refreshCost(S);
-    h += `</div><div class="row" style="margin-top:12px"><button class="btn" data-act="reroll" ${S.gold < rc ? "disabled" : ""}>\u63DB\u4E00\u6279\uFF08<span class="num">${fmt(rc)}</span> \u91D1\uFF09</button><span class="sub" style="margin:0;align-self:center">\u63DB\u4E00\u6279\u4E5F\u7B97\u9032\u4FDD\u5E95</span></div>
-    <h2 style="font-size:18px">\u50B3\u5947\u82F1\u96C4</h2><div class="stack">${Object.entries(LEGENDS).map(([k, L]) => {
+    h += tx('</div><div class="row" style="margin-top:12px"><button class="btn" data-act="reroll" {0}>\u63DB\u4E00\u6279\uFF08<span class="num">{1}</span> \u91D1\uFF09</button><span class="sub" style="margin:0;align-self:center">\u63DB\u4E00\u6279\u4E5F\u7B97\u9032\u4FDD\u5E95</span></div> <h2 style="font-size:18px">\u50B3\u5947\u82F1\u96C4</h2><div class="stack">{2}</div> <h2 style="font-size:18px">\u8077\u696D\u5716\u9451</h2><div class="stack">{3}</div>', S.gold < rc ? "disabled" : "", fmt(rc), Object.entries(LEGENDS).map(([k, L]) => {
       const owned = S.heroes.some((x) => x.legend && x.cls === k);
-      return `<div class="hero ${owned ? "r-4" : "unowned"}"><div class="ic">${CLASSES[k].icon}</div><div class="nm"><span class="c4">${L.title}\u30FB${L.name}</span><small>${CLASSES[k].name}\u30FB${owned ? "\u5DF2\u62DB\u52DF" : "\u672A\u62DB\u52DF"}</small></div><span></span><div class="st"><b>${L.pname}</b>\uFF1A${L.desc}</div></div>`;
-    }).join("")}</div>
-    <h2 style="font-size:18px">\u8077\u696D\u5716\u9451</h2><div class="stack">${Object.values(CLASSES).map((c) => `<div class="hero"><div class="ic">${c.icon}</div><div class="nm">${c.name}<small>${ROLE_NAME[c.role]}</small></div><span></span><div class="st">${c.desc}</div></div>`).join("")}</div>`;
+      return tx('<div class="hero {0}"><div class="ic">{1}</div><div class="nm"><span class="c4">{2}\u30FB{3}</span><small>{4}\u30FB{5}</small></div><span></span><div class="st"><b>{6}</b>\uFF1A{7}</div></div>', owned ? "r-4" : "unowned", CLASSES[k].icon, L.title, L.name, CLASSES[k].name, owned ? tx("\u5DF2\u62DB\u52DF") : tx("\u672A\u62DB\u52DF"), L.pname, L.desc);
+    }).join(""), Object.values(CLASSES).map((c) => `<div class="hero"><div class="ic">${c.icon}</div><div class="nm">${c.name}<small>${ROLE_NAME[c.role]}</small></div><span></span><div class="st">${c.desc}</div></div>`).join(""));
     return h;
   }
 
@@ -2148,8 +2669,13 @@
     renderModal();
   }
   function closeModal() {
+    const done = app.modal && app.modal.type === "dialog" && app.modal.done;
     app.modal = null;
     renderModal();
+    if (done) done();
+  }
+  function playDialog(lines, done) {
+    openModal({ type: "dialog", lines, i: 0, done });
   }
   function renderModal() {
     const el = $("#modal");
@@ -2163,6 +2689,7 @@
     if (app.modal.type === "item") body = sheetItem(app.S.items[app.modal.id]);
     if (app.modal.type === "pick") body = sheetPick();
     if (app.modal.type === "text") body = app.modal.html;
+    if (app.modal.type === "dialog") body = sheetDialog(app.modal);
     if (!body) {
       app.modal = null;
       el.innerHTML = "";
@@ -2174,88 +2701,85 @@
     el.innerHTML = `<div class="scrim" data-act="close"><div class="sheet ${fresh ? "anim" : ""}" role="dialog" aria-modal="true">${body}</div></div>`;
     if (!fresh) el.querySelector(".sheet").scrollTop = scroll;
   }
+  function sheetDialog(m) {
+    const L = m.lines[m.i], last = m.i >= m.lines.length - 1;
+    return `<div class="dlg" data-act="dlgnext">${L.who ? `<b class="who">${L.who}</b>` : ""}<p class="${L.who ? "" : "narr"}">${L.text}</p>
+    <div class="row" style="align-items:center"><span class="sub num" style="margin:0">${m.i + 1}/${m.lines.length}</span>
+    <button class="btn sm" data-act="dlgskip" style="margin-left:auto">${tx("\u8DF3\u904E")}</button><button class="btn sm main" data-act="dlgnext">${last ? tx("\u958B\u59CB") : tx("\u7E7C\u7E8C \u25B8")}</button></div></div>`;
+  }
   function sheetHero(x) {
     if (!x) return "";
     const c = cls(x), st = heroStats(x, app.S.items), view = app.modal.view || "gear", pend = pendingPicks(x);
     const sp = x.spec && SPECS[x.cls][x.spec];
     const R2 = HERO_RARITY[x.rarity || 0], L = x.legend && LEGENDS[x.cls];
-    let h = `<h3>${c.icon} ${heroName(x)} ${rarityTag(x)}</h3><div class="sub" style="margin:0">${c.name}${sp ? `\u30FB${sp.name}` : ""}\u30FB${ROLE_NAME[roleOf(x)]}\u3000${c.desc}</div>
-    ${x.rarity ? `<div class="raritycard r-${x.rarity}"><b class="c${x.rarity}">${R2.name}\u52A0\u6210</b><span>\u57FA\u790E\u5C6C\u6027 \xD7${R2.mult.toFixed(2)}${R2.crit ? `\u30FB\u66B4\u64CA +${Math.round(R2.crit * 100)}%` : ""}${R2.baseCdMult ? "\u30FB\u57FA\u790E\u6280\u80FD\u51B7\u537B \u221210%" : ""}</span>${L ? `<span><b class="c4">${L.pname}</b>\uFF1A${L.desc}</span>` : ""}</div>` : ""}
-    <div class="statgrid num"><div><b>${x.level}</b><span>\u7B49\u7D1A</span></div><div><b>${fmt(st.hp)}</b><span>\u751F\u547D</span></div><div><b>${st.pow}</b><span>\u5A01\u529B</span></div><div><b>${Math.round(st.crit * 100)}%</b><span>\u66B4\u64CA</span></div></div>
-    <div class="sub" style="margin:0">${x.level >= HERO.maxLevel ? `<b style="color:var(--brass)">\u5DD4\u5CF0 ${x.para || 0}</b>\uFF08\u751F\u547D\uFF0F\u5A01\u529B +${x.para || 0}%\uFF09<span class="num">${fmt(x.paraXp || 0)} / ${fmt(paraNeed(x.para || 0))}</span>` : `\u7D93\u9A57 <span class="num">${fmt(x.xp)} / ${fmt(xpNeed(x.level))}</span>`}\u30FB\u8B77\u7532\u6E1B\u50B7 ${Math.round(st.armor * 100)}%</div>
-    <div class="seg wide"><button data-act="heroview" data-id="${x.id}" data-v="gear" class="${view === "gear" ? "sel" : ""}">\u88DD\u5099</button><button data-act="heroview" data-id="${x.id}" data-v="talent" class="${view === "talent" ? "sel" : ""}">\u5929\u8CE6${pend ? `<span class="pip">${pend}</span>` : ""}</button></div>`;
+    let h = tx('<h3>{0} {1} {2}</h3><div class="sub" style="margin:0">{3}{4}\u30FB{5}\u3000{6}</div> {7} <div class="statgrid num"><div><b>{8}</b><span>\u7B49\u7D1A</span></div><div><b>{9}</b><span>\u751F\u547D</span></div><div><b>{10}</b><span>\u5A01\u529B</span></div><div><b>{11}%</b><span>\u66B4\u64CA</span></div></div> <div class="sub" style="margin:0">{12}\u30FB\u8B77\u7532\u6E1B\u50B7 {13}%</div> <div class="seg wide"><button data-act="heroview" data-id="{14}" data-v="gear" class="{15}">\u88DD\u5099</button><button data-act="heroview" data-id="{16}" data-v="talent" class="{17}">\u5929\u8CE6{18}</button></div>', c.icon, heroName(x), rarityTag(x), c.name, sp ? `\u30FB${sp.name}` : "", ROLE_NAME[roleOf(x)], c.desc, x.rarity ? tx('<div class="raritycard r-{0}"><b class="c{1}">{2}\u52A0\u6210</b><span>\u57FA\u790E\u5C6C\u6027 \xD7{3}{4}{5}</span>{6}</div>', x.rarity, x.rarity, R2.name, R2.mult.toFixed(2), R2.crit ? tx("\u30FB\u66B4\u64CA +{0}%", Math.round(R2.crit * 100)) : "", R2.baseCdMult ? tx("\u30FB\u57FA\u790E\u6280\u80FD\u51B7\u537B \u221210%") : "", L ? tx('<span><b class="c4">{0}</b>\uFF1A{1}</span>', L.pname, L.desc) : "") : "", x.level, fmt(st.hp), st.pow, Math.round(st.crit * 100), x.level >= HERO.maxLevel ? tx('<b style="color:var(--brass)">\u5DD4\u5CF0 {0}</b>\uFF08\u751F\u547D\uFF0F\u5A01\u529B +{1}%\uFF09<span class="num">{2} / {3}</span>', x.para || 0, x.para || 0, fmt(x.paraXp || 0), fmt(paraNeed(x.para || 0))) : tx('\u7D93\u9A57 <span class="num">{0} / {1}</span>', fmt(x.xp), fmt(xpNeed(x.level))), Math.round(st.armor * 100), x.id, view === "gear" ? "sel" : "", x.id, view === "talent" ? "sel" : "", pend ? `<span class="pip">${pend}</span>` : "");
     if (view === "talent") return h + talentView(x) + heroActions(x);
     h += `<div>`;
     for (const [slot, sn] of Object.entries(SLOTS)) {
       const it = x.gear[slot] && app.S.items[x.gear[slot]];
       const n = app.S.bag.filter((id) => app.S.items[id].slot === slot).length;
-      h += `<div class="gearrow"><span class="sl">${sn}</span><span>${it ? `${itemName(it)} <span class="sub num">${it.ilvl}</span><br><span class="sub num" style="font-size:12px">${itemStatText(it)}</span>` : '<span class="sub">\uFF08\u7A7A\uFF09</span>'}</span>
-      <span class="row">${it ? upBtn(it, "sm") : ""}
-      <button class="btn sm" data-act="pick" data-id="${x.id}" data-slot="${slot}" ${n ? "" : "disabled"}>\u66F4\u63DB</button></span></div>`;
+      h += tx('<div class="gearrow"><span class="sl">{0}</span><span>{1}</span> <span class="row">{2} <button class="btn sm" data-act="pick" data-id="{3}" data-slot="{4}" {5}>\u66F4\u63DB</button></span></div>', sn, it ? `${itemName(it)} <span class="sub num">${it.ilvl}</span><br><span class="sub num" style="font-size:12px">${itemStatText(it)}</span>` : tx('<span class="sub">\uFF08\u7A7A\uFF09</span>'), it ? upBtn(it, "sm") : "", x.id, slot, n ? "" : "disabled");
     }
     const plan = upgradeAll(app.S, x.id, true), hasGear = Object.values(x.gear).some(Boolean);
     const better = autoEquip(app.S, x.id, true);
-    h += `</div><div class="row">
-    <button class="btn grow ${better ? "main" : ""}" data-act="autoequip1" data-id="${x.id}" ${better ? "" : "disabled"}>${better ? `\u4E00\u9375\u914D\u88DD\uFF08${better} \u4EF6\u66F4\u597D\uFF09` : "\u5DF2\u662F\u6700\u4F73\u914D\u88DD"}</button>
-    <button class="btn" data-act="unequipall" data-id="${x.id}" ${hasGear ? "" : "disabled"}>\u5168\u90E8\u5378\u4E0B</button></div>
-    <div class="row">
-    <button class="btn grow" data-act="upall" data-id="${x.id}" ${plan.count ? "" : "disabled"}>${plan.empty ? "\u6C92\u6709\u88DD\u5099" : plan.count ? `\u4E00\u9375\u5F37\u5316 ${plan.count} \u6B21\uFF08${fmt(plan.spent)} \u91D1${plan.dustSpent ? `\u30FB${plan.dustSpent} \u7CBE\u83EF` : ""}\uFF09` : plan.maxed ? `\u5DF2\u5168\u90E8\u5F37\u5316\u5230 +${maxUpFor(app.S)}` : "\u91D1\u5E63\u6216\u7CBE\u83EF\u4E0D\u5920"}</button>
-</div>`;
+    h += tx('</div><div class="row"> <button class="btn grow {0}" data-act="autoequip1" data-id="{1}" {2}>{3}</button> <button class="btn" data-act="unequipall" data-id="{4}" {5}>\u5168\u90E8\u5378\u4E0B</button></div> <div class="row"> <button class="btn grow" data-act="upall" data-id="{6}" {7}>{8}</button> </div>', better ? "main" : "", x.id, better ? "" : "disabled", better ? tx("\u4E00\u9375\u914D\u88DD\uFF08{0} \u4EF6\u66F4\u597D\uFF09", better) : tx("\u5DF2\u662F\u6700\u4F73\u914D\u88DD"), x.id, hasGear ? "" : "disabled", x.id, plan.count ? "" : "disabled", plan.empty ? tx("\u6C92\u6709\u88DD\u5099") : plan.count ? tx("\u4E00\u9375\u5F37\u5316 {0} \u6B21\uFF08{1} \u91D1{2}\uFF09", plan.count, fmt(plan.spent), plan.dustSpent ? tx("\u30FB{0} \u7CBE\u83EF", plan.dustSpent) : "") : plan.maxed ? tx("\u5DF2\u5168\u90E8\u5F37\u5316\u5230 +{0}", maxUpFor(app.S)) : tx("\u91D1\u5E63\u6216\u7CBE\u83EF\u4E0D\u5920"));
     return h + heroActions(x);
   }
   function heroActions(x) {
     const locked = partyLocked(app.S);
-    if (locked) return `<div class="row"><button class="btn grow" disabled>${inParty(x) ? "\u51FA\u6230\u4E2D" : "\u5F85\u547D\u4E2D"}\u30FB\u639B\u6A5F\u6642\u7121\u6CD5\u66F4\u63DB\u968A\u54E1</button></div>`;
-    return `<div class="row">${inParty(x) ? `<button class="btn grow" data-act="bench" data-id="${x.id}">\u79FB\u51FA\u968A\u4F0D</button>` : `<button class="btn main grow" data-act="join" data-id="${x.id}" ${app.S.party.length >= ECONOMY.partyMax ? "disabled" : ""}>${app.S.party.length >= ECONOMY.partyMax ? "\u968A\u4F0D\u5DF2\u6EFF" : "\u52A0\u5165\u968A\u4F0D"}</button>`}
-    ${app.S.heroes.length > 1 ? `<button class="btn" data-act="fire" data-id="${x.id}" style="color:var(--bad)">${app.modal.confirmFire ? `\u78BA\u5B9A\u89E3\u96C7\uFF1F\u9000 ${fmt(Math.round(hireCost(x) * RECRUIT.fireRefund))} \u91D1` : "\u89E3\u96C7"}</button>` : ""}</div>`;
+    if (locked) return tx('<div class="row"><button class="btn grow" disabled>{0}\u30FB\u639B\u6A5F\u6642\u7121\u6CD5\u66F4\u63DB\u968A\u54E1</button></div>', inParty(x) ? tx("\u51FA\u6230\u4E2D") : tx("\u5F85\u547D\u4E2D"));
+    return `<div class="row">${inParty(x) ? tx('<button class="btn grow" data-act="bench" data-id="{0}">\u79FB\u51FA\u968A\u4F0D</button>', x.id) : `<button class="btn main grow" data-act="join" data-id="${x.id}" ${app.S.party.length >= ECONOMY.partyMax ? "disabled" : ""}>${app.S.party.length >= ECONOMY.partyMax ? tx("\u968A\u4F0D\u5DF2\u6EFF") : tx("\u52A0\u5165\u968A\u4F0D")}</button>`}
+    ${app.S.heroes.length > 1 ? `<button class="btn" data-act="fire" data-id="${x.id}" style="color:var(--bad)">${app.modal.confirmFire ? tx("\u78BA\u5B9A\u89E3\u96C7\uFF1F\u9000 {0} \u91D1", fmt(Math.round(hireCost(x) * RECRUIT.fireRefund))) : tx("\u89E3\u96C7")}</button>` : ""}</div>`;
   }
   function talentView(x) {
     const B = BASE_SKILLS[x.cls], specs = SPECS[x.cls], t = x.talents || {};
     const top = Math.max(0, app.S.unlocked - 1), dn = DUNGEONS[top];
     const opt = (act, v, on, locked, name, desc, extra = "") => `<button class="opt ${on ? "sel" : ""}" data-act="${act}" data-id="${x.id}" data-v="${v}" ${extra} ${locked ? "disabled" : ""}><b>${name}</b><span>${desc}</span></button>`;
-    const specRow = `<div class="trow ${x.level < SPEC_LEVEL ? "locked" : ""}"><span class="tlv num">Lv${SPEC_LEVEL}<small>${x.level < SPEC_LEVEL ? "\u672A\u89E3\u9396" : "\u5C08\u7CBE"}</small></span>
+    const specRow = `<div class="trow ${x.level < SPEC_LEVEL ? "locked" : ""}"><span class="tlv num">Lv${SPEC_LEVEL}<small>${x.level < SPEC_LEVEL ? tx("\u672A\u89E3\u9396") : tx("\u5C08\u7CBE")}</small></span>
       ${Object.entries(specs).map(([k, sp]) => opt("spec", k, x.spec === k, x.level < SPEC_LEVEL, `${sp.name}\u30FB${sp.skill}`, sp.desc)).join("")}</div>`;
-    let h = `<div class="skillcard"><span class="label">\u57FA\u790E\u6280\u80FD</span><b>${B.name}</b><span class="sub" style="margin:0">${B.desc}</span></div>`;
+    let h = tx('<div class="skillcard"><span class="label">\u57FA\u790E\u6280\u80FD</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>', B.name, B.desc);
     TALENTS[x.cls].forEach((row, i) => {
       const lv = TALENT_ROWS[i], locked = x.level < lv;
       if (lv > SPEC_LEVEL && !h.includes('data-act="spec"')) h += specRow;
-      h += `<div class="trow ${locked ? "locked" : ""}"><span class="tlv num">Lv${lv}${locked ? "<small>\u672A\u89E3\u9396</small>" : ""}</span>
+      h += `<div class="trow ${locked ? "locked" : ""}"><span class="tlv num">Lv${lv}${locked ? tx("<small>\u672A\u89E3\u9396</small>") : ""}</span>
       ${["a", "b"].map((k) => opt("talent", k, t[lv] === k && !locked, locked, row[k].name, row[k].desc, `data-lv="${lv}"`)).join("")}</div>`;
     });
-    h += `<div class="row"><button class="btn grow" data-act="recommend" data-id="${x.id}" data-d="${top}">\u4F9D\u300C${dn.name}\u300D\u63A8\u85A6\u914D\u7F6E</button></div>
-    <p class="sub" style="margin:0">\u96A8\u6642\u53EF\u4EE5\u514D\u8CBB\u66F4\u63DB\uFF0C\u4E0B\u4E00\u5834\u6230\u9B25\u751F\u6548\u3002</p>`;
+    h += tx('<div class="row"><button class="btn grow" data-act="recommend" data-id="{0}" data-d="{1}">\u4F9D\u300C{2}\u300D\u63A8\u85A6\u914D\u7F6E</button></div> <p class="sub" style="margin:0">\u96A8\u6642\u53EF\u4EE5\u514D\u8CBB\u66F4\u63DB\uFF0C\u4E0B\u4E00\u5834\u6230\u9B25\u751F\u6548\u3002</p>', x.id, top, dn.name);
     return h;
   }
   function sheetPick() {
     const x = hero(app.modal.id), slot = app.modal.slot, cur = x.gear[slot] && app.S.items[x.gear[slot]];
     const list = app.S.bag.map((id) => app.S.items[id]).filter((it) => it.slot === slot).sort((a, b) => itemScore(b) - itemScore(a));
-    return `<h3>\u70BA ${x.name} \u9078\u64C7${SLOTS[slot]}</h3><div class="sub" style="margin:0">\u76EE\u524D\uFF1A${cur ? itemName(cur) + "\u30FB" + itemStatText(cur) : "\u7121"}</div>
-    <div class="choices">${list.map((it) => `<button class="item rar${it.rarity}" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="in">${itemName(it)}${!cur || itemScore(it) > itemScore(cur) ? '<span class="better">\u25B2</span>' : ""}</div><div class="il"><b class="num">${it.ilvl}</b></div><div class="is num">${itemStatText(it)}</div></button>`).join("")}</div>
-    <div class="row">${cur ? `<button class="btn" data-act="unequip" data-hero="${x.id}" data-slot="${slot}">\u5378\u4E0B</button>` : ""}<button class="btn" data-act="hero" data-id="${x.id}">\u8FD4\u56DE</button></div>`;
+    return tx('<h3>\u70BA {0} \u9078\u64C7{1}</h3><div class="sub" style="margin:0">\u76EE\u524D\uFF1A{2}</div> <div class="choices">{3}</div> <div class="row">{4}<button class="btn" data-act="hero" data-id="{5}">\u8FD4\u56DE</button></div>', x.name, SLOTS[slot], cur ? itemName(cur) + "\u30FB" + itemStatText(cur) : tx("\u7121"), list.map((it) => `<button class="item rar${it.rarity}" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="in">${itemName(it)}${!cur || itemScore(it) > itemScore(cur) ? '<span class="better">\u25B2</span>' : ""}</div><div class="il"><b class="num">${it.ilvl}</b></div><div class="is num">${itemStatText(it)}</div></button>`).join(""), cur ? tx('<button class="btn" data-act="unequip" data-hero="{0}" data-slot="{1}">\u5378\u4E0B</button>', x.id, slot) : "", x.id);
   }
   function sheetItem(it) {
     if (!it) return "";
     const party = partyHeroes(app.S);
-    return `<h3>${itemName(it)}</h3><div class="sub num" style="margin:0">${RARITY[it.rarity].name}${SLOTS[it.slot]}\u30FB\u88DD\u7B49 ${it.ilvl}\u30FB\u5F37\u5316 +${it.up}/${maxUpFor(app.S)}<br>${itemStatText(it)}</div>
-    <span class="label">\u88DD\u5099\u7D66</span><div class="stack">${party.map((x) => {
+    return tx('<h3>{0}</h3><div class="sub num" style="margin:0">{1}{2}\u30FB\u88DD\u7B49 {3}\u30FB\u5F37\u5316 +{4}/{5}<br>{6}</div> <span class="label">\u88DD\u5099\u7D66</span><div class="stack">{7}</div> <div class="row">{8} <button class="btn" data-act="salvage" data-id="{9}">\u5206\u89E3 +<span class="num">{10}</span> \u91D1{11}</button></div>', itemName(it), RARITY[it.rarity].name, SLOTS[it.slot], it.ilvl, it.up, maxUpFor(app.S), itemStatText(it), party.map((x) => {
       const cur = x.gear[it.slot] && app.S.items[x.gear[it.slot]];
       const better = !cur || itemScore(it) > itemScore(cur);
-      return `<button class="hero" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="ic">${cls(x).icon}</div><div class="nm">${x.name}<small>${cls(x).name}</small></div><span class="tag ${better ? "in" : ""}">${better ? "\u25B2 \u63D0\u5347" : "\u8F03\u5DEE"}</span><div class="st">\u76EE\u524D\uFF1A${cur ? `${cur.name}\uFF08${cur.ilvl}\uFF09` : "\u7A7A"}</div></button>`;
-    }).join("")}</div>
-    <div class="row">${upBtn(it, "")}
-    <button class="btn" data-act="salvage" data-id="${it.id}">\u5206\u89E3 +<span class="num">${salvageValue(it)}</span> \u91D1${salvageDust(it) ? `\u30FB<span class="dust num">${salvageDust(it)}</span> \u7CBE\u83EF` : ""}</button></div>`;
+      return tx('<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">\u76EE\u524D\uFF1A{7}</div></button>', x.id, it.id, cls(x).icon, x.name, cls(x).name, better ? "in" : "", better ? tx("\u25B2 \u63D0\u5347") : tx("\u8F03\u5DEE"), cur ? tx("{0}\uFF08{1}\uFF09", cur.name, cur.ilvl) : tx("\u7A7A"));
+    }).join(""), upBtn(it, ""), it.id, salvageValue(it), salvageDust(it) ? tx('\u30FB<span class="dust num">{0}</span> \u7CBE\u83EF', salvageDust(it)) : "");
   }
   function upBtn(it, size) {
-    if (it.up >= maxUpFor(app.S)) return `<button class="btn ${size}" disabled>\u5F37\u5316 MAX</button>`;
+    if (it.up >= maxUpFor(app.S)) return tx('<button class="btn {0}" disabled>\u5F37\u5316 MAX</button>', size);
     const g = upgradeCost(it), d = dustCost(it), ok = app.S.gold >= g && (app.S.dust || 0) >= d;
-    return `<button class="btn ${size}" data-act="up" data-id="${it.id}" ${ok ? "" : "disabled"}>${d ? "\u7CBE\u7149" : "\u5F37\u5316"} <span class="num">${fmt(g)}</span>${d ? `<span class="dust num">+${d}\u2726</span>` : ""}</button>`;
+    return `<button class="btn ${size}" data-act="up" data-id="${it.id}" ${ok ? "" : "disabled"}>${d ? tx("\u7CBE\u7149") : tx("\u5F37\u5316")} <span class="num">${fmt(g)}</span>${d ? `<span class="dust num">+${d}\u2726</span>` : ""}</button>`;
   }
+
+  // src/ui/story.js
+  var PROLOGUE = [
+    { who: "", text: tx("\u908A\u5883\u516C\u6703\u7684\u61F8\u8CDE\u699C\u4E0A\uFF0C\u8CBC\u6EFF\u4E86\u526F\u672C\u7684\u59D4\u8A17\u3002") },
+    { who: tx("\u516C\u6703\u66F8\u8A18"), text: tx("\u65B0\u4F86\u7684\u5718\u9577\uFF1F\u5148\u5F9E\u8150\u6839\u6D1E\u7A9F\u958B\u59CB\u5427\uFF0C\u90A3\u88E1\u7684\u8611\u83C7\u9818\u4E3B\u6700\u8FD1\u4E0D\u592A\u5B89\u5206\u3002") },
+    { who: tx("\u516C\u6703\u66F8\u8A18"), text: tx("\u968A\u4F0D\u6211\u5E6B\u4F60\u6E4A\u4E86\u4E09\u500B\u4EBA\u3002\u4EBA\u624B\u4E0D\u5920\uFF0C\u5C31\u53BB\u9152\u9928\u627E\u3002") },
+    { who: tx("\u516C\u6703\u66F8\u8A18"), text: tx("\u5C0D\u4E86\u2014\u2014\u6700\u4E0A\u9762\u90A3\u5F35\u5C60\u9F8D\u4EE4\uFF0C\u7B49\u4F60\u5011\u5920\u5F37\u518D\u8AAA\u3002") }
+  ];
 
   // src/ui/battle-runner.js
   function startBattle(dIdx) {
     const p = partyHeroes(app.S);
     if (!p.length) {
-      toast("\u968A\u4F0D\u6C92\u6709\u6210\u54E1");
+      toast(tx("\u968A\u4F0D\u6C92\u6709\u6210\u54E1"));
       app.tab = "team";
       app.render();
       return;
@@ -2264,13 +2788,13 @@
     app.pendingRepeat = null;
     app.battle = new Battle(p, app.S.items, dIdx, { autoHorn: app.S.idle === dIdx });
     app.lastResult = null;
-    app.battle.push(`\u9032\u5165 ${DUNGEONS[dIdx].name}\uFF0C\u7B2C 1 \u6CE2\u6575\u4EBA\u51FA\u73FE`, "info");
+    app.battle.push(tx("\u9032\u5165 {0}\uFF0C\u7B2C 1 \u6CE2\u6575\u4EBA\u51FA\u73FE", DUNGEONS[dIdx].name), "info");
     runTimer();
   }
   function startMythic(dIdx) {
     const p = partyHeroes(app.S);
     if (!p.length) {
-      toast("\u968A\u4F0D\u6C92\u6709\u6210\u54E1");
+      toast(tx("\u968A\u4F0D\u6C92\u6709\u6210\u54E1"));
       app.tab = "team";
       app.render();
       return;
@@ -2280,7 +2804,7 @@
     const o = mythicBattleOpts(dIdx, app.S.mythic.key);
     app.battle = new Battle(p, app.S.items, dIdx, o);
     app.lastResult = null;
-    app.battle.push(`\u9032\u5165\u50B3\u5947\u79D8\u5883\uFF1A${DUNGEONS[dIdx].name} +${o.mythic.level}\uFF5C\u8A5E\u7DB4\uFF1A${o.mythic.affixes.map((a) => AFFIXES[a].name).join("\u3001")}`, "info");
+    app.battle.push(tx("\u9032\u5165\u50B3\u5947\u79D8\u5883\uFF1A{0} +{1}\uFF5C\u8A5E\u7DB4\uFF1A{2}", DUNGEONS[dIdx].name, o.mythic.level, o.mythic.affixes.map((a) => AFFIXES[a].name).join(tx("\u3001"))), "info");
     runTimer();
   }
   function startMythicIdle(dIdx) {
@@ -2292,26 +2816,26 @@
     app.battle = new Battle(p, app.S.items, dIdx, { ...o, autoHorn: true });
     app.battle.mythicIdle = true;
     app.lastResult = null;
-    app.battle.push(`\u79D8\u5883\u639B\u6A5F\uFF1A${DUNGEONS[dIdx].name} +${lv}\uFF08\u9470\u77F3\u4E0D\u8B8A\uFF0C\u734E\u52F5 ${Math.round(MYTHIC.idleMult * 100)}%\uFF09`, "info");
+    app.battle.push(tx("\u79D8\u5883\u639B\u6A5F\uFF1A{0} +{1}\uFF08\u9470\u77F3\u4E0D\u8B8A\uFF0C\u734E\u52F5 {2}%\uFF09", DUNGEONS[dIdx].name, lv, Math.round(MYTHIC.idleMult * 100)), "info");
     runTimer();
   }
   function startVault(floor) {
     const p = partyHeroes(app.S);
     if (!p.length) {
-      toast("\u968A\u4F0D\u6C92\u6709\u6210\u54E1");
+      toast(tx("\u968A\u4F0D\u6C92\u6709\u6210\u54E1"));
       app.tab = "team";
       app.render();
       return false;
     }
     if (!vaultLeft(app.S)) {
-      toast("\u4ECA\u5929\u7684\u5BF6\u5EAB\u6B21\u6578\u7528\u5B8C\u4E86\uFF0C\u660E\u5929 00:00 \u91CD\u7F6E");
+      toast(tx("\u4ECA\u5929\u7684\u5BF6\u5EAB\u6B21\u6578\u7528\u5B8C\u4E86\uFF0C\u660E\u5929 00:00 \u91CD\u7F6E"));
       return false;
     }
     clearTimeout(app.pendingRepeat);
     app.pendingRepeat = null;
     app.battle = new Battle(p, app.S.items, floor, vaultBattleOpts(floor));
     app.lastResult = null;
-    app.battle.push(`\u9032\u5165\u5BF6\u5EAB\u7B2C ${floor + 1} \u5C64\uFF1A60 \u79D2\u5167\u6253\u5012\u8D8A\u591A\u5BF6\u85CF\u54E5\u5E03\u6797\uFF0C\u91D1\u5E63\u8D8A\u591A\uFF01`, "info");
+    app.battle.push(tx("\u9032\u5165\u5BF6\u5EAB\u7B2C {0} \u5C64\uFF1A60 \u79D2\u5167\u6253\u5012\u8D8A\u591A\u5BF6\u85CF\u54E5\u5E03\u6797\uFF0C\u91D1\u5E63\u8D8A\u591A\uFF01", floor + 1), "info");
     runTimer();
     return true;
   }
@@ -2334,11 +2858,11 @@
     app.lastResult = app.battle.vault ? applyVaultResult(app.S, app.battle, partyHeroes) : app.battle.mythicIdle ? applyMythicIdleResult(app.S, app.battle) : app.battle.mythic ? applyMythicResult(app.S, app.battle) : applyResult(app.S, app.battle.dIdx, app.battle);
     save();
     const r = app.lastResult, b = app.battle;
-    for (const m of newBagMilestones(app.S)) setTimeout(() => toast(`\u{1F392} ${m.name}\uFF1A\u80CC\u5305 +${BAG_PER_MILESTONE} \u683C`), 400);
-    if (b.vault) sendEvent("\u5BF6\u5EAB", `\u7B2C ${b.vault.floor + 1} \u5C64 \u6253\u5012 ${r.kills} \u96BB +${r.gold} \u91D1`);
+    for (const m of newBagMilestones(app.S)) setTimeout(() => toast(tx("\u{1F392} {0}\uFF1A\u80CC\u5305 +{1} \u683C", m.name, BAG_PER_MILESTONE)), 400);
+    if (b.vault) sendEvent(tx("\u5BF6\u5EAB"), tx("\u7B2C {0} \u5C64 \u6253\u5012 {1} \u96BB +{2} \u91D1", b.vault.floor + 1, r.kills, r.gold));
     else if (b.mythicIdle) {
-    } else if (b.mythic) sendEvent("\u79D8\u5883", `${DUNGEONS[b.dIdx].name} +${b.mythic.level} ${r.inTime ? "\u9650\u6642" : b.win ? "\u8D85\u6642" : "\u5931\u6557"} ${mmss(b.tick)}${r.record ? "\uFF08\u65B0\u7D00\u9304\uFF09" : ""}`);
-    else if (r.first) sendEvent("\u9996\u901A", `\u7B2C ${b.dIdx + 1} \u5C64 ${DUNGEONS[b.dIdx].name}`);
+    } else if (b.mythic) sendEvent(tx("\u79D8\u5883"), `${DUNGEONS[b.dIdx].name} +${b.mythic.level} ${r.inTime ? tx("\u9650\u6642") : b.win ? tx("\u8D85\u6642") : tx("\u5931\u6557")} ${mmss(b.tick)}${r.record ? tx("\uFF08\u65B0\u7D00\u9304\uFF09") : ""}`);
+    else if (r.first) sendEvent(tx("\u9996\u901A"), tx("\u7B2C {0} \u5C64 {1}", b.dIdx + 1, DUNGEONS[b.dIdx].name));
     if (!app.battle.mythic && !app.battle.vault && app.S.idle === app.battle.dIdx) {
       const d = app.battle.dIdx;
       app.pendingRepeat = setTimeout(() => {
@@ -2364,7 +2888,7 @@
     bag: '<path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
     tavern: '<path d="M6 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M16 5h2a2 2 0 0 1 0 4h-2M11 13v4M7 20h8"/>'
   };
-  var TABS = [["dungeon", "\u526F\u672C"], ["battle", "\u6230\u9B25"], ["team", "\u5718\u968A"], ["bag", "\u80CC\u5305"], ["tavern", "\u9152\u9928"]];
+  var TABS = [["dungeon", tx("\u526F\u672C")], ["battle", tx("\u6230\u9B25")], ["team", tx("\u5718\u968A")], ["bag", tx("\u80CC\u5305")], ["tavern", tx("\u9152\u9928")]];
   function renderTabs() {
     $("#tabs").innerHTML = TABS.map(([k, n]) => `<button data-tab="${k}" class="${app.tab === k ? "sel" : ""}" aria-label="${n}"><svg viewBox="0 0 24 24">${ICONS[k]}</svg>${n}${k === "battle" && app.battle && !app.battle.over && app.tab !== "battle" || k === "bag" && app.S.stash.length || k === "team" && app.S.heroes.some((h) => pendingPicks(h)) ? '<span class="dot"></span>' : ""}</button>`).join("");
   }
@@ -2427,14 +2951,14 @@
         break;
       case "prepare-vault": {
         const r = prepare(app.S, ["summon"]);
-        toast(prepMsg(r, "\u5BF6\u5EAB\uFF08\u504F\u7BC4\u570D\u8F38\u51FA\uFF09"));
+        toast(prepMsg(r, tx("\u5BF6\u5EAB\uFF08\u504F\u7BC4\u570D\u8F38\u51FA\uFF09")));
         save();
         break;
       }
       case "scroll": {
         const n = +t.dataset.n, r = recruitScroll(app.S, n);
         if (r.error) {
-          toast(r.error === "gold" ? "\u91D1\u5E63\u4E0D\u5920" : "\u540D\u518A\u7A7A\u4F4D\u4E0D\u5920");
+          toast(r.error === "gold" ? tx("\u91D1\u5E63\u4E0D\u5920") : tx("\u540D\u518A\u7A7A\u4F4D\u4E0D\u5920"));
           break;
         }
         save();
@@ -2443,7 +2967,7 @@
       }
       case "recommend-mythic": {
         const d = +t.dataset.d, r = prepare(app.S, [...DUNGEONS[d].mech.map((m) => m.t), ...affixHints(activeAffixes(app.S.mythic.key))]);
-        toast(prepMsg(r, `\u300C${DUNGEONS[d].name}\u300D\u8207\u4ECA\u65E5\u8A5E\u7DB4`));
+        toast(prepMsg(r, tx("\u300C{0}\u300D\u8207\u4ECA\u65E5\u8A5E\u7DB4", DUNGEONS[d].name)));
         save();
         break;
       }
@@ -2453,12 +2977,12 @@
           app.S.idle = null;
           clearTimeout(app.pendingRepeat);
           app.pendingRepeat = null;
-          toast("\u5DF2\u505C\u6B62\u639B\u6A5F");
+          toast(tx("\u5DF2\u505C\u6B62\u639B\u6A5F"));
         } else {
           const swap = app.S.idleMythic != null;
           app.S.idleMythic = null;
           app.S.idle = d;
-          toast(`\u958B\u59CB\u639B\u6A5F\uFF1A${DUNGEONS[d].name}`);
+          toast(tx("\u958B\u59CB\u639B\u6A5F\uFF1A{0}", DUNGEONS[d].name));
           if (swap || !app.battle || app.battle.over) {
             startBattle(d);
           }
@@ -2472,16 +2996,16 @@
           app.S.idleMythic = null;
           clearTimeout(app.pendingRepeat);
           app.pendingRepeat = null;
-          toast("\u5DF2\u505C\u6B62\u79D8\u5883\u639B\u6A5F");
+          toast(tx("\u5DF2\u505C\u6B62\u79D8\u5883\u639B\u6A5F"));
         } else if (lv) {
           const busy = app.battle && !app.battle.over && !app.battle.mythicIdle && !(app.S.idle != null && app.battle.dIdx === app.S.idle && !app.battle.mythic);
           if (busy) {
-            toast("\u76EE\u524D\u6709\u6230\u9B25\u9032\u884C\u4E2D\uFF0C\u6253\u5B8C\u518D\u958B\u59CB\u79D8\u5883\u639B\u6A5F");
+            toast(tx("\u76EE\u524D\u6709\u6230\u9B25\u9032\u884C\u4E2D\uFF0C\u6253\u5B8C\u518D\u958B\u59CB\u79D8\u5883\u639B\u6A5F"));
             break;
           }
           app.S.idle = null;
           app.S.idleMythic = d;
-          toast(`\u958B\u59CB\u79D8\u5883\u639B\u6A5F\uFF1A${DUNGEONS[d].name} +${lv}`);
+          toast(tx("\u958B\u59CB\u79D8\u5883\u639B\u6A5F\uFF1A{0} +{1}", DUNGEONS[d].name, lv));
           startMythicIdle(d);
           app.tab = "battle";
           window.scrollTo(0, 0);
@@ -2489,6 +3013,29 @@
         save();
         break;
       }
+      case "dlgnext":
+        if (app.modal && app.modal.type === "dialog") {
+          if (app.modal.i < app.modal.lines.length - 1) {
+            app.modal.i++;
+            renderModal();
+          } else closeModal();
+        }
+        return;
+      case "dlgskip":
+        closeModal();
+        return;
+      case "lang":
+        if (t.dataset.v !== getLang()) {
+          if (app.fresh) {
+            try {
+              localStorage.removeItem(KEY2);
+            } catch (e2) {
+            }
+          } else save();
+          setLang(t.dataset.v);
+          location.reload();
+        }
+        return;
       case "speed":
         app.speed = +t.dataset.x;
         runTimer();
@@ -2507,7 +3054,7 @@
           clearInterval(app.bTimer);
           app.battle.over = true;
           app.battle.win = false;
-          app.battle.push("\u{1F3F3} \u4E3B\u52D5\u64A4\u9000", "bad");
+          app.battle.push(tx("\u{1F3F3} \u4E3B\u52D5\u64A4\u9000"), "bad");
           app.lastResult = app.battle.mythicIdle ? applyMythicIdleResult(app.S, app.battle) : applyResult(app.S, app.battle.dIdx, app.battle);
           if (app.S.idle === app.battle.dIdx) app.S.idle = null;
           if (app.battle.mythicIdle) app.S.idleMythic = null;
@@ -2530,13 +3077,13 @@
         break;
       case "recommend":
         applyRecommend(hero(id), DUNGEONS[+t.dataset.d].mech.map((m) => m.t));
-        toast("\u5DF2\u5957\u7528\u63A8\u85A6\u914D\u7F6E");
+        toast(tx("\u5DF2\u5957\u7528\u63A8\u85A6\u914D\u7F6E"));
         save();
         break;
       case "recommend-party":
       case "prepare": {
         const d = +t.dataset.d, r = prepare(app.S, DUNGEONS[d].mech.map((m) => m.t));
-        toast(prepMsg(r, `\u300C${DUNGEONS[d].name}\u300D`));
+        toast(prepMsg(r, tx("\u300C{0}\u300D", DUNGEONS[d].name)));
         save();
         break;
       }
@@ -2551,7 +3098,7 @@
         return;
       case "equip":
         equip(app.S, t.dataset.hero, id);
-        toast("\u5DF2\u88DD\u5099");
+        toast(tx("\u5DF2\u88DD\u5099"));
         save();
         app.modal = { type: "hero", id: t.dataset.hero };
         break;
@@ -2563,19 +3110,19 @@
       case "up": {
         const it = app.S.items[id], refine = it && it.up >= GEAR.refineFrom;
         if (upgrade(app.S, id)) {
-          toast(`${refine ? "\u7CBE\u7149" : "\u5F37\u5316"}\u6210\u529F +${it.up}`);
+          toast(tx("{0}\u6210\u529F +{1}", refine ? tx("\u7CBE\u7149") : tx("\u5F37\u5316"), it.up));
           save();
-        } else toast(refine ? "\u91D1\u5E63\u6216\u7CBE\u83EF\u4E0D\u8DB3" : "\u91D1\u5E63\u4E0D\u8DB3");
+        } else toast(refine ? tx("\u91D1\u5E63\u6216\u7CBE\u83EF\u4E0D\u8DB3") : tx("\u91D1\u5E63\u4E0D\u8DB3"));
         break;
       }
       case "salvage":
-        toast(`\u5206\u89E3\u7372\u5F97 ${salvage(app.S, id)} \u91D1`);
+        toast(tx("\u5206\u89E3\u7372\u5F97 {0} \u91D1", salvage(app.S, id)));
         save();
         app.modal = null;
         break;
       case "join":
         if (partyLocked(app.S)) {
-          toast("\u639B\u6A5F\u4E2D\u4E0D\u80FD\u66F4\u63DB\u968A\u54E1\uFF0C\u8ACB\u5148\u505C\u6B62\u639B\u6A5F");
+          toast(tx("\u639B\u6A5F\u4E2D\u4E0D\u80FD\u66F4\u63DB\u968A\u54E1\uFF0C\u8ACB\u5148\u505C\u6B62\u639B\u6A5F"));
           break;
         }
         joinParty(app.S, id);
@@ -2583,7 +3130,7 @@
         break;
       case "bench":
         if (partyLocked(app.S)) {
-          toast("\u639B\u6A5F\u4E2D\u4E0D\u80FD\u66F4\u63DB\u968A\u54E1\uFF0C\u8ACB\u5148\u505C\u6B62\u639B\u6A5F");
+          toast(tx("\u639B\u6A5F\u4E2D\u4E0D\u80FD\u66F4\u63DB\u968A\u54E1\uFF0C\u8ACB\u5148\u505C\u6B62\u639B\u6A5F"));
           break;
         }
         benchHero(app.S, id);
@@ -2591,7 +3138,7 @@
         break;
       case "fire": {
         if (partyLocked(app.S) && app.S.party.includes(id)) {
-          toast("\u639B\u6A5F\u4E2D\u4E0D\u80FD\u66F4\u63DB\u968A\u54E1\uFF0C\u8ACB\u5148\u505C\u6B62\u639B\u6A5F");
+          toast(tx("\u639B\u6A5F\u4E2D\u4E0D\u80FD\u66F4\u63DB\u968A\u54E1\uFF0C\u8ACB\u5148\u505C\u6B62\u639B\u6A5F"));
           break;
         }
         if (!app.modal.confirmFire) {
@@ -2600,7 +3147,7 @@
         }
         const x = fireHero(app.S, id);
         app.modal = null;
-        if (x) toast(`${x.name} \u96E2\u958B\u4E86\u5718\u968A\uFF0C\u9000\u9084 ${x.refund} \u91D1${gearMsg(x.gear)}`);
+        if (x) toast(tx("{0} \u96E2\u958B\u4E86\u5718\u968A\uFF0C\u9000\u9084 {1} \u91D1{2}", x.name, x.refund, gearMsg(x.gear)));
         save();
         break;
       }
@@ -2613,7 +3160,7 @@
         }
         app.fireConfirm = false;
         const r = fireMany(app.S, app.fireSel ?? 0);
-        toast(`\u89E3\u96C7 ${r.count} \u4F4D\u82F1\u96C4\uFF0C\u9000\u9084 ${fmt(r.refund)} \u91D1${gearMsg(r.gear)}`);
+        toast(tx("\u89E3\u96C7 {0} \u4F4D\u82F1\u96C4\uFF0C\u9000\u9084 {1} \u91D1{2}", r.count, fmt(r.refund), gearMsg(r.gear)));
         save();
         break;
       }
@@ -2625,7 +3172,7 @@
           return;
         }
         if (x) {
-          toast(`${x.name} \u52A0\u5165\u4E86${app.S.party.includes(x.id) ? "\u968A\u4F0D" : "\u540D\u518A"}`);
+          toast(tx("{0} \u52A0\u5165\u4E86{1}", x.name, app.S.party.includes(x.id) ? tx("\u968A\u4F0D") : tx("\u540D\u518A")));
           save();
         }
         break;
@@ -2638,13 +3185,13 @@
         break;
       case "autoequip1": {
         const n = autoEquip(app.S, id);
-        toast(n ? `\u66F4\u63DB\u4E86 ${n} \u4EF6\u88DD\u5099` : "\u76EE\u524D\u5DF2\u662F\u6700\u4F73\u914D\u88DD");
+        toast(n ? tx("\u66F4\u63DB\u4E86 {0} \u4EF6\u88DD\u5099", n) : tx("\u76EE\u524D\u5DF2\u662F\u6700\u4F73\u914D\u88DD"));
         save();
         break;
       }
       case "autoequip": {
         const n = autoEquip(app.S);
-        toast(n ? `\u66F4\u63DB\u4E86 ${n} \u4EF6\u88DD\u5099` : "\u76EE\u524D\u5DF2\u662F\u6700\u4F73\u914D\u88DD");
+        toast(n ? tx("\u66F4\u63DB\u4E86 {0} \u4EF6\u88DD\u5099", n) : tx("\u76EE\u524D\u5DF2\u662F\u6700\u4F73\u914D\u88DD"));
         save();
         break;
       }
@@ -2656,19 +3203,19 @@
         }
         app.salvConfirm = false;
         const r = salvageUpTo(app.S, lv);
-        toast(r.count ? `\u5206\u89E3 ${r.count} \u4EF6\uFF0C\u7372\u5F97 ${r.gold} \u91D1` : "\u6C92\u6709\u7B26\u5408\u7684\u88DD\u5099");
+        toast(r.count ? tx("\u5206\u89E3 {0} \u4EF6\uFF0C\u7372\u5F97 {1} \u91D1", r.count, r.gold) : tx("\u6C92\u6709\u7B26\u5408\u7684\u88DD\u5099"));
         save();
         break;
       }
       case "upall": {
         const r = upgradeAll(app.S, id);
-        toast(r.count ? `\u5F37\u5316 ${r.count} \u6B21\uFF0C\u82B1\u8CBB ${fmt(r.spent)} \u91D1` : "\u91D1\u5E63\u4E0D\u5920");
+        toast(r.count ? tx("\u5F37\u5316 {0} \u6B21\uFF0C\u82B1\u8CBB {1} \u91D1", r.count, fmt(r.spent)) : tx("\u91D1\u5E63\u4E0D\u5920"));
         save();
         break;
       }
       case "unequipall": {
         const r = unequipAll(app.S, id);
-        toast(r.left ? `\u80CC\u5305\u548C\u6230\u5229\u54C1\u7BB1\u90FD\u6EFF\u4E86\uFF0C\u9084\u6709 ${r.left} \u4EF6\u6C92\u5378\u4E0B` : `\u5DF2\u5378\u4E0B ${r.moved + r.stashed} \u4EF6${r.stashed ? `\uFF08${r.stashed} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF09` : ""}`);
+        toast(r.left ? tx("\u80CC\u5305\u548C\u6230\u5229\u54C1\u7BB1\u90FD\u6EFF\u4E86\uFF0C\u9084\u6709 {0} \u4EF6\u6C92\u5378\u4E0B", r.left) : tx("\u5DF2\u5378\u4E0B {0} \u4EF6{1}", r.moved + r.stashed, r.stashed ? tx("\uFF08{0} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF09", r.stashed) : ""));
         save();
         break;
       }
@@ -2682,29 +3229,29 @@
         break;
       case "takestash": {
         const n = takeFromStash(app.S);
-        toast(n ? `\u53D6\u51FA ${n} \u4EF6` : "\u80CC\u5305\u5DF2\u6EFF");
+        toast(n ? tx("\u53D6\u51FA {0} \u4EF6", n) : tx("\u80CC\u5305\u5DF2\u6EFF"));
         save();
         break;
       }
       case "salvagestash": {
         const r = salvageStash(app.S);
-        toast(`\u5206\u89E3 ${r.count} \u4EF6\uFF0C\u7372\u5F97 ${r.gold} \u91D1`);
+        toast(tx("\u5206\u89E3 {0} \u4EF6\uFF0C\u7372\u5F97 {1} \u91D1", r.count, r.gold));
         save();
         break;
       }
       case "export":
-        openModal({ type: "text", html: `<h3>\u532F\u51FA\u5B58\u6A94\u78BC</h3><p class="sub" style="margin:0">\u8907\u88FD\u9019\u6BB5\u6587\u5B57\uFF0C\u5230\u53E6\u4E00\u53F0\u88DD\u7F6E\u7684\u300C\u532F\u5165\u300D\u8CBC\u4E0A\u3002</p><textarea id="expTxt" readonly>${exportCode()}</textarea><div class="row"><button class="btn main" data-act="copy">\u8907\u88FD</button><button class="btn" data-act="closebtn">\u95DC\u9589</button></div>` });
+        openModal({ type: "text", html: tx('<h3>\u532F\u51FA\u5B58\u6A94\u78BC</h3><p class="sub" style="margin:0">\u8907\u88FD\u9019\u6BB5\u6587\u5B57\uFF0C\u5230\u53E6\u4E00\u53F0\u88DD\u7F6E\u7684\u300C\u532F\u5165\u300D\u8CBC\u4E0A\u3002</p><textarea id="expTxt" readonly>{0}</textarea><div class="row"><button class="btn main" data-act="copy">\u8907\u88FD</button><button class="btn" data-act="closebtn">\u95DC\u9589</button></div>', exportCode()) });
         return;
       case "copy": {
         const ta = $("#expTxt");
-        navigator.clipboard?.writeText(ta.value).then(() => toast("\u5DF2\u8907\u88FD"), () => {
+        navigator.clipboard?.writeText(ta.value).then(() => toast(tx("\u5DF2\u8907\u88FD")), () => {
           ta.select();
-          toast("\u8ACB\u624B\u52D5\u8907\u88FD");
-        }) ?? (ta.select(), toast("\u8ACB\u624B\u52D5\u8907\u88FD"));
+          toast(tx("\u8ACB\u624B\u52D5\u8907\u88FD"));
+        }) ?? (ta.select(), toast(tx("\u8ACB\u624B\u52D5\u8907\u88FD")));
         return;
       }
       case "import":
-        openModal({ type: "text", html: `<h3>\u532F\u5165\u5B58\u6A94\u78BC</h3><p class="sub" style="margin:0">\u6703\u8986\u84CB\u76EE\u524D\u9032\u5EA6\u3002</p><textarea id="impTxt" placeholder="\u8CBC\u4E0A\u5B58\u6A94\u78BC"></textarea><div class="row"><button class="btn main" data-act="doimport">\u532F\u5165</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>` });
+        openModal({ type: "text", html: tx('<h3>\u532F\u5165\u5B58\u6A94\u78BC</h3><p class="sub" style="margin:0">\u6703\u8986\u84CB\u76EE\u524D\u9032\u5EA6\u3002</p><textarea id="impTxt" placeholder="\u8CBC\u4E0A\u5B58\u6A94\u78BC"></textarea><div class="row"><button class="btn main" data-act="doimport">\u532F\u5165</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>') });
         return;
       case "doimport":
         try {
@@ -2712,14 +3259,14 @@
           app.battle = null;
           save();
           app.modal = null;
-          toast("\u532F\u5165\u5B8C\u6210");
+          toast(tx("\u532F\u5165\u5B8C\u6210"));
         } catch (err) {
-          toast("\u5B58\u6A94\u78BC\u7121\u6CD5\u8B80\u53D6\uFF0C\u8ACB\u78BA\u8A8D\u662F\u5426\u5B8C\u6574\u8907\u88FD");
+          toast(tx("\u5B58\u6A94\u78BC\u7121\u6CD5\u8B80\u53D6\uFF0C\u8ACB\u78BA\u8A8D\u662F\u5426\u5B8C\u6574\u8907\u88FD"));
           return;
         }
         break;
       case "reset":
-        openModal({ type: "text", html: `<h3>\u91CD\u65B0\u958B\u59CB\uFF1F</h3><p class="sub" style="margin:0">\u76EE\u524D\u7684\u82F1\u96C4\u3001\u88DD\u5099\u8207\u9032\u5EA6\u90FD\u6703\u6E05\u9664\uFF0C\u7121\u6CD5\u5FA9\u539F\u3002</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">\u6E05\u9664\u4E26\u91CD\u4F86</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>` });
+        openModal({ type: "text", html: tx('<h3>\u91CD\u65B0\u958B\u59CB\uFF1F</h3><p class="sub" style="margin:0">\u76EE\u524D\u7684\u82F1\u96C4\u3001\u88DD\u5099\u8207\u9032\u5EA6\u90FD\u6703\u6E05\u9664\uFF0C\u7121\u6CD5\u5FA9\u539F\u3002</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">\u6E05\u9664\u4E26\u91CD\u4F86</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>') });
         return;
       case "doreset":
         clearInterval(app.bTimer);
@@ -2743,7 +3290,7 @@
         app.S.player.asked = true;
         app.modal = null;
         save();
-        toast(v ? `\u66B1\u7A31\u8A2D\u70BA\u300C${v}\u300D\uFF0C\u5929\u68AF\u7D04 1 \u5206\u9418\u5167\u66F4\u65B0` : "\u4EE5\u533F\u540D\u53C3\u52A0");
+        toast(v ? tx("\u66B1\u7A31\u8A2D\u70BA\u300C{0}\u300D\uFF0C\u5929\u68AF\u7D04 1 \u5206\u9418\u5167\u66F4\u65B0", v) : tx("\u4EE5\u533F\u540D\u53C3\u52A0"));
         sendSnapshot(true).then((r) => {
           if (r && r.error === "too fast") setTimeout(() => sendSnapshot(), 25e3);
         });
@@ -2758,7 +3305,7 @@
       case "sendfb": {
         const ta = $("#fbText"), text = (ta.value || "").trim();
         if (!text) {
-          toast("\u8ACB\u5148\u8F38\u5165\u610F\u898B");
+          toast(tx("\u8ACB\u5148\u8F38\u5165\u610F\u898B"));
           return;
         }
         t.disabled = true;
@@ -2766,8 +3313,8 @@
           if (r && r.ok) {
             app.fbDraft = "";
             ta.value = "";
-            toast("\u5DF2\u9001\u51FA\uFF0C\u8B1D\u8B1D\u56DE\u994B\uFF01");
-          } else toast(r && r.error === "too fast" ? "\u9001\u592A\u5FEB\u4E86\uFF0C\u8ACB\u4E00\u5206\u9418\u5F8C\u518D\u8A66" : "\u9001\u51FA\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66");
+            toast(tx("\u5DF2\u9001\u51FA\uFF0C\u8B1D\u8B1D\u56DE\u994B\uFF01"));
+          } else toast(r && r.error === "too fast" ? tx("\u9001\u592A\u5FEB\u4E86\uFF0C\u8ACB\u4E00\u5206\u9418\u5F8C\u518D\u8A66") : tx("\u9001\u51FA\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66"));
           t.disabled = false;
         });
         return;
@@ -2782,12 +3329,8 @@
     const r = offlineProgress(app.S);
     if (!r || !r.runs) return;
     save();
-    const hrs = r.sec >= 3600 ? `${(r.sec / 3600).toFixed(1)} \u5C0F\u6642` : `${Math.round(r.sec / 60)} \u5206\u9418`;
-    openModal({ type: "text", html: `<h3>\u96E2\u7DDA\u6536\u76CA</h3><p class="sub" style="margin:0">\u4F60\u96E2\u958B\u4E86 ${hrs}\uFF0C\u968A\u4F0D\u5728 ${app.S.idleMythic != null ? `\u79D8\u5883\u300C${DUNGEONS[app.S.idleMythic].name}\u300D+${mythicIdleLevel(app.S, app.S.idleMythic)}` : DUNGEONS[app.S.idle].name} \u6301\u7E8C\u4F5C\u6230\u3002</p>
-    <div class="statgrid num"><div><b>${r.runs}</b><span>\u6311\u6230</span></div><div><b>${r.wins}</b><span>\u901A\u95DC</span></div><div><b>+${fmt(r.gold)}</b><span>\u91D1\u5E63</span></div><div><b>${r.items}</b><span>\u88DD\u5099</span></div></div>
-    ${r.stashed ? `<div style="color:var(--brass)">\u80CC\u5305\u5DF2\u6EFF\uFF0C${r.stashed} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF0C\u5230\u80CC\u5305\u53D6\u51FA</div>` : ""}
-    ${r.lv ? `<div style="color:var(--good)">\u671F\u9593\u5171\u5347\u7D1A ${r.lv} \u6B21</div>` : ""}
-    <div class="row"><button class="btn main grow" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button><button class="btn" data-act="closebtn">\u597D</button></div>` });
+    const hrs = r.sec >= 3600 ? tx("{0} \u5C0F\u6642", (r.sec / 3600).toFixed(1)) : tx("{0} \u5206\u9418", Math.round(r.sec / 60));
+    openModal({ type: "text", html: tx('<h3>\u96E2\u7DDA\u6536\u76CA</h3><p class="sub" style="margin:0">\u4F60\u96E2\u958B\u4E86 {0}\uFF0C\u968A\u4F0D\u5728 {1} \u6301\u7E8C\u4F5C\u6230\u3002</p> <div class="statgrid num"><div><b>{2}</b><span>\u6311\u6230</span></div><div><b>{3}</b><span>\u901A\u95DC</span></div><div><b>+{4}</b><span>\u91D1\u5E63</span></div><div><b>{5}</b><span>\u88DD\u5099</span></div></div> {6} {7} <div class="row"><button class="btn main grow" data-act="autoequip">\u4E00\u9375\u914D\u88DD</button><button class="btn" data-act="closebtn">\u597D</button></div>', hrs, app.S.idleMythic != null ? tx("\u79D8\u5883\u300C{0}\u300D+{1}", DUNGEONS[app.S.idleMythic].name, mythicIdleLevel(app.S, app.S.idleMythic)) : DUNGEONS[app.S.idle].name, r.runs, r.wins, fmt(r.gold), r.items, r.stashed ? tx('<div style="color:var(--brass)">\u80CC\u5305\u5DF2\u6EFF\uFF0C{0} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF0C\u5230\u80CC\u5305\u53D6\u51FA</div>', r.stashed) : "", r.lv ? tx('<div style="color:var(--good)">\u671F\u9593\u5171\u5347\u7D1A {0} \u6B21</div>', r.lv) : "") });
   }
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
@@ -2830,27 +3373,66 @@
   });
   function showDraw(list, cost) {
     const sorted = [...list].sort((a, b) => (b.rarity || 0) - (a.rarity || 0)), best = sorted[0].rarity || 0;
-    openModal({ type: "text", html: `<h3>${best === 4 ? "\u2728 \u50B3\u8AAA\u964D\u81E8\uFF01" : best === 3 ? "\u53F2\u8A69\u82F1\u96C4\u52A0\u5165\uFF01" : "\u62DB\u52DF\u7D50\u679C"}</h3>
-    <p class="sub" style="margin:0">\u82B1\u8CBB ${fmt(cost)} \u91D1\u30FB\u5DF2\u52A0\u5165\u540D\u518A${app.S.party.length < ECONOMY.partyMax ? "" : "\uFF08\u968A\u4F0D\u5DF2\u6EFF\uFF0C\u5728\u5F85\u547D\u5340\uFF09"}</p>
-    <div class="drawlist">${sorted.map((x) => `<div class="drawcard r-${x.rarity || 0}"><span class="ic">${CLASSES[x.cls].icon}</span><span>${heroName(x)}</span><span class="rtag r${x.rarity || 0}">${HERO_RARITY[x.rarity || 0].name}</span><small>${CLASSES[x.cls].name}\u30FBLv${x.level}</small>${x.legend ? `<small class="c4">${LEGENDS[x.cls].pname}\uFF1A${LEGENDS[x.cls].desc}</small>` : ""}</div>`).join("")}</div>
-    <div class="row"><button class="btn main grow" data-act="closebtn">\u597D</button><button class="btn" data-tab="team">\u53BB\u5718\u968A\u770B\u770B</button></div>` });
+    openModal({ type: "text", html: tx('<h3>{0}</h3> <p class="sub" style="margin:0">\u82B1\u8CBB {1} \u91D1\u30FB\u5DF2\u52A0\u5165\u540D\u518A{2}</p> <div class="drawlist">{3}</div> <div class="row"><button class="btn main grow" data-act="closebtn">\u597D</button><button class="btn" data-tab="team">\u53BB\u5718\u968A\u770B\u770B</button></div>', best === 4 ? tx("\u2728 \u50B3\u8AAA\u964D\u81E8\uFF01") : best === 3 ? tx("\u53F2\u8A69\u82F1\u96C4\u52A0\u5165\uFF01") : tx("\u62DB\u52DF\u7D50\u679C"), fmt(cost), app.S.party.length < ECONOMY.partyMax ? "" : tx("\uFF08\u968A\u4F0D\u5DF2\u6EFF\uFF0C\u5728\u5F85\u547D\u5340\uFF09"), sorted.map((x) => `<div class="drawcard r-${x.rarity || 0}"><span class="ic">${CLASSES[x.cls].icon}</span><span>${heroName(x)}</span><span class="rtag r${x.rarity || 0}">${HERO_RARITY[x.rarity || 0].name}</span><small>${CLASSES[x.cls].name}\u30FBLv${x.level}</small>${x.legend ? tx('<small class="c4">{0}\uFF1A{1}</small>', LEGENDS[x.cls].pname, LEGENDS[x.cls].desc) : ""}</div>`).join("")) });
   }
   function openNick() {
-    openModal({ type: "text", html: `<h3>\u4F60\u7684\u66B1\u7A31</h3><p class="sub" style="margin:0">\u986F\u793A\u5728\u5929\u68AF\u4E0A\uFF0C\u4E4B\u5F8C\u96A8\u6642\u53EF\u4EE5\u4FEE\u6539\u3002\u904A\u6232\u6703\u8A18\u9304\u66B1\u7A31\u3001\u9032\u5EA6\u8207\u904A\u73A9\u6642\u9593\uFF0C\u4E0D\u6703\u6536\u96C6\u5E33\u865F\u6216\u500B\u4EBA\u8CC7\u6599\u3002</p>
-    <input id="nickInp" class="inp" maxlength="16" placeholder="\u4F8B\u5982\uFF1AYomi" value="${esc(app.S.player.name)}" autocomplete="off">
-    <div class="row"><button class="btn main grow" data-act="savenick">\u78BA\u5B9A</button><button class="btn" data-act="skipnick">\u533F\u540D\u53C3\u52A0</button></div>` });
+    openModal({ type: "text", html: tx('<h3>\u4F60\u7684\u66B1\u7A31</h3><p class="sub" style="margin:0">\u986F\u793A\u5728\u5929\u68AF\u4E0A\uFF0C\u4E4B\u5F8C\u96A8\u6642\u53EF\u4EE5\u4FEE\u6539\u3002\u904A\u6232\u6703\u8A18\u9304\u66B1\u7A31\u3001\u9032\u5EA6\u8207\u904A\u73A9\u6642\u9593\uFF0C\u4E0D\u6703\u6536\u96C6\u5E33\u865F\u6216\u500B\u4EBA\u8CC7\u6599\u3002</p> <input id="nickInp" class="inp" maxlength="16" placeholder="\u4F8B\u5982\uFF1AYomi" value="{0}" autocomplete="off"> <div class="row"><button class="btn main grow" data-act="savenick">\u78BA\u5B9A</button><button class="btn" data-act="skipnick">\u533F\u540D\u53C3\u52A0</button></div>', esc(app.S.player.name)) });
   }
   for (const ev of ["gesturestart", "gesturechange"]) document.addEventListener(ev, (e) => e.preventDefault(), { passive: false });
   document.addEventListener("touchmove", (e) => {
     if (e.touches.length > 1) e.preventDefault();
   }, { passive: false });
   function start(data) {
-    app.S = migrate(data && data.S || load() || newGame());
+    const saved = data && data.S || load();
+    app.S = migrate(saved || newGame());
+    app.fresh = !saved;
+    for (const h of [...app.S.heroes, ...app.S.tavern || []]) h.name = localName(h.name);
+    for (const it of Object.values(app.S.items)) it.name = localName(it.name);
+    $(".brand").textContent = tx("\u526F\u672C\u5718\u9577");
+    $("#idleChip").textContent = tx("\u639B\u6A5F\u4E2D");
+    document.title = tx("\u526F\u672C\u5718\u9577");
+    document.documentElement.lang = getLang();
     settleOffline();
     resumeIdle();
     render();
-    if (enabled() && !app.S.player.asked && !app.modal) openNick();
-    else if (app.S.player.asked) setTimeout(() => sendSnapshot(), 3e3);
+    const after = () => {
+      if (enabled() && !app.S.player.asked && !app.modal) openNick();
+      else if (app.S.player.asked) setTimeout(() => sendSnapshot(), 3e3);
+    };
+    showTitle(!saved, () => {
+      app.fresh = false;
+      save();
+      return !saved ? playDialog(PROLOGUE, after) : after();
+    });
+  }
+  function showTitle(fresh, onGo) {
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem("rl-title") === "1";
+    } catch (e) {
+    }
+    if (seen) {
+      onGo();
+      return;
+    }
+    const el = document.createElement("div");
+    el.id = "title";
+    el.innerHTML = `<div class="tbox"><div class="tlogo">${tx("\u526F\u672C\u5718\u9577")}</div>${getLang() === "en" ? "" : '<div class="tsub">RAID LEADER</div>'}
+    <p class="ttag">${tx("\u5E36\u9818\u4F60\u7684\u5192\u96AA\u5718\uFF0C\u653B\u4E0B\u6BCF\u4E00\u5EA7\u526F\u672C\u3002")}</p>
+    <button class="btn main tgo" data-act="titlego">${fresh ? tx("\u958B\u59CB\u5192\u96AA") : tx("\u7E7C\u7E8C\u5192\u96AA")}</button>
+    <div class="seg tlang">${LANGS.map((l) => `<button data-act="lang" data-v="${l.id}" class="${l.id === getLang() ? "sel" : ""}">${l.name}</button>`).join("")}</div>
+    <div class="sub num tver">v${VERSION}</div></div>`;
+    document.body.appendChild(el);
+    el.addEventListener("click", (e) => {
+      if (!e.target.closest('[data-act="titlego"]')) return;
+      try {
+        sessionStorage.setItem("rl-title", "1");
+      } catch (err) {
+      }
+      el.classList.add("out");
+      setTimeout(() => el.remove(), 260);
+      onGo();
+    });
   }
   window.claude?.hot?.snapshot?.(() => ({ S: app.S }));
   window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
@@ -2861,7 +3443,7 @@
     if (i) app.S.idle = null;
     clearTimeout(app.pendingRepeat);
     app.pendingRepeat = null;
-    toast("\u5DF2\u505C\u6B62\u639B\u6A5F");
+    toast(tx("\u5DF2\u505C\u6B62\u639B\u6A5F"));
     save();
   }
   function resumeIdle() {
@@ -2869,13 +3451,13 @@
     else if (app.S.idle != null && app.S.clears[app.S.idle]) startBattle(app.S.idle);
   }
   function prepMsg(r, what) {
-    const roles = `\u5766 ${r.roles.tank}\u30FB\u88DC ${r.roles.heal}\u30FB\u8F38\u51FA ${r.roles.dps}`, gear = r.swapped ? `\uFF0C\u63DB\u4E0A ${r.swapped} \u4EF6\u88DD\u5099` : "";
-    return r.locked ? `\u639B\u6A5F\u4E2D\u4E0D\u63DB\u9663\u5BB9\uFF0C\u5DF2\u4F9D${what}\u8ABF\u6574\u5929\u8CE6${gear}` : `\u5DF2\u4F9D${what}\u5099\u6230\uFF1A${roles}${gear}`;
+    const roles = tx("\u5766 {0}\u30FB\u88DC {1}\u30FB\u8F38\u51FA {2}", r.roles.tank, r.roles.heal, r.roles.dps), gear = r.swapped ? tx("\uFF0C\u63DB\u4E0A {0} \u4EF6\u88DD\u5099", r.swapped) : "";
+    return r.locked ? tx("\u639B\u6A5F\u4E2D\u4E0D\u63DB\u9663\u5BB9\uFF0C\u5DF2\u4F9D{0}\u8ABF\u6574\u5929\u8CE6{1}", what, gear) : tx("\u5DF2\u4F9D{0}\u5099\u6230\uFF1A{1}{2}", what, roles, gear);
   }
   function gearMsg(g) {
     if (!g) return "";
     const n = g.bag + g.stash + g.salvaged;
     if (!n) return "";
-    return `\uFF1B\u5378\u4E0B ${n} \u4EF6\u88DD\u5099${g.stash ? `\uFF08${g.stash} \u4EF6\u9032\u6230\u5229\u54C1\u7BB1\uFF09` : ""}${g.salvaged ? `\uFF08${g.salvaged} \u4EF6\u653E\u4E0D\u4E0B\u5DF2\u5206\u89E3 +${fmt(g.gold)} \u91D1\uFF09` : ""}`;
+    return tx("\uFF1B\u5378\u4E0B {0} \u4EF6\u88DD\u5099{1}{2}", n, g.stash ? tx("\uFF08{0} \u4EF6\u9032\u6230\u5229\u54C1\u7BB1\uFF09", g.stash) : "", g.salvaged ? tx("\uFF08{0} \u4EF6\u653E\u4E0D\u4E0B\u5DF2\u5206\u89E3 +{1} \u91D1\uFF09", g.salvaged, fmt(g.gold)) : "");
   }
 })();

@@ -204,9 +204,9 @@ textarea{width:100%;min-height:90px;font-size:16px!important;background:#0e1117;
 .keystone.sm{min-width:0;font-size:13px;padding:1px 8px;vertical-align:middle}
 .keystone.up{background:var(--good)} .keystone.down{background:var(--bad);color:#fff}
 .affixes{display:grid;gap:4px}
-.affix{display:grid;grid-template-columns:44px 1fr auto;gap:8px;align-items:baseline;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;opacity:.5;min-width:0}
+.affix{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:baseline;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;opacity:.5;min-width:0}
 .affix.on{opacity:1;border-color:color-mix(in srgb,var(--r4) 60%,var(--line))}
-.affix b{font-size:14px;color:var(--r4)} .affix span{font-size:12px;color:var(--fg);line-height:1.35;min-width:0} .affix small{font-size:10.5px;color:var(--muted);white-space:nowrap}
+.affix b{font-size:14px;color:var(--r4);min-width:44px} .affix span{font-size:12px;color:var(--fg);line-height:1.35;min-width:0} .affix small{font-size:10.5px;color:var(--muted);text-align:right;max-width:110px}
 .mlist{display:grid;gap:6px}
 .mrow2{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:flex-end;background:var(--panel2);border-radius:8px;padding:8px 10px}
 .mname{display:grid;min-width:0}
@@ -266,3 +266,20 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 
 .mrow2 .mname{flex:1 1 100%}
 .dust{color:#7fd3e6}
+
+/* ---------- 開始畫面 ---------- */
+#title{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:radial-gradient(ellipse at 50% 30%,rgba(208,164,76,.18),transparent 60%),linear-gradient(#0d1016,var(--bg));transition:opacity .25s}
+#title.out{opacity:0;pointer-events:none}
+#title .tbox{display:grid;justify-items:center;gap:14px;text-align:center;max-width:360px;width:100%}
+#title .tlogo{font-family:var(--f-display);font-weight:900;font-size:44px;letter-spacing:.12em;color:var(--brass);text-shadow:0 2px 18px rgba(208,164,76,.35)}
+#title .tsub{font-family:var(--f-num);font-size:12px;letter-spacing:.5em;color:var(--muted);margin-top:-10px}
+#title .ttag{color:var(--fg);margin:8px 0 10px;opacity:.85}
+#title .tgo{width:100%;font-size:17px;padding:14px}
+#title .tlang{margin-top:6px}
+#title .tver{margin:6px 0 0}
+/* ---------- 對話 ---------- */
+.dlg{display:grid;gap:10px;cursor:pointer;min-height:150px}
+.dlg .who{font-family:var(--f-display);color:var(--brass);font-size:17px;letter-spacing:.06em}
+.dlg p{margin:0;font-size:17px;line-height:1.7}
+.dlg p.narr{color:var(--muted);font-style:italic}

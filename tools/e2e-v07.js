@@ -14,7 +14,7 @@ s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcde
 s.heroes = s.heroes.slice(0, 5); s.party = s.party.filter(id => s.heroes.some(h => h.id === id));
 s.recruit = { sinceEpic: 0, sinceLegend: 95, total: 95 }; // 再 5 抽保底傳說
 
-const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 }, deviceScaleFactor: 2 });
+const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 }, deviceScaleFactor: 2 }); await page.addInitScript(() => sessionStorage.setItem('rl-title', '1'));
 const errs = []; page.on('pageerror', e => errs.push(e.message));
 await page.addInitScript(v => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('raid-leader-save-v1', v); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(s));
 await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'app.test') return r.abort();

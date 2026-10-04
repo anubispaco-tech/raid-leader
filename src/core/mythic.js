@@ -1,4 +1,5 @@
 // ===== 傳奇秘境：鑰石、每日詞綴、敵人成長、結算 =====
+import { tx } from './i18n.js';
 import { DUNGEONS, DUNGEON, MYTHIC, REWARD, SLOTS, RARITY } from './config.js';
 import { R, rnd, rint, pick } from './rng.js';
 import { buildWaves, dropIlvl } from './dungeons.js';
@@ -7,12 +8,12 @@ import { makeItem, rollRarity } from './items.js';
 // ---------- 詞綴 ----------
 // hint：對應哪種首領機制（推薦天賦用）
 export const AFFIXES = {
-  fortified:  { name: '強韌', desc: '小怪生命 +30%、攻擊 +20%', test: '範圍輸出', hint: 'summon' },
-  tyrannical: { name: '暴君', desc: '首領生命 +30%、攻擊 +15%', test: '單體輸出', hint: 'enrage' },
-  raging:     { name: '暴怒', desc: '小怪生命低於 30% 時傷害 +50%', test: '快速收尾', hint: 'enrage' },
-  bolstering: { name: '繁盛', desc: '小怪死亡時，其他小怪生命與攻擊 +15%', test: '平均打血', hint: 'summon' },
-  volcanic:   { name: '火山', desc: '每 8 秒隨機一名隊員受到魔法傷害', test: '治療', hint: 'pulse' },
-  necrotic:   { name: '壞疽', desc: '坦克每被攻擊一次，受到的治療 −2%，每波重置', test: '坦克', hint: 'buster' },
+  fortified:  { name: tx('強韌'), desc: tx('小怪生命 +30%、攻擊 +20%'), test: tx('範圍輸出'), hint: 'summon' },
+  tyrannical: { name: tx('暴君'), desc: tx('首領生命 +30%、攻擊 +15%'), test: tx('單體輸出'), hint: 'enrage' },
+  raging:     { name: tx('暴怒'), desc: tx('小怪生命低於 30% 時傷害 +50%'), test: tx('快速收尾'), hint: 'enrage' },
+  bolstering: { name: tx('繁盛'), desc: tx('小怪死亡時，其他小怪生命與攻擊 +15%'), test: tx('平均打血'), hint: 'summon' },
+  volcanic:   { name: tx('火山'), desc: tx('每 8 秒隨機一名隊員受到魔法傷害'), test: tx('治療'), hint: 'pulse' },
+  necrotic:   { name: tx('壞疽'), desc: tx('坦克每被攻擊一次，受到的治療 −2%，每波重置'), test: tx('坦克'), hint: 'buster' },
 };
 const BASE_AFFIX = ['fortified', 'tyrannical'], EXTRA_AFFIX = ['raging', 'bolstering', 'volcanic', 'necrotic'];
 
