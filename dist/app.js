@@ -1,4 +1,4 @@
-/* 副本團長 v0.8.1 */
+/* 副本團長 v0.8.2 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -367,6 +367,7 @@
     '<small class="c4">{0}\uFF1A{1}</small>': '<small class="c4">{0}: {1}</small>',
     '<h3>\u4F60\u7684\u66B1\u7A31</h3><p class="sub" style="margin:0">\u986F\u793A\u5728\u5929\u68AF\u4E0A\uFF0C\u4E4B\u5F8C\u96A8\u6642\u53EF\u4EE5\u4FEE\u6539\u3002\u904A\u6232\u6703\u8A18\u9304\u66B1\u7A31\u3001\u9032\u5EA6\u8207\u904A\u73A9\u6642\u9593\uFF0C\u4E0D\u6703\u6536\u96C6\u5E33\u865F\u6216\u500B\u4EBA\u8CC7\u6599\u3002</p> <input id="nickInp" class="inp" maxlength="16" placeholder="\u4F8B\u5982\uFF1AYomi" value="{0}" autocomplete="off"> <div class="row"><button class="btn main grow" data-act="savenick">\u78BA\u5B9A</button><button class="btn" data-act="skipnick">\u533F\u540D\u53C3\u52A0</button></div>': '<h3>Your nickname</h3><p class="sub" style="margin:0">Shown on the Ladder; you can change it anytime. The game records your nickname, progress and play time \u2014 no accounts or personal data.</p> <input id="nickInp" class="inp" maxlength="16" placeholder="e.g. Yomi" value="{0}" autocomplete="off"> <div class="row"><button class="btn main grow" data-act="savenick">OK</button><button class="btn" data-act="skipnick">Stay anonymous</button></div>',
     "\u526F\u672C\u5718\u9577": "Raid Leader",
+    "\u8A2D\u5B9A": "Settings",
     "\u639B\u6A5F\u4E2D": "Idling",
     "\u5E36\u9818\u4F60\u7684\u5192\u96AA\u5718\uFF0C\u653B\u4E0B\u6BCF\u4E00\u5EA7\u526F\u672C\u3002": "Lead your party through every dungeon.",
     "\u958B\u59CB\u5192\u96AA": "New adventure",
@@ -483,6 +484,27 @@
     "\u4E00\u9375\u5099\u6230\uFF1A\u639B\u6A5F\u4E2D\u53EA\u8ABF\u5929\u8CE6\u3001\u88DD\u5099": "One-tap prep: talents and gear only while idling",
     "\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099": "One-tap prep: lineup, talents, gear",
     '<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u5230\u300C\u5718\u968A\u300D\u6700\u4E0B\u65B9\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>': `<div class="howto" style="margin-top:16px"><b>Prep</b>: sets lineup, talents and gear for this boss's weakness (while idling, only talents and gear).<br><b>Idle</b>: repeats the floor automatically, even with the page closed (up to {0}h); rewards are paid when you return.<br><b>Save data</b>: progress lives in this browser. To switch devices, export a save code at the bottom of Party.</div>`,
+    "{0} \u5C0F\u6642 {1} \u5206": "{0}h {1}m",
+    "\u5E33\u865F": "Account",
+    "\u66B1\u7A31": "Nickname",
+    "\u4FEE\u6539": "Edit",
+    "\u73A9\u5BB6 ID": "Player ID",
+    "\u904A\u73A9\u6642\u9593": "Play time",
+    "\u6230\u7E3E": "Record",
+    "\u5171\u6311\u6230 {0} \u6B21\u30FB\u901A\u95DC {1} \u6B21": "{0} runs \xB7 {1} clears",
+    "\u5B58\u6A94": "Save data",
+    "\u9032\u5EA6\u5B58\u5728\u9019\u53F0\u88DD\u7F6E\u7684\u700F\u89BD\u5668\u3002\u63DB\u88DD\u7F6E\u524D\uFF0C\u5148\u532F\u51FA\u5B58\u6A94\u78BC\u3002": "Progress is stored in this device's browser. Export a save code before switching devices.",
+    "\u532F\u51FA\u5B58\u6A94\u78BC": "Export save code",
+    "\u532F\u5165": "Import",
+    "\u91CD\u65B0\u958B\u59CB": "Start over",
+    "\u610F\u898B\u56DE\u994B": "Feedback",
+    "\u54EA\u88E1\u597D\u73A9\u3001\u54EA\u88E1\u5361\u4F4F\u3001\u60F3\u8981\u4EC0\u9EBC\u529F\u80FD\u90FD\u53EF\u4EE5\u5BEB": "What's fun, where you got stuck, what you'd like to see\u2026",
+    "\u6703\u9644\u4E0A\u66B1\u7A31\u300C{0}\u300D\u8207\u76EE\u524D\u9032\u5EA6": 'Sent with your nickname "{0}" and progress',
+    "\u9001\u51FA": "Send",
+    "\u95DC\u65BC": "About",
+    "\u7248\u672C": "Version",
+    "\u6545\u4E8B": "Story",
+    "\u91CD\u770B\u5E8F\u7AE0": "Replay prologue",
     "\u8DF3\u904E": "Skip",
     "\u958B\u59CB": "Begin",
     "\u7E7C\u7E8C \u25B8": "Next \u25B8",
@@ -543,16 +565,14 @@
     '<div class="slot emptyslot">\u7A7A\u4F4D</div>': '<div class="slot emptyslot">Empty</div>',
     '<span style="color:var(--warn)">\u7F3A\u5766\u514B</span>': '<span style="color:var(--warn)">No tank</span>',
     '<span style="color:var(--warn)">\u7F3A\u6CBB\u7642</span>': '<span style="color:var(--warn)">No healer</span>',
-    '<h2 style="font-size:18px">\u610F\u898B\u56DE\u994B</h2><div class="settings"> <textarea id="fbText" class="fb" maxlength="1000" placeholder="\u54EA\u88E1\u597D\u73A9\u3001\u54EA\u88E1\u5361\u4F4F\u3001\u60F3\u8981\u4EC0\u9EBC\u529F\u80FD\u90FD\u53EF\u4EE5\u5BEB">{0}</textarea> <div class="row" style="align-items:center"><span class="sub" style="margin:0">\u6703\u9644\u4E0A\u66B1\u7A31\u300C{1}\u300D\u8207\u76EE\u524D\u9032\u5EA6</span><button class="btn main" data-act="sendfb" style="margin-left:auto">\u9001\u51FA</button></div></div>': `<h2 style="font-size:18px">Feedback</h2><div class="settings"> <textarea id="fbText" class="fb" maxlength="1000" placeholder="What's fun, where you got stuck, what you'd like to see\u2026">{0}</textarea> <div class="row" style="align-items:center"><span class="sub" style="margin:0">Sent with your nickname "{1}" and progress</span><button class="btn main" data-act="sendfb" style="margin-left:auto">Send</button></div></div>`,
-    '<h2 style="font-size:18px">\u66B1\u7A31</h2><div class="settings"><div class="set"><span>\u5929\u68AF\u4E0A\u986F\u793A\u70BA <b>{0}</b></span><button class="btn sm" data-act="nick">\u4FEE\u6539</button></div></div> <h2 style="font-size:18px">\u5B58\u6A94</h2><div class="row"><button class="btn" data-act="export">\u532F\u51FA\u5B58\u6A94\u78BC</button><button class="btn" data-act="import">\u532F\u5165</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">\u91CD\u65B0\u958B\u59CB</button></div> <p class="sub" style="margin-top:8px">\u5171\u6311\u6230 {1} \u6B21\u30FB\u901A\u95DC {2} \u6B21</p>': '<h2 style="font-size:18px">Nickname</h2><div class="settings"><div class="set"><span>Shown on the Ladder as <b>{0}</b></span><button class="btn sm" data-act="nick">Edit</button></div></div> <h2 style="font-size:18px">Save data</h2><div class="row"><button class="btn" data-act="export">Export save code</button><button class="btn" data-act="import">Import</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">Start over</button></div> <p class="sub" style="margin-top:8px">{1} runs \xB7 {2} clears</p>',
+    "\u66B1\u7A31\u3001\u5B58\u6A94\u3001\u8A9E\u8A00\u8207\u610F\u898B\u56DE\u994B\uFF0C\u5728\u5DE6\u4E0A\u89D2\u300C\u8A2D\u5B9A\u300D\u3002": "Nickname, save data, language and feedback are under Settings (top left).",
     '<button class="hero r-{0}" data-act="hero" data-id="{1}"><div class="ic">{2}</div> <div class="nm">{3}{4}<small>{5}{6}\u30FB<span class="num">Lv{7}</span></small>{8}</div> <span class="tag {9}">{10}</span> <div class="st num"><span>\u751F\u547D {11}</span><span>\u5A01\u529B {12}</span><span>\u66B4\u64CA {13}%</span><span>\u88DD\u7B49 {14}</span></div> <div class="xpbar"><i style="width:{15}%"></i></div></button>': '<button class="hero r-{0}" data-act="hero" data-id="{1}"><div class="ic">{2}</div> <div class="nm">{3}{4}<small>{5}{6}\u30FB<span class="num">Lv{7}</span></small>{8}</div> <span class="tag {9}">{10}</span> <div class="st num"><span>HP {11}</span><span>Power {12}</span><span>Crit {13}%</span><span>iLvl {14}</span></div> <div class="xpbar"><i style="width:{15}%"></i></div></button>',
     '<span class="newpick">\u53EF\u9078\u5929\u8CE6</span>': '<span class="newpick">Talent ready</span>',
     "\u5F85\u547D": "Bench",
     '<div class="toolbar"><label class="selwrap"><span>\u89E3\u96C7\u5F85\u547D</span><select id="fireSel" aria-label="\u89E3\u96C7\u54C1\u8CEA">{0}</select></label> <button class="btn sm {1}" data-act="firemany" {2}>{3}</button></div> <p class="sub" style="margin:4px 0 8px">\u53EA\u89E3\u96C7\u5F85\u547D\u4E2D\u7684\u82F1\u96C4\uFF0C\u50B3\u8AAA\u4E0D\u6703\u88AB\u9078\u5230\uFF1B\u8EAB\u4E0A\u88DD\u5099\u81EA\u52D5\u5378\u56DE\u80CC\u5305\u3002</p>': '<div class="toolbar"><label class="selwrap"><span>Dismiss bench</span><select id="fireSel" aria-label="Dismiss quality">{0}</select></label> <button class="btn sm {1}" data-act="firemany" {2}>{3}</button></div> <p class="sub" style="margin:4px 0 8px">Only benched heroes are dismissed, never Legendaries; their gear returns to your bag.</p>',
     "\u6C92\u6709\u7B26\u5408\u7684\u82F1\u96C4": "No matching heroes",
     "\u78BA\u5B9A\u89E3\u96C7 {0} \u4EBA\uFF1F\u9000 {1} \u91D1": "Dismiss {0}? Refund {1} gold",
-    "\u4E00\u9375\u89E3\u96C7\uFF08{0} \u4EBA\uFF09": "Dismiss all ({0})",
-    "\u8A9E\u8A00": "Language"
+    "\u4E00\u9375\u89E3\u96C7\uFF08{0} \u4EBA\uFF09": "Dismiss all ({0})"
   };
 
   // src/core/i18n.js
@@ -1273,9 +1293,9 @@
   }
   function heroMods(h) {
     const m = {}, t = h.talents || {};
-    PACKS[h.cls].talents.forEach((row, i) => {
+    PACKS[h.cls].talents.forEach((row2, i) => {
       const lv = TALENT_ROWS[i], pick2 = h.level >= lv && t[lv];
-      if (pick2 && row[pick2]) Object.assign(m, row[pick2].mods);
+      if (pick2 && row2[pick2]) Object.assign(m, row2[pick2].mods);
     });
     return m;
   }
@@ -2406,7 +2426,7 @@
   }
 
   // src/core/version.js
-  var VERSION = "0.8.1";
+  var VERSION = "0.8.2";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -2603,7 +2623,7 @@
     }).join(""), c.tank, c.heal, c.dps, fmt(partyPower()), !c.tank ? tx('<span style="color:var(--warn)">\u7F3A\u5766\u514B</span>') : "", !c.heal ? tx('<span style="color:var(--warn)">\u7F3A\u6CBB\u7642</span>') : "", app.S.heroes.length, ECONOMY.rosterMax, fireBar());
     const sorted = [...app.S.heroes].sort((a, b) => inParty(b) - inParty(a) || (b.rarity || 0) - (a.rarity || 0) || b.level - a.level);
     for (const x of sorted) h += heroCard(x);
-    h += `</div>` + (enabled() ? tx('<h2 style="font-size:18px">\u610F\u898B\u56DE\u994B</h2><div class="settings"> <textarea id="fbText" class="fb" maxlength="1000" placeholder="\u54EA\u88E1\u597D\u73A9\u3001\u54EA\u88E1\u5361\u4F4F\u3001\u60F3\u8981\u4EC0\u9EBC\u529F\u80FD\u90FD\u53EF\u4EE5\u5BEB">{0}</textarea> <div class="row" style="align-items:center"><span class="sub" style="margin:0">\u6703\u9644\u4E0A\u66B1\u7A31\u300C{1}\u300D\u8207\u76EE\u524D\u9032\u5EA6</span><button class="btn main" data-act="sendfb" style="margin-left:auto">\u9001\u51FA</button></div></div>', esc(app.fbDraft || ""), esc(app.S.player.name || tx("\u533F\u540D"))) : "") + langBar() + tx('<h2 style="font-size:18px">\u66B1\u7A31</h2><div class="settings"><div class="set"><span>\u5929\u68AF\u4E0A\u986F\u793A\u70BA <b>{0}</b></span><button class="btn sm" data-act="nick">\u4FEE\u6539</button></div></div> <h2 style="font-size:18px">\u5B58\u6A94</h2><div class="row"><button class="btn" data-act="export">\u532F\u51FA\u5B58\u6A94\u78BC</button><button class="btn" data-act="import">\u532F\u5165</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">\u91CD\u65B0\u958B\u59CB</button></div> <p class="sub" style="margin-top:8px">\u5171\u6311\u6230 {1} \u6B21\u30FB\u901A\u95DC {2} \u6B21</p>', esc(app.S.player.name || tx("\u533F\u540D")), app.S.stats.runs, app.S.stats.wins);
+    h += `</div><p class="sub" style="margin-top:12px">${tx("\u66B1\u7A31\u3001\u5B58\u6A94\u3001\u8A9E\u8A00\u8207\u610F\u898B\u56DE\u994B\uFF0C\u5728\u5DE6\u4E0A\u89D2\u300C\u8A2D\u5B9A\u300D\u3002")}</p>`;
     return h;
   }
   function heroCard(x) {
@@ -2614,9 +2634,6 @@
   function fireBar() {
     const sel = app.fireSel ?? 0, d = fireMany(app.S, sel, true);
     return tx('<div class="toolbar"><label class="selwrap"><span>\u89E3\u96C7\u5F85\u547D</span><select id="fireSel" aria-label="\u89E3\u96C7\u54C1\u8CEA">{0}</select></label> <button class="btn sm {1}" data-act="firemany" {2}>{3}</button></div> <p class="sub" style="margin:4px 0 8px">\u53EA\u89E3\u96C7\u5F85\u547D\u4E2D\u7684\u82F1\u96C4\uFF0C\u50B3\u8AAA\u4E0D\u6703\u88AB\u9078\u5230\uFF1B\u8EAB\u4E0A\u88DD\u5099\u81EA\u52D5\u5378\u56DE\u80CC\u5305\u3002</p>', [0, 1, 2, 3].map((r) => `<option value="${r}" ${sel === r ? "selected" : ""}>${HERO_RARITY[r].name}${r ? tx("\u4EE5\u4E0B") : ""}</option>`).join(""), app.fireConfirm ? "danger" : "", d.count ? "" : "disabled", !d.count ? tx("\u6C92\u6709\u7B26\u5408\u7684\u82F1\u96C4") : app.fireConfirm ? tx("\u78BA\u5B9A\u89E3\u96C7 {0} \u4EBA\uFF1F\u9000 {1} \u91D1", d.count, fmt(d.refund)) : tx("\u4E00\u9375\u89E3\u96C7\uFF08{0} \u4EBA\uFF09", d.count));
-  }
-  function langBar() {
-    return `<h2 style="font-size:18px">${tx("\u8A9E\u8A00")} \xB7 Language</h2><div class="seg">${LANGS.map((l) => `<button data-act="lang" data-v="${l.id}" class="${l.id === getLang() ? "sel" : ""}">${l.name}</button>`).join("")}</div>`;
   }
 
   // src/ui/views/bag.js
@@ -2663,6 +2680,34 @@
     return h;
   }
 
+  // src/ui/views/settings.js
+  var row = (label, value) => `<div class="set"><span>${label}</span>${value}</div>`;
+  function sheetSettings() {
+    const S = app.S, p = S.player, sec = p.playSec || 0;
+    const play = sec >= 3600 ? tx("{0} \u5C0F\u6642 {1} \u5206", Math.floor(sec / 3600), Math.floor(sec % 3600 / 60)) : tx("{0} \u5206\u9418", Math.floor(sec / 60));
+    let h = `<h3>${tx("\u8A2D\u5B9A")}</h3>
+    <span class="label">${tx("\u5E33\u865F")}</span><div class="settings">
+      ${row(tx("\u66B1\u7A31"), `<span class="row" style="align-items:center;margin:0"><b>${esc(p.name || tx("\u533F\u540D"))}</b><button class="btn sm" data-act="nick">${tx("\u4FEE\u6539")}</button></span>`)}
+      ${row(tx("\u73A9\u5BB6 ID"), `<span class="num sub" style="margin:0">${esc(p.pid)}</span>`)}
+      ${row(tx("\u904A\u73A9\u6642\u9593"), `<span class="num">${play}</span>`)}
+      ${row(tx("\u6230\u7E3E"), `<span class="num">${tx("\u5171\u6311\u6230 {0} \u6B21\u30FB\u901A\u95DC {1} \u6B21", fmt(S.stats.runs), fmt(S.stats.wins))}</span>`)}
+    </div>
+    <span class="label">${tx("\u5B58\u6A94")}</span>
+    <p class="sub" style="margin:0">${tx("\u9032\u5EA6\u5B58\u5728\u9019\u53F0\u88DD\u7F6E\u7684\u700F\u89BD\u5668\u3002\u63DB\u88DD\u7F6E\u524D\uFF0C\u5148\u532F\u51FA\u5B58\u6A94\u78BC\u3002")}</p>
+    <div class="row"><button class="btn" data-act="export">${tx("\u532F\u51FA\u5B58\u6A94\u78BC")}</button><button class="btn" data-act="import">${tx("\u532F\u5165")}</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">${tx("\u91CD\u65B0\u958B\u59CB")}</button></div>
+    <span class="label">${getLang() === "en" ? "Language" : "\u8A9E\u8A00 \xB7 Language"}</span>
+    <div class="seg">${LANGS.map((l) => `<button data-act="lang" data-v="${l.id}" class="${l.id === getLang() ? "sel" : ""}">${l.name}</button>`).join("")}</div>`;
+    if (enabled()) h += `<span class="label">${tx("\u610F\u898B\u56DE\u994B")}</span>
+    <textarea id="fbText" class="fb" maxlength="1000" placeholder="${tx("\u54EA\u88E1\u597D\u73A9\u3001\u54EA\u88E1\u5361\u4F4F\u3001\u60F3\u8981\u4EC0\u9EBC\u529F\u80FD\u90FD\u53EF\u4EE5\u5BEB")}">${esc(app.fbDraft || "")}</textarea>
+    <div class="row" style="align-items:center"><span class="sub" style="margin:0">${tx("\u6703\u9644\u4E0A\u66B1\u7A31\u300C{0}\u300D\u8207\u76EE\u524D\u9032\u5EA6", esc(p.name || tx("\u533F\u540D")))}</span><button class="btn main" data-act="sendfb" style="margin-left:auto">${tx("\u9001\u51FA")}</button></div>`;
+    h += `<span class="label">${tx("\u95DC\u65BC")}</span><div class="settings">
+      ${row(tx("\u7248\u672C"), `<span class="num">v${VERSION}</span>`)}
+      ${row(tx("\u6545\u4E8B"), `<button class="btn sm" data-act="replaystory">${tx("\u91CD\u770B\u5E8F\u7AE0")}</button>`)}
+    </div>
+    <div class="row"><button class="btn grow" data-act="close-settings">${tx("\u95DC\u9589")}</button></div>`;
+    return h;
+  }
+
   // src/ui/views/sheets.js
   function openModal(m) {
     app.modal = m;
@@ -2690,6 +2735,7 @@
     if (app.modal.type === "pick") body = sheetPick();
     if (app.modal.type === "text") body = app.modal.html;
     if (app.modal.type === "dialog") body = sheetDialog(app.modal);
+    if (app.modal.type === "settings") body = sheetSettings();
     if (!body) {
       app.modal = null;
       el.innerHTML = "";
@@ -2738,11 +2784,11 @@
     const specRow = `<div class="trow ${x.level < SPEC_LEVEL ? "locked" : ""}"><span class="tlv num">Lv${SPEC_LEVEL}<small>${x.level < SPEC_LEVEL ? tx("\u672A\u89E3\u9396") : tx("\u5C08\u7CBE")}</small></span>
       ${Object.entries(specs).map(([k, sp]) => opt("spec", k, x.spec === k, x.level < SPEC_LEVEL, `${sp.name}\u30FB${sp.skill}`, sp.desc)).join("")}</div>`;
     let h = tx('<div class="skillcard"><span class="label">\u57FA\u790E\u6280\u80FD</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>', B.name, B.desc);
-    TALENTS[x.cls].forEach((row, i) => {
+    TALENTS[x.cls].forEach((row2, i) => {
       const lv = TALENT_ROWS[i], locked = x.level < lv;
       if (lv > SPEC_LEVEL && !h.includes('data-act="spec"')) h += specRow;
       h += `<div class="trow ${locked ? "locked" : ""}"><span class="tlv num">Lv${lv}${locked ? tx("<small>\u672A\u89E3\u9396</small>") : ""}</span>
-      ${["a", "b"].map((k) => opt("talent", k, t[lv] === k && !locked, locked, row[k].name, row[k].desc, `data-lv="${lv}"`)).join("")}</div>`;
+      ${["a", "b"].map((k) => opt("talent", k, t[lv] === k && !locked, locked, row2[k].name, row2[k].desc, `data-lv="${lv}"`)).join("")}</div>`;
     });
     h += tx('<div class="row"><button class="btn grow" data-act="recommend" data-id="{0}" data-d="{1}">\u4F9D\u300C{2}\u300D\u63A8\u85A6\u914D\u7F6E</button></div> <p class="sub" style="margin:0">\u96A8\u6642\u53EF\u4EE5\u514D\u8CBB\u66F4\u63DB\uFF0C\u4E0B\u4E00\u5834\u6230\u9B25\u751F\u6548\u3002</p>', x.id, top, dn.name);
     return h;
@@ -3024,6 +3070,15 @@
       case "dlgskip":
         closeModal();
         return;
+      case "settings":
+        openModal({ type: "settings" });
+        return;
+      case "close-settings":
+        closeModal();
+        return;
+      case "replaystory":
+        playDialog(PROLOGUE, () => openModal({ type: "settings" }));
+        return;
       case "lang":
         if (t.dataset.v !== getLang()) {
           if (app.fresh) {
@@ -3277,7 +3332,10 @@
         app.modal = null;
         app.tab = "dungeon";
         save();
-        break;
+        render();
+        playDialog(PROLOGUE, () => {
+        });
+        return;
       case "closebtn":
         app.modal = null;
         break;
@@ -3388,7 +3446,8 @@
     app.fresh = !saved;
     for (const h of [...app.S.heroes, ...app.S.tavern || []]) h.name = localName(h.name);
     for (const it of Object.values(app.S.items)) it.name = localName(it.name);
-    $(".brand").textContent = tx("\u526F\u672C\u5718\u9577");
+    $(".brand-t").textContent = tx("\u526F\u672C\u5718\u9577");
+    $(".brand").setAttribute("aria-label", tx("\u8A2D\u5B9A"));
     $("#idleChip").textContent = tx("\u639B\u6A5F\u4E2D");
     document.title = tx("\u526F\u672C\u5718\u9577");
     document.documentElement.lang = getLang();

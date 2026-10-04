@@ -89,6 +89,9 @@ document.addEventListener('click', e => {
     }
     case 'dlgnext': if (app.modal && app.modal.type === 'dialog') { if (app.modal.i < app.modal.lines.length - 1) { app.modal.i++; renderModal(); } else closeModal(); } return;
     case 'dlgskip': closeModal(); return;
+    case 'settings': openModal({ type: 'settings' }); return;
+    case 'close-settings': closeModal(); return;
+    case 'replaystory': playDialog(PROLOGUE, () => openModal({ type: 'settings' })); return;
     case 'lang': if (t.dataset.v !== getLang()) { // 新玩家還沒按開始就換語言：不留存檔，重新載入後仍是「開始冒險」
       if (app.fresh) { try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ } } else save();
       setLang(t.dataset.v); location.reload(); } return;
@@ -162,7 +165,7 @@ document.addEventListener('click', e => {
     case 'import': openModal({ type: 'text', html: tx('<h3>匯入存檔碼</h3><p class="sub" style="margin:0">會覆蓋目前進度。</p><textarea id="impTxt" placeholder="貼上存檔碼"></textarea><div class="row"><button class="btn main" data-act="doimport">匯入</button><button class="btn" data-act="closebtn">取消</button></div>') }); return;
     case 'doimport': try { app.S = importCode($('#impTxt').value); app.battle = null; save(); app.modal = null; toast(tx('匯入完成')); } catch (err) { toast(tx('存檔碼無法讀取，請確認是否完整複製')); return; } break;
     case 'reset': openModal({ type: 'text', html: tx('<h3>重新開始？</h3><p class="sub" style="margin:0">目前的英雄、裝備與進度都會清除，無法復原。</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">清除並重來</button><button class="btn" data-act="closebtn">取消</button></div>') }); return;
-    case 'doreset': clearInterval(app.bTimer); clearTimeout(app.pendingRepeat); app.S = G.newGame(); app.battle = null; app.lastResult = null; app.modal = null; app.tab = 'dungeon'; save(); break;
+    case 'doreset': clearInterval(app.bTimer); clearTimeout(app.pendingRepeat); app.S = G.newGame(); app.battle = null; app.lastResult = null; app.modal = null; app.tab = 'dungeon'; save(); render(); playDialog(PROLOGUE, () => {}); return;
     case 'closebtn': app.modal = null; break;
     case 'nick': openNick(); return;
     case 'savenick': {
@@ -228,7 +231,7 @@ function start(data) {
   app.S = G.migrate(saved || G.newGame()); app.fresh = !saved;
   for (const h of [...app.S.heroes, ...(app.S.tavern || [])]) h.name = localName(h.name);
   for (const it of Object.values(app.S.items)) it.name = localName(it.name);
-  $('.brand').textContent = tx('副本團長'); $('#idleChip').textContent = tx('掛機中'); document.title = tx('副本團長');
+  $('.brand-t').textContent = tx('副本團長'); $('.brand').setAttribute('aria-label', tx('設定')); $('#idleChip').textContent = tx('掛機中'); document.title = tx('副本團長');
   document.documentElement.lang = getLang();
   settleOffline();
   resumeIdle();

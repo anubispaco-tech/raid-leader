@@ -1,0 +1,16 @@
+{
+"設定": "Settings",
+"帳號": "Account",
+"玩家 ID": "Player ID",
+"遊玩時間": "Play time",
+"戰績": "Record",
+"{0} 小時 {1} 分": "{0}h {1}m",
+"共挑戰 {0} 次・通關 {1} 次": "{0} runs · {1} clears",
+"進度存在這台裝置的瀏覽器。換裝置前，先匯出存檔碼。": "Progress is stored in this device's browser. Export a save code before switching devices.",
+"會附上暱稱「{0}」與目前進度": "Sent with your nickname \"{0}\" and progress",
+"關於": "About",
+"版本": "Version",
+"故事": "Story",
+"重看序章": "Replay prologue",
+"暱稱、存檔、語言與意見回饋，在左上角「設定」。": "Nickname, save data, language and feedback are under Settings (top left)."
+}

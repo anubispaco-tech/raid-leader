@@ -33,16 +33,16 @@ await page.click('[data-tab="dungeon"]'); await page.waitForTimeout(800);
 out.push('排行榜：' + (await page.locator('.board li').allInnerTexts()).map(t => t.replace(/\n/g, ' ')).join('｜'));
 out.push('自己被標示：' + await page.locator('.board li.me').count() + '｜惡意名稱沒變成圖片：' + (await page.locator('.board img').count() === 0));
 await page.locator('.boardcard').screenshot({ path: '/tmp/claude-0/m-board.png' });
-await page.click('[data-tab="team"]');
+await page.click('[data-act="settings"]');
 await page.fill('#fbText', '第六層好難\n但很好玩');
-await page.click('[data-act="fight"]').catch(() => {}); // 不該發生；只是確認草稿
-await page.click('[data-tab="team"]');
+await page.click('[data-act="close-settings"]'); // 關掉再開，確認草稿保留
+await page.click('[data-act="settings"]');
 out.push('切頁後草稿保留：' + (await page.locator('#fbText').inputValue()).includes('第六層'));
 await page.click('[data-act="sendfb"]'); await page.waitForTimeout(500);
 out.push('回饋：' + JSON.stringify(posts.find(p => p.type === 'feedback')));
 out.push('送出後清空：' + ((await page.locator('#fbText').inputValue()) === ''));
-await page.click('[data-tab="team"]'); await page.click('.settings [data-act="nick"]');
+await page.click('.settings [data-act="nick"]');
 await page.fill('#nickInp', '改名後'); await page.click('[data-act="savenick"]'); await page.waitForTimeout(500);
-out.push('改名後送出：' + posts.filter(p => p.type === 'snapshot').map(p => p.name).join(' → ') + '｜團隊頁顯示：' + (await page.locator('.set b').first().innerText()));
+out.push('改名後送出：' + posts.filter(p => p.type === 'snapshot').map(p => p.name).join(' → ') + '｜設定顯示：' + (await (async () => { await page.click('[data-act="settings"]'); return page.locator('.sheet .set b').first().innerText(); })()));
 console.log(out.join('\n') + '\nERRORS: ' + JSON.stringify(errs));
 await browser.close();
