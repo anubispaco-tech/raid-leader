@@ -285,3 +285,4 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 .dlg .who{font-family:var(--f-display);color:var(--brass);font-size:17px;letter-spacing:.06em}
 .dlg p{margin:0;font-size:17px;line-height:1.7}
 .dlg p.narr{color:var(--muted);font-style:italic}
+.trow.n3{grid-template-columns:44px 1fr}.trow.n3 .opt{grid-column:2}.trow.n3 .tlv{grid-row:span 3}

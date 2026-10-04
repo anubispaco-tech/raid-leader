@@ -34,12 +34,12 @@ export function setTalent(h, lv, pick) {
 
 // ---------- 推薦配置（依副本機制）----------
 // 每個專精對應一種首領機制；天賦依機制挑防禦或輸出。模擬工具與「推薦」按鈕共用。
-export function recommend(cls, mechTypes) {
+export function recommend(cls, mechTypes, hero) {
   const has = t => mechTypes.includes(t);
-  return PACKS[cls].recommend(has);
+  return PACKS[cls].recommend(has, hero);
 }
 export function applyRecommend(h, mechTypes) {
-  const r = recommend(h.cls, mechTypes);
+  const r = recommend(h.cls, mechTypes, h);
   if (canPickSpec(h)) h.spec = r.spec;
   const t = {};
   TALENT_ROWS.forEach((lv, i) => { if (h.level >= lv) t[lv] = r.t[i]; });

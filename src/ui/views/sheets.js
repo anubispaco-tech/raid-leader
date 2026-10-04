@@ -68,7 +68,7 @@ function talentView(x) {
   const top = Math.max(0, app.S.unlocked - 1), dn = G.DUNGEONS[top];
   const opt = (act, v, on, locked, name, desc, extra = '') =>
     `<button class="opt ${on ? 'sel' : ''}" data-act="${act}" data-id="${x.id}" data-v="${v}" ${extra} ${locked ? 'disabled' : ''}><b>${name}</b><span>${desc}</span></button>`;
-  const specRow = `<div class="trow ${x.level < G.SPEC_LEVEL ? 'locked' : ''}"><span class="tlv num">Lv${G.SPEC_LEVEL}<small>${x.level < G.SPEC_LEVEL ? tx('未解鎖') : tx('專精')}</small></span>
+  const specRow = `<div class="trow ${Object.keys(specs).length > 2 ? 'n3' : ''} ${x.level < G.SPEC_LEVEL ? 'locked' : ''}"><span class="tlv num">Lv${G.SPEC_LEVEL}<small>${x.level < G.SPEC_LEVEL ? tx('未解鎖') : tx('專精')}</small></span>
       ${Object.entries(specs).map(([k, sp]) => opt('spec', k, x.spec === k, x.level < G.SPEC_LEVEL, `${sp.name}・${sp.skill}`, sp.desc)).join('')}</div>`;
   let h = tx('<div class="skillcard"><span class="label">基礎技能</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>', B.name, B.desc);
   G.TALENTS[x.cls].forEach((row, i) => {

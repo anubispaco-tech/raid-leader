@@ -1,4 +1,4 @@
-/* 副本團長 v0.8.2 */
+/* 副本團長 v0.8.3 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -78,6 +78,41 @@
     "\u6668\u66E6": "Dawnlight",
     "\u6EA2\u5149": "Overflow",
     "\u6CBB\u7642\u8D85\u51FA\u7684\u90E8\u5206\u8F49\u70BA\u8B77\u76FE\uFF08\u4E0A\u9650\u662F\u8A72\u968A\u54E1\u751F\u547D\u7684 20%\uFF09": "Overhealing becomes a shield (up to 20% of the ally's HP)",
+    "\u5FB7\u9B6F\u4F0A": "Druid",
+    "\u5766\u514B\uFF0F\u6CBB\u7642\uFF0F\u8F38\u51FA": "Tank / Healer / DPS",
+    "\u4F9D\u5C08\u7CBE\u5316\u8EAB\u718A\u3001\u6A39\u4EBA\u6216\u7375\u8C79\uFF0C\u53EF\u4EE5\u7576\u5766\u514B\u3001\u6CBB\u7642\u6216\u8F38\u51FA\uFF1B\u55AE\u4E00\u8077\u8CAC\u6BD4\u5C08\u8077\u8077\u696D\u5F31\u4E00\u4E9B\u3002": "Shapeshifts by spec into bear, treant or cat \u2014 tank, healer or DPS. A little weaker than a dedicated class in any one role.",
+    "\u6708\u706B\u8853": "Moonfire",
+    "\u51B7\u537B 6 \u79D2\uFF1A\u5A01\u529B \xD72 \u50B7\u5BB3\uFF0C\u4E26\u5728 4 \u79D2\u5167\u6BCF\u79D2\u9020\u6210\u5A01\u529B \xD70.4": "6s CD: Power \xD72 damage, then Power \xD70.4 per second for 4s",
+    "\u5B88\u8B77\uFF08\u718A\uFF09": "Guardian (Bear)",
+    "\u72C2\u66B4\u56DE\u5FA9": "Frenzied Regeneration",
+    "\u5766\u514B\u3002\u718A\u5F62\u614B\u53D7\u5230\u7684\u91CD\u64CA\u50B7\u5BB3 \u221215%\uFF1B\u51B7\u537B 15 \u79D2\uFF1A\u751F\u547D\u4F4E\u65BC 50% \u6642\uFF0C6 \u79D2\u5167\u56DE\u5FA9 40% \u751F\u547D": "Tank. Bear form takes 15% less from heavy blows; 15s CD: below 50% HP, regain 40% HP over 6s",
+    "\u6062\u5FA9\uFF08\u6A39\u4EBA\uFF09": "Restoration (Treant)",
+    "\u751F\u547D\u7DBB\u653E": "Lifebloom",
+    "\u6CBB\u7642\u3002\u51B7\u537B 7 \u79D2\uFF1A\u5168\u968A 4 \u79D2\u5167\u6BCF\u79D2\u56DE\u5FA9\u5A01\u529B \xD70.4\uFF1B\u968A\u53CB\u751F\u547D\u4F4E\u65BC 50% \u6642\u53E6\u6709\u300C\u8FC5\u7652\u300D\u5927\u88DC\uFF08\u51B7\u537B 8 \u79D2\uFF09": "Healer. 7s CD: party heals Power \xD70.4 per second for 4s; Swiftmend gives a big heal to allies below 50% HP (8s CD)",
+    "\u91CE\u6027\uFF08\u7375\u8C79\uFF09": "Feral (Cat)",
+    "\u6495\u88C2": "Rip",
+    "\u8F38\u51FA\u3002\u51B7\u537B 12 \u79D2\uFF1A\u9996\u9818\u6D41\u8840 8 \u79D2\uFF0C\u6BCF\u79D2\u5A01\u529B \xD70.7": "DPS. 12s CD: the boss bleeds for Power \xD70.7 per second over 8s",
+    "\u539A\u76AE": "Thick Hide",
+    "\u751F\u547D +10%": "HP +10%",
+    "\u6708\u5149\u5F37\u5316": "Lunar Empowerment",
+    "\u6708\u706B\u8853\u50B7\u5BB3 +50%": "Moonfire damage +50%",
+    "\u6A39\u76AE\u8853": "Barkskin",
+    "\u53D7\u5230\u7684\u50B7\u5BB3 \u221215%": "Damage taken \u221215%",
+    "\u91CE\u6027\u672C\u80FD": "Feral Instinct",
+    "\u66B4\u64CA\u7387 +6%": "Crit chance +6%",
+    "\u5171\u751F": "Symbiosis",
+    "\u5168\u968A\u751F\u547D +5%": "Party HP +5%",
+    "\u539F\u59CB\u4E4B\u6012": "Primal Fury",
+    "\u50B7\u5BB3 +15%": "Damage +15%",
+    "\u751F\u751F\u4E0D\u606F": "Everbloom",
+    "\u6CBB\u7642 +15%": "Healing +15%",
+    "\u8FC5\u6377\u6708\u706B": "Swift Moonfire",
+    "\u6708\u706B\u8853\u51B7\u537B 6 \u2192 4 \u79D2": "Moonfire cooldown 6 \u2192 4s",
+    "\u745F\u862D\u6735": "Serando",
+    "\u68EE\u8A9E": "Forestsong",
+    "\u842C\u7269\u5FA9\u7526": "Renewal",
+    "\u6BCF\u5834\u7B2C\u4E00\u6B21\u5168\u968A\u5E73\u5747\u751F\u547D\u4F4E\u65BC 30% \u6642\uFF0C\u5168\u968A\u56DE\u5FA9 25% \u751F\u547D\uFF1B\u4EFB\u4F55\u5C08\u7CBE\u90FD\u6C92\u6709 10% \u7684\u6578\u503C\u6298\u6263": "The first time party HP averages below 30% each battle, the whole party heals 25%; no 10% stat penalty in any spec",
+    "\u8FC5\u7652": "Swiftmend",
     "\u5B88\u8B77\u9A0E\u58EB": "Guardian Knight",
     "\u5632\u8AF7\u6240\u6709\u6575\u4EBA\uFF0C\u627F\u53D7\u50B7\u5BB3\u3002\u8B77\u7532\u6E1B\u50B7 45%\u3002": "Taunts every enemy and soaks damage. 45% armor.",
     "\u76FE\u724C\u731B\u64CA": "Shield Slam",
@@ -89,7 +124,6 @@
     "\u5FA9\u4EC7\u4E4B\u6012": "Avenging Wrath",
     "\u51B7\u537B 20 \u79D2\uFF1A10 \u79D2\u5167\u50B7\u5BB3 +50%\u3001\u5438\u8840 20%": "20s CD: +50% damage and 20% lifesteal for 10s",
     "\u5805\u97CC": "Toughness",
-    "\u751F\u547D +10%": "HP +10%",
     "\u92B3\u5229\u76FE\u724C": "Keen Shield",
     "\u76FE\u724C\u731B\u64CA\u50B7\u5BB3 +50%": "Shield Slam damage +50%",
     "\u683C\u64CB": "Block",
@@ -97,7 +131,6 @@
     "\u9B54\u6297": "Spell Ward",
     "\u53D7\u5230\u7BC4\u570D\u653B\u64CA\u7684\u50B7\u5BB3 \u221230%": "Area damage taken \u221230%",
     "\u9F13\u821E": "Rally",
-    "\u5168\u968A\u751F\u547D +5%": "Party HP +5%",
     "\u53CD\u64CA": "Riposte",
     "\u53D7\u64CA\u6642 15% \u6A5F\u7387\u53CD\u64CA\u5A01\u529B \xD71": "15% chance to counter for Power \xD71 when hit",
     "\u76FE\u7246": "Shield Wall",
@@ -124,7 +157,6 @@
     "\u70C8\u7130\u98A8\u66B4\u50B7\u5BB3 +40%": "Flamestrike damage +40%",
     "\u751F\u547D\u4F4E\u65BC 30% \u6642\u514D\u50B7 4 \u79D2\uFF0C\u6BCF\u5834\u4E00\u6B21": "Below 30% HP, become immune for 4s (once per battle)",
     "\u6CD5\u529B\u8B77\u76FE": "Mana Shield",
-    "\u53D7\u5230\u7684\u50B7\u5BB3 \u221215%": "Damage taken \u221215%",
     "\u9023\u9396\u53CD\u61C9": "Chain Reaction",
     "\u7BC4\u570D\u653B\u64CA\u6BCF\u591A 1 \u500B\u76EE\u6A19\uFF0C\u50B7\u5BB3 +5%": "Area attacks deal +5% per extra target",
     "\u5C08\u6CE8": "Focus",
@@ -1006,8 +1038,140 @@
   };
   var mage_default = P4;
 
+  // src/core/classes/druid.js
+  var ROLE = { bear: "tank", resto: "heal", feral: "dps" };
+  var FORM = {
+    bear: { hp: 230, hpL: 42, pow: 5.4, powL: 1.35, armor: 0.45, crit: 0.05 },
+    resto: { hp: 117, hpL: 20, pow: 8.1, powL: 1.8, armor: 0.15, crit: 0.05 },
+    feral: { hp: 126, hpL: 22, pow: 9, powL: 2.07, armor: 0.2, crit: 0.12 }
+  };
+  var P5 = {
+    id: "druid",
+    name: tx("\u5FB7\u9B6F\u4F0A"),
+    role: "dps",
+    roleText: tx("\u5766\u514B\uFF0F\u6CBB\u7642\uFF0F\u8F38\u51FA"),
+    icon: "\u{1F33F}",
+    hp: 126,
+    hpL: 22,
+    pow: 9,
+    powL: 2.07,
+    armor: 0.2,
+    crit: 0.12,
+    desc: tx("\u4F9D\u5C08\u7CBE\u5316\u8EAB\u718A\u3001\u6A39\u4EBA\u6216\u7375\u8C79\uFF0C\u53EF\u4EE5\u7576\u5766\u514B\u3001\u6CBB\u7642\u6216\u8F38\u51FA\uFF1B\u55AE\u4E00\u8077\u8CAC\u6BD4\u5C08\u8077\u8077\u696D\u5F31\u4E00\u4E9B\u3002"),
+    roleOf: (h) => ROLE[h.spec] || "dps",
+    statsOf(h) {
+      const f = FORM[h.spec] || FORM.feral;
+      if (!h.legend) return f;
+      return { ...f, hp: f.hp / 0.9, hpL: f.hpL / 0.9, pow: f.pow / 0.9, powL: f.powL / 0.9 };
+    },
+    // 熊形態天生扛重擊（沒有聖盾術，改用這個補坦度）
+    modsOf: (h) => h.spec === "bear" ? { busterReduce: 0.15 } : {},
+    ai: { tankHit: 0.8, catHit: 1.2, heal: 2, swift: 4, swiftCd: 8, idleHit: 0.6 },
+    base: { name: tx("\u6708\u706B\u8853"), cd: 6, mult: 2, dot: 0.4, dotDur: 4, desc: tx("\u51B7\u537B 6 \u79D2\uFF1A\u5A01\u529B \xD72 \u50B7\u5BB3\uFF0C\u4E26\u5728 4 \u79D2\u5167\u6BCF\u79D2\u9020\u6210\u5A01\u529B \xD70.4") },
+    specs: {
+      bear: { name: tx("\u5B88\u8B77\uFF08\u718A\uFF09"), skill: tx("\u72C2\u66B4\u56DE\u5FA9"), counters: "buster", desc: tx("\u5766\u514B\u3002\u718A\u5F62\u614B\u53D7\u5230\u7684\u91CD\u64CA\u50B7\u5BB3 \u221215%\uFF1B\u51B7\u537B 15 \u79D2\uFF1A\u751F\u547D\u4F4E\u65BC 50% \u6642\uFF0C6 \u79D2\u5167\u56DE\u5FA9 40% \u751F\u547D"), cd: 15, below: 0.5, dur: 6, heal: 0.4 },
+      resto: { name: tx("\u6062\u5FA9\uFF08\u6A39\u4EBA\uFF09"), skill: tx("\u751F\u547D\u7DBB\u653E"), counters: "pulse", desc: tx("\u6CBB\u7642\u3002\u51B7\u537B 7 \u79D2\uFF1A\u5168\u968A 4 \u79D2\u5167\u6BCF\u79D2\u56DE\u5FA9\u5A01\u529B \xD70.4\uFF1B\u968A\u53CB\u751F\u547D\u4F4E\u65BC 50% \u6642\u53E6\u6709\u300C\u8FC5\u7652\u300D\u5927\u88DC\uFF08\u51B7\u537B 8 \u79D2\uFF09"), cd: 7, dur: 4, mult: 0.4 },
+      feral: { name: tx("\u91CE\u6027\uFF08\u7375\u8C79\uFF09"), skill: tx("\u6495\u88C2"), counters: "enrage", desc: tx("\u8F38\u51FA\u3002\u51B7\u537B 12 \u79D2\uFF1A\u9996\u9818\u6D41\u8840 8 \u79D2\uFF0C\u6BCF\u79D2\u5A01\u529B \xD70.7"), cd: 12, dur: 8, mult: 0.7 }
+    },
+    talents: [
+      {
+        a: { name: tx("\u539A\u76AE"), desc: tx("\u751F\u547D +10%"), mods: { hpMult: 1.1 } },
+        b: { name: tx("\u6708\u5149\u5F37\u5316"), desc: tx("\u6708\u706B\u8853\u50B7\u5BB3 +50%"), mods: { baseMult: 1.5 } }
+      },
+      {
+        a: { name: tx("\u6A39\u76AE\u8853"), desc: tx("\u53D7\u5230\u7684\u50B7\u5BB3 \u221215%"), mods: { allReduce: 0.15 } },
+        b: { name: tx("\u91CE\u6027\u672C\u80FD"), desc: tx("\u66B4\u64CA\u7387 +6%"), mods: { critAdd: 0.06 } }
+      },
+      {
+        a: { name: tx("\u5171\u751F"), desc: tx("\u5168\u968A\u751F\u547D +5%"), mods: { partyHp: 0.05 } },
+        b: { name: tx("\u539F\u59CB\u4E4B\u6012"), desc: tx("\u50B7\u5BB3 +15%"), mods: { dmgMult: 1.15 } }
+      },
+      SPEC_ROW,
+      {
+        a: { name: tx("\u751F\u751F\u4E0D\u606F"), desc: tx("\u6CBB\u7642 +15%"), mods: { healMult: 1.15 } },
+        b: { name: tx("\u8FC5\u6377\u6708\u706B"), desc: tx("\u6708\u706B\u8853\u51B7\u537B 6 \u2192 4 \u79D2"), mods: { baseCd: 4 } }
+      }
+    ],
+    // 備戰不改德魯伊的職責（陣容是照目前職責挑的），只依職責配天賦
+    recommend(has, h) {
+      const sp = h && h.spec || "feral";
+      const t = { bear: ["a", "a", "a", "b", "a"], resto: ["a", "a", "a", "b", "a"], feral: ["b", "b", "b", "b", "b"] }[sp];
+      return { spec: sp, t };
+    },
+    legend: {
+      name: tx("\u745F\u862D\u6735"),
+      title: tx("\u68EE\u8A9E"),
+      passive: "renewal",
+      pname: tx("\u842C\u7269\u5FA9\u7526"),
+      desc: tx("\u6BCF\u5834\u7B2C\u4E00\u6B21\u5168\u968A\u5E73\u5747\u751F\u547D\u4F4E\u65BC 30% \u6642\uFF0C\u5168\u968A\u56DE\u5FA9 25% \u751F\u547D\uFF1B\u4EFB\u4F55\u5C08\u7CBE\u90FD\u6C92\u6709 10% \u7684\u6578\u503C\u6298\u6263"),
+      hooks: {
+        tick(b, u) {
+          if (u.used.renewal) return;
+          const team = b.alive();
+          if (!team.length) return;
+          if (team.reduce((a, x) => a + x.hp / x.max, 0) / team.length >= 0.3) return;
+          u.used.renewal = true;
+          b.skillLog(u, tx("\u842C\u7269\u5FA9\u7526"));
+          for (const x of team) b.heal(u, x, x.max * 0.25, true);
+        }
+      }
+    },
+    act(b, u, foes, focus) {
+      const S = spec(P5, u), B = P5.base, A = P5.ai, boss = foes.find((e) => e.boss);
+      const moonfire = (t) => {
+        b.hitEnemy(u, t, u.pow * B.mult * (u.mods.baseMult || 1), { skill: true });
+        t.bleed = { until: b.tick + B.dotDur, amt: u.pow * B.dot * (u.mods.baseMult || 1), src: u };
+        u.cd.base = b.tick + baseCd(u, B.cd);
+        b.skillLog(u, B.name, t);
+      };
+      if (u.spec === "bear") {
+        if (ready(b, u, "spec") && u.hp < u.max * S.below) {
+          u.hots.push({ until: b.tick + S.dur, amt: u.max * S.heal * fx(u) / S.dur, src: u });
+          u.cd.spec = b.tick + specCd(u, S);
+          b.skillLog(u, S.skill);
+        }
+        if (ready(b, u, "base")) return moonfire(boss || focus);
+        b.hitEnemy(u, focus, u.pow * A.tankHit);
+        return;
+      }
+      if (u.spec === "resto") {
+        const team = b.alive();
+        if (ready(b, u, "spec") && team.some((x) => x.hp < x.max * 0.95)) {
+          for (const x of team) x.hots.push({ until: b.tick + S.dur, amt: u.pow * S.mult * fx(u), src: u });
+          u.cd.spec = b.tick + specCd(u, S);
+          b.skillLog(u, S.skill);
+          return;
+        }
+        const tank = team.find((x) => x.role === "tank" && x.hp < x.max * 0.75);
+        const low = tank || team.reduce((m, x) => x.hp / x.max < m.hp / m.max ? x : m);
+        if (low.hp < low.max * 0.5 && ready(b, u, "swift")) {
+          b.heal(u, low, u.pow * A.swift);
+          u.cd.swift = b.tick + A.swiftCd;
+          b.skillLog(u, tx("\u8FC5\u7652"), low);
+          return;
+        }
+        if (low.hp < low.max * 0.8) {
+          b.heal(u, low, u.pow * A.heal);
+          return;
+        }
+        if (ready(b, u, "base")) return moonfire(boss || focus);
+        b.hitEnemy(u, focus, u.pow * A.idleHit);
+        return;
+      }
+      if (u.spec === "feral" && boss && ready(b, u, "spec")) {
+        boss.bleed = { until: b.tick + S.dur, amt: u.pow * S.mult * fx(u), src: u };
+        u.cd.spec = b.tick + specCd(u, S);
+        b.skillLog(u, S.skill, boss);
+      }
+      if (ready(b, u, "base")) return moonfire(boss || focus);
+      b.hitEnemy(u, boss || focus, u.pow * A.catHit);
+    },
+    hooks: {}
+  };
+  var druid_default = P5;
+
   // src/core/classes/index.js
-  var PACKS = { guardian: guardian_default, cleric: cleric_default, rogue: rogue_default, mage: mage_default };
+  var PACKS = { guardian: guardian_default, cleric: cleric_default, rogue: rogue_default, mage: mage_default, druid: druid_default };
   var roleOf = (h) => {
     const p = PACKS[h.cls];
     return p.roleOf ? p.roleOf(h) : p.role;
@@ -1306,12 +1470,12 @@
     if (!TALENT_ROWS.includes(lv) || h.level < lv || !["a", "b"].includes(pick2)) return;
     h.talents = { ...h.talents || {}, [lv]: pick2 };
   }
-  function recommend(cls2, mechTypes) {
+  function recommend(cls2, mechTypes, hero2) {
     const has = (t) => mechTypes.includes(t);
-    return PACKS[cls2].recommend(has);
+    return PACKS[cls2].recommend(has, hero2);
   }
   function applyRecommend(h, mechTypes) {
-    const r = recommend(h.cls, mechTypes);
+    const r = recommend(h.cls, mechTypes, h);
     if (canPickSpec(h)) h.spec = r.spec;
     const t = {};
     TALENT_ROWS.forEach((lv, i) => {
@@ -1345,7 +1509,7 @@
   }
   var gearOf = (h, items) => Object.keys(SLOTS).map((s) => h.gear[s] && items[h.gear[s]]).filter(Boolean);
   function heroStats(h, items) {
-    const c = CLASSES[h.cls], m = heroMods(h), R2 = HERO_RARITY[h.rarity || 0];
+    const c = CLASSES[h.cls].statsOf ? CLASSES[h.cls].statsOf(h) : CLASSES[h.cls], m = heroMods(h), R2 = HERO_RARITY[h.rarity || 0];
     let pow = (c.pow + c.powL * (h.level - 1)) * R2.mult, hp = (c.hp + c.hpL * (h.level - 1)) * R2.mult, crit = c.crit + R2.crit;
     for (const it of gearOf(h, items)) {
       pow += itemPow(it);
@@ -1451,7 +1615,7 @@
       this.kills = 0;
       this.maxTicks = opts.maxTicks || DUNGEON.maxTicks;
       this.units = party.map((h) => {
-        const s = heroStats(h, items), pack = PACKS[h.cls], mods = { ...heroMods(h), ...rarityMods(h) };
+        const s = heroStats(h, items), pack = PACKS[h.cls], mods = { ...heroMods(h), ...rarityMods(h), ...pack.modsOf ? pack.modsOf(h) : {} };
         const lh = mods.legend && pack.legend.hooks || {};
         return {
           id: h.id,
@@ -1655,6 +1819,7 @@
         u.hots = u.hots.filter((h) => h.until >= this.tick);
         for (const h of u.hots) this.heal(h.src, u, h.amt);
         if (u.hk.tick) u.hk.tick(this, u);
+        if (u.lh.tick) u.lh.tick(this, u);
       }
     }
     step() {
@@ -1875,11 +2040,11 @@
   var ownsLegend = (s, cls2) => [...s.heroes, ...s.tavern || []].some((h) => h.legend && h.cls === cls2);
   var legendsAvailable = (s) => Object.keys(CLASSES).filter((c) => CLASSES[c].legend).filter((c) => !ownsLegend(s, c));
   function rollHeroRarity(s) {
-    const P5 = s.recruit || (s.recruit = { sinceEpic: 0, sinceLegend: 0, total: 0 });
+    const P6 = s.recruit || (s.recruit = { sinceEpic: 0, sinceLegend: 0, total: 0 });
     const canLegend = legendsAvailable(s).length > 0;
     let r;
-    if (P5.sinceLegend >= RECRUIT.pityLegend && canLegend) r = 4;
-    else if (P5.sinceEpic >= RECRUIT.pityEpic) r = 3;
+    if (P6.sinceLegend >= RECRUIT.pityLegend && canLegend) r = 4;
+    else if (P6.sinceEpic >= RECRUIT.pityEpic) r = 3;
     else {
       let x = R(), i = HERO_RARITY.length - 1;
       for (; i > 0; i--) {
@@ -1889,9 +2054,9 @@
       r = Math.max(0, i);
     }
     if (r === 4 && !canLegend) r = 3;
-    P5.total++;
-    P5.sinceEpic = r >= 3 ? 0 : P5.sinceEpic + 1;
-    P5.sinceLegend = r === 4 ? 0 : P5.sinceLegend + 1;
+    P6.total++;
+    P6.sinceEpic = r >= 3 ? 0 : P6.sinceEpic + 1;
+    P6.sinceLegend = r === 4 ? 0 : P6.sinceLegend + 1;
     return r;
   }
   function newRecruit(s, level) {
@@ -2426,7 +2591,7 @@
   }
 
   // src/core/version.js
-  var VERSION = "0.8.2";
+  var VERSION = "0.8.3";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -2666,8 +2831,8 @@
   // src/ui/views/tavern.js
   function viewTavern() {
     const S = app.S, E = ECONOMY, full = S.heroes.length >= E.rosterMax;
-    const one = scrollCost(S, 1), ten = scrollCost(S, 10), P5 = S.recruit, legendsLeft = legendsAvailable(S).length;
-    let h = tx('<h2>\u9152\u9928</h2><p class="sub">\u540D\u518A <b class="num">{0}/{1}</b>\u3002\u65B0\u82F1\u96C4\u7684\u7B49\u7D1A\u6703\u63A5\u8FD1\u4F60\u968A\u4F0D\u7684\u5E73\u5747\u3002</p> <div class="recruit"><div><span class="label">\u62DB\u52DF\u4EE4</span><b>\u76F4\u63A5\u62BD\u4E00\u4F4D\u82F1\u96C4\u52A0\u5165\u540D\u518A</b> <span class="sub num" style="margin:0">\u7B2C {2} \u62BD\u5167\u5FC5\u51FA\u53F2\u8A69\u4EE5\u4E0A{3}</span></div> <div class="row"><button class="btn main grow" data-act="scroll" data-n="1" {4}>\u55AE\u62BD <span class="num">{5}</span> \u91D1</button> <button class="btn main grow" data-act="scroll" data-n="10" {6}>\u5341\u9023 <span class="num">{7}</span> \u91D1</button></div> {8} <div class="rates">{9}</div></div> <h2 style="font-size:18px">\u4ECA\u65E5\u540D\u55AE</h2><div class="stack">', S.heroes.length, E.rosterMax, Math.max(1, RECRUIT.pityEpic - P5.sinceEpic + 1), legendsLeft ? tx("\u30FB\u7B2C {0} \u62BD\u5167\u5FC5\u51FA\u50B3\u8AAA", Math.max(1, RECRUIT.pityLegend - P5.sinceLegend + 1)) : "", full || S.gold < one ? "disabled" : "", fmt(one), S.heroes.length + 10 > E.rosterMax || S.gold < ten ? "disabled" : "", fmt(ten), full ? tx('<span class="sub" style="margin:0;color:var(--warn)">\u540D\u518A\u6EFF\u4E86\uFF0C\u5148\u5230\u300C\u5718\u968A\u300D\u89E3\u96C7\u4E00\u4E9B\u82F1\u96C4</span>') : S.heroes.length + 10 > E.rosterMax ? tx('<span class="sub" style="margin:0">\u5341\u9023\u9700\u8981\u540D\u518A\u9084\u6709 10 \u500B\u7A7A\u4F4D</span>') : "", HERO_RARITY.map((r, i) => `<span class="c${i}">${r.name} ${+(r.weight * 100).toFixed(1)}%</span>`).join(""));
+    const one = scrollCost(S, 1), ten = scrollCost(S, 10), P6 = S.recruit, legendsLeft = legendsAvailable(S).length;
+    let h = tx('<h2>\u9152\u9928</h2><p class="sub">\u540D\u518A <b class="num">{0}/{1}</b>\u3002\u65B0\u82F1\u96C4\u7684\u7B49\u7D1A\u6703\u63A5\u8FD1\u4F60\u968A\u4F0D\u7684\u5E73\u5747\u3002</p> <div class="recruit"><div><span class="label">\u62DB\u52DF\u4EE4</span><b>\u76F4\u63A5\u62BD\u4E00\u4F4D\u82F1\u96C4\u52A0\u5165\u540D\u518A</b> <span class="sub num" style="margin:0">\u7B2C {2} \u62BD\u5167\u5FC5\u51FA\u53F2\u8A69\u4EE5\u4E0A{3}</span></div> <div class="row"><button class="btn main grow" data-act="scroll" data-n="1" {4}>\u55AE\u62BD <span class="num">{5}</span> \u91D1</button> <button class="btn main grow" data-act="scroll" data-n="10" {6}>\u5341\u9023 <span class="num">{7}</span> \u91D1</button></div> {8} <div class="rates">{9}</div></div> <h2 style="font-size:18px">\u4ECA\u65E5\u540D\u55AE</h2><div class="stack">', S.heroes.length, E.rosterMax, Math.max(1, RECRUIT.pityEpic - P6.sinceEpic + 1), legendsLeft ? tx("\u30FB\u7B2C {0} \u62BD\u5167\u5FC5\u51FA\u50B3\u8AAA", Math.max(1, RECRUIT.pityLegend - P6.sinceLegend + 1)) : "", full || S.gold < one ? "disabled" : "", fmt(one), S.heroes.length + 10 > E.rosterMax || S.gold < ten ? "disabled" : "", fmt(ten), full ? tx('<span class="sub" style="margin:0;color:var(--warn)">\u540D\u518A\u6EFF\u4E86\uFF0C\u5148\u5230\u300C\u5718\u968A\u300D\u89E3\u96C7\u4E00\u4E9B\u82F1\u96C4</span>') : S.heroes.length + 10 > E.rosterMax ? tx('<span class="sub" style="margin:0">\u5341\u9023\u9700\u8981\u540D\u518A\u9084\u6709 10 \u500B\u7A7A\u4F4D</span>') : "", HERO_RARITY.map((r, i) => `<span class="c${i}">${r.name} ${+(r.weight * 100).toFixed(1)}%</span>`).join(""));
     for (const x of S.tavern) {
       const c = cls(x), cost = hireCost(x);
       h += tx('<div class="hero r-{0}"><div class="ic">{1}</div><div class="nm">{2}{3}<small>{4}{5}\u30FB{6}\u30FB<span class="num">Lv{7}</span></small></div> <button class="btn sm main" data-act="hire" data-id="{8}" {9} style="grid-row:span 2"><span class="num">{10}</span> \u91D1</button> <div class="st">{11}</div></div>', x.rarity || 0, c.icon, heroName(x), rarityTag(x), c.name, x.spec ? `\u30FB${SPECS[x.cls][x.spec].name}` : "", ROLE_NAME[roleOf(x)], x.level, x.id, S.gold < cost || full ? "disabled" : "", fmt(cost), x.legend ? tx('<b class="c4">{0}</b>\uFF1A{1}', LEGENDS[x.cls].pname, LEGENDS[x.cls].desc) : c.desc);
@@ -2676,7 +2841,7 @@
     h += tx('</div><div class="row" style="margin-top:12px"><button class="btn" data-act="reroll" {0}>\u63DB\u4E00\u6279\uFF08<span class="num">{1}</span> \u91D1\uFF09</button><span class="sub" style="margin:0;align-self:center">\u63DB\u4E00\u6279\u4E5F\u7B97\u9032\u4FDD\u5E95</span></div> <h2 style="font-size:18px">\u50B3\u5947\u82F1\u96C4</h2><div class="stack">{2}</div> <h2 style="font-size:18px">\u8077\u696D\u5716\u9451</h2><div class="stack">{3}</div>', S.gold < rc ? "disabled" : "", fmt(rc), Object.entries(LEGENDS).map(([k, L]) => {
       const owned = S.heroes.some((x) => x.legend && x.cls === k);
       return tx('<div class="hero {0}"><div class="ic">{1}</div><div class="nm"><span class="c4">{2}\u30FB{3}</span><small>{4}\u30FB{5}</small></div><span></span><div class="st"><b>{6}</b>\uFF1A{7}</div></div>', owned ? "r-4" : "unowned", CLASSES[k].icon, L.title, L.name, CLASSES[k].name, owned ? tx("\u5DF2\u62DB\u52DF") : tx("\u672A\u62DB\u52DF"), L.pname, L.desc);
-    }).join(""), Object.values(CLASSES).map((c) => `<div class="hero"><div class="ic">${c.icon}</div><div class="nm">${c.name}<small>${ROLE_NAME[c.role]}</small></div><span></span><div class="st">${c.desc}</div></div>`).join(""));
+    }).join(""), Object.values(CLASSES).map((c) => `<div class="hero"><div class="ic">${c.icon}</div><div class="nm">${c.name}<small>${c.roleText || ROLE_NAME[c.role]}</small></div><span></span><div class="st">${c.desc}</div></div>`).join(""));
     return h;
   }
 
@@ -2781,7 +2946,7 @@
     const B = BASE_SKILLS[x.cls], specs = SPECS[x.cls], t = x.talents || {};
     const top = Math.max(0, app.S.unlocked - 1), dn = DUNGEONS[top];
     const opt = (act, v, on, locked, name, desc, extra = "") => `<button class="opt ${on ? "sel" : ""}" data-act="${act}" data-id="${x.id}" data-v="${v}" ${extra} ${locked ? "disabled" : ""}><b>${name}</b><span>${desc}</span></button>`;
-    const specRow = `<div class="trow ${x.level < SPEC_LEVEL ? "locked" : ""}"><span class="tlv num">Lv${SPEC_LEVEL}<small>${x.level < SPEC_LEVEL ? tx("\u672A\u89E3\u9396") : tx("\u5C08\u7CBE")}</small></span>
+    const specRow = `<div class="trow ${Object.keys(specs).length > 2 ? "n3" : ""} ${x.level < SPEC_LEVEL ? "locked" : ""}"><span class="tlv num">Lv${SPEC_LEVEL}<small>${x.level < SPEC_LEVEL ? tx("\u672A\u89E3\u9396") : tx("\u5C08\u7CBE")}</small></span>
       ${Object.entries(specs).map(([k, sp]) => opt("spec", k, x.spec === k, x.level < SPEC_LEVEL, `${sp.name}\u30FB${sp.skill}`, sp.desc)).join("")}</div>`;
     let h = tx('<div class="skillcard"><span class="label">\u57FA\u790E\u6280\u80FD</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>', B.name, B.desc);
     TALENTS[x.cls].forEach((row2, i) => {

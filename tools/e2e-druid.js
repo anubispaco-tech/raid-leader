@@ -1,0 +1,54 @@
+// v0.8.3 測試：德魯伊（三種專精切換職責、天賦頁、酒館圖鑑、戰鬥）
+import { createRequire } from 'module';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { playthrough } from './sim-lib.js';
+const require = createRequire(import.meta.url);
+const { chromium } = require(process.env.PLAYWRIGHT_PATH || '/opt/npm-tools/node_modules/playwright');
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const entry = process.argv[2] || 'index.html';
+const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
+const { s } = playthrough({ talents: true });
+s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0 };
+s.party = s.heroes.slice(0, 5).map(h => h.id);
+const G = await import('../src/core/index.js');
+const dr = G.makeHero('druid', 20, 0); dr.name = '德魯測'; s.heroes.push(dr); s.idle = null;
+const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); await page.addInitScript(() => sessionStorage.setItem('rl-title', '1'));
+const errs = []; page.on('pageerror', e => errs.push(e.message));
+await page.addInitScript(v => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('raid-leader-save-v1', v); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(s));
+await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'app.test') return r.abort();
+  const f = path.join(root, u.pathname === '/' ? entry : u.pathname.slice(1));
+  return r.fulfill({ body: fs.readFileSync(f), contentType: types[path.extname(f)] }); });
+await page.goto('https://app.test/'); await page.waitForTimeout(500);
+const saved = () => page.evaluate(() => JSON.parse(localStorage.getItem('raid-leader-save-v1')));
+const fails = [], check = (ok, msg) => { console.log((ok ? '✅ ' : '❌ ') + msg); if (!ok) fails.push(msg); };
+const shot = n => (process.env.SHOTS || '/tmp/claude-0') + '/' + n;
+await page.click('[data-tab="tavern"]');
+check((await page.locator('main').innerText()).includes('德魯伊'), '職業圖鑑有德魯伊');
+await page.click('[data-tab="team"]');
+await page.locator('.hero', { hasText: '德魯測' }).click(); await page.waitForTimeout(200);
+await page.click('.sheet [data-v="talent"]'); await page.waitForTimeout(200);
+const specs = page.locator('.sheet .trow.n3 [data-act="spec"]');
+check(await specs.count() === 3, '專精三選一');
+await page.screenshot({ path: shot('druid-talent.png') });
+for (const [k, role] of [['bear', '・坦克'], ['resto', '・治療'], ['feral', '・輸出']]) {
+  await page.click(`.sheet [data-act="spec"][data-v="${k}"]`); await page.waitForTimeout(150);
+  const sub = await page.locator('.sheet .sub').first().innerText();
+  check(sub.includes(role), `${k} → ${role}：${sub.slice(0, 30)}`);
+}
+await page.click(`.sheet [data-act="spec"][data-v="bear"]`); await page.waitForTimeout(150);
+await page.click('.scrim', { position: { x: 5, y: 5 } });
+// 換掉守護騎士：熊德當坦克開打
+const sv = await saved(); const g = sv.heroes.find(h => h.cls === 'guardian' && sv.party.includes(h.id));
+await page.locator('.hero', { hasText: g.name }).first().click(); await page.click('.sheet [data-act="bench"]'); await page.click('.scrim', { position: { x: 5, y: 5 } });
+await page.locator('.hero', { hasText: '德魯測' }).click(); await page.click('.sheet [data-act="join"]'); await page.click('.scrim', { position: { x: 5, y: 5 } });
+check((await page.locator('.comp').innerText()).includes('坦克 1'), '熊德算坦克：' + (await page.locator('.comp').innerText()).split('\n')[0]);
+await page.click('[data-tab="dungeon"]'); await page.click('.dg [data-act="fight"][data-d="1"]'); await page.waitForTimeout(1500);
+await page.click('[data-act="speed"][data-x="4"]'); await page.waitForTimeout(2500);
+const log = await page.locator('.log').innerText();
+check(log.includes('德魯測'), '德魯伊有出手：' + log.split('\n').filter(l => l.includes('德魯測')).slice(0, 2).join(' / '));
+await page.screenshot({ path: shot('druid-battle.png') });
+check(!errs.length, '無 JS 錯誤 ' + errs.join(';'));
+await browser.close();
+if (fails.length) process.exit(1);

@@ -46,7 +46,7 @@ export class Battle {
     this.vault = opts.vault || null; this.kills = 0;
     this.maxTicks = opts.maxTicks || DUNGEON.maxTicks;
     this.units = party.map(h => {
-      const s = heroStats(h, items), pack = PACKS[h.cls], mods = { ...heroMods(h), ...rarityMods(h) };
+      const s = heroStats(h, items), pack = PACKS[h.cls], mods = { ...heroMods(h), ...rarityMods(h), ...(pack.modsOf ? pack.modsOf(h) : {}) }; // modsOf：職業包依型態給的固定修正
       const lh = (mods.legend && pack.legend.hooks) || {}; // 傳說被動的掛勾
       return { id: h.id, name: h.name, cls: h.cls, rarity: h.rarity || 0, role: roleOf(h), icon: pack.icon, spec: h.spec || null, mods,
         pack, hk: pack.hooks || {}, lh, legendCd: lh.cdMult || 1,
@@ -176,7 +176,8 @@ export class Battle {
     for (const u of this.alive()) {
       u.hots = u.hots.filter(h => h.until >= this.tick);
       for (const h of u.hots) this.heal(h.src, u, h.amt);
-      if (u.hk.tick) u.hk.tick(this, u);                               // 掛勾：每秒（引導技能等）
+      if (u.hk.tick) u.hk.tick(this, u);
+      if (u.lh.tick) u.lh.tick(this, u);                               // 傳說掛勾：每秒                               // 掛勾：每秒（引導技能等）
     }
   }
 

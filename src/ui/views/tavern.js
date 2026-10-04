@@ -16,6 +16,6 @@ export function viewTavern() {
   h += tx('</div><div class="row" style="margin-top:12px"><button class="btn" data-act="reroll" {0}>換一批（<span class="num">{1}</span> 金）</button><span class="sub" style="margin:0;align-self:center">換一批也算進保底</span></div> <h2 style="font-size:18px">傳奇英雄</h2><div class="stack">{2}</div> <h2 style="font-size:18px">職業圖鑑</h2><div class="stack">{3}</div>', S.gold < rc ? 'disabled' : '', fmt(rc), Object.entries(G.LEGENDS).map(([k, L]) => {
       const owned = S.heroes.some(x => x.legend && x.cls === k);
       return tx('<div class="hero {0}"><div class="ic">{1}</div><div class="nm"><span class="c4">{2}・{3}</span><small>{4}・{5}</small></div><span></span><div class="st"><b>{6}</b>：{7}</div></div>', owned ? 'r-4' : 'unowned', G.CLASSES[k].icon, L.title, L.name, G.CLASSES[k].name, owned ? tx('已招募') : tx('未招募'), L.pname, L.desc);
-    }).join(''), Object.values(G.CLASSES).map(c => `<div class="hero"><div class="ic">${c.icon}</div><div class="nm">${c.name}<small>${G.ROLE_NAME[c.role]}</small></div><span></span><div class="st">${c.desc}</div></div>`).join(''));
+    }).join(''), Object.values(G.CLASSES).map(c => `<div class="hero"><div class="ic">${c.icon}</div><div class="nm">${c.name}<small>${c.roleText || G.ROLE_NAME[c.role]}</small></div><span></span><div class="st">${c.desc}</div></div>`).join(''));
   return h;
 }

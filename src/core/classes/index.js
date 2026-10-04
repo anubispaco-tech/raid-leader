@@ -7,7 +7,8 @@ import guardian from './guardian.js';
 import cleric from './cleric.js';
 import rogue from './rogue.js';
 import mage from './mage.js';
+import druid from './druid.js';
 
-export const PACKS = { guardian, cleric, rogue, mage };
+export const PACKS = { guardian, cleric, rogue, mage, druid };
 // 職責：一般職業固定；之後德魯伊這類職業可在職業包裡定義 roleOf(h) 依專精切換
 export const roleOf = h => { const p = PACKS[h.cls]; return p.roleOf ? p.roleOf(h) : p.role; };

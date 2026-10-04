@@ -24,7 +24,7 @@ const gearOf = (h, items) => Object.keys(SLOTS).map(s => h.gear[s] && items[h.ge
 
 // 最終屬性 = (職業基礎 + 等級成長 + 裝備) × 天賦
 export function heroStats(h, items) {
-  const c = CLASSES[h.cls], m = heroMods(h), R = HERO_RARITY[h.rarity || 0];
+  const c = CLASSES[h.cls].statsOf ? CLASSES[h.cls].statsOf(h) : CLASSES[h.cls], m = heroMods(h), R = HERO_RARITY[h.rarity || 0];
   let pow = (c.pow + c.powL * (h.level - 1)) * R.mult, hp = (c.hp + c.hpL * (h.level - 1)) * R.mult, crit = c.crit + R.crit;
   for (const it of gearOf(h, items)) { pow += itemPow(it); hp += itemSta(it) * GEAR.staToHp; crit += it.crit; }
   const para = 1 + HERO.paragon.bonus * (h.para || 0);

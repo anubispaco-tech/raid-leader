@@ -35,6 +35,12 @@ for (let combo = 0; combo < 16; combo++) {
   }
 }
 rec('vault', new G.Battle(party, items, 3, G.vaultBattleOpts(3)).runToEnd());
+// 3) 德魯伊（v0.8.3）：三種專精各頂替一個職責，傳說與一般各一次
+for (const [slot, sp] of [[0, 'bear'], [1, 'resto'], [2, 'feral']]) for (const rar of [0, 4]) {
+  const d = mk('druid', rar); G.setSpec(d, sp); for (const lv of G.TALENT_ROWS) G.setTalent(d, lv, 'a');
+  const p2 = party.map((h, i) => (i === slot ? d : h));
+  for (let dd = 0; dd < G.DUNGEONS.length; dd++) rec(`druid-${sp}-${rar}-d${dd}`, new G.Battle(p2, items, dd, { autoHorn: true }).runToEnd());
+}
 G.setSeed(null);
 
 const digest = crypto.createHash('sha256').update(JSON.stringify(out)).digest('hex').slice(0, 16);
@@ -44,6 +50,7 @@ else {
   const base = JSON.parse(fs.readFileSync(file, 'utf8'));
   if (base.digest === digest) { console.log('✅ 回歸一致', digest, out.length, 'records'); }
   else {
+    if (process.argv.includes('--matrix')) { const d2 = out.findIndex((r, i) => i > 0 && JSON.stringify(r) !== JSON.stringify(base.out[i])); console.log(d2 < 0 ? '✅ 矩陣部分一致（只有主線流程不同）' : '❌ 矩陣第 ' + d2 + ' 筆不同'); }
     const diff = out.findIndex((r, i) => JSON.stringify(r) !== JSON.stringify(base.out[i]));
     console.log('❌ 不一致', digest, '≠', base.digest, '第一筆差異 #' + diff, JSON.stringify(base.out[diff]), '→', JSON.stringify(out[diff]));
     process.exit(1);
