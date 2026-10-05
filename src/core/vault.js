@@ -19,7 +19,10 @@ export const vaultGoldPerKill = f => Math.round(floorGold(f) * VAULT.parRuns / V
 export const vaultMaxKills = f => Math.round(VAULT.par[f] * VAULT.capMult);
 
 // 一波 3 隻哥布林，越後面越硬；打不完的波數夠多，時間到就結算
+// 只接受有寶庫數值的樓層（第一章），其他一律退回可進入的最高層，避免 VAULT.par[f] 不存在算出 NaN
+export const vaultFloorOk = f => Number.isInteger(f) && f >= 0 && f <= CH1_TOP && VAULT.par[f] != null;
 export function vaultBattleOpts(floor) {
+  if (!vaultFloorOk(floor)) floor = CH1_TOP;
   const base = buildWaves(floor)[0][0];
   const waves = Array.from({ length: 40 }, (_, k) => Array.from({ length: 3 }, () => ({
     name: tx('寶藏哥布林'), boss: false, goblin: true,
@@ -27,7 +30,7 @@ export function vaultBattleOpts(floor) {
   return { vault: { floor, dur: VAULT.dur }, waves, maxTicks: VAULT.dur };
 }
 export function applyVaultResult(s, battle, partyHeroes) {
-  const f = battle.vault.floor, kills = battle.kills || 0, v = vaultToday(s);
+  const f = vaultFloorOk(battle.vault.floor) ? battle.vault.floor : CH1_TOP, kills = battle.kills || 0, v = vaultToday(s);
   const gold = Math.min(kills, vaultMaxKills(f)) * vaultGoldPerKill(f);
   const xp = Math.round(REWARD.xpBase * Math.pow(f + 1, REWARD.xpExp) * VAULT.xpMult);
   v.used++; v.runs++;

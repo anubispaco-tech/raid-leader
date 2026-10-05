@@ -118,7 +118,7 @@ document.addEventListener('click', e => {
       const b = app.battle; b.opts.autoHorn = true; // 直接結算視同掛機：首領戰自動吹號角
       if (b.waveIdx === b.waves.length - 1) b.useHorn();
       b.runToEnd(); finishBattle(); } break;
-    case 'retreat': if (app.battle && !app.battle.over) { clearInterval(app.bTimer); app.battle.over = true; app.battle.win = false; app.battle.push(tx('🏳 主動撤退'), 'bad'); app.lastResult = app.battle.mythicIdle ? G.applyMythicIdleResult(app.S, app.battle) : app.battle.mythic ? G.applyMythicResult(app.S, app.battle) : G.applyResult(app.S, app.battle.dIdx, app.battle); if (app.S.idle === app.battle.dIdx) app.S.idle = null; if (app.battle.mythicIdle) app.S.idleMythic = null; save(); } break;
+    case 'retreat': if (app.battle && !app.battle.over) { clearInterval(app.bTimer); app.battle.over = true; app.battle.win = false; app.battle.push(tx('🏳 主動撤退'), 'bad'); app.lastResult = app.battle.vault ? G.applyVaultResult(app.S, app.battle, G.partyHeroes) : app.battle.mythicIdle ? G.applyMythicIdleResult(app.S, app.battle) : app.battle.mythic ? G.applyMythicResult(app.S, app.battle) : G.applyResult(app.S, app.battle.dIdx, app.battle); if (app.S.idle === app.battle.dIdx) app.S.idle = null; if (app.battle.mythicIdle) app.S.idleMythic = null; save(); } break;
     case 'hero': openModal({ type: 'hero', id, view: app.modal && app.modal.id === id ? app.modal.view : undefined }); return;
     case 'heroview': app.modal = { type: 'hero', id, view: t.dataset.v }; break;
     case 'spec': G.setSpec(hero(id), t.dataset.v); save(); break;

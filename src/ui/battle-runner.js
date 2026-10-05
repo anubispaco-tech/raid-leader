@@ -36,7 +36,9 @@ export function startMythicIdle(dIdx) {
 }
 // 寶庫：每日次數用完就不能開
 export function startVault(floor) {
-  const p = G.partyHeroes(app.S);
+  const p = G.partyHeroes(app.S), floors = G.vaultFloors(app.S);
+  if (!floors.includes(floor)) floor = floors[floors.length - 1]; // 不在可進入清單（例如第二章樓層）就改打最高可進入層
+  if (floor == null) return false;
   if (!p.length) { toast(tx('隊伍沒有成員')); app.tab = 'team'; app.render(); return false; }
   if (!G.vaultLeft(app.S)) { toast(tx('今天的寶庫次數用完了，明天 00:00 重置')); return false; }
   clearTimeout(app.pendingRepeat); app.pendingRepeat = null;

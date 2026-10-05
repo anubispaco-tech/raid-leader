@@ -349,7 +349,7 @@ h3 .gi{vertical-align:-.12em}
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.13.2 */
+/* 副本團長 v0.13.3 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -3180,7 +3180,9 @@ h3 .gi{vertical-align:-.12em}
   var floorGold = (f) => REWARD.goldBase + REWARD.goldPerTier * f;
   var vaultGoldPerKill = (f) => Math.round(floorGold(f) * VAULT.parRuns / VAULT.par[f]);
   var vaultMaxKills = (f) => Math.round(VAULT.par[f] * VAULT.capMult);
+  var vaultFloorOk = (f) => Number.isInteger(f) && f >= 0 && f <= CH1_TOP && VAULT.par[f] != null;
   function vaultBattleOpts(floor) {
+    if (!vaultFloorOk(floor)) floor = CH1_TOP;
     const base = buildWaves(floor)[0][0];
     const waves = Array.from({ length: 40 }, (_, k) => Array.from({ length: 3 }, () => ({
       name: tx("\u5BF6\u85CF\u54E5\u5E03\u6797"),
@@ -3192,7 +3194,7 @@ h3 .gi{vertical-align:-.12em}
     return { vault: { floor, dur: VAULT.dur }, waves, maxTicks: VAULT.dur };
   }
   function applyVaultResult(s, battle, partyHeroes2) {
-    const f = battle.vault.floor, kills = battle.kills || 0, v = vaultToday(s);
+    const f = vaultFloorOk(battle.vault.floor) ? battle.vault.floor : CH1_TOP, kills = battle.kills || 0, v = vaultToday(s);
     const gold = Math.min(kills, vaultMaxKills(f)) * vaultGoldPerKill(f);
     const xp = Math.round(REWARD.xpBase * Math.pow(f + 1, REWARD.xpExp) * VAULT.xpMult);
     v.used++;
@@ -3957,7 +3959,7 @@ h3 .gi{vertical-align:-.12em}
     if (party.some((h) => pendingPicks(h))) return { text: tx("\u6709\u5929\u8CE6\u9084\u6C92\u9078"), sub: s.idle != null ? tx("\u639B\u6A5F\u4E2D\u9663\u5BB9\u4E0D\u8B8A\uFF0C\u4E00\u9375\u4F9D\u300C{0}\u300D\u914D\u597D\u5929\u8CE6\u8207\u88DD\u5099\u3002", DUNGEONS[top].name) : tx("\u4E00\u9375\u4F9D\u300C{0}\u300D\u914D\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\u3002", DUNGEONS[top].name), btn: { label: tx("\u4E00\u9375\u5099\u6230"), act: "prepare", d: top } };
     if ((s.failStreak || 0) >= 2 && top > 0) return { text: tx("\u300C{0}\u300D\u9023\u8F38 {1} \u5834", DUNGEONS[top].name, s.failStreak), sub: tx("\u56DE\u524D\u4E00\u5C64\u639B\u6A5F\u5237\u88DD\u5099\u8207\u7B49\u7D1A\uFF0C\u6216\u8ABF\u6574\u9663\u5BB9\u3002"), btn: { label: tx("\u639B\u6A5F\u5237\u300C{0}\u300D", DUNGEONS[top - 1].name), act: "idle", d: top - 1 } };
     if (s.stash && s.stash.length) return { text: tx("\u6230\u5229\u54C1\u7BB1\u6709 {0} \u4EF6\u88DD\u5099", s.stash.length), sub: tx("\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\u6389\u7684\u88DD\u5099\u653E\u5728\u9019\u88E1\uFF0C\u8A18\u5F97\u53D6\u51FA\u3002"), btn: { label: tx("\u524D\u5F80\u80CC\u5305"), tab: "bag" } };
-    if (vaultUnlocked(s) && vaultLeft(s) && s.stats.runs >= 5) return { text: tx("\u4ECA\u5929\u5BF6\u5EAB\u9084\u6709 {0} \u6B21", vaultLeft(s)), sub: tx("60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\uFF0C\u5927\u91CF\u91D1\u5E63\u53EF\u4EE5\u62FF\u53BB\u62DB\u52DF\u82F1\u96C4\u3002"), btn: { label: tx("\u9032\u5165\u5BF6\u5EAB"), act: "vault", d: Math.max(...Object.keys(s.clears).filter((k) => s.clears[k]).map(Number)) } };
+    if (vaultUnlocked(s) && vaultLeft(s) && s.stats.runs >= 5) return { text: tx("\u4ECA\u5929\u5BF6\u5EAB\u9084\u6709 {0} \u6B21", vaultLeft(s)), sub: tx("60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\uFF0C\u5927\u91CF\u91D1\u5E63\u53EF\u4EE5\u62FF\u53BB\u62DB\u52DF\u82F1\u96C4\u3002"), btn: { label: tx("\u9032\u5165\u5BF6\u5EAB"), act: "vault", d: vaultFloors(s).at(-1) } };
     if (mythicUnlocked(s) && !s.mythic.runs) return { text: tx("\u50B3\u5947\u79D8\u5883\u5DF2\u89E3\u9396"), sub: tx("\u5C31\u5728\u4E0B\u65B9\uFF1A\u5C64\u6578\u7121\u4E0A\u9650\uFF0C\u6BCF\u5929\u8A5E\u7DB4\u4E0D\u540C\u3002"), btn: null };
     return null;
   }
@@ -4198,7 +4200,7 @@ h3 .gi{vertical-align:-.12em}
   var dailyOpenNow = () => app.dailyOpen != null ? app.dailyOpen : dailyPending(app.S) > 0;
 
   // src/core/version.js
-  var VERSION = "0.13.2";
+  var VERSION = "0.13.3";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -4991,7 +4993,9 @@ h3 .gi{vertical-align:-.12em}
     runTimer();
   }
   function startVault(floor) {
-    const p = partyHeroes(app.S);
+    const p = partyHeroes(app.S), floors = vaultFloors(app.S);
+    if (!floors.includes(floor)) floor = floors[floors.length - 1];
+    if (floor == null) return false;
     if (!p.length) {
       toast(tx("\u968A\u4F0D\u6C92\u6709\u6210\u54E1"));
       app.tab = "team";
@@ -5289,7 +5293,7 @@ h3 .gi{vertical-align:-.12em}
           app.battle.over = true;
           app.battle.win = false;
           app.battle.push(tx("\u{1F3F3} \u4E3B\u52D5\u64A4\u9000"), "bad");
-          app.lastResult = app.battle.mythicIdle ? applyMythicIdleResult(app.S, app.battle) : app.battle.mythic ? applyMythicResult(app.S, app.battle) : applyResult(app.S, app.battle.dIdx, app.battle);
+          app.lastResult = app.battle.vault ? applyVaultResult(app.S, app.battle, partyHeroes) : app.battle.mythicIdle ? applyMythicIdleResult(app.S, app.battle) : app.battle.mythic ? applyMythicResult(app.S, app.battle) : applyResult(app.S, app.battle.dIdx, app.battle);
           if (app.S.idle === app.battle.dIdx) app.S.idle = null;
           if (app.battle.mythicIdle) app.S.idleMythic = null;
           save();
