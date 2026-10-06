@@ -1,0 +1,6 @@
+// Cloudflare Workers 靜態網站設定：只部署 public/（由 tools/build.js 產生）
+{
+  "name": "raid-leader",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./public" }
+}

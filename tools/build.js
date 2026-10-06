@@ -45,4 +45,11 @@ fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
 fs.writeFileSync(path.join(root, 'dist/app.js'), js);
 fs.writeFileSync(path.join(root, 'dist/raid-leader.html'),
   `${head}\n<style>\n${read('src/styles.css')}</style>\n${body}\n<script>\n${js}</script>\n`);
-console.log(`built index.html + dist/raid-leader.html (v${pkg.version})`);
+// Cloudflare 部署目錄：只放遊戲本體（index.html、dist/app.js、src/styles.css），repo 其他檔案（gas、tools…）不會被公開
+const pub = path.join(root, 'public');
+fs.rmSync(pub, { recursive: true, force: true });
+for (const f of ['index.html', 'dist/app.js', 'src/styles.css']) {
+  fs.mkdirSync(path.dirname(path.join(pub, f)), { recursive: true });
+  fs.copyFileSync(path.join(root, f), path.join(pub, f));
+}
+console.log(`built index.html + dist/raid-leader.html + public/ (v${pkg.version})`);

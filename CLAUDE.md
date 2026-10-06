@@ -18,7 +18,7 @@
 ## 每次改版的固定流程
 1. 改 `src/`；新文字一律用 `tx('中文原文', 參數…)`。
 2. `python3 tools/i18n-build.py` → 列出 MISSING 的片段，寫進新的 `src/i18n/en-frags-N.json`，直到 0 missing。
-3. `package.json` 版本號 +1 → `node tools/build.js`（會同時產生 index.html、dist/app.js、dist/raid-leader.html、version.js）。
+3. `package.json` 版本號 +1 → `node tools/build.js`（會同時產生 index.html、dist/app.js、dist/raid-leader.html、version.js，以及 Cloudflare 部署用的 `public/`；`public/` 要一起 commit）。
 4. `node tools/regress.js` 要一致；只有主線流程改變（例如酒館多了職業）時才 `--save` 重設基準，矩陣部分必須一致（`--matrix`）。
 5. 跑相關 e2e：`node tools/e2e-*.js`（Playwright 在 /opt/npm-tools）。全部測試清單見 tools/。
 6. README.md 版本紀錄加一行 → commit（附 Co-Authored-By）→ push main。
