@@ -3,6 +3,7 @@ import { tx } from '../core/i18n.js';
 import * as G from '../core/index.js';
 import { app, KEY, canSkip } from './state.js';
 import { load, save, exportCode, importCode } from './save.js';
+import { moveAway, takeMoved } from './move.js';
 import { $, fmt, toast, hero, mmss, itemName, dailyOpenNow, firstWinLine } from './helpers.js';
 import { viewDungeons } from './views/dungeon.js';
 import { viewBattle } from './views/battle.js';
@@ -369,7 +370,12 @@ function showTitle(fresh, onGo) {
   });
 }
 window.claude?.hot?.snapshot?.(() => ({ S: app.S }));
-window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+// v0.17.2 搬家：舊網址直接跳走；新網址先收下帶過來的存檔再啟動
+if (!moveAway()) takeMoved().then(r => {
+  window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+  const msg = { moved: tx('已搬到新網址，進度已帶過來'), kept: tx('這台裝置在新網址已有進度，沒有覆蓋'), bad: tx('搬家存檔讀取失敗，可用 Google 登入或存檔碼找回進度') }[r];
+  if (msg) { const wait = () => (document.getElementById('title') || document.getElementById('boot') ? setTimeout(wait, 400) : setTimeout(() => toast(msg), 300)); setTimeout(wait, 800); }
+});
 
 // 手動開打其他副本／秘境／寶庫時先停掉掛機，避免掛機迴圈與陣容鎖卡住
 function stopIdleFor(d) {
