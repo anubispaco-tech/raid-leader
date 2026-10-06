@@ -403,7 +403,7 @@ h3 .gi{vertical-align:-.12em}
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.17.0 */
+/* 副本團長 v0.17.1 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -1014,13 +1014,16 @@ h3 .gi{vertical-align:-.12em}
     "\u767B\u5165\u5931\u6557\uFF0C\u8ACB\u518D\u8A66\u4E00\u6B21": "Sign-in failed. Please try again",
     "\u96F2\u7AEF\u5DF2\u6709\u5B58\u6A94": "A cloud save already exists",
     "\u5DF2\u767B\u5165\uFF0C\u6B63\u5728\u5EFA\u7ACB\u96F2\u7AEF\u5B58\u6A94": "Signed in. Creating your cloud save",
+    "\u9023\u4E0D\u4E0A\u4F3A\u670D\u5668\uFF0C\u8ACB\u78BA\u8A8D\u7DB2\u8DEF\u5F8C\u518D\u8A66": "Can't reach the server. Check your connection and try again",
+    "\u4E0B\u8F09\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66": "Download failed. Try again later",
+    "\u525B\u525B\u5DF2\u540C\u6B65\u904E\uFF0C{0} \u79D2\u5F8C\u81EA\u52D5\u518D\u4E0A\u50B3\u4E00\u6B21": "Just synced. Uploading again automatically in {0}s",
+    "\u4E0A\u50B3\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66": "Upload failed. Try again later",
+    "\u96F2\u7AEF\u5931\u6557": "Cloud error",
     "\u767B\u5165\u5DF2\u904E\u671F\uFF0C\u8ACB\u91CD\u65B0\u767B\u5165": "Your sign-in expired. Please sign in again",
     '<h3>{0}</h3><p class="sub" style="margin:0">\u96F2\u7AEF\uFF1A{1}\uFF08{2} \u4E0A\u50B3\uFF09<br>\u9019\u53F0\u88DD\u7F6E\uFF1A{3}</p><div class="row"><button class="btn main grow" data-act="cloudpick" data-v="cloud">\u8F09\u5165\u96F2\u7AEF</button><button class="btn grow" data-act="cloudpick" data-v="local">\u4FDD\u7559\u9019\u53F0\u4E26\u4E0A\u50B3</button></div>': '<h3>{0}</h3><p class="sub" style="margin:0">Cloud: {1} (uploaded {2})<br>This device: {3}</p><div class="row"><button class="btn main grow" data-act="cloudpick" data-v="cloud">Load cloud</button><button class="btn grow" data-act="cloudpick" data-v="local">Keep this device and upload</button></div>',
     "\u5169\u908A\u90FD\u6709\u65B0\u9032\u5EA6": "Both have new progress",
     "\u5DF2\u4E0A\u50B3\u5230\u96F2\u7AEF": "Uploaded to the cloud",
     "\u96F2\u7AEF\u5728\u5225\u7684\u88DD\u7F6E\u66F4\u65B0\u904E": "The cloud save was updated on another device",
-    "\u4E0A\u50B3\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66": "Upload failed. Try again later",
-    "\u4E0B\u8F09\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66": "Download failed. Try again later",
     "\u96F2\u7AEF\u9084\u6C92\u6709\u5B58\u6A94": "There's no cloud save yet",
     "\u5F9E\u96F2\u7AEF\u4E0B\u8F09": "Download from cloud",
     "\u5DF2\u81EA\u52D5\u8F09\u5165\u96F2\u7AEF\u8F03\u65B0\u7684\u9032\u5EA6\uFF08{0}\uFF09": "Loaded newer cloud progress ({0})",
@@ -4572,7 +4575,7 @@ h3 .gi{vertical-align:-.12em}
   var dailyOpenNow = () => app.dailyOpen != null ? app.dailyOpen : dailyPending(app.S) > 0;
 
   // src/core/version.js
-  var VERSION = "0.17.0";
+  var VERSION = "0.17.1";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -5031,6 +5034,14 @@ h3 .gi{vertical-align:-.12em}
     }
     rerender();
   }
+  var RETRY_SEC = 16;
+  var failMsg = (r, what) => !r ? tx("\u9023\u4E0D\u4E0A\u4F3A\u670D\u5668\uFF0C\u8ACB\u78BA\u8A8D\u7DB2\u8DEF\u5F8C\u518D\u8A66") : what === "down" ? tx("\u4E0B\u8F09\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66") : r.error === "too fast" ? tx("\u525B\u525B\u5DF2\u540C\u6B65\u904E\uFF0C{0} \u79D2\u5F8C\u81EA\u52D5\u518D\u4E0A\u50B3\u4E00\u6B21", RETRY_SEC) : tx("\u4E0A\u50B3\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66");
+  var lastLog = 0;
+  var logFail = (op, r) => {
+    if (Date.now() - lastLog < 6e4) return;
+    lastLog = Date.now();
+    sendEvent(tx("\u96F2\u7AEF\u5931\u6557"), `${op}:${r ? String(r.error || "?").slice(0, 80) : "net"}`);
+  };
   var expired = (r) => {
     if (r && r.error === "login") {
       setSession(null);
@@ -5088,11 +5099,23 @@ h3 .gi{vertical-align:-.12em}
       cloud.info = { updated: toMs(r.updated), summary: progressText() };
       if (!quiet) toast(tx("\u5DF2\u4E0A\u50B3\u5230\u96F2\u7AEF"));
     } else if (r && r.error === "conflict") chooser(tx("\u96F2\u7AEF\u5728\u5225\u7684\u88DD\u7F6E\u66F4\u65B0\u904E"), toMs(r.updated), r.summary);
-    else if (!expired(r) && !quiet) toast(tx("\u4E0A\u50B3\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66"));
+    else if (!expired(r)) {
+      const fast = !!r && r.error === "too fast";
+      if (!(fast && quiet)) logFail("save", r);
+      if (fast) {
+        cloud.pending = true;
+        if (!quiet) {
+          clearTimeout(cloud.retryT);
+          cloud.retryT = setTimeout(() => upload(false, force), RETRY_SEC * 1e3);
+        }
+      }
+      if (!quiet) toast(failMsg(r, "up"));
+    }
     rerender();
   }
   function uploadOnHide() {
     if (!cloudEnabled() || !loggedIn() || !dirty() || app.fresh) return;
+    cloud.lastTry = Date.now();
     const s = session(), body = { type: "cloudsave", token: s.token, save: JSON.stringify(app.S), summary: progressText(), ver: VERSION, base: s.base || 0 };
     post(body, true).then((r) => {
       if (r && r.ok) synced(r.updated);
@@ -5102,7 +5125,10 @@ h3 .gi{vertical-align:-.12em}
     if (!loggedIn()) return;
     const r = await post({ type: "cloudload", token: session().token });
     if (!r || !r.ok) {
-      if (!expired(r)) toast(tx("\u4E0B\u8F09\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66"));
+      if (!expired(r)) {
+        logFail("load", r);
+        toast(failMsg(r, "down"));
+      }
       return;
     }
     if (!r.save) {

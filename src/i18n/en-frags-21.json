@@ -1,0 +1,5 @@
+{
+"連不上伺服器，請確認網路後再試": "Can't reach the server. Check your connection and try again",
+"剛剛已同步過，{0} 秒後自動再上傳一次": "Just synced. Uploading again automatically in {0}s",
+"雲端失敗": "Cloud error"
+}

@@ -5,7 +5,7 @@
 import { tx } from '../core/i18n.js';
 import * as G from '../core/index.js';
 import { app } from './state.js';
-import { post, progressText } from './telemetry.js';
+import { post, progressText, sendEvent } from './telemetry.js';
 import { save } from './save.js';
 import { toast } from './helpers.js';
 import { VERSION } from '../core/version.js';
@@ -57,6 +57,16 @@ async function onCredential(resp) {
   else { toast(tx('已登入，正在建立雲端存檔')); upload(true, true); }
   rerender();
 }
+// v0.17.1 失敗原因分開提示＋埋點（同一分鐘只記一筆）
+const RETRY_SEC = 16; // GAS cloudsave 限流 15 秒
+const failMsg = (r, what) => !r ? tx('連不上伺服器，請確認網路後再試')
+  : what === 'down' ? tx('下載失敗，請稍後再試')
+  : r.error === 'too fast' ? tx('剛剛已同步過，{0} 秒後自動再上傳一次', RETRY_SEC) : tx('上傳失敗，請稍後再試');
+let lastLog = 0;
+const logFail = (op, r) => {
+  if (Date.now() - lastLog < 60000) return; lastLog = Date.now();
+  sendEvent(tx('雲端失敗'), `${op}:${r ? String(r.error || '?').slice(0, 80) : 'net'}`);
+};
 const expired = r => {
   if (r && r.error === 'login') { setSession(null); cloud.info = null; toast(tx('登入已過期，請重新登入')); rerender(); return true; }
   return false;
@@ -100,19 +110,28 @@ export async function upload(quiet = false, force = false) {
   cloud.busy = false; cloud.lastAuto = Date.now(); chip(false);
   if (r && r.ok) { cloud.pending = false; synced(r.updated); cloud.info = { updated: toMs(r.updated), summary: progressText() }; if (!quiet) toast(tx('已上傳到雲端')); }
   else if (r && r.error === 'conflict') chooser(tx('雲端在別的裝置更新過'), toMs(r.updated), r.summary);
-  else if (!expired(r) && !quiet) toast(tx('上傳失敗，請稍後再試'));
+  else if (!expired(r)) {
+    const fast = !!r && r.error === 'too fast';
+    if (!(fast && quiet)) logFail('save', r);          // 自動上傳被限流是預期內的，不記
+    if (fast) {
+      cloud.pending = true;
+      if (!quiet) { clearTimeout(cloud.retryT); cloud.retryT = setTimeout(() => upload(false, force), RETRY_SEC * 1000); }
+    }
+    if (!quiet) toast(failMsg(r, 'up'));
+  }
   rerender();
 }
 // 離開頁面時：有新進度就用 keepalive 送出（存檔一般遠小於 64 KB 上限）
 export function uploadOnHide() {
   if (!cloudEnabled() || !loggedIn() || !dirty() || app.fresh) return;
+  cloud.lastTry = Date.now();
   const s = session(), body = { type: 'cloudsave', token: s.token, save: JSON.stringify(app.S), summary: progressText(), ver: VERSION, base: s.base || 0 };
   post(body, true).then(r => { if (r && r.ok) synced(r.updated); });
 }
 export async function download(confirmed = false, auto = false) {
   if (!loggedIn()) return;
   const r = await post({ type: 'cloudload', token: session().token });
-  if (!r || !r.ok) { if (!expired(r)) toast(tx('下載失敗，請稍後再試')); return; }
+  if (!r || !r.ok) { if (!expired(r)) { logFail('load', r); toast(failMsg(r, 'down')); } return; }
   if (!r.save) { toast(tx('雲端還沒有存檔')); return; }
   if (!confirmed) { chooser(tx('從雲端下載'), toMs(r.updated), r.summary); return; }
   app.S = G.migrate(G.sanitizeSave(JSON.parse(r.save)));
