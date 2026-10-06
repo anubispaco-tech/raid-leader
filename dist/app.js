@@ -1,4 +1,4 @@
-/* 副本團長 v0.15.0 */
+/* 副本團長 v0.16.0 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -441,8 +441,35 @@
     "\u96F7\u8A93\u8005": "Thunderoath",
     "\u50B7\u5BB3\u3001\u6CBB\u7642 +6%": "Damage and healing +6%",
     "\u50B7\u5BB3\u3001\u6CBB\u7642\u518D +6%\uFF0C\u55DC\u8840\u6301\u7E8C +4 \u79D2": "Damage and healing another +6%; Bloodlust lasts 4s longer",
+    "\u5DE8\u65A7": "Greataxe",
+    "\u5F4E\u5200": "Scimitar",
+    "\u6CD5\u5178": "Tome",
+    "\u9577\u69CD": "Spear",
+    "\u89D2\u76D4": "Horned Helm",
+    "\u982D\u5DFE": "Bandana",
+    "\u6230\u888D": "Tabard",
+    "\u9C57\u7532": "Scale Armor",
+    "\u62F3\u5957": "Knuckles",
+    "\u6307\u5957": "Grips",
+    "\u99AC\u8932": "Breeches",
+    "\u88D9\u7532": "Tassets",
+    "\u8033\u74B0": "Earring",
+    "\u8170\u6263": "Buckle",
+    "\u7B26\u6587\u77F3": "Runestone",
+    "\u9435\u88FD": "Iron",
+    "\u7CBE\u92FC": "Steel",
+    "\u707C\u7130": "Flameforged",
+    "\u5BD2\u971C": "Frostbound",
+    "\u865B\u7A7A": "Void",
+    "\u9060\u53E4": "Ancient",
+    "\u9F8D\u9C57": "Dragonscale",
+    "\u72C2\u6012\u7684": "Furious ",
     "\u5805\u6BC5\u7684": "Steadfast ",
+    "\u5147\u731B\u7684": "Savage ",
+    "\u5B88\u8B77\u7684": "Warding ",
+    "\u7CBE\u6E96\u7684": "Precise ",
     "\u92B3\u5229\u7684": "Keen ",
+    "\u5B8C\u7F8E\u7684": "Perfect ",
     "\u707C\u71B1\u7684": "Searing ",
     "\u5BD2\u971C\u7684": "Frostbitten ",
     "\u865B\u7A7A\u7684": "Voidtouched ",
@@ -607,6 +634,7 @@
     "\u91D1\u5E63\u6216\u7CBE\u83EF\u4E0D\u8DB3": "Not enough gold or essence",
     "\u91D1\u5E63\u4E0D\u8DB3": "Not enough gold",
     "\u80CC\u5305 +{0} \u683C\uFF08\u82B1\u8CBB {1} \u91D1\uFF09": "Bag +{0} slots (spent {1} gold)",
+    "\u5716\u9451 {0}%\uFF1A\u7372\u5F97 {1} \u91D1\u3001{2} \u7CBE\u83EF": "Codex {0}%: received {1} gold and {2} essence",
     "\u5DF2\u9396\u5B9A\uFF0C\u4E0D\u6703\u88AB\u5206\u89E3\u6216\u89E3\u96C7": "Locked. It won't be salvaged or dismissed",
     "\u5DF2\u89E3\u9664\u9396\u5B9A": "Unlocked",
     "\u5206\u89E3\u7372\u5F97 {0} \u91D1": "Salvaged for {0} gold",
@@ -725,6 +753,11 @@
     '<div class="set"><span style="margin:0">\u91D1\u5E63\u64F4\u5145 <span class="sub num">{0}/{1}</span></span>{2}</div>': '<div class="set"><span style="margin:0">Buy with gold <span class="sub num">{0}/{1}</span></span>{2}</div>',
     '<span class="num okc">\u5DF2\u5168\u90E8\u64F4\u5145</span>': '<span class="num okc">Fully expanded</span>',
     '<button class="btn sm main" data-act="buybag" {0}>+{1} \u683C\u30FB<span class="num">{2}</span> \u91D1</button>': '<button class="btn sm main" data-act="buybag" {0}>+{1} slots \xB7 <span class="num">{2}</span> gold</button>',
+    "\u5716\u9451 {0}%": "Codex {0}%",
+    '<h2>\u5716\u9451 <span class="sub num">{0}/{1}</span></h2><p class="sub" style="margin:0 0 8px">\u62FF\u5230\u904E\u7684\u88DD\u5099\u6703\u4EAE\u8D77\u4F86\uFF08\u81EA\u52D5\u5206\u89E3\u7684\u4E5F\u7B97\uFF09\u3002\u4E00\u822C\u88DD\u5099\u4EE5\u300C\u7A2E\u985E\uFF0B\u7A00\u6709\u5EA6\u300D\u70BA\u4E00\u683C\uFF0C\u5957\u88DD\u4EE5\u300C\u8077\u696D\uFF0B\u90E8\u4F4D\u300D\u70BA\u4E00\u683C\u3002</p>': `<h2>Codex <span class="sub num">{0}/{1}</span></h2><p class="sub" style="margin:0 0 8px">Gear you've obtained lights up (auto-salvaged drops count). Regular gear fills one slot per type and rarity; set gear fills one per class and slot.</p>`,
+    "\u5DF2\u9818\u53D6": "Claimed",
+    "\u91D1": "gold",
+    "T0 \u8077\u696D\u5957\u88DD": "T0 class sets",
     '<h2>\u80CC\u5305 <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">\u7CBE\u83EF <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">\u5206\u89E3\u7CBE\u826F\u4EE5\u4E0A\u7684\u88DD\u5099\u6703\u5F97\u5230\u7CBE\u83EF\u3002\u901A\u95DC\u7B2C 7 \u5C64\u5F8C\uFF0C\u53EF\u7528\u7CBE\u83EF\u628A\u88DD\u5099\u7CBE\u7149\u5230 +6 ~ +{4}\u3002</p>': '<h2>Bag <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">Essence <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">Salvaging Uncommon or better gear yields essence. After clearing Floor 7, use essence to refine gear to +6 ~ +{4}.</p>',
     '<div class="stashbox"><div class="row" style="align-items:center"><b>\u6230\u5229\u54C1\u7BB1</b><span class="sub num" style="margin:0">{0}/{1}</span> <span class="sub" style="margin:0 0 0 auto">\u80CC\u5305\u6EFF\u6642\u6389\u843D\u7684\u88DD\u5099</span></div> <div class="stack">{2} {3}</div> <div class="row"><button class="btn sm main grow" data-act="takestash" {4}>{5}</button> <button class="btn sm" data-act="salvagestash">\u5168\u90E8\u5206\u89E3</button></div></div>': '<div class="stashbox"><div class="row" style="align-items:center"><b>Loot chest</b><span class="sub num" style="margin:0">{0}/{1}</span> <span class="sub" style="margin:0 0 0 auto">Drops received while your bag was full</span></div> <div class="stack">{2} {3}</div> <div class="row"><button class="btn sm main grow" data-act="takestash" {4}>{5}</button> <button class="btn sm" data-act="salvagestash">Salvage all</button></div></div>',
     '<div class="sub" style="margin:0">\u9084\u6709 {0} \u4EF6</div>': '<div class="sub" style="margin:0">{0} more</div>',
@@ -1870,6 +1903,52 @@
   };
   var SET_PIECE = { head: tx("\u982D\u51A0"), chest: tx("\u80F8\u7532"), hands: tx("\u8B77\u624B"), legs: tx("\u817F\u7532") };
   var SET_DROP = { chance: 0.15, rarity: 3 };
+  var ITEM_BASES = {
+    weapon: [
+      ["longsword", tx("\u9577\u528D")],
+      ["staff", tx("\u6CD5\u6756")],
+      ["dagger", tx("\u5315\u9996")],
+      ["warhammer", tx("\u6230\u9318")],
+      ["scepter", tx("\u6B0A\u6756")],
+      ["shortbow", tx("\u77ED\u5F13")],
+      ["greataxe", tx("\u5DE8\u65A7")],
+      ["scimitar", tx("\u5F4E\u5200")],
+      ["tome", tx("\u6CD5\u5178")],
+      ["spear", tx("\u9577\u69CD")]
+    ],
+    head: [["helm", tx("\u982D\u76D4")], ["hood", tx("\u515C\u5E3D")], ["circlet", tx("\u982D\u51A0")], ["visor", tx("\u9762\u7532")], ["hornhelm", tx("\u89D2\u76D4")], ["bandana", tx("\u982D\u5DFE")]],
+    chest: [["mail", tx("\u9396\u7532")], ["robe", tx("\u6CD5\u888D")], ["leather", tx("\u76AE\u7532")], ["plate", tx("\u677F\u7532")], ["tabard", tx("\u6230\u888D")], ["scale", tx("\u9C57\u7532")]],
+    hands: [["gloves", tx("\u624B\u5957")], ["gauntlets", tx("\u8B77\u624B")], ["bracers", tx("\u8155\u7532")], ["knuckles", tx("\u62F3\u5957")], ["grips", tx("\u6307\u5957")]],
+    legs: [["greaves", tx("\u8B77\u817F")], ["wraps", tx("\u7D81\u817F")], ["legplates", tx("\u817F\u7532")], ["breeches", tx("\u99AC\u8932")], ["tassets", tx("\u88D9\u7532")]],
+    trinket: [
+      ["amulet", tx("\u8B77\u7B26")],
+      ["ring", tx("\u6212\u6307")],
+      ["sigil", tx("\u5FBD\u8A18")],
+      ["orb", tx("\u5BF6\u73E0")],
+      ["necklace", tx("\u9805\u934A")],
+      ["earring", tx("\u8033\u74B0")],
+      ["buckle", tx("\u8170\u6263")],
+      ["runestone", tx("\u7B26\u6587\u77F3")]
+    ]
+  };
+  var BASE_INFO = Object.fromEntries(Object.entries(ITEM_BASES).flatMap(([slot, list]) => list.map(([key, name]) => [key, { slot, name, icon: null, tags: [] }])));
+  var ITEM_TIERS = ["", tx("\u9435\u88FD"), tx("\u7CBE\u92FC"), tx("\u707C\u7130"), tx("\u5BD2\u971C"), tx("\u865B\u7A7A"), tx("\u9060\u53E4"), tx("\u9F8D\u9C57")];
+  var GEAR_AFFIX = {
+    balanced: { name: "", pow: 1, sta: 1, crit: 0, w: [50, 30, 20, 10, 10] },
+    fury: { name: tx("\u72C2\u6012\u7684"), pow: 1.25, sta: 0.75, crit: 0, w: [8, 12, 13, 14, 14] },
+    stalwart: { name: tx("\u5805\u6BC5\u7684"), pow: 0.75, sta: 1.25, crit: 0, w: [8, 12, 13, 14, 14] },
+    savage: { name: tx("\u5147\u731B\u7684"), pow: 1.12, sta: 0.88, crit: 0, w: [9, 12, 13, 13, 13] },
+    warding: { name: tx("\u5B88\u8B77\u7684"), pow: 0.88, sta: 1.12, crit: 0, w: [9, 12, 13, 13, 13] },
+    precise: { name: tx("\u7CBE\u6E96\u7684"), pow: 0.9, sta: 1, crit: 0.02, w: [8, 11, 14, 14, 14] },
+    keen: { name: tx("\u92B3\u5229\u7684"), pow: 0.95, sta: 0.95, crit: 0.015, w: [8, 11, 14, 13, 12] },
+    perfect: { name: tx("\u5B8C\u7F8E\u7684"), pow: 1.08, sta: 1.08, crit: 0, w: [0, 0, 0, 9, 10] }
+  };
+  var CODEX_REWARDS = [
+    { pct: 25, gold: 5e3, dust: 50 },
+    { pct: 50, gold: 2e4, dust: 150 },
+    { pct: 75, gold: 6e4, dust: 300 },
+    { pct: 100, gold: 15e4, dust: 600 }
+  ];
   var PREFIX = ["", tx("\u5805\u6BC5\u7684"), tx("\u92B3\u5229\u7684"), tx("\u707C\u71B1\u7684"), tx("\u5BD2\u971C\u7684"), tx("\u865B\u7A7A\u7684"), tx("\u9060\u53E4\u7684"), tx("\u9F8D\u9C57\u7684")];
   var GEAR = {
     maxUp: 10,
@@ -2111,20 +2190,45 @@
   function makeItem(slot, ilvl, rarity) {
     const B = ilvl * RARITY[rarity].mult, w = SLOT_STATS[slot];
     const v = () => rnd(0.9, 1.1);
-    const crit = slot === "trinket" && rarity >= 2 ? 0.01 * rarity + 0.01 : 0;
-    const pre = PREFIX[Math.min(PREFIX.length - 1, Math.floor(ilvl / 6))];
-    return {
-      id: uid(),
-      slot,
-      ilvl,
-      rarity,
-      up: 0,
-      pow: Math.round(B * w.pow * v()),
-      sta: Math.round(B * w.sta * v()),
-      crit,
-      name: pre + pick(SLOT_NAMES[slot])
-    };
+    const base = pick(ITEM_BASES[slot])[0], affix = rollAffix(rarity), A = GEAR_AFFIX[affix];
+    const crit = (slot === "trinket" && rarity >= 2 ? 0.01 * rarity + 0.01 : 0) + A.crit;
+    const it = { id: uid(), slot, ilvl, rarity, up: 0, base, affix, pow: Math.round(B * w.pow * v() * A.pow), sta: Math.round(B * w.sta * v() * A.sta), crit: Math.round(crit * 1e3) / 1e3 };
+    it.name = itemLabel(it);
+    return it;
   }
+  function rollAffix(rarity) {
+    const ks = Object.keys(GEAR_AFFIX), tot = ks.reduce((a, k) => a + GEAR_AFFIX[k].w[rarity], 0);
+    let x = R() * tot;
+    for (const k of ks) {
+      x -= GEAR_AFFIX[k].w[rarity];
+      if (x < 0) return k;
+    }
+    return "balanced";
+  }
+  var itemTier = (it) => Math.min(ITEM_TIERS.length - 1, Math.floor(it.ilvl / 6));
+  function itemLabel(it) {
+    const en = getLang() === "en", sp = en ? " " : "";
+    if (it.set && SETS[it.set]) return SETS[it.set].name + sp + SET_PIECE[it.slot];
+    if (!it.base || !BASE_INFO[it.base]) return it.name;
+    const a = it.affix && GEAR_AFFIX[it.affix] ? GEAR_AFFIX[it.affix].name : "", t = ITEM_TIERS[itemTier(it)];
+    return (a ? tx(a) : "") + (t ? tx(t) + sp : "") + tx(BASE_INFO[it.base].name);
+  }
+  function guessBase(it) {
+    if (it.base || it.set || !it.name) return it.base;
+    let best = null, len = 0;
+    for (const [k, b] of Object.entries(BASE_INFO)) if (b.slot === it.slot) {
+      for (const n2 of [b.name, tx(b.name)]) if (n2 && it.name.endsWith(n2) && n2.length > len) {
+        best = k;
+        len = n2.length;
+      }
+    }
+    return best;
+  }
+  var codexKey = (it) => it.set ? `set:${it.set}:${it.slot}` : it.base ? `${it.base}:${it.rarity}` : null;
+  var codexAllKeys = () => [
+    ...Object.keys(BASE_INFO).flatMap((b) => RARITY.map((_, r) => `${b}:${r}`)),
+    ...Object.keys(SETS).flatMap((c) => ARMOR_SLOTS.map((sl) => `set:${c}:${sl}`))
+  ];
   function rollRarity(minR = 0) {
     let x = R(), r = 0;
     for (let i = RARITY.length - 1; i >= 0; i--) {
@@ -2141,7 +2245,10 @@
     it.set = cls2;
     it.pow = Math.round(it.pow * 1.1);
     it.sta = Math.round(it.sta * 1.1);
-    it.name = SETS[cls2].name + (getLang() === "en" ? " " : "") + SET_PIECE[slot];
+    delete it.base;
+    delete it.affix;
+    it.pow = Math.round(it.pow);
+    it.name = itemLabel(it);
     return it;
   }
   var randomArmorSlot = () => pick(ARMOR_SLOTS);
@@ -3085,6 +3192,15 @@
   function migrate(s) {
     s.stats = s.stats || { runs: 0, wins: 0 };
     s.bagBought = Math.max(0, Math.min(ECONOMY.bagBuy.max, Math.floor(Number(s.bagBought) || 0)));
+    if (!s.codex || typeof s.codex !== "object" || Array.isArray(s.codex)) s.codex = {};
+    if (!Array.isArray(s.codexClaimed)) s.codexClaimed = [];
+    for (const it of Object.values(s.items || {})) {
+      if (it && typeof it === "object") {
+        const b = guessBase(it);
+        if (b) it.base = b;
+        codexAdd(s, it);
+      }
+    }
     if (s.autoSalvageBelow == null) s.autoSalvageBelow = s.autoSalvageCommon ? 1 : 0;
     delete s.autoSalvageCommon;
     if (s.keepRarity == null) s.keepRarity = ECONOMY.defaultKeepRarity;
@@ -3310,6 +3426,7 @@
     return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
   }
   function addLoot(s, it) {
+    codexAdd(s, it);
     const auto = () => {
       s.gold += salvageValue(it);
       s.dust = (s.dust || 0) + salvageDust(it);
@@ -3359,6 +3476,7 @@
   }
   var grantItem = (s, it) => it.set ? addSetLoot(s, it) : addLoot(s, it);
   function addSetLoot(s, it) {
+    codexAdd(s, it);
     s.items[it.id] = it;
     if (s.bag.length < bagMax(s)) {
       s.bag.push(it.id);
@@ -3557,6 +3675,22 @@
     s.stash = s.stash.filter((id) => !ids.includes(id));
     s.gold += gold;
     return { count: ids.length, gold };
+  }
+  function codexAdd(s, it) {
+    const k = codexKey(it);
+    if (k && s.codex && !s.codex[k]) s.codex[k] = 1;
+  }
+  function codexStats(s) {
+    const all = codexAllKeys(), got = all.filter((k) => s.codex && s.codex[k]).length;
+    return { got, total: all.length, pct: Math.floor(got / all.length * 100) };
+  }
+  function claimCodex(s, pct2) {
+    const r = CODEX_REWARDS.find((x) => x.pct === pct2);
+    if (!r || s.codexClaimed.includes(pct2) || codexStats(s).pct < pct2) return null;
+    s.codexClaimed.push(pct2);
+    s.gold += r.gold;
+    s.dust = (s.dust || 0) + r.dust;
+    return r;
   }
   function mythicSuggest(s, f0, f1) {
     let pick3 = f0, lv = Infinity;
@@ -3935,7 +4069,7 @@
   var dailyOpenNow = () => app.dailyOpen != null ? app.dailyOpen : dailyPending(app.S) > 0;
 
   // src/core/version.js
-  var VERSION = "0.15.0";
+  var VERSION = "0.16.0";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -4248,11 +4382,33 @@
     const c = bagBuyCost(S), n2 = S.bagBought || 0, B = ECONOMY.bagBuy;
     return tx('<div class="set"><span style="margin:0">\u91D1\u5E63\u64F4\u5145 <span class="sub num">{0}/{1}</span></span>{2}</div>', n2, B.max, c == null ? tx('<span class="num okc">\u5DF2\u5168\u90E8\u64F4\u5145</span>') : tx('<button class="btn sm main" data-act="buybag" {0}>+{1} \u683C\u30FB<span class="num">{2}</span> \u91D1</button>', S.gold >= c ? "" : "disabled", B.slots, fmt(c)));
   }
+  var bagTabs = () => {
+    const c = codexStats(app.S), ready2 = CODEX_REWARDS.some((r) => c.pct >= r.pct && !app.S.codexClaimed.includes(r.pct));
+    return `<div class="seg modes"><button data-act="bagview" data-v="bag" class="${app.bagView !== "codex" ? "sel" : ""}">${tx("\u80CC\u5305")}</button><button data-act="bagview" data-v="codex" class="${app.bagView === "codex" ? "sel" : ""}">${tx("\u5716\u9451 {0}%", c.pct)}${ready2 ? ' <span class="pip">!</span>' : ""}</button></div>`;
+  };
+  function viewCodex() {
+    const S = app.S, c = codexStats(S), has = (k) => !!S.codex[k];
+    let h = bagTabs() + tx('<h2>\u5716\u9451 <span class="sub num">{0}/{1}</span></h2><p class="sub" style="margin:0 0 8px">\u62FF\u5230\u904E\u7684\u88DD\u5099\u6703\u4EAE\u8D77\u4F86\uFF08\u81EA\u52D5\u5206\u89E3\u7684\u4E5F\u7B97\uFF09\u3002\u4E00\u822C\u88DD\u5099\u4EE5\u300C\u7A2E\u985E\uFF0B\u7A00\u6709\u5EA6\u300D\u70BA\u4E00\u683C\uFF0C\u5957\u88DD\u4EE5\u300C\u8077\u696D\uFF0B\u90E8\u4F4D\u300D\u70BA\u4E00\u683C\u3002</p>', c.got, c.total);
+    h += `<div class="cxbar"><i style="width:${c.got / c.total * 100}%"></i></div><div class="cxmiles">${CODEX_REWARDS.map((r) => {
+      const done = S.codexClaimed.includes(r.pct), ok = c.pct >= r.pct;
+      return `<button class="cxm ${done ? "done" : ok ? "ready" : ""}" data-act="codexclaim" data-v="${r.pct}" ${ok && !done ? "" : "disabled"}><b class="num">${r.pct}%</b><small class="num">${done ? tx("\u5DF2\u9818\u53D6") : `${fmt(r.gold)} ${tx("\u91D1")}\u30FB${r.dust}\u2726`}</small></button>`;
+    }).join("")}</div>`;
+    const cell = (k, r) => `<i class="cx ${has(k) ? "on r" + r : ""}" title="${RARITY[r] ? RARITY[r].name : ""}"></i>`;
+    h += `<div class="cxhead"><span></span>${RARITY.map((r, i) => `<b class="c${i}">${r.name}</b>`).join("")}</div>`;
+    for (const [slot, list] of Object.entries(ITEM_BASES)) {
+      h += `<div class="cxslot label">${SLOTS[slot]}</div>`;
+      h += list.map(([key, name]) => `<div class="cxrow"><span class="${RARITY.some((_, r) => has(`${key}:${r}`)) ? "" : "sub"}">${tx(name)}</span>${RARITY.map((_, r) => cell(`${key}:${r}`, r)).join("")}</div>`).join("");
+    }
+    h += `<div class="cxslot label">${tx("T0 \u8077\u696D\u5957\u88DD")}</div><div class="cxhead"><span></span>${ARMOR_SLOTS.map((sl) => `<b>${SLOTS[sl]}</b>`).join("")}</div>`;
+    h += Object.keys(SETS).map((cls2) => `<div class="cxrow sets"><span>${CLASSES[cls2].icon}${SETS[cls2].name}</span>${ARMOR_SLOTS.map((sl) => cell(`set:${cls2}:${sl}`, 3)).join("")}</div>`).join("");
+    return h;
+  }
   function viewBag() {
+    if (app.bagView === "codex") return viewCodex();
     const S = app.S, E = ECONOMY;
     const items2 = S.bag.map((id) => S.items[id]).filter(Boolean).filter((it) => app.invFilter === "all" || it.slot === app.invFilter || app.invFilter === "armor" && ARMOR_SLOTS.includes(it.slot) || app.invFilter === "set" && it.set).sort((a, b) => itemScore(b) - itemScore(a));
     const cap = bagMax(S), full = S.bag.length >= cap;
-    let h = tx('<h2>\u80CC\u5305 <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">\u7CBE\u83EF <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">\u5206\u89E3\u7CBE\u826F\u4EE5\u4E0A\u7684\u88DD\u5099\u6703\u5F97\u5230\u7CBE\u83EF\u3002\u901A\u95DC\u7B2C 7 \u5C64\u5F8C\uFF0C\u53EF\u7528\u7CBE\u83EF\u628A\u88DD\u5099\u7CBE\u7149\u5230 +6 ~ +{4}\u3002</p>', full ? "warnc" : "", S.bag.length, cap, fmt(S.dust || 0), GEAR.maxUp);
+    let h = bagTabs() + tx('<h2>\u80CC\u5305 <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">\u7CBE\u83EF <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">\u5206\u89E3\u7CBE\u826F\u4EE5\u4E0A\u7684\u88DD\u5099\u6703\u5F97\u5230\u7CBE\u83EF\u3002\u901A\u95DC\u7B2C 7 \u5C64\u5F8C\uFF0C\u53EF\u7528\u7CBE\u83EF\u628A\u88DD\u5099\u7CBE\u7149\u5230 +6 ~ +{4}\u3002</p>', full ? "warnc" : "", S.bag.length, cap, fmt(S.dust || 0), GEAR.maxUp);
     if (S.stash.length) {
       h += tx('<div class="stashbox"><div class="row" style="align-items:center"><b>\u6230\u5229\u54C1\u7BB1</b><span class="sub num" style="margin:0">{0}/{1}</span> <span class="sub" style="margin:0 0 0 auto">\u80CC\u5305\u6EFF\u6642\u6389\u843D\u7684\u88DD\u5099</span></div> <div class="stack">{2} {3}</div> <div class="row"><button class="btn sm main grow" data-act="takestash" {4}>{5}</button> <button class="btn sm" data-act="salvagestash">\u5168\u90E8\u5206\u89E3</button></div></div>', S.stash.length, E.stashMax, S.stash.map((id) => S.items[id]).sort((a, b) => itemScore(b) - itemScore(a)).slice(0, 5).map((it) => itemRow(it)).join(""), S.stash.length > 5 ? tx('<div class="sub" style="margin:0">\u9084\u6709 {0} \u4EF6</div>', S.stash.length - 5) : "", full ? "disabled" : "", full ? tx("\u80CC\u5305\u5DF2\u6EFF") : tx("\u53D6\u51FA\u5230\u80CC\u5305\uFF08\u9084\u80FD\u653E {0} \u4EF6\uFF09", cap - S.bag.length));
     }
@@ -4646,7 +4802,7 @@
     const list = app.S.bag.map((id) => app.S.items[id]).filter((it) => it.slot === slot).sort((a, b) => heroItemScore(x, b) - heroItemScore(x, a));
     return tx('<h3>\u70BA {0} \u9078\u64C7{1}</h3><div class="sub" style="margin:0">\u76EE\u524D\uFF1A{2}</div> <div class="choices">{3}</div> <div class="row">{4}<button class="btn" data-act="hero" data-id="{5}">\u8FD4\u56DE</button></div>', x.name, SLOTS[slot], cur ? itemName(cur) + "\u30FB" + itemStatText(cur) : tx("\u7121"), list.map((it) => `<button class="item rar${it.rarity}" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="in">${itemName(it)}${!cur || heroItemScore(x, it) > heroItemScore(x, cur) ? '<span class="better">\u25B2</span>' : ""}</div><div class="il"><b class="num">${it.ilvl}</b></div><div class="is num">${itemStatText(it)}</div></button>`).join(""), cur ? tx('<button class="btn" data-act="unequip" data-hero="{0}" data-slot="{1}">\u5378\u4E0B</button>', x.id, slot) : "", x.id);
   }
-  var withSet = (it, html) => html.replace('<span class="label">', setInfo(it) + '<span class="label">');
+  var withSet = (it, html) => html.replace('<span class="label">', affixLine(it) + setInfo(it) + '<span class="label">');
   function sheetItem(it) {
     if (!it) return "";
     const party = partyHeroes(app.S);
@@ -4670,6 +4826,15 @@
       salvageDust(it) ? tx('\u30FB<span class="dust num">{0}</span> \u7CBE\u83EF', salvageDust(it)) : "",
       lockBtn("item", it) + (it.locked ? "" : tx('<button class="btn" data-act="salvage" data-id="{0}">\u5206\u89E3 +<span class="num">{1}</span> \u91D1{2}</button>', it.id, salvageValue(it), salvageDust(it) ? tx('\u30FB<span class="dust num">{0}</span> \u7CBE\u83EF', salvageDust(it)) : ""))
     ));
+  }
+  function affixLine(it) {
+    const A = it.affix && GEAR_AFFIX[it.affix];
+    if (!A || !A.name) return "";
+    const p = (v) => (v > 1 ? "+" : "\u2212") + Math.round(Math.abs(v - 1) * 100) + "%", parts = [];
+    if (A.pow !== 1) parts.push(tx("\u5A01\u529B {0}", p(A.pow)));
+    if (A.sta !== 1) parts.push(tx("\u8010\u529B {0}", p(A.sta)));
+    if (A.crit) parts.push(tx("\u66B4\u64CA +{0}%", A.crit * 100));
+    return `<div class="affixnote"><b>${tx(A.name)}</b>${parts.join(tx("\u3001"))}</div>`;
   }
   var lockBtn = (kind, x) => `<button class="btn" data-act="lock" data-kind="${kind}" data-id="${x.id}" title="${x.locked ? tx("\u89E3\u9664\u9396\u5B9A") : tx("\u9396\u5B9A\uFF08\u907F\u514D\u8AA4\u5206\u89E3\uFF0F\u89E3\u96C7\uFF09")}">${x.locked ? tx("\u{1F512} \u5DF2\u9396\u5B9A") : tx("\u{1F513} \u9396\u5B9A")}</button>`;
   function upBtn(it, size) {
@@ -5168,6 +5333,17 @@
         app.mythicHelpOpen = false;
         save();
         break;
+      case "bagview":
+        app.bagView = t.dataset.v;
+        break;
+      case "codexclaim": {
+        const r = claimCodex(app.S, +t.dataset.v);
+        if (r) {
+          toast(tx("\u5716\u9451 {0}%\uFF1A\u7372\u5F97 {1} \u91D1\u3001{2} \u7CBE\u83EF", r.pct, fmt(r.gold), r.dust));
+          save();
+        }
+        break;
+      }
       case "lock": {
         const on = toggleLock(app.S, t.dataset.kind, id);
         if (on != null) toast(on ? tx("\u5DF2\u9396\u5B9A\uFF0C\u4E0D\u6703\u88AB\u5206\u89E3\u6216\u89E3\u96C7") : tx("\u5DF2\u89E3\u9664\u9396\u5B9A"));
@@ -5512,7 +5688,7 @@
     app.fresh = !saved;
     checkAchievements(app.S);
     for (const h of [...app.S.heroes, ...app.S.tavern || []]) h.name = localName(h.name);
-    for (const it of Object.values(app.S.items)) it.name = localName(it.name);
+    for (const it of Object.values(app.S.items)) it.name = it.base || it.set ? itemLabel(it) : localName(it.name);
     $(".brand-t").textContent = tx("\u526F\u672C\u5718\u9577");
     $(".brand").setAttribute("aria-label", tx("\u8A2D\u5B9A"));
     $("#idleChip").textContent = tx("\u639B\u6A5F\u4E2D");

@@ -141,6 +141,8 @@ document.addEventListener('click', e => {
     case 'mythicall': app.mythicAll = true; break;
     case 'mythichelp': app.mythicHelpOpen = true; break;
     case 'mythichelpok': app.S.mythicHelp = true; app.mythicHelpOpen = false; save(); break;
+    case 'bagview': app.bagView = t.dataset.v; break;
+    case 'codexclaim': { const r = G.claimCodex(app.S, +t.dataset.v); if (r) { toast(tx('圖鑑 {0}%：獲得 {1} 金、{2} 精華', r.pct, fmt(r.gold), r.dust)); save(); } break; }
     case 'lock': { const on = G.toggleLock(app.S, t.dataset.kind, id); if (on != null) toast(on ? tx('已鎖定，不會被分解或解雇') : tx('已解除鎖定')); save(); break; }
     case 'salvage': toast(tx('分解獲得 {0} 金', G.salvage(app.S, id))); save(); app.modal = null; break;
     case 'join': if (G.partyLocked(app.S)) { toast(tx('掛機中不能更換隊員，請先停止掛機')); break; } G.joinParty(app.S, id); save(); break;
@@ -289,7 +291,7 @@ function start(data) {
   app.S = G.migrate(saved || G.newGame()); app.fresh = !saved;
   G.checkAchievements(app.S); // 舊存檔：已達成的成就直接補登，不跳提示
   for (const h of [...app.S.heroes, ...(app.S.tavern || [])]) h.name = localName(h.name);
-  for (const it of Object.values(app.S.items)) it.name = localName(it.name);
+  for (const it of Object.values(app.S.items)) it.name = it.base || it.set ? G.itemLabel(it) : localName(it.name); // v0.16 名稱由代號組出
   $('.brand-t').textContent = tx('副本團長'); $('.brand').setAttribute('aria-label', tx('設定')); $('#idleChip').textContent = tx('掛機中'); document.title = tx('副本團長');
   document.documentElement.lang = getLang();
   $('#saveChip').textContent = tx('存檔中');

@@ -40,7 +40,7 @@ const serve = r => { const u = new URL(r.request().url()); if (u.host !== 'app.t
   await page.click('[data-act="skip"]'); await page.waitForTimeout(300);
   // 鎖定裝備：分解按鈕消失、批次分解跳過
   const r = 'lk1';
-  await reopen(s => { const any = Object.values(s.items)[0]; s.items.lk1 = { ...any, id: 'lk1', name: '測試之劍', rarity: 0, ilvl: 1, up: 0, set: null, locked: true }; s.bag.push('lk1'); return s; });
+  await reopen(s => { const any = Object.values(s.items)[0]; s.items.lk1 = { ...any, id: 'lk1', name: '測試之劍', base: undefined, affix: undefined, rarity: 0, ilvl: 1, up: 0, set: null, locked: true }; s.bag.push('lk1'); return s; });
   await page.locator('[data-act="dlgskip"]').click({ timeout: 1000 }).catch(() => {});
   await page.click('[data-tab="bag"]'); await page.waitForTimeout(200);
   await page.locator('.item', { hasText: '測試之劍' }).first().click(); await page.waitForTimeout(200);

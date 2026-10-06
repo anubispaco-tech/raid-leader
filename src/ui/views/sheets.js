@@ -104,7 +104,7 @@ function sheetPick() {
   return tx('<h3>為 {0} 選擇{1}</h3><div class="sub" style="margin:0">目前：{2}</div> <div class="choices">{3}</div> <div class="row">{4}<button class="btn" data-act="hero" data-id="{5}">返回</button></div>', x.name, G.SLOTS[slot], cur ? itemName(cur) + '・' + itemStatText(cur) : tx('無'), list.map(it => `<button class="item rar${it.rarity}" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="in">${itemName(it)}${!cur || G.heroItemScore(x, it) > G.heroItemScore(x, cur) ? '<span class="better">▲</span>' : ''}</div><div class="il"><b class="num">${it.ilvl}</b></div><div class="is num">${itemStatText(it)}</div></button>`).join(''), cur ? tx('<button class="btn" data-act="unequip" data-hero="{0}" data-slot="{1}">卸下</button>', x.id, slot) : '', x.id);
 }
 // 套裝說明插在「裝備給」上方
-const withSet = (it, html) => html.replace('<span class="label">', setInfo(it) + '<span class="label">');
+const withSet = (it, html) => html.replace('<span class="label">', affixLine(it) + setInfo(it) + '<span class="label">');
 function sheetItem(it) {
   if (!it) return '';
   const party = G.partyHeroes(app.S);
@@ -114,6 +114,13 @@ function sheetItem(it) {
       return tx('<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">目前：{7}</div></button>', x.id, it.id, cls(x).icon, x.name, cls(x).name, better ? 'in' : '', better ? tx('▲ 提升') : tx('較差'), cur ? tx('{0}（{1}）', cur.name, cur.ilvl) : tx('空'));
     }).join(''), upBtn(it, ''), it.id, G.salvageValue(it), G.salvageDust(it) ? tx('・<span class="dust num">{0}</span> 精華', G.salvageDust(it)) : '',
     lockBtn('item', it) + (it.locked ? '' : tx('<button class="btn" data-act="salvage" data-id="{0}">分解 +<span class="num">{1}</span> 金{2}</button>', it.id, G.salvageValue(it), G.salvageDust(it) ? tx('・<span class="dust num">{0}</span> 精華', G.salvageDust(it)) : ''))));
+}
+// v0.16 詞綴說明（放在標題下方：withSet 會把套裝說明插在「裝備給」上方）
+function affixLine(it) {
+  const A = it.affix && G.GEAR_AFFIX[it.affix]; if (!A || !A.name) return '';
+  const p = v => (v > 1 ? '+' : '−') + Math.round(Math.abs(v - 1) * 100) + '%', parts = [];
+  if (A.pow !== 1) parts.push(tx('威力 {0}', p(A.pow))); if (A.sta !== 1) parts.push(tx('耐力 {0}', p(A.sta))); if (A.crit) parts.push(tx('暴擊 +{0}%', A.crit * 100));
+  return `<div class="affixnote"><b>${tx(A.name)}</b>${parts.join(tx('、'))}</div>`;
 }
 // v0.14 鎖定按鈕：鎖住後不能解雇／分解（批次與自動分解也會跳過）
 const lockBtn = (kind, x) => `<button class="btn" data-act="lock" data-kind="${kind}" data-id="${x.id}" title="${x.locked ? tx('解除鎖定') : tx('鎖定（避免誤分解／解雇）')}">${x.locked ? tx('🔒 已鎖定') : tx('🔓 鎖定')}</button>`;

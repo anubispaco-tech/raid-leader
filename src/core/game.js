@@ -2,7 +2,8 @@
 // 所有函式都接收存檔物件 s 並直接修改它；畫面層只呼叫這裡，不自己改存檔。
 import { CLASSES, HERO, SLOTS, DUNGEONS, REWARD, ECONOMY, GEAR, BAG_MILESTONES, BAG_PER_MILESTONE, HERO_RARITY, LEGENDS, RECRUIT } from './config.js';
 import { R, rnd, rint, pick } from './rng.js';
-import { makeItem, rollRarity, itemScore, heroItemScore, makeSetItem, randomArmorSlot, salvageValue, salvageDust, upgradeCost, dustCost } from './items.js';
+import { makeItem, rollRarity, itemScore, heroItemScore, makeSetItem, randomArmorSlot, salvageValue, salvageDust, upgradeCost, dustCost, codexKey, codexAllKeys, guessBase } from './items.js';
+import { CODEX_REWARDS } from './config.js';
 import { makeHero, gainXp, heroPower, roleOf, heroIlvl } from './heroes.js';
 import { getLang } from './i18n.js';
 import { dungeonInfo } from './dungeons.js';
@@ -51,6 +52,10 @@ export function newGame() {
 export function migrate(s) {
   s.stats = s.stats || { runs: 0, wins: 0 };
   s.bagBought = Math.max(0, Math.min(ECONOMY.bagBuy.max, Math.floor(Number(s.bagBought) || 0))); // v0.15
+  // v0.16 舊裝備補上基底代號；圖鑑登錄目前持有的裝備
+  if (!s.codex || typeof s.codex !== 'object' || Array.isArray(s.codex)) s.codex = {};
+  if (!Array.isArray(s.codexClaimed)) s.codexClaimed = [];
+  for (const it of Object.values(s.items || {})) { if (it && typeof it === 'object') { const b = guessBase(it); if (b) it.base = b; codexAdd(s, it); } }
   // v1 → v2：自動分解改成品質門檻、加入戰利品箱
   if (s.autoSalvageBelow == null) s.autoSalvageBelow = s.autoSalvageCommon ? 1 : 0;
   delete s.autoSalvageCommon;
@@ -235,6 +240,7 @@ export function salvageLowIlvl(s, gap, dry = false) {
   return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
 }
 export function addLoot(s, it) {
+  codexAdd(s, it); // 自動分解的也算「獲得過」
   const auto = () => { s.gold += salvageValue(it); s.dust = (s.dust || 0) + salvageDust(it); s.stats.salvaged = (s.stats.salvaged || 0) + 1; return 'salvaged'; };
   if (s.salvageIlvlGap && it.rarity < 4 && it.ilvl < partyIlvl(s) - s.salvageIlvlGap) return auto();
   if (it.rarity < s.autoSalvageBelow) return auto();
@@ -269,6 +275,7 @@ export function applyResult(s, dIdx, battle) {
 export const grantItem = (s, it) => (it.set ? addSetLoot(s, it) : addLoot(s, it));
 // 套裝部件不會被自動分解：背包滿就進戰利品箱
 export function addSetLoot(s, it) {
+  codexAdd(s, it);
   s.items[it.id] = it;
   if (s.bag.length < bagMax(s)) { s.bag.push(it.id); return 'bag'; }
   if (s.stash.length < ECONOMY.stashMax) { s.stash.push(it.id); return 'stash'; }
@@ -408,6 +415,17 @@ export function salvageStash(s) {
   const gold = ids.reduce((g, id) => { const v = salvageValue(s.items[id]); s.dust = (s.dust || 0) + salvageDust(s.items[id]); delete s.items[id]; return g + v; }, 0);
   s.stash = s.stash.filter(id => !ids.includes(id)); s.gold += gold;
   return { count: ids.length, gold };
+}
+// ---------- v0.16 圖鑑 ----------
+export function codexAdd(s, it) { const k = codexKey(it); if (k && s.codex && !s.codex[k]) s.codex[k] = 1; }
+export function codexStats(s) {
+  const all = codexAllKeys(), got = all.filter(k => s.codex && s.codex[k]).length;
+  return { got, total: all.length, pct: Math.floor((got / all.length) * 100) };
+}
+// 領取里程碑獎勵：達到收集率且還沒領過
+export function claimCodex(s, pct) {
+  const r = CODEX_REWARDS.find(x => x.pct === pct); if (!r || s.codexClaimed.includes(pct) || codexStats(s).pct < pct) return null;
+  s.codexClaimed.push(pct); s.gold += r.gold; s.dust = (s.dust || 0) + r.dust; return r;
 }
 // v0.15 秘境推薦副本：該階層裡最佳限時等級最低的（沒限時過的優先），同分取前面的
 export function mythicSuggest(s, f0, f1) {

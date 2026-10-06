@@ -20,13 +20,33 @@ function buyRow(S) {
   const c = G.bagBuyCost(S), n = S.bagBought || 0, B = G.ECONOMY.bagBuy;
   return tx('<div class="set"><span style="margin:0">金幣擴充 <span class="sub num">{0}/{1}</span></span>{2}</div>', n, B.max, c == null ? tx('<span class="num okc">已全部擴充</span>') : tx('<button class="btn sm main" data-act="buybag" {0}>+{1} 格・<span class="num">{2}</span> 金</button>', S.gold >= c ? '' : 'disabled', B.slots, fmt(c)));
 }
+// v0.16 背包／圖鑑切換
+const bagTabs = () => { const c = G.codexStats(app.S), ready = G.CODEX_REWARDS.some(r => c.pct >= r.pct && !app.S.codexClaimed.includes(r.pct));
+  return `<div class="seg modes"><button data-act="bagview" data-v="bag" class="${app.bagView !== 'codex' ? 'sel' : ''}">${tx('背包')}</button><button data-act="bagview" data-v="codex" class="${app.bagView === 'codex' ? 'sel' : ''}">${tx('圖鑑 {0}%', c.pct)}${ready ? ' <span class="pip">!</span>' : ''}</button></div>`; };
+function viewCodex() {
+  const S = app.S, c = G.codexStats(S), has = k => !!S.codex[k];
+  let h = bagTabs() + tx('<h2>圖鑑 <span class="sub num">{0}/{1}</span></h2><p class="sub" style="margin:0 0 8px">拿到過的裝備會亮起來（自動分解的也算）。一般裝備以「種類＋稀有度」為一格，套裝以「職業＋部位」為一格。</p>', c.got, c.total);
+  h += `<div class="cxbar"><i style="width:${(c.got / c.total) * 100}%"></i></div><div class="cxmiles">${G.CODEX_REWARDS.map(r => {
+    const done = S.codexClaimed.includes(r.pct), ok = c.pct >= r.pct;
+    return `<button class="cxm ${done ? 'done' : ok ? 'ready' : ''}" data-act="codexclaim" data-v="${r.pct}" ${ok && !done ? '' : 'disabled'}><b class="num">${r.pct}%</b><small class="num">${done ? tx('已領取') : `${fmt(r.gold)} ${tx('金')}・${r.dust}✦`}</small></button>`; }).join('')}</div>`;
+  const cell = (k, r) => `<i class="cx ${has(k) ? 'on r' + r : ''}" title="${G.RARITY[r] ? G.RARITY[r].name : ''}"></i>`;
+  h += `<div class="cxhead"><span></span>${G.RARITY.map((r, i) => `<b class="c${i}">${r.name}</b>`).join('')}</div>`;
+  for (const [slot, list] of Object.entries(G.ITEM_BASES)) {
+    h += `<div class="cxslot label">${G.SLOTS[slot]}</div>`;
+    h += list.map(([key, name]) => `<div class="cxrow"><span class="${G.RARITY.some((_, r) => has(`${key}:${r}`)) ? '' : 'sub'}">${tx(name)}</span>${G.RARITY.map((_, r) => cell(`${key}:${r}`, r)).join('')}</div>`).join('');
+  }
+  h += `<div class="cxslot label">${tx('T0 職業套裝')}</div><div class="cxhead"><span></span>${G.ARMOR_SLOTS.map(sl => `<b>${G.SLOTS[sl]}</b>`).join('')}</div>`;
+  h += Object.keys(G.SETS).map(cls => `<div class="cxrow sets"><span>${G.CLASSES[cls].icon}${G.SETS[cls].name}</span>${G.ARMOR_SLOTS.map(sl => cell(`set:${cls}:${sl}`, 3)).join('')}</div>`).join('');
+  return h;
+}
 export function viewBag() {
+  if (app.bagView === 'codex') return viewCodex();
   const S = app.S, E = G.ECONOMY;
   const items = S.bag.map(id => S.items[id]).filter(Boolean)
     .filter(it => app.invFilter === 'all' || it.slot === app.invFilter || (app.invFilter === 'armor' && G.ARMOR_SLOTS.includes(it.slot)) || (app.invFilter === 'set' && it.set))
     .sort((a, b) => G.itemScore(b) - G.itemScore(a));
   const cap = G.bagMax(S), full = S.bag.length >= cap;
-  let h = tx('<h2>背包 <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">精華 <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">分解精良以上的裝備會得到精華。通關第 7 層後，可用精華把裝備精煉到 +6 ~ +{4}。</p>', full ? 'warnc' : '', S.bag.length, cap, fmt(S.dust || 0), G.GEAR.maxUp);
+  let h = bagTabs() + tx('<h2>背包 <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">精華 <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">分解精良以上的裝備會得到精華。通關第 7 層後，可用精華把裝備精煉到 +6 ~ +{4}。</p>', full ? 'warnc' : '', S.bag.length, cap, fmt(S.dust || 0), G.GEAR.maxUp);
   if (S.stash.length) {
     h += tx('<div class="stashbox"><div class="row" style="align-items:center"><b>戰利品箱</b><span class="sub num" style="margin:0">{0}/{1}</span> <span class="sub" style="margin:0 0 0 auto">背包滿時掉落的裝備</span></div> <div class="stack">{2} {3}</div> <div class="row"><button class="btn sm main grow" data-act="takestash" {4}>{5}</button> <button class="btn sm" data-act="salvagestash">全部分解</button></div></div>', S.stash.length, E.stashMax, S.stash.map(id => S.items[id]).sort((a, b) => G.itemScore(b) - G.itemScore(a)).slice(0, 5).map(it => itemRow(it)).join(''), S.stash.length > 5 ? tx('<div class="sub" style="margin:0">還有 {0} 件</div>', S.stash.length - 5) : '', full ? 'disabled' : '', full ? tx('背包已滿') : tx('取出到背包（還能放 {0} 件）', cap - S.bag.length));
   }

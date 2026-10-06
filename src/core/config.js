@@ -68,6 +68,36 @@ export const SETS = {
 };
 export const SET_PIECE = { head: tx('頭冠'), chest: tx('胸甲'), hands: tx('護手'), legs: tx('腿甲') };
 export const SET_DROP = { chance: 0.15, rarity: 3 }; // 第二章每場勝利 15% 掉一件（出戰隊員其中一人的職業）
+// ---------- v0.16 物品定義表 ----------
+// 基底：key 是存檔用的固定代號（不可改），name 用 tx() 顯示；icon／tags 預留給之後的物品圖與連動
+export const ITEM_BASES = {
+  weapon: [['longsword', tx('長劍')], ['staff', tx('法杖')], ['dagger', tx('匕首')], ['warhammer', tx('戰錘')], ['scepter', tx('權杖')], ['shortbow', tx('短弓')],
+    ['greataxe', tx('巨斧')], ['scimitar', tx('彎刀')], ['tome', tx('法典')], ['spear', tx('長槍')]],
+  head: [['helm', tx('頭盔')], ['hood', tx('兜帽')], ['circlet', tx('頭冠')], ['visor', tx('面甲')], ['hornhelm', tx('角盔')], ['bandana', tx('頭巾')]],
+  chest: [['mail', tx('鎖甲')], ['robe', tx('法袍')], ['leather', tx('皮甲')], ['plate', tx('板甲')], ['tabard', tx('戰袍')], ['scale', tx('鱗甲')]],
+  hands: [['gloves', tx('手套')], ['gauntlets', tx('護手')], ['bracers', tx('腕甲')], ['knuckles', tx('拳套')], ['grips', tx('指套')]],
+  legs: [['greaves', tx('護腿')], ['wraps', tx('綁腿')], ['legplates', tx('腿甲')], ['breeches', tx('馬褲')], ['tassets', tx('裙甲')]],
+  trinket: [['amulet', tx('護符')], ['ring', tx('戒指')], ['sigil', tx('徽記')], ['orb', tx('寶珠')], ['necklace', tx('項鍊')], ['earring', tx('耳環')],
+    ['buckle', tx('腰扣')], ['runestone', tx('符文石')]],
+};
+export const BASE_INFO = Object.fromEntries(Object.entries(ITEM_BASES).flatMap(([slot, list]) => list.map(([key, name]) => [key, { slot, name, icon: null, tags: [] }])));
+// 裝等階級材質（每 6 裝等一階），只影響名稱
+export const ITEM_TIERS = ['', tx('鐵製'), tx('精鋼'), tx('灼焰'), tx('寒霜'), tx('虛空'), tx('遠古'), tx('龍鱗')];
+// 詞綴：重新分配威力／耐力，或換一點暴擊；總量大致不變。w = 各稀有度的出現權重（普通→傳說）
+export const GEAR_AFFIX = {
+  balanced: { name: '', pow: 1, sta: 1, crit: 0, w: [50, 30, 20, 10, 10] },
+  fury: { name: tx('狂怒的'), pow: 1.25, sta: 0.75, crit: 0, w: [8, 12, 13, 14, 14] },
+  stalwart: { name: tx('堅毅的'), pow: 0.75, sta: 1.25, crit: 0, w: [8, 12, 13, 14, 14] },
+  savage: { name: tx('兇猛的'), pow: 1.12, sta: 0.88, crit: 0, w: [9, 12, 13, 13, 13] },
+  warding: { name: tx('守護的'), pow: 0.88, sta: 1.12, crit: 0, w: [9, 12, 13, 13, 13] },
+  precise: { name: tx('精準的'), pow: 0.9, sta: 1, crit: 0.02, w: [8, 11, 14, 14, 14] },
+  keen: { name: tx('銳利的'), pow: 0.95, sta: 0.95, crit: 0.015, w: [8, 11, 14, 13, 12] },
+  perfect: { name: tx('完美的'), pow: 1.08, sta: 1.08, crit: 0, w: [0, 0, 0, 9, 10] },
+};
+// 圖鑑收集里程碑（收集率 %）與獎勵
+export const CODEX_REWARDS = [
+  { pct: 25, gold: 5000, dust: 50 }, { pct: 50, gold: 20000, dust: 150 }, { pct: 75, gold: 60000, dust: 300 }, { pct: 100, gold: 150000, dust: 600 },
+];
 export const PREFIX = ['', tx('堅毅的'), tx('銳利的'), tx('灼熱的'), tx('寒霜的'), tx('虛空的'), tx('遠古的'), tx('龍鱗的')];
 export const GEAR = {
   maxUp: 10, upBonus: 0.08,         // 每級強化屬性 +8%（+6 以上為精煉）

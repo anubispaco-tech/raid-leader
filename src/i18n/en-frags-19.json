@@ -1,0 +1,14 @@
+{
+"巨斧": "Greataxe", "彎刀": "Scimitar", "法典": "Tome", "長槍": "Spear",
+"角盔": "Horned Helm", "頭巾": "Bandana", "戰袍": "Tabard", "鱗甲": "Scale Armor",
+"拳套": "Knuckles", "指套": "Grips", "馬褲": "Breeches", "裙甲": "Tassets",
+"耳環": "Earring", "腰扣": "Buckle", "符文石": "Runestone",
+"鐵製": "Iron", "精鋼": "Steel", "灼焰": "Flameforged", "寒霜": "Frostbound", "虛空": "Void", "遠古": "Ancient", "龍鱗": "Dragonscale",
+"狂怒的": "Furious ", "兇猛的": "Savage ", "守護的": "Warding ", "精準的": "Precise ", "完美的": "Perfect ",
+"圖鑑 {0}%：獲得 {1} 金、{2} 精華": "Codex {0}%: received {1} gold and {2} essence",
+"圖鑑 {0}%": "Codex {0}%",
+"圖鑑": "Codex",
+"拿到過的裝備會亮起來（自動分解的也算）。一般裝備以「種類＋稀有度」為一格，套裝以「職業＋部位」為一格。": "Gear you've obtained lights up (auto-salvaged drops count). Regular gear fills one slot per type and rarity; set gear fills one per class and slot.",
+"已領取": "Claimed",
+"T0 職業套裝": "T0 class sets"
+}

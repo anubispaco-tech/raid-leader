@@ -356,3 +356,18 @@ h3 .gi{vertical-align:-.12em}
 .msteps{margin:0;padding-left:20px;display:grid;gap:4px;font-size:13px}
 .mrow2.sug{outline:1px solid var(--r4);background:color-mix(in srgb,var(--r4) 10%,var(--panel2))}
 .sugtag{font-size:11px;font-weight:700;color:var(--ink);background:var(--r4);border-radius:999px;padding:1px 7px;margin-left:6px;vertical-align:1px}
+
+/* v0.16 圖鑑、詞綴 */
+.cxbar{height:6px;border-radius:3px;background:var(--panel2);overflow:hidden}.cxbar i{display:block;height:100%;background:var(--brass)}
+.cxmiles{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0 14px}
+.cxm{display:grid;gap:1px;justify-items:center;padding:6px 4px;border-radius:8px;border:1px solid var(--line);background:var(--panel);opacity:.55}
+.cxm small{font-size:10.5px;color:var(--muted)}.cxm.ready{opacity:1;border-color:var(--good);color:var(--good)}.cxm.done{opacity:.8;border-color:var(--brass-d)}.cxm.done b{color:var(--brass)}
+.cxhead,.cxrow{display:grid;grid-template-columns:minmax(0,1fr) repeat(5,32px);gap:4px;align-items:center}
+.cxrow.sets,.cxhead:has(+ .cxrow.sets){grid-template-columns:minmax(0,1fr) repeat(4,40px)}
+.cxhead b{font-size:10px;text-align:center;font-weight:500;color:var(--muted)}
+.cxrow{padding:3px 0;border-bottom:1px solid color-mix(in srgb,var(--line) 50%,transparent);font-size:13px}
+.cxrow span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cxslot{margin:12px 0 2px}
+.cx{display:block;height:14px;border-radius:4px;border:1px dashed var(--line)}
+.cx.on{border-style:solid}.cx.r0{background:var(--r0);border-color:var(--r0)}.cx.r1{background:var(--r1);border-color:var(--r1)}.cx.r2{background:var(--r2);border-color:var(--r2)}.cx.r3{background:var(--r3);border-color:var(--r3)}.cx.r4{background:var(--r4);border-color:var(--r4);box-shadow:0 0 8px -2px var(--r4)}
+.affixnote{display:flex;gap:8px;align-items:baseline;font-size:12.5px;color:var(--muted)}.affixnote b{color:var(--brass);font-weight:500}
