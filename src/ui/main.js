@@ -4,6 +4,7 @@ import * as G from '../core/index.js';
 import { app, KEY, canSkip } from './state.js';
 import { load, save, exportCode, importCode } from './save.js';
 import { moveAway, takeMoved } from './move.js';
+import * as N from './news.js';
 import { $, fmt, toast, hero, mmss, itemName, dailyOpenNow, firstWinLine } from './helpers.js';
 import { viewDungeons } from './views/dungeon.js';
 import { viewBattle } from './views/battle.js';
@@ -137,6 +138,8 @@ document.addEventListener('click', e => {
     case 'dlgnext': if (app.modal && app.modal.type === 'dialog') { if (app.modal.i < app.modal.lines.length - 1) { app.modal.i++; renderModal(); } else closeModal(); } return;
     case 'dlgskip': closeModal(); return;
     case 'settings': openModal({ type: 'settings' }); return;
+    case 'news': N.openNews(); return;
+    case 'newsreload': location.reload(); return;
     case 'ach': openModal({ type: 'ach' }); return;
     case 'achcat': app.achCat = t.dataset.v; renderModal(); return;
     case 'mode': app.mode = t.dataset.v; break;
@@ -293,7 +296,7 @@ function settleOffline() {
 // 切到背景：暫停即時戰鬥並記錄時間；回來時掛機改用離線結算，避免重複計算
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { clearInterval(app.bTimer); clearTimeout(app.pendingRepeat); app.pendingRepeat = null; save(); if (app.S.player.asked) T.sendSnapshot(true); C.uploadOnHide(); return; }
-  C.check();
+  C.check(); N.refresh();
   if (G.partyLocked(app.S) && (Date.now() - app.S.lastSeen) > 60000) {
     app.battle = null; app.lastResult = null; settleOffline(); resumeIdle(); render();
   } else if (app.battle && !app.battle.over) runTimer();
@@ -329,11 +332,13 @@ function start(data) {
   for (const it of Object.values(app.S.items)) it.name = it.base || it.set ? G.itemLabel(it) : localName(it.name); // v0.16 名稱由代號組出
   $('.brand-t').textContent = tx('副本團長'); $('.brand').setAttribute('aria-label', tx('設定')); $('#idleChip').textContent = tx('掛機中'); document.title = tx('副本團長');
   document.documentElement.lang = getLang();
-  $('#saveChip').textContent = tx('存檔中');
+  $('#saveChip').textContent = tx('存檔中'); $('#newsBtn').setAttribute('aria-label', tx('公告'));
+  N.updateDot(); N.refresh(true);
   settleOffline();
   resumeIdle();
   render();
   const after = () => {
+    setTimeout(() => N.maybePop(), 600); // v0.18 公告彈出：等暱稱等其他視窗之後
     if (T.enabled() && !app.S.player.asked && !app.modal) openNick();
     else if (app.S.player.asked) setTimeout(() => T.sendSnapshot(), 3000);
   };

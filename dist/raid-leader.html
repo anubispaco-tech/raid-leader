@@ -387,11 +387,30 @@ h3 .gi{vertical-align:-.12em}
 .stucklist{display:grid;gap:8px}
 .stuck{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
 .stuck>div{display:grid;gap:2px;min-width:0}.stuck b{font-size:14px}.stuck .btn{flex:0 0 auto}
+
+/* v0.18 公告 */
+.newsbtn{position:relative;display:grid;place-items:center;width:32px;height:32px;border-radius:999px;border:1px solid var(--line);background:var(--panel)}
+.newsbtn svg{width:17px;height:17px;fill:none;stroke:var(--brass);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.newsbtn .ndot{position:absolute;top:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:var(--bad);border:2px solid var(--bg)}
+.nlist{display:grid;gap:10px}
+.ncard{display:grid;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px}
+.ncard.pin{border-color:var(--brass-d)}
+.nhead{display:flex;align-items:center;gap:6px}
+.ntag{font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px;color:var(--ink)}
+.n-info{background:var(--brass)} .n-event{background:var(--r4)} .n-update{background:var(--good)} .n-maint{background:var(--bad);color:#fff}
+.npin{font-size:11px;color:var(--brass);border:1px solid var(--brass-d);border-radius:999px;padding:0 7px}
+.ndate{margin-left:auto;font-size:12px;color:var(--muted)}
+.ntitle{font-size:15px}
+.nbody{margin:0;font-size:13.5px;line-height:1.6;color:var(--fg);opacity:.9;overflow-wrap:anywhere}
+.nbody a{color:var(--brass)}
+.nold{display:flex;gap:8px;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--warn);background:color-mix(in srgb,var(--warn) 10%,transparent);border-radius:8px;padding:8px 10px}
+.nold .btn{white-space:nowrap;flex:0 0 auto}
 </style>
 <div class="app">
   <header class="top">
     <button class="brand" data-act="settings"><span class="brand-t">副本團長</span><svg class="gear" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></button>
     <div class="res">
+      <button id="newsBtn" class="newsbtn" data-act="news" aria-label="公告" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></svg><i id="newsDot" class="ndot" hidden></i></button>
       <span id="saveChip" class="savechip" hidden>存檔中</span>
       <span id="idleChip" class="idlechip" hidden>掛機中</span>
       <span class="pill num"><i class="coin"></i><span id="gold">0</span></span>
@@ -403,7 +422,7 @@ h3 .gi{vertical-align:-.12em}
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.17.2 */
+/* 副本團長 v0.18.0 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -1126,6 +1145,7 @@ h3 .gi{vertical-align:-.12em}
     "\u8A2D\u5B9A": "Settings",
     "\u639B\u6A5F\u4E2D": "Idling",
     "\u5B58\u6A94\u4E2D": "Saving",
+    "\u516C\u544A": "News",
     "\u540C\u6B65\u96F2\u7AEF\u5B58\u6A94\u2026": "Syncing cloud save\u2026",
     "\u8B80\u53D6\u5B58\u6A94\u4E2D\u2026": "Loading save\u2026",
     "\u5E36\u9818\u4F60\u7684\u5192\u96AA\u5718\uFF0C\u653B\u4E0B\u6BCF\u4E00\u5EA7\u526F\u672C\u3002": "Lead your party through every dungeon.",
@@ -1142,6 +1162,16 @@ h3 .gi{vertical-align:-.12em}
     "\uFF08{0} \u4EF6\u9032\u6230\u5229\u54C1\u7BB1\uFF09": " ({0} to loot chest)",
     "\uFF08{0} \u4EF6\u653E\u4E0D\u4E0B\u5DF2\u5206\u89E3 +{1} \u91D1\uFF09": " ({0} didn't fit, salvaged +{1} gold)",
     "\u904A\u6232\u642C\u5BB6\u4E86\uFF0C\u6B63\u5728\u5E36\u8457\u4F60\u7684\u9032\u5EA6\u524D\u5F80\u65B0\u7DB2\u5740\u2026": "The game has moved. Taking your progress to the new address\u2026",
+    "\u6D3B\u52D5": "Events",
+    "\u66F4\u65B0": "Update",
+    "\u7DAD\u4FEE": "Maintenance",
+    "\u7F6E\u9802": "Pinned",
+    "\u4F60\u7684\u7248\u672C v{0} \u8F03\u820A\uFF0C\u8ACB\u91CD\u65B0\u6574\u7406\u53D6\u5F97 v{1} \u4EE5\u4E0A": "You're on v{0}. Refresh to get v{1} or later",
+    "\u91CD\u65B0\u6574\u7406": "Refresh",
+    "\u76EE\u524D\u6C92\u6709\u516C\u544A": "No news right now",
+    "\u6700\u65B0\u516C\u544A": "Latest News",
+    "\u770B\u5168\u90E8\u516C\u544A": "All News",
+    "\u77E5\u9053\u4E86": "Got it",
     "\u683C\u5F0F\u4E0D\u7B26": "Invalid format",
     "\u908A\u5883\u516C\u6703\u7684\u61F8\u8CDE\u699C\u4E0A\uFF0C\u8CBC\u6EFF\u4E86\u526F\u672C\u7684\u59D4\u8A17\u3002": "The frontier guild's bounty board is covered in dungeon contracts.",
     "\u516C\u6703\u66F8\u8A18": "Guild Clerk",
@@ -1303,7 +1333,6 @@ h3 .gi{vertical-align:-.12em}
     "\u639B\u6A5F +{0}": "Idle +{0}",
     '<span class="sugtag">\u63A8\u85A6</span>': '<span class="sugtag">Suggested</span>',
     '<button class="btn sm grow" data-act="mythicall">\u986F\u793A\u5176\u4ED6 {0} \u500B\u526F\u672C</button><p class="sub" style="margin:0">\u5148\u5F9E\u63A8\u85A6\u7684\u526F\u672C\u9650\u6642\u901A\u95DC\u4E00\u6B21\uFF0C\u5176\u4ED6\u526F\u672C\u96A8\u6642\u90FD\u80FD\u6253\uFF0C\u9470\u77F3\u7B49\u7D1A\u5171\u7528\u3002</p>': '<button class="btn sm grow" data-act="mythicall">Show the other {0} dungeons</button><p class="sub" style="margin:0">Time the suggested dungeon once first. The others are open anytime and share the same keystone.</p>',
-    "\u77E5\u9053\u4E86": "Got it",
     '<div class="row" style="justify-content:flex-end;margin:-4px 0 8px"><button class="linkbtn" data-act="mythichelp">\uFF1F\u79D8\u5883\u600E\u9EBC\u73A9</button></div>': '<div class="row" style="justify-content:flex-end;margin:-4px 0 8px"><button class="linkbtn" data-act="mythichelp">? How Mythic works</button></div>',
     '<div class="mguide"><b class="mgt">\u79D8\u5883\u600E\u9EBC\u73A9</b> <div class="mcmp"><span></span><b>\u4E3B\u7DDA</b><b>\u79D8\u5883</b> <span>\u76EE\u7684</span><span>\u63A8\u9032\u5287\u60C5\u3001\u89E3\u9396\u65B0\u5C64</span><span>\u91CD\u8907\u5237\u540C\u4E00\u6279\u526F\u672C\uFF0C\u62FF\u66F4\u9AD8\u88DD\u7B49\u7684\u88DD\u5099</span> <span>\u96E3\u5EA6</span><span>\u6BCF\u5C64\u56FA\u5B9A</span><span>\u770B\u9470\u77F3\u7B49\u7D1A\uFF1A\u8D8A\u9AD8\u6575\u4EBA\u8D8A\u786C\uFF0C+{0} \u8D77\u6709\u8A5E\u7DB4</span> <span>\u6642\u9593</span><span>\u4E0D\u9650\u6642</span><span>\u6709\u9650\u6642\uFF0C\u9650\u6642\u5167\u901A\u95DC\u624D\u5347\u7D1A</span> <span>\u734E\u52F5</span><span>\u9996\u901A\u4FDD\u5E95\u7A00\u6709</span><span>\u9470\u77F3\u8D8A\u9AD8\u88DD\u7B49\u8D8A\u9AD8\uFF0C+{1} \u8D77\u53EF\u80FD\u6389\u50B3\u8AAA</span></div> <ol class="msteps"><li>\u9EDE<b>\u63A8\u85A6</b>\u526F\u672C\u7684\u300C\u6311\u6230\u300D\uFF0C\u7528\u76EE\u524D\u9470\u77F3\u7B49\u7D1A\u958B\u6253\u3002</li><li>\u9650\u6642\u5167\u901A\u95DC\uFF1A\u9470\u77F3 +1\uFF0C\u6253\u5F97\u5920\u5FEB +2\uFF1B\u8D85\u6642\u3001\u5931\u6557\u6216\u64A4\u9000\uFF1A\u9470\u77F3 \u22121\u3002</li><li>\u6240\u6709\u79D8\u5883\u526F\u672C\u5171\u7528\u540C\u4E00\u9846\u9470\u77F3\uFF0C\u63DB\u526F\u672C\u6253\u4E0D\u6703\u91CD\u4F86\u3002</li><li>\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u958B\u300C\u79D8\u5883\u639B\u6A5F\u300D\uFF0C\u96E2\u7DDA\u4E5F\u6703\u6162\u6162\u5237\u3002</li></ol> <div class="row"><button class="btn sm main" data-act="mythichelpok">\u77E5\u9053\u4E86</button></div></div>': `<div class="mguide"><b class="mgt">How Mythic works</b> <div class="mcmp"><span></span><b>Story</b><b>Mythic</b> <span>Goal</span><span>Advance the story and unlock floors</span><span>Rerun the same dungeons for higher item level gear</span> <span>Difficulty</span><span>Fixed per floor</span><span>Set by keystone level: higher means tougher enemies, affixes from +{0}</span> <span>Timer</span><span>None</span><span>Timed; finish in time to level up the key</span> <span>Rewards</span><span>First clear guarantees rare</span><span>Higher key, higher item level; legendaries can drop from +{1}</span></div> <ol class="msteps"><li>Tap Fight on the <b>Suggested</b> dungeon to run it at your current key level.</li><li>Finish in time: key +1, or +2 if fast enough. Over time, wipe or retreat: key \u22121.</li><li>All Mythic dungeons share one keystone, so switching dungeons doesn't reset it.</li><li>Dungeons you've timed can be idled, and progress keeps building offline.</li></ol> <div class="row"><button class="btn sm main" data-act="mythichelpok">Got it</button></div></div>`,
     "\u5929\u68AF\u66AB\u6642\u8B80\u4E0D\u5230\uFF0C\u7A0D\u5F8C\u518D\u8A66\u3002": "Ladder unavailable \u2014 try again later.",
@@ -1316,7 +1345,6 @@ h3 .gi{vertical-align:-.12em}
     "\u6539\u66B1\u7A31": "Rename",
     "\u8A2D\u5B9A\u66B1\u7A31": "Set nickname",
     '<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv{0}</b>\u30FB\u88DD\u7B49 <b class="num">{1}</b>\u30FB\u6230\u529B <b class="num">{2}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u90FD\u6709\u5F31\u9EDE\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\uFF0C\u6216\u56DE\u982D\u5237\u88DD\u5099\u3002</p>': `<h2>Dungeons</h2><p class="sub">Party avg <b class="num">Lv{0}</b> \xB7 iLvl <b class="num">{1}</b> \xB7 Rating <b class="num">{2}</b>  | Every boss has a weakness \u2014 if you can't win, change the lineup or farm gear.</p>`,
-    "\u6D3B\u52D5": "Events",
     "\u5373\u5C07\u63A8\u51FA\uFF1A\u7BC0\u6176\u526F\u672C\u3001\u88DD\u5099\u526F\u672C\u7B49\u9650\u6642\u6D3B\u52D5\u6703\u653E\u5728\u9019\u88E1\u3002": "Coming soon: festival dungeons, gear dungeons and other limited events will live here.",
     '<div class="dg {0}"> <div class="tier">{1}<small>\u7B2C {2} \u5C64</small></div> <h3>{3}<span class="boss">\u9996\u9818\u30FB{4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>\u5EFA\u8B70 <b class="num {6}">Lv{7}</b></span> <span>\u88DD\u7B49 <b class="num {8}">{9}</b></span> <span>\u6389\u843D <b class="num">{10}</b></span> <span>\u901A\u95DC <b class="num">{11}</b> \u6B21</span> </div> <div class="acts">{12} </div></div>': '<div class="dg {0}"> <div class="tier">{1}<small>Floor {2}</small></div> <h3>{3}<span class="boss">Boss \xB7 {4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>Rec. <b class="num {6}">Lv{7}</b></span> <span>iLvl <b class="num {8}">{9}</b></span> <span>Drops <b class="num">{10}</b></span> <span>Cleared <b class="num">{11}</b> times</span> </div> <div class="acts">{12} </div></div>',
     '<span class="sub" style="margin:0">\u5148\u901A\u95DC\u4E0A\u4E00\u5C64</span>': '<span class="sub" style="margin:0">Clear the previous floor first</span>',
@@ -2185,8 +2213,8 @@ h3 .gi{vertical-align:-.12em}
     hooks: {
       tick(b, u) {
         if (!b.lust.used && b.foes().some((e) => e.boss)) {
-          const L = P6.lust, leg = !!u.mods.legend;
-          b.startLust(u, L.dur + (u.mods.lustDur || 0) + (u.mods.setLust || 0) + (leg ? L.legendDur : 0), L.haste, leg ? L.proc : 0, L.procMult);
+          const L2 = P6.lust, leg = !!u.mods.legend;
+          b.startLust(u, L2.dur + (u.mods.lustDur || 0) + (u.mods.setLust || 0) + (leg ? L2.legendDur : 0), L2.haste, leg ? L2.proc : 0, L2.procMult);
         }
         if (u.mods.cleanseTotem && b.tick % u.mods.cleanseTotem === 0) {
           const c = b.alive().find((x) => x.curse > b.tick);
@@ -2758,7 +2786,7 @@ h3 .gi{vertical-align:-.12em}
   }
 
   // src/core/heroes.js
-  var xpNeed = (L) => Math.round(HERO.xpBase * Math.pow(L, HERO.xpExp));
+  var xpNeed = (L2) => Math.round(HERO.xpBase * Math.pow(L2, HERO.xpExp));
   function makeHero(cls2, level = 1, rarity = 0) {
     const legend = rarity === 4 ? CLASSES[cls2].legend : null;
     return {
@@ -3077,9 +3105,9 @@ h3 .gi{vertical-align:-.12em}
       if (o.skill || o.dot) u.skillDmg += amt;
       if (u.hk.afterHit) u.hk.afterHit(this, u, e, amt, o);
       if (this.lust.proc && !o.dot && !o.proc && this.lustActive() && R() < this.lust.proc) {
-        const L = this.lust, t = e.hp > amt ? e : this.foes().find((x) => x !== e);
+        const L2 = this.lust, t = e.hp > amt ? e : this.foes().find((x) => x !== e);
         if (t) {
-          this.hitEnemy(L.src, t, L.src.pow * L.procMult, { proc: true, skill: true });
+          this.hitEnemy(L2.src, t, L2.src.pow * L2.procMult, { proc: true, skill: true });
         }
       }
       if (e.hp === 0) {
@@ -3319,31 +3347,31 @@ h3 .gi{vertical-align:-.12em}
     else s.mythic.key = k;
   }
   var STA_MS = () => MYTHIC.stamina.regenMin * 6e4;
-  function stamina(s, now = Date.now()) {
+  function stamina(s, now2 = Date.now()) {
     const max = MYTHIC.stamina.max;
-    const st = s.mythic.sta || (s.mythic.sta = { pts: max, at: now });
+    const st = s.mythic.sta || (s.mythic.sta = { pts: max, at: now2 });
     if (st.pts >= max) {
-      st.at = now;
+      st.at = now2;
       return st;
     }
-    const n2 = Math.floor((now - st.at) / STA_MS());
+    const n2 = Math.floor((now2 - st.at) / STA_MS());
     if (n2 > 0) {
       st.pts = Math.min(max, st.pts + n2);
-      st.at = st.pts >= max ? now : st.at + n2 * STA_MS();
+      st.at = st.pts >= max ? now2 : st.at + n2 * STA_MS();
     }
     return st;
   }
-  function addStamina(s, n2, cap, now = Date.now()) {
-    const st = stamina(s, now);
+  function addStamina(s, n2, cap, now2 = Date.now()) {
+    const st = stamina(s, now2);
     st.pts = Math.min(cap, st.pts + n2);
     return st.pts;
   }
-  var staminaNext = (s, now = Date.now()) => {
-    const st = stamina(s, now);
-    return st.pts >= MYTHIC.stamina.max ? 0 : Math.max(0, st.at + STA_MS() - now);
+  var staminaNext = (s, now2 = Date.now()) => {
+    const st = stamina(s, now2);
+    return st.pts >= MYTHIC.stamina.max ? 0 : Math.max(0, st.at + STA_MS() - now2);
   };
-  function spendStamina(s, now = Date.now()) {
-    const st = stamina(s, now);
+  function spendStamina(s, now2 = Date.now()) {
+    const st = stamina(s, now2);
     if (st.pts < 1) return false;
     st.pts--;
     return true;
@@ -3471,8 +3499,8 @@ h3 .gi{vertical-align:-.12em}
     while (picked.length < 3) picked.push(rest.splice(rnd2(rest.length), 1)[0]);
     return picked.map((id) => ({ id, n: 0, claimed: false }));
   }
-  function dailyToday(s, now = Date.now()) {
-    const day = dayKey(new Date(now));
+  function dailyToday(s, now2 = Date.now()) {
+    const day = dayKey(new Date(now2));
     const d = s.daily || (s.daily = { day: "", q: [], firstWin: false, chest: false, signDays: 0, signed: false });
     if (d.day !== day) Object.assign(d, { day, q: rollQuests(s, day), firstWin: false, chest: false, signed: false });
     return d;
@@ -3512,8 +3540,8 @@ h3 .gi{vertical-align:-.12em}
     return giveItem(s, DAILY.chestRarity, DAILY.chestSetChance);
   }
   var signinReward = (n2) => DAILY.signin[(n2 - 1) % DAILY.signin.length];
-  function claimSignin(s, now = Date.now()) {
-    const d = dailyToday(s, now);
+  function claimSignin(s, now2 = Date.now()) {
+    const d = dailyToday(s, now2);
     if (d.signed) return null;
     d.signed = true;
     d.signDays++;
@@ -3528,7 +3556,7 @@ h3 .gi{vertical-align:-.12em}
     }
     if (r.t === "sta") {
       out.sta = r.n;
-      addStamina(s, r.n, DAILY.staminaOver, now);
+      addStamina(s, r.n, DAILY.staminaOver, now2);
     }
     if (r.t === "item") Object.assign(out, giveItem(s, r.r, r.set ? 1 : 0));
     return out;
@@ -3587,7 +3615,7 @@ h3 .gi{vertical-align:-.12em}
   function decayFor(dIdx) {
     const rec = dungeonInfo(dIdx).recLevel;
     const floor = dIdx >= CH1_TOP ? REWARD.decayFloorTop : REWARD.decayFloor;
-    return (L) => Math.max(floor, Math.min(1, 1 - REWARD.decayPerLevel * (L - (rec + REWARD.decayGrace))));
+    return (L2) => Math.max(floor, Math.min(1, 1 - REWARD.decayPerLevel * (L2 - (rec + REWARD.decayGrace))));
   }
   function newGame() {
     const s = {
@@ -3762,9 +3790,9 @@ h3 .gi{vertical-align:-.12em}
   }
   var recruitLevel = (s) => Math.max(1, Math.round(avgLevel(s.heroes)) - 1);
   function rollTavern(s) {
-    const L = recruitLevel(s);
+    const L2 = recruitLevel(s);
     s.tavern = [];
-    for (let i = 0; i < 3; i++) s.tavern.push(newRecruit(s, Math.max(1, L + rint(-1, 0))));
+    for (let i = 0; i < 3; i++) s.tavern.push(newRecruit(s, Math.max(1, L2 + rint(-1, 0))));
   }
   var scrollCost = (s, n2 = 1) => Math.round((RECRUIT.scrollBase + RECRUIT.scrollPerLevel * avgLevel(s.heroes)) * n2 * (n2 >= 10 ? RECRUIT.tenDiscount : 1));
   function recruitScroll(s, n2 = 1) {
@@ -4200,14 +4228,14 @@ h3 .gi{vertical-align:-.12em}
     }
     return changed;
   }
-  function offlineProgress(s, now = Date.now()) {
+  function offlineProgress(s, now2 = Date.now()) {
     const myth = s.idleMythic != null && mythicIdleLevel(s, s.idleMythic);
     if (!myth && (s.idle == null || !s.clears[s.idle])) {
-      s.lastSeen = now;
+      s.lastSeen = now2;
       return null;
     }
-    const sec = Math.min(ECONOMY.offlineCapHours * 3600, Math.max(0, (now - s.lastSeen) / 1e3));
-    s.lastSeen = now;
+    const sec = Math.min(ECONOMY.offlineCapHours * 3600, Math.max(0, (now2 - s.lastSeen) / 1e3));
+    s.lastSeen = now2;
     if (sec < 60 || !partyHeroes(s).length) return null;
     let t = 0, runs = 0, wins = 0, gold = 0, items2 = 0, stashed = 0, lv = 0;
     while (runs < 400) {
@@ -4404,7 +4432,7 @@ h3 .gi{vertical-align:-.12em}
     const [c, g] = a.prog(s);
     return [Math.min(c, g), g];
   };
-  function checkAchievements(s, now = Date.now()) {
+  function checkAchievements(s, now2 = Date.now()) {
     s.ach = s.ach || { done: {} };
     const fresh = [];
     for (const a of ACHIEVEMENTS) {
@@ -4417,7 +4445,7 @@ h3 .gi{vertical-align:-.12em}
         ok = false;
       }
       if (ok) {
-        s.ach.done[a.id] = now;
+        s.ach.done[a.id] = now2;
         fresh.push(a);
       }
     }
@@ -4641,7 +4669,7 @@ h3 .gi{vertical-align:-.12em}
   var dailyOpenNow = () => app.dailyOpen != null ? app.dailyOpen : dailyPending(app.S) > 0;
 
   // src/core/version.js
-  var VERSION = "0.17.2";
+  var VERSION = "0.18.0";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -4705,6 +4733,108 @@ h3 .gi{vertical-align:-.12em}
       sinceSnap = 0;
       sendSnapshot();
     }
+  }
+
+  // src/ui/news.js
+  var URL_2 = TELEMETRY.url;
+  var LS = "raid-leader-news";
+  var READ = "raid-leader-news-read";
+  var POP = "raid-leader-news-pop";
+  var REFRESH_MS = 10 * 60 * 1e3;
+  var get = (k, d) => {
+    try {
+      return JSON.parse(localStorage.getItem(k) || "null") ?? d;
+    } catch (e) {
+      return d;
+    }
+  };
+  var put = (k, v) => {
+    try {
+      localStorage.setItem(k, JSON.stringify(v));
+    } catch (e) {
+    }
+  };
+  var cached = get(LS, {});
+  var news = { list: Array.isArray(cached.list) ? cached.list : [], at: Number(cached.at) || 0, loading: false };
+  var TYPE_CLASS = { \u516C\u544A: "n-info", \u6D3B\u52D5: "n-event", \u66F4\u65B0: "n-update", \u7DAD\u4FEE: "n-maint" };
+  var typeLabel = (t) => ({ \u516C\u544A: tx("\u516C\u544A"), \u6D3B\u52D5: tx("\u6D3B\u52D5"), \u66F4\u65B0: tx("\u66F4\u65B0"), \u7DAD\u4FEE: tx("\u7DAD\u4FEE") })[t] || tx("\u516C\u544A");
+  var cmpVer = (a, b) => {
+    const x = String(a).split(".").map(Number), y = String(b).split(".").map(Number);
+    for (let i = 0; i < 3; i++) {
+      const d = (x[i] || 0) - (y[i] || 0);
+      if (d) return d;
+    }
+    return 0;
+  };
+  var now = () => Date.now();
+  var live = () => news.list.filter((n2) => (!n2.start || n2.start <= now()) && (!n2.end || n2.end > now()));
+  var readIds = () => get(READ, []);
+  var unread = () => {
+    const r = readIds();
+    return live().filter((n2) => !r.includes(n2.id)).length;
+  };
+  var tooOld = (n2) => n2.minVer && cmpVer(n2.minVer, VERSION) > 0;
+  function updateDot() {
+    const d = document.getElementById("newsDot");
+    if (d) d.hidden = !unread();
+    const b = document.getElementById("newsBtn");
+    if (b) b.hidden = !URL_2 || !live().length;
+  }
+  function refresh(force = false) {
+    if (!URL_2 || news.loading || !force && now() - news.at < REFRESH_MS) return Promise.resolve();
+    news.loading = true;
+    return fetch(URL_2 + "?action=news").then((r) => r.json()).then((d) => {
+      if (d && d.ok && Array.isArray(d.list)) {
+        news.list = d.list.filter((n2) => n2 && n2.id && n2.title);
+        news.at = now();
+        put(LS, { at: news.at, list: news.list });
+      }
+    }).catch(() => {
+    }).finally(() => {
+      news.loading = false;
+      updateDot();
+      if (app.modal && app.modal.type === "news") app.renderModal();
+      maybePop();
+    });
+  }
+  var L = (n2) => getLang() === "en" && n2.titleEn ? { title: n2.titleEn, body: n2.bodyEn || n2.body } : { title: n2.title, body: n2.body };
+  var md = (ms) => {
+    const d = new Date(ms);
+    return `${d.getMonth() + 1}/${d.getDate()}`;
+  };
+  var bodyHtml = (s) => esc(s).replace(/https?:\/\/[^\s<"']+/g, (u) => `<a href="${u}" target="_blank" rel="noopener noreferrer">${u}</a>`).replace(/\n/g, "<br>");
+  function card(n2) {
+    const t = L(n2);
+    return `<article class="ncard${n2.pin ? " pin" : ""}"><div class="nhead"><span class="ntag ${TYPE_CLASS[n2.type] || "n-info"}">${typeLabel(n2.type)}</span>${n2.pin ? `<span class="npin">${tx("\u7F6E\u9802")}</span>` : ""}<span class="ndate num">${n2.start ? md(n2.start) : ""}</span></div><b class="ntitle">${esc(t.title)}</b>${t.body ? `<p class="nbody">${bodyHtml(t.body)}</p>` : ""}` + (tooOld(n2) ? `<div class="nold"><span>${tx("\u4F60\u7684\u7248\u672C v{0} \u8F03\u820A\uFF0C\u8ACB\u91CD\u65B0\u6574\u7406\u53D6\u5F97 v{1} \u4EE5\u4E0A", VERSION, esc(n2.minVer))}</span><button class="btn sm main" data-act="newsreload">${tx("\u91CD\u65B0\u6574\u7406")}</button></div>` : "") + "</article>";
+  }
+  function newsHtml(only) {
+    const list = only ? live().filter((n2) => n2.id === only) : live();
+    const body = list.length ? list.map(card).join("") : `<p class="sub">${tx("\u76EE\u524D\u6C92\u6709\u516C\u544A")}</p>`;
+    return `<h3>${only ? tx("\u6700\u65B0\u516C\u544A") : tx("\u516C\u544A")}</h3><div class="nlist">${body}</div><div class="row">${only && live().length > 1 ? `<button class="btn grow" data-act="news">${tx("\u770B\u5168\u90E8\u516C\u544A")}</button>` : ""}<button class="btn main grow" data-act="closebtn">${tx("\u77E5\u9053\u4E86")}</button></div>`;
+  }
+  function markRead(ids) {
+    const r = readIds();
+    put(READ, [.../* @__PURE__ */ new Set([...ids, ...r])].slice(0, 200));
+    updateDot();
+  }
+  var lastLog = 0;
+  function openNews() {
+    app.openModal({ type: "news" });
+    markRead(live().map((n2) => n2.id));
+    if (now() - lastLog > 10 * 60 * 1e3) {
+      lastLog = now();
+      sendEvent(tx("\u516C\u544A"), "open");
+    }
+  }
+  function maybePop() {
+    if (!app.S || app.modal || app.fresh || document.getElementById("title") || document.getElementById("boot")) return;
+    if (tutActive(app.S)) return;
+    const popped = get(POP, []), n2 = live().find((x) => x.pop && !popped.includes(x.id));
+    if (!n2) return;
+    put(POP, [n2.id, ...popped].slice(0, 200));
+    app.openModal({ type: "news", only: n2.id });
+    markRead([n2.id]);
+    sendEvent(tx("\u516C\u544A"), "pop:" + n2.id);
   }
 
   // src/ui/views/dungeon.js
@@ -5009,9 +5139,9 @@ h3 .gi{vertical-align:-.12em}
       h += tx('<div class="hero r-{0}"><div class="ic">{1}</div><div class="nm">{2}{3}<small>{4}{5}\u30FB{6}\u30FB<span class="num">Lv{7}</span></small></div> <button class="btn sm main" data-act="hire" data-id="{8}" {9} style="grid-row:span 2"><span class="num">{10}</span> \u91D1</button> <div class="st">{11}</div></div>', x.rarity || 0, c.icon, heroName(x), rarityTag(x), c.name, x.spec ? `\u30FB${SPECS[x.cls][x.spec].name}` : "", ROLE_NAME[roleOf(x)], x.level, x.id, S.gold < cost || full ? "disabled" : "", fmt(cost), x.legend ? tx('<b class="c4">{0}</b>\uFF1A{1}', LEGENDS[x.cls].pname, LEGENDS[x.cls].desc) : c.desc);
     }
     const rc = refreshCost(S);
-    h += tx('</div><div class="row" style="margin-top:12px"><button class="btn" data-act="reroll" {0}>\u63DB\u4E00\u6279\uFF08<span class="num">{1}</span> \u91D1\uFF09</button><span class="sub" style="margin:0;align-self:center">\u63DB\u4E00\u6279\u4E5F\u7B97\u9032\u4FDD\u5E95</span></div> <h2 style="font-size:18px">\u50B3\u5947\u82F1\u96C4</h2><div class="stack">{2}</div> <h2 style="font-size:18px">\u8077\u696D\u5716\u9451</h2><div class="stack">{3}</div>', S.gold < rc ? "disabled" : "", fmt(rc), Object.entries(LEGENDS).map(([k, L]) => {
+    h += tx('</div><div class="row" style="margin-top:12px"><button class="btn" data-act="reroll" {0}>\u63DB\u4E00\u6279\uFF08<span class="num">{1}</span> \u91D1\uFF09</button><span class="sub" style="margin:0;align-self:center">\u63DB\u4E00\u6279\u4E5F\u7B97\u9032\u4FDD\u5E95</span></div> <h2 style="font-size:18px">\u50B3\u5947\u82F1\u96C4</h2><div class="stack">{2}</div> <h2 style="font-size:18px">\u8077\u696D\u5716\u9451</h2><div class="stack">{3}</div>', S.gold < rc ? "disabled" : "", fmt(rc), Object.entries(LEGENDS).map(([k, L2]) => {
       const owned = S.heroes.some((x) => x.legend && x.cls === k);
-      return tx('<div class="hero {0}"><div class="ic">{1}</div><div class="nm"><span class="c4">{2}\u30FB{3}</span><small>{4}\u30FB{5}</small></div><span></span><div class="st"><b>{6}</b>\uFF1A{7}</div></div>', owned ? "r-4" : "unowned", CLASSES[k].icon, L.title, L.name, CLASSES[k].name, owned ? tx("\u5DF2\u62DB\u52DF") : tx("\u672A\u62DB\u52DF"), L.pname, L.desc);
+      return tx('<div class="hero {0}"><div class="ic">{1}</div><div class="nm"><span class="c4">{2}\u30FB{3}</span><small>{4}\u30FB{5}</small></div><span></span><div class="st"><b>{6}</b>\uFF1A{7}</div></div>', owned ? "r-4" : "unowned", CLASSES[k].icon, L2.title, L2.name, CLASSES[k].name, owned ? tx("\u5DF2\u62DB\u52DF") : tx("\u672A\u62DB\u52DF"), L2.pname, L2.desc);
     }).join(""), Object.values(CLASSES).map((c) => `<div class="hero"><div class="ic">${c.icon}</div><div class="nm">${c.name}<small>${c.roleText || ROLE_NAME[c.role]}</small></div><span></span><div class="st">${c.desc}</div></div>`).join(""));
     return h;
   }
@@ -5102,10 +5232,10 @@ h3 .gi{vertical-align:-.12em}
   }
   var RETRY_SEC = 16;
   var failMsg = (r, what) => !r ? tx("\u9023\u4E0D\u4E0A\u4F3A\u670D\u5668\uFF0C\u8ACB\u78BA\u8A8D\u7DB2\u8DEF\u5F8C\u518D\u8A66") : what === "down" ? tx("\u4E0B\u8F09\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66") : r.error === "too fast" ? tx("\u525B\u525B\u5DF2\u540C\u6B65\u904E\uFF0C{0} \u79D2\u5F8C\u81EA\u52D5\u518D\u4E0A\u50B3\u4E00\u6B21", RETRY_SEC) : tx("\u4E0A\u50B3\u5931\u6557\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66");
-  var lastLog = 0;
+  var lastLog2 = 0;
   var logFail = (op, r) => {
-    if (Date.now() - lastLog < 6e4) return;
-    lastLog = Date.now();
+    if (Date.now() - lastLog2 < 6e4) return;
+    lastLog2 = Date.now();
     sendEvent(tx("\u96F2\u7AEF\u5931\u6557"), `${op}:${r ? String(r.error || "?").slice(0, 80) : "net"}`);
   };
   var expired = (r) => {
@@ -5324,6 +5454,7 @@ h3 .gi{vertical-align:-.12em}
     if (app.modal.type === "dialog") body = sheetDialog(app.modal);
     if (app.modal.type === "settings") body = sheetSettings();
     if (app.modal.type === "ach") body = sheetAchievements();
+    if (app.modal.type === "news") body = newsHtml(app.modal.only);
     if (!body) {
       app.modal = null;
       el.innerHTML = "";
@@ -5337,8 +5468,8 @@ h3 .gi{vertical-align:-.12em}
     if (app.afterModal) app.afterModal();
   }
   function sheetDialog(m) {
-    const L = m.lines[m.i], last = m.i >= m.lines.length - 1;
-    return `<div class="dlg" data-act="dlgnext">${L.who ? `<b class="who">${L.who}</b>` : ""}<p class="${L.who ? "" : "narr"}">${L.text}</p>
+    const L2 = m.lines[m.i], last = m.i >= m.lines.length - 1;
+    return `<div class="dlg" data-act="dlgnext">${L2.who ? `<b class="who">${L2.who}</b>` : ""}<p class="${L2.who ? "" : "narr"}">${L2.text}</p>
     <div class="row" style="align-items:center"><span class="sub num" style="margin:0">${m.i + 1}/${m.lines.length}</span>
     <button class="btn sm" data-act="dlgskip" style="margin-left:auto">${tx("\u8DF3\u904E")}</button><button class="btn sm main" data-act="dlgnext">${last ? tx("\u958B\u59CB") : tx("\u7E7C\u7E8C \u25B8")}</button></div></div>`;
   }
@@ -5346,8 +5477,8 @@ h3 .gi{vertical-align:-.12em}
     if (!x) return "";
     const c = cls(x), st = heroStats(x, app.S.items), view = app.modal.view || "gear", pend = pendingPicks(x);
     const sp = x.spec && SPECS[x.cls][x.spec];
-    const R2 = HERO_RARITY[x.rarity || 0], L = x.legend && LEGENDS[x.cls];
-    let h = tx('<h3>{0} {1} {2}</h3><div class="sub" style="margin:0">{3}{4}\u30FB{5}\u3000{6}</div> {7} <div class="statgrid num"><div><b>{8}</b><span>\u7B49\u7D1A</span></div><div><b>{9}</b><span>\u751F\u547D</span></div><div><b>{10}</b><span>\u5A01\u529B</span></div><div><b>{11}%</b><span>\u66B4\u64CA</span></div></div> <div class="sub" style="margin:0">{12}\u30FB\u8B77\u7532\u6E1B\u50B7 {13}%</div> <div class="seg wide"><button data-act="heroview" data-id="{14}" data-v="gear" class="{15}">\u88DD\u5099</button><button data-act="heroview" data-id="{16}" data-v="talent" class="{17}">\u5929\u8CE6{18}</button></div>', c.icon, heroName(x), rarityTag(x), c.name, sp ? `\u30FB${sp.name}` : "", ROLE_NAME[roleOf(x)], c.desc, x.rarity ? tx('<div class="raritycard r-{0}"><b class="c{1}">{2}\u52A0\u6210</b><span>\u57FA\u790E\u5C6C\u6027 \xD7{3}{4}{5}</span>{6}</div>', x.rarity, x.rarity, R2.name, R2.mult.toFixed(2), R2.crit ? tx("\u30FB\u66B4\u64CA +{0}%", Math.round(R2.crit * 100)) : "", R2.baseCdMult ? tx("\u30FB\u57FA\u790E\u6280\u80FD\u51B7\u537B \u221210%") : "", L ? tx('<span><b class="c4">{0}</b>\uFF1A{1}</span>', L.pname, L.desc) : "") : "", x.level, fmt(st.hp), st.pow, Math.round(st.crit * 100), x.level >= HERO.maxLevel ? tx('<b style="color:var(--brass)">\u5DD4\u5CF0 {0}</b>\uFF08\u751F\u547D\uFF0F\u5A01\u529B +{1}%\uFF09<span class="num">{2} / {3}</span>', x.para || 0, x.para || 0, fmt(x.paraXp || 0), fmt(paraNeed(x.para || 0))) : tx('\u7D93\u9A57 <span class="num">{0} / {1}</span>', fmt(x.xp), fmt(xpNeed(x.level))) + (x.para ? tx("\u30FB\u5DD4\u5CF0 {0}\uFF08\u751F\u547D\uFF0F\u5A01\u529B +{1}%\uFF09", x.para, x.para) : ""), Math.round(st.armor * 100), x.id, view === "gear" ? "sel" : "", x.id, view === "talent" ? "sel" : "", pend ? `<span class="pip">${pend}</span>` : "");
+    const R2 = HERO_RARITY[x.rarity || 0], L2 = x.legend && LEGENDS[x.cls];
+    let h = tx('<h3>{0} {1} {2}</h3><div class="sub" style="margin:0">{3}{4}\u30FB{5}\u3000{6}</div> {7} <div class="statgrid num"><div><b>{8}</b><span>\u7B49\u7D1A</span></div><div><b>{9}</b><span>\u751F\u547D</span></div><div><b>{10}</b><span>\u5A01\u529B</span></div><div><b>{11}%</b><span>\u66B4\u64CA</span></div></div> <div class="sub" style="margin:0">{12}\u30FB\u8B77\u7532\u6E1B\u50B7 {13}%</div> <div class="seg wide"><button data-act="heroview" data-id="{14}" data-v="gear" class="{15}">\u88DD\u5099</button><button data-act="heroview" data-id="{16}" data-v="talent" class="{17}">\u5929\u8CE6{18}</button></div>', c.icon, heroName(x), rarityTag(x), c.name, sp ? `\u30FB${sp.name}` : "", ROLE_NAME[roleOf(x)], c.desc, x.rarity ? tx('<div class="raritycard r-{0}"><b class="c{1}">{2}\u52A0\u6210</b><span>\u57FA\u790E\u5C6C\u6027 \xD7{3}{4}{5}</span>{6}</div>', x.rarity, x.rarity, R2.name, R2.mult.toFixed(2), R2.crit ? tx("\u30FB\u66B4\u64CA +{0}%", Math.round(R2.crit * 100)) : "", R2.baseCdMult ? tx("\u30FB\u57FA\u790E\u6280\u80FD\u51B7\u537B \u221210%") : "", L2 ? tx('<span><b class="c4">{0}</b>\uFF1A{1}</span>', L2.pname, L2.desc) : "") : "", x.level, fmt(st.hp), st.pow, Math.round(st.crit * 100), x.level >= HERO.maxLevel ? tx('<b style="color:var(--brass)">\u5DD4\u5CF0 {0}</b>\uFF08\u751F\u547D\uFF0F\u5A01\u529B +{1}%\uFF09<span class="num">{2} / {3}</span>', x.para || 0, x.para || 0, fmt(x.paraXp || 0), fmt(paraNeed(x.para || 0))) : tx('\u7D93\u9A57 <span class="num">{0} / {1}</span>', fmt(x.xp), fmt(xpNeed(x.level))) + (x.para ? tx("\u30FB\u5DD4\u5CF0 {0}\uFF08\u751F\u547D\uFF0F\u5A01\u529B +{1}%\uFF09", x.para, x.para) : ""), Math.round(st.armor * 100), x.id, view === "gear" ? "sel" : "", x.id, view === "talent" ? "sel" : "", pend ? `<span class="pip">${pend}</span>` : "");
     if (view === "talent") return h + talentView(x) + heroActions(x);
     h += `<div>`;
     for (const [slot, sn] of Object.entries(SLOTS)) {
@@ -5832,6 +5963,12 @@ h3 .gi{vertical-align:-.12em}
       case "settings":
         openModal({ type: "settings" });
         return;
+      case "news":
+        openNews();
+        return;
+      case "newsreload":
+        location.reload();
+        return;
       case "ach":
         openModal({ type: "ach" });
         return;
@@ -6284,6 +6421,7 @@ h3 .gi{vertical-align:-.12em}
       return;
     }
     check();
+    refresh();
     if (partyLocked(app.S) && Date.now() - app.S.lastSeen > 6e4) {
       app.battle = null;
       app.lastResult = null;
@@ -6342,10 +6480,14 @@ h3 .gi{vertical-align:-.12em}
     document.title = tx("\u526F\u672C\u5718\u9577");
     document.documentElement.lang = getLang();
     $("#saveChip").textContent = tx("\u5B58\u6A94\u4E2D");
+    $("#newsBtn").setAttribute("aria-label", tx("\u516C\u544A"));
+    updateDot();
+    refresh(true);
     settleOffline();
     resumeIdle();
     render();
     const after = () => {
+      setTimeout(() => maybePop(), 600);
       if (enabled() && !app.S.player.asked && !app.modal) openNick();
       else if (app.S.player.asked) setTimeout(() => sendSnapshot(), 3e3);
     };

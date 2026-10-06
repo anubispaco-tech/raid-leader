@@ -1,0 +1,11 @@
+{
+"公告": "News",
+"更新": "Update",
+"維修": "Maintenance",
+"置頂": "Pinned",
+"你的版本 v{0} 較舊，請重新整理取得 v{1} 以上": "You're on v{0}. Refresh to get v{1} or later",
+"重新整理": "Refresh",
+"目前沒有公告": "No news right now",
+"最新公告": "Latest News",
+"看全部公告": "All News"
+}

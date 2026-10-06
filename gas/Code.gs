@@ -23,7 +23,10 @@ const SHEETS = {
   players: { name: '玩家', headers: ['玩家ID', '暱稱', '第一次遊玩', '最後上線', '回訪天數', '遊玩分鐘', '隊伍等級', '最高層', '秘境鑰石', '秘境最高', '版本', '遊玩日期', '深淵最高', '深淵鑰石', '封鎖（填任何字就不上天梯）'] },
   events: { name: '事件', headers: ['時間', '玩家ID', '暱稱', '類型', '內容'] },
   feedback: { name: '回饋', headers: ['時間', '玩家ID', '暱稱', '意見', '當時進度', '版本'] },
+  news: { name: '公告', headers: ['ID（不可重複，例如 n001）', '類型', '標題', '內容（可換行，網址會自動變連結）', '標題EN', '內容EN', '開始時間（空白＝立即）', '結束時間（空白＝不下架）', '置頂', '開啟時彈出', '最低版本（例如 0.18.0）', '狀態'] },
 };
+// v0.18 公告：狀態「上架」且在開始～結束時間內才會出現在遊戲；遊戲端快取 10 分鐘、GAS 端快取 1 分鐘
+const NEWS = { types: ['公告', '活動', '更新', '維修'], status: ['上架', '草稿'], max: 20 };
 const COL = { pid: 1, name: 2, first: 3, last: 4, days: 5, minutes: 6, level: 7, top: 8, key: 9, best: 10, ver: 11, dates: 12, best2: 13, key2: 14, ban: 15 };
 // 成績合理性（v0.10.1）：傳奇秘境要通關第 7 層、深淵秘境要通關第 14 層才可能有成績；每次回報最多進步 JUMP 級
 const SANE = { mythicTop: 7, abyssTop: 14, jump: 15 };
@@ -48,6 +51,13 @@ function setup() {
   ps.hideColumns(COL.dates); // 遊玩日期清單只給程式用
   ps.getRange(1, COL.dates, ps.getMaxRows(), 1).setNumberFormat('@'); // 純文字，避免單一日期被自動轉成日期值
   fixDates();
+  const ns = ss.getSheetByName(SHEETS.news.name), nr = ns.getMaxRows() - 1;
+  ns.getRange(2, 2, nr, 1).setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(NEWS.types, true).build());
+  ns.getRange(2, 9, nr, 2).insertCheckboxes();
+  ns.getRange(2, 11, nr, 1).setNumberFormat('@'); // 版本號維持文字（避免 0.18.0 被當成日期或數字）
+  ns.getRange(2, 12, nr, 1).setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(NEWS.status, true).build());
+  ns.getRange(2, 7, nr, 2).setNumberFormat('yyyy/mm/dd hh:mm');
+  ns.setColumnWidth(3, 200); ns.setColumnWidth(4, 360);
   const cs = ss.getSheetByName(CLOUD.sheet) || ss.insertSheet(CLOUD.sheet);
   cs.getRange(1, 1, 1, CLOUD_HEAD.length).setValues([CLOUD_HEAD]).setFontWeight('bold'); cs.setFrozenRows(1);
   cloudFolder(); // 第一次執行會要求 Google Drive 授權
@@ -104,6 +114,7 @@ function doPost(e) {
 // ---------- 遊戲讀排行榜（GET ?action=leaderboard） ----------
 function doGet(e) {
   const action = (e && e.parameter && e.parameter.action) || '';
+  if (action === 'news') return newsOut();
   if (action !== 'leaderboard') return json({ ok: true, service: 'raid-leader' });
   const cache = CacheService.getScriptCache(), hit = cache.get('leaderboard');
   if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
@@ -116,6 +127,29 @@ function doGet(e) {
     .slice(0, 10);
   const out = JSON.stringify({ ok: true, updated: now(), list });
   cache.put('leaderboard', out, 60); // 1 分鐘快取，避免大家同時讀
+  return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
+}
+
+// ---------- v0.18 公告 ----------
+function newsOut() {
+  const cache = CacheService.getScriptCache(), hit = cache.get('news');
+  if (hit) return ContentService.createTextOutput(hit).setMimeType(ContentService.MimeType.JSON);
+  const sh = SpreadsheetApp.getActive().getSheetByName(SHEETS.news.name), t = Date.now();
+  const rows = sh && sh.getLastRow() > 1 ? sh.getRange(2, 1, sh.getLastRow() - 1, 12).getValues() : [];
+  const ms = v => { if (v instanceof Date) return v.getTime(); if (!v) return 0;
+    let x = String(v).trim().replace(/\//g, '-').replace(' ', 'T'); if (x.indexOf('T') < 0) x += 'T00:00';
+    return new Date(x + '+08:00').getTime() || 0; };
+  const txt = (v, max) => String(v == null ? '' : v).replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, '').trim().slice(0, max);
+  const list = rows
+    .filter(r => r[0] && String(r[11]).trim() === '上架')
+    .map(r => ({ id: txt(r[0], 20), type: NEWS.types.indexOf(String(r[1]).trim()) >= 0 ? String(r[1]).trim() : '公告',
+      title: txt(r[2], 60), body: txt(r[3], 2000), titleEn: txt(r[4], 80), bodyEn: txt(r[5], 2000),
+      start: ms(r[6]), end: ms(r[7]), pin: r[8] === true, pop: r[9] === true, minVer: txt(r[10], 12) }))
+    .filter(n => n.title && (!n.start || n.start <= t) && (!n.end || n.end > t))
+    .sort((a, b) => (b.pin - a.pin) || ((b.start || 0) - (a.start || 0)))
+    .slice(0, NEWS.max);
+  const out = JSON.stringify({ ok: true, at: t, list });
+  cache.put('news', out, 60);
   return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
 }
 
