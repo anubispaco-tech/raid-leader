@@ -17,7 +17,7 @@ const evil = JSON.parse(JSON.stringify(s));
 evil.heroes[0].name = '<img src=x onerror="window.__pwned=1">壞人';
 evil.heroes[1].rarity = '"><img src=x onerror="window.__pwned=2">';
 const code = Buffer.from(JSON.stringify(evil), 'utf8').toString('base64');
-const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); await page.addInitScript(() => sessionStorage.setItem('rl-title', '1'));
+const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); await page.addInitScript(() => (sessionStorage.setItem('rl-title', '1'), sessionStorage.setItem('rl-e2e', '1')));
 const errs = [], csp = []; page.on('pageerror', e => errs.push(e.message)); page.on('console', m => { if (/Content Security Policy/i.test(m.text())) csp.push(m.text()); });
 await page.addInitScript(v => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('raid-leader-save-v1', v); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(s));
 await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'app.test') return r.abort();

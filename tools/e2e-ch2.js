@@ -17,7 +17,7 @@ s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcde
 for (const h of G.partyHeroes(s)) { h.level = 40; for (const sl of Object.keys(G.SLOTS)) { const it = G.makeItem(sl, 100, 2); it.up = 5; s.items[it.id] = it; h.gear[sl] = it.id; } }
 for (let i = 0; i < 6; i++) { const it = G.makeItem('weapon', 40, 2); s.items[it.id] = it; s.bag.push(it.id); } // 6 件低裝等
 G.rollTavern(s);
-const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); await page.addInitScript(() => sessionStorage.setItem('rl-title', '1'));
+const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); await page.addInitScript(() => (sessionStorage.setItem('rl-title', '1'), sessionStorage.setItem('rl-e2e', '1')));
 const errs = []; page.on('pageerror', e => errs.push(e.message));
 await page.addInitScript(v => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('raid-leader-save-v1', v); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(s));
 await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'app.test') return r.abort();

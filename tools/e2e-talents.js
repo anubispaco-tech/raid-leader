@@ -15,7 +15,7 @@ const old = G.newGame();
 for (const h of old.heroes) { h.level = 12; delete h.spec; delete h.talents; }
 old.v = 2; old.unlocked = 5; old.clears = { 0: 3, 1: 3, 2: 3, 3: 3 };
 
-const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 }, deviceScaleFactor: 2 }); await page.addInitScript(() => sessionStorage.setItem('rl-title', '1'));
+const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 }, deviceScaleFactor: 2 }); await page.addInitScript(() => (sessionStorage.setItem('rl-title', '1'), sessionStorage.setItem('rl-e2e', '1')));
 const errs = []; page.on('pageerror', e => errs.push(e.message));
 await page.addInitScript(v => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('raid-leader-save-v1', v); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(old));
 await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'app.test') return r.abort();

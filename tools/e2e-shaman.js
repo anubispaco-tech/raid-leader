@@ -15,7 +15,7 @@ s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcde
 const G = await import('../src/core/index.js');
 s.party = G.partyHeroes(s).map(h => h.id).slice(0, 5);
 const sh = G.makeHero('shaman', 20, 0); sh.name = '薩滿測'; s.heroes.push(sh);
-const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); await page.addInitScript(() => sessionStorage.setItem('rl-title', '1'));
+const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); await page.addInitScript(() => (sessionStorage.setItem('rl-title', '1'), sessionStorage.setItem('rl-e2e', '1')));
 const errs = []; page.on('pageerror', e => errs.push(e.message));
 await page.addInitScript(v => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('raid-leader-save-v1', v); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(s));
 await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'app.test') return r.abort();

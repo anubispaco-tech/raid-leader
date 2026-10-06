@@ -1,7 +1,7 @@
 // ===== 入口：分頁切換、事件、離線結算、啟動 =====
 import { tx } from '../core/i18n.js';
 import * as G from '../core/index.js';
-import { app, KEY } from './state.js';
+import { app, KEY, canSkip } from './state.js';
 import { load, save, exportCode, importCode } from './save.js';
 import { $, fmt, toast, hero, mmss, itemName, dailyOpenNow, firstWinLine } from './helpers.js';
 import { viewDungeons } from './views/dungeon.js';
@@ -115,6 +115,7 @@ document.addEventListener('click', e => {
       setLang(t.dataset.v); location.reload(); } return;
     case 'speed': app.speed = +t.dataset.x; runTimer(); break;
     case 'skip': if (app.battle && !app.battle.over) {
+      if (!canSkip(app.battle)) { toast(tx('首次挑戰需完整觀戰（可用 4× 加速）')); break; }
       const b = app.battle; b.opts.autoHorn = true; // 直接結算視同掛機：首領戰自動吹號角
       if (b.waveIdx === b.waves.length - 1) b.useHorn();
       b.runToEnd(); finishBattle(); } break;
@@ -135,6 +136,7 @@ document.addEventListener('click', e => {
     case 'unequip': G.unequip(app.S, t.dataset.hero, t.dataset.slot); save(); app.modal = { type: 'hero', id: t.dataset.hero }; break;
     case 'up': { const it = app.S.items[id], refine = it && it.up >= G.GEAR.refineFrom;
       if (G.upgrade(app.S, id)) { toast(tx('{0}成功 +{1}', refine ? tx('精煉') : tx('強化'), it.up)); save(); } else toast(refine ? tx('金幣或精華不足') : tx('金幣不足')); break; }
+    case 'lock': { const on = G.toggleLock(app.S, t.dataset.kind, id); if (on != null) toast(on ? tx('已鎖定，不會被分解或解雇') : tx('已解除鎖定')); save(); break; }
     case 'salvage': toast(tx('分解獲得 {0} 金', G.salvage(app.S, id))); save(); app.modal = null; break;
     case 'join': if (G.partyLocked(app.S)) { toast(tx('掛機中不能更換隊員，請先停止掛機')); break; } G.joinParty(app.S, id); save(); break;
     case 'bench': if (G.partyLocked(app.S)) { toast(tx('掛機中不能更換隊員，請先停止掛機')); break; } G.benchHero(app.S, id); save(); break;
@@ -263,6 +265,7 @@ document.addEventListener('change', e => {
 }); // 回饋草稿：畫面重畫時不會消失
 // 抽卡結果：依稀有度由高到低排列，傳說與史詩特別標示
 function showDraw(list, cost) {
+  if (list.some(x => x.legend)) C.milestone(); // 獲得傳說英雄：立刻同步雲端
   const sorted = [...list].sort((a, b) => (b.rarity || 0) - (a.rarity || 0)), best = sorted[0].rarity || 0;
   openModal({ type: 'text', html: tx('<h3>{0}</h3> <p class="sub" style="margin:0">花費 {1} 金・已加入名冊{2}</p> <div class="drawlist">{3}</div> <div class="row"><button class="btn main grow" data-act="closebtn">好</button><button class="btn" data-tab="team">去團隊看看</button></div>', best === 4 ? tx('✨ 傳說降臨！') : best === 3 ? tx('史詩英雄加入！') : tx('招募結果'), fmt(cost), app.S.party.length < G.ECONOMY.partyMax ? '' : tx('（隊伍已滿，在待命區）'), sorted.map(x => `<div class="drawcard r-${x.rarity || 0}"><span class="ic">${G.CLASSES[x.cls].icon}</span><span>${heroName(x)}</span><span class="rtag r${x.rarity || 0}">${G.HERO_RARITY[x.rarity || 0].name}</span><small>${G.CLASSES[x.cls].name}・Lv${x.level}</small>${x.legend ? tx('<small class="c4">{0}：{1}</small>', G.LEGENDS[x.cls].pname, G.LEGENDS[x.cls].desc) : ''}</div>`).join('')) });
 }
@@ -284,15 +287,28 @@ function start(data) {
   for (const it of Object.values(app.S.items)) it.name = localName(it.name);
   $('.brand-t').textContent = tx('副本團長'); $('.brand').setAttribute('aria-label', tx('設定')); $('#idleChip').textContent = tx('掛機中'); document.title = tx('副本團長');
   document.documentElement.lang = getLang();
+  $('#saveChip').textContent = tx('存檔中');
   settleOffline();
   resumeIdle();
   render();
-  setTimeout(() => C.check(true), 1500); // 雲端有較新的進度就同步
   const after = () => {
     if (T.enabled() && !app.S.player.asked && !app.modal) openNick();
     else if (app.S.player.asked) setTimeout(() => T.sendSnapshot(), 3000);
   };
-  showTitle(!saved, () => { app.fresh = false; save(); return !saved ? playDialog(PROLOGUE, after) : after(); });
+  // v0.14 讀取畫面：先讀本機存檔，有 Google 登入就等雲端比對完（最多 6 秒）再進遊戲，避免玩到一半才被雲端進度蓋掉
+  const boot = bootScreen(), t0 = Date.now(), useCloud = !!saved && C.cloudEnabled() && C.loggedIn();
+  if (useCloud) boot.msg(tx('同步雲端存檔…'));
+  const wait = useCloud ? Promise.race([C.check(true).catch(() => {}), new Promise(ok => setTimeout(ok, 6000))]) : Promise.resolve();
+  wait.then(() => setTimeout(() => {
+    boot.done();
+    showTitle(!saved, () => { app.fresh = false; save(); return !saved ? playDialog(PROLOGUE, after) : after(); });
+  }, Math.max(0, 700 - (Date.now() - t0))));
+}
+function bootScreen() {
+  const el = document.createElement('div'); el.id = 'boot';
+  el.innerHTML = `<div class="blogo">${tx('副本團長')}</div><div class="bbar"><i></i></div><div class="bmsg">${tx('讀取存檔中…')}</div>`;
+  document.body.appendChild(el);
+  return { msg: t => { el.querySelector('.bmsg').textContent = t; }, done: () => { el.classList.add('out'); setTimeout(() => el.remove(), 260); } };
 }
 // 開始畫面：每次開啟遊戲顯示一次（同一個分頁工作階段內不重複）；可切換語言
 function showTitle(fresh, onGo) {

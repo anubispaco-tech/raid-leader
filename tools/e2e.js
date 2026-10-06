@@ -12,7 +12,7 @@ const serve = r => { const u = new URL(r.request().url()); if (u.host !== 'app.t
   const f = path.join(root, u.pathname === '/' ? entry : u.pathname.slice(1));
   return fs.existsSync(f) ? r.fulfill({ body: fs.readFileSync(f), contentType: types[path.extname(f)] || 'text/plain' }) : r.fulfill({ status: 404 }); };
 (async () => {
-  const browser = await chromium.launch(); let page = await browser.newPage({ viewport: { width: 400, height: 820 } }); await page.addInitScript(() => sessionStorage.setItem('rl-title', '1'));
+  const browser = await chromium.launch(); let page = await browser.newPage({ viewport: { width: 400, height: 820 } }); await page.addInitScript(() => (sessionStorage.setItem('rl-title', '1'), sessionStorage.setItem('rl-e2e', '1')));
   const errs = []; page.on('pageerror', e => errs.push(e.message)); page.on('console', m => { if (m.type()==='error') errs.push(m.text()); });
   await page.route('**/*', serve);
   await page.goto('https://app.test/'); await page.locator('[data-act="dlgskip"]').click({ timeout: 1500 }).catch(() => {}); await page.waitForTimeout(500); await page.locator('[data-act=\"skipnick\"]').click({ timeout: 1500 }).catch(() => {});
@@ -40,7 +40,7 @@ const serve = r => { const u = new URL(r.request().url()); if (u.host !== 'app.t
   await page.click('[data-act="idle"][data-d="0"]'); await page.waitForTimeout(400);
   out.push('idle chip visible: ' + await page.locator('#idleChip').isVisible());
   const saved = await page.evaluate(() => localStorage.getItem('raid-leader-save-v1'));
-  const p2 = await browser.newPage({ viewport: { width: 400, height: 820 } }); await p2.addInitScript(() => sessionStorage.setItem('rl-title', '1'));
+  const p2 = await browser.newPage({ viewport: { width: 400, height: 820 } }); await p2.addInitScript(() => (sessionStorage.setItem('rl-title', '1'), sessionStorage.setItem('rl-e2e', '1')));
   await p2.route('**/*', serve);
   await p2.addInitScript(v => { const s=JSON.parse(v); s.lastSeen=Date.now()-2*3600e3; localStorage.setItem('raid-leader-save-v1', JSON.stringify(s)); }, saved);
   await page.close(); page = p2; page.on('pageerror', e => errs.push(e.message));

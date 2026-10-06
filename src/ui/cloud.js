@@ -12,7 +12,9 @@ import { VERSION } from '../core/version.js';
 
 const KEY = 'raid-leader-cloud';
 export const cloudEnabled = () => !!G.CLOUD.clientId && !!G.TELEMETRY.url;
-export const cloud = { info: null, busy: false, lastAuto: Date.now(), lastCheck: 0 };
+export const cloud = { info: null, busy: false, lastAuto: Date.now(), lastCheck: 0, pending: false, lastTry: 0 };
+// 存檔中提示（右上角小圈圈）
+const chip = on => { const el = document.getElementById('saveChip'); if (el) el.hidden = !on; };
 const session = () => { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } };
 const setSession = v => { try { v ? localStorage.setItem(KEY, JSON.stringify(v)) : localStorage.removeItem(KEY); } catch (e) {} };
 const patch = o => { const s = session(); if (s) setSession({ ...s, ...o }); };
@@ -92,11 +94,11 @@ export async function check(force = false) {
 }
 export async function upload(quiet = false, force = false) {
   if (!loggedIn() || cloud.busy || app.fresh) return;
-  cloud.busy = true; if (!quiet) rerender();
+  cloud.busy = true; cloud.lastTry = Date.now(); chip(true); if (!quiet) rerender();
   const s = session();
   const r = await post({ type: 'cloudsave', token: s.token, save: JSON.stringify(app.S), summary: progressText(), ver: VERSION, base: s.base || 0, force });
-  cloud.busy = false; cloud.lastAuto = Date.now();
-  if (r && r.ok) { synced(r.updated); cloud.info = { updated: toMs(r.updated), summary: progressText() }; if (!quiet) toast(tx('已上傳到雲端')); }
+  cloud.busy = false; cloud.lastAuto = Date.now(); chip(false);
+  if (r && r.ok) { cloud.pending = false; synced(r.updated); cloud.info = { updated: toMs(r.updated), summary: progressText() }; if (!quiet) toast(tx('已上傳到雲端')); }
   else if (r && r.error === 'conflict') chooser(tx('雲端在別的裝置更新過'), toMs(r.updated), r.summary);
   else if (!expired(r) && !quiet) toast(tx('上傳失敗，請稍後再試'));
   rerender();
@@ -122,5 +124,13 @@ export async function download(confirmed = false, auto = false) {
 export function logout() { setSession(null); cloud.info = null; try { window.google && window.google.accounts.id.disableAutoSelect(); } catch (e) {} }
 // 每 5 秒的 tick：本機有新進度時，每 autoMin 分鐘自動上傳
 export function autoTick() {
-  if (cloudEnabled() && loggedIn() && dirty() && Date.now() - cloud.lastAuto > G.CLOUD.autoMin * 60000) upload(true);
+  if (!cloudEnabled() || !loggedIn() || !dirty()) return;
+  if (cloud.pending && Date.now() - cloud.lastTry > 16000) upload(true);               // 里程碑存檔：上次被限流就 16 秒後重試
+  else if (Date.now() - cloud.lastAuto > G.CLOUD.autoMin * 60000) upload(true);
+}
+// v0.14 里程碑強制存檔（首通、秘境新等級、獲得傳說英雄）：本機已存，馬上同步到雲端
+export function milestone() {
+  if (!cloudEnabled() || !loggedIn() || app.fresh) return;
+  cloud.pending = true;
+  if (!cloud.busy && Date.now() - cloud.lastTry > 16000) upload(true);
 }

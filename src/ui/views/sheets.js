@@ -78,7 +78,7 @@ function heroActions(x) {
   return `<div class="row">${inParty(x)
     ? tx('<button class="btn grow" data-act="bench" data-id="{0}">移出隊伍</button>', x.id)
     : `<button class="btn main grow" data-act="join" data-id="${x.id}" ${app.S.party.length >= G.ECONOMY.partyMax ? 'disabled' : ''}>${app.S.party.length >= G.ECONOMY.partyMax ? tx('隊伍已滿') : tx('加入隊伍')}</button>`}
-    ${app.S.heroes.length > 1 ? `<button class="btn" data-act="fire" data-id="${x.id}" style="color:var(--bad)">${app.modal.confirmFire ? tx('確定解雇？退 {0} 金', fmt(Math.round(G.hireCost(x) * G.RECRUIT.fireRefund))) : tx('解雇')}</button>` : ''}</div>`;
+    ${lockBtn('hero', x)}${app.S.heroes.length > 1 && !x.locked ? `<button class="btn" data-act="fire" data-id="${x.id}" style="color:var(--bad)">${app.modal.confirmFire ? tx('確定解雇？退 {0} 金', fmt(Math.round(G.hireCost(x) * G.RECRUIT.fireRefund))) : tx('解雇')}</button>` : ''}</div>`;
 }
 // ---------- 天賦頁 ----------
 function talentView(x) {
@@ -108,12 +108,15 @@ const withSet = (it, html) => html.replace('<span class="label">', setInfo(it) +
 function sheetItem(it) {
   if (!it) return '';
   const party = G.partyHeroes(app.S);
-  return withSet(it, tx('<h3>{0}</h3><div class="sub num" style="margin:0">{1}{2}・裝等 {3}・強化 +{4}/{5}<br>{6}</div> <span class="label">裝備給</span><div class="stack">{7}</div> <div class="row">{8} <button class="btn" data-act="salvage" data-id="{9}">分解 +<span class="num">{10}</span> 金{11}</button></div>', itemName(it), G.RARITY[it.rarity].name, G.SLOTS[it.slot], it.ilvl, it.up, G.maxUpFor(app.S), itemStatText(it), party.map(x => {
+  return withSet(it, tx('<h3>{0}</h3><div class="sub num" style="margin:0">{1}{2}・裝等 {3}・強化 +{4}/{5}<br>{6}</div> <span class="label">裝備給</span><div class="stack">{7}</div> <div class="row">{8} {12}</div>', itemName(it), G.RARITY[it.rarity].name, G.SLOTS[it.slot], it.ilvl, it.up, G.maxUpFor(app.S), itemStatText(it), party.map(x => {
       const cur = x.gear[it.slot] && app.S.items[x.gear[it.slot]];
       const better = !cur || G.heroItemScore(x, it) > G.heroItemScore(x, cur);
       return tx('<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">目前：{7}</div></button>', x.id, it.id, cls(x).icon, x.name, cls(x).name, better ? 'in' : '', better ? tx('▲ 提升') : tx('較差'), cur ? tx('{0}（{1}）', cur.name, cur.ilvl) : tx('空'));
-    }).join(''), upBtn(it, ''), it.id, G.salvageValue(it), G.salvageDust(it) ? tx('・<span class="dust num">{0}</span> 精華', G.salvageDust(it)) : ''));
+    }).join(''), upBtn(it, ''), it.id, G.salvageValue(it), G.salvageDust(it) ? tx('・<span class="dust num">{0}</span> 精華', G.salvageDust(it)) : '',
+    lockBtn('item', it) + (it.locked ? '' : tx('<button class="btn" data-act="salvage" data-id="{0}">分解 +<span class="num">{1}</span> 金{2}</button>', it.id, G.salvageValue(it), G.salvageDust(it) ? tx('・<span class="dust num">{0}</span> 精華', G.salvageDust(it)) : ''))));
 }
+// v0.14 鎖定按鈕：鎖住後不能解雇／分解（批次與自動分解也會跳過）
+const lockBtn = (kind, x) => `<button class="btn" data-act="lock" data-kind="${kind}" data-id="${x.id}" title="${x.locked ? tx('解除鎖定') : tx('鎖定（避免誤分解／解雇）')}">${x.locked ? tx('🔒 已鎖定') : tx('🔓 鎖定')}</button>`;
 // 強化按鈕：+5 以上叫「精煉」，額外需要精華
 function upBtn(it, size) {
   if (it.up >= G.maxUpFor(app.S)) return tx('<button class="btn {0}" disabled>強化 MAX</button>', size);

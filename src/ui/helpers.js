@@ -9,7 +9,8 @@ export const fmt = n => Math.round(n).toLocaleString('zh-TW');
 export const pct = (a, b) => Math.max(0, Math.min(100, 100 * a / b));
 export const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 // 英雄名字（稀有度上色；傳說加稱號）
-export const heroName = h => `<span class="c${h.rarity || 0}">${h.legend ? `${G.LEGENDS[h.cls].title}・` : ''}${h.name}</span>`;
+const lockMark = x => (x.locked ? '<span class="lockic" aria-label="locked">🔒</span>' : '');
+export const heroName = h => `${lockMark(h)}<span class="c${h.rarity || 0}">${h.legend ? `${G.LEGENDS[h.cls].title}・` : ''}${h.name}</span>`;
 export const rarityTag = h => `<span class="rtag r${h.rarity || 0}">${G.HERO_RARITY[h.rarity || 0].name}</span>`;
 export const mmss = sec => `${Math.floor(Math.abs(sec) / 60)}:${String(Math.abs(sec) % 60).padStart(2, '0')}`;
 
@@ -26,7 +27,7 @@ export function itemStatText(it) {
   return p.join(' · ');
 }
 export function itemName(it) {
-  return `${slotIcon(it.slot, it.rarity)}${it.set ? '<span class="settag">T0</span>' : ''}<span class="c${it.rarity}">${it.name}</span>${it.up ? `<span class="up">+${it.up}</span>` : ''}`;
+  return `${slotIcon(it.slot, it.rarity)}${it.set ? '<span class="settag">T0</span>' : ''}<span class="c${it.rarity}">${it.name}</span>${it.up ? `<span class="up">+${it.up}</span>` : ''}${lockMark(it)}`;
 }
 export function partyPower() { return G.partyHeroes(app.S).reduce((a, h) => a + G.heroPower(h, app.S.items), 0); }
 export function avgPartyIlvl() { const p = G.partyHeroes(app.S); return p.length ? Math.round(p.reduce((a, h) => a + G.heroIlvl(h, app.S.items), 0) / p.length) : 0; }

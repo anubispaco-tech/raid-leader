@@ -184,10 +184,10 @@ export function joinParty(s, id) { if (partyLocked(s)) return false; if (s.party
 export function benchHero(s, id) { if (partyLocked(s)) return false; s.party = s.party.filter(x => x !== id); }
 // 解雇：身上裝備自動卸下 → 背包 → 背包滿放戰利品箱 → 都滿就分解成金幣（不會弄丟裝備）
 export function fireHero(s, id, gear = { bag: 0, stash: 0, salvaged: 0, gold: 0 }) {
-  const h = s.heroes.find(x => x.id === id); if (!h || (partyLocked(s) && s.party.includes(id))) return null;
+  const h = s.heroes.find(x => x.id === id); if (!h || h.locked || (partyLocked(s) && s.party.includes(id))) return null;
   for (const sl in h.gear) {
     const iid = h.gear[sl]; if (!iid) continue; h.gear[sl] = null;
-    if (s.bag.length < bagMax(s)) { s.bag.push(iid); gear.bag++; }
+    if (s.bag.length < bagMax(s) || (s.items[iid] && s.items[iid].locked)) { s.bag.push(iid); gear.bag++; } // 鎖定的裝備一定放回背包（可超過上限）
     else if (s.stash.length < ECONOMY.stashMax) { s.stash.push(iid); gear.stash++; }
     else { s.bag.push(iid); gear.gold += salvage(s, iid); gear.salvaged++; }
   }
@@ -197,7 +197,7 @@ export function fireHero(s, id, gear = { bag: 0, stash: 0, salvaged: 0, gold: 0 
 }
 // 一鍵解雇：只動待命英雄，品質 ≤ maxRarity，傳說永遠不會被一鍵解雇；dry = 只試算
 export function fireTargets(s, maxRarity) {
-  const list = s.heroes.filter(h => !s.party.includes(h.id) && !h.legend && (h.rarity || 0) <= Math.min(maxRarity, 3));
+  const list = s.heroes.filter(h => !s.party.includes(h.id) && !h.legend && !h.locked && (h.rarity || 0) <= Math.min(maxRarity, 3));
   return list.length >= s.heroes.length ? list.slice(0, s.heroes.length - 1) : list; // 至少留一位英雄
 }
 export function fireMany(s, maxRarity, dry = false) {
@@ -223,7 +223,7 @@ export function newBagMilestones(s) {
 export const partyIlvl = s => { const p = partyHeroes(s); return p.length ? p.reduce((a, h) => a + heroIlvl(h, s.items), 0) / p.length : 0; };
 // 分解背包裡比平均裝等低 gap 以上的裝備（傳說除外）
 export function salvageLowIlvl(s, gap, dry = false) {
-  const lim = partyIlvl(s) - gap, ids = s.bag.filter(i => s.items[i].rarity < 4 && !s.items[i].set && s.items[i].ilvl < lim);
+  const lim = partyIlvl(s) - gap, ids = s.bag.filter(i => s.items[i].rarity < 4 && !s.items[i].set && !s.items[i].locked && s.items[i].ilvl < lim);
   if (dry) return { count: ids.length };
   return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
 }
@@ -357,13 +357,13 @@ export function upgradeAll(s, heroId, dry = false) {
   return { count, spent, dustSpent, maxed, empty: !items.length };
 }
 export function salvage(s, itemId) {
-  const it = s.items[itemId]; if (!it) return 0;
+  const it = s.items[itemId]; if (!it || it.locked) return 0;
   s.bag = s.bag.filter(id => id !== itemId); s.stash = (s.stash || []).filter(id => id !== itemId); delete s.items[itemId];
   const v = salvageValue(it); s.gold += v; s.dust = (s.dust || 0) + salvageDust(it); s.stats.salvaged = (s.stats.salvaged || 0) + 1; bump(s, 'salvage'); return v;
 }
 // 分解背包中品質 ≤ maxRarity 的裝備（0 = 普通，1 = 精良以下）
 export function salvageUpTo(s, maxRarity) {
-  const ids = s.bag.filter(i => s.items[i].rarity <= maxRarity && !s.items[i].set); // 套裝不會被批次分解
+  const ids = s.bag.filter(i => s.items[i].rarity <= maxRarity && !s.items[i].set && !s.items[i].locked); // 套裝、鎖定不會被批次分解
   return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
 }
 // ---------- 推薦陣容 ----------
@@ -397,9 +397,22 @@ export function takeFromStash(s) {
   return ids.length;
 }
 export function salvageStash(s) {
-  const gold = s.stash.reduce((g, id) => { const v = salvageValue(s.items[id]); s.dust = (s.dust || 0) + salvageDust(s.items[id]); delete s.items[id]; return g + v; }, 0);
-  const count = s.stash.length; s.stash = []; s.gold += gold;
-  return { count, gold };
+  const ids = s.stash.filter(id => !s.items[id].locked); // 鎖定的留在戰利品箱
+  const gold = ids.reduce((g, id) => { const v = salvageValue(s.items[id]); s.dust = (s.dust || 0) + salvageDust(s.items[id]); delete s.items[id]; return g + v; }, 0);
+  s.stash = s.stash.filter(id => !ids.includes(id)); s.gold += gold;
+  return { count: ids.length, gold };
+}
+// v0.14 直接結算限制：首次挑戰的副本、該副本秘境還沒限時過的鑰石等級，要完整觀戰（寶庫、秘境掛機不受限）
+export function skipAllowed(s, b) {
+  if (!b || b.vault || b.mythicIdle) return true;
+  if (b.mythic) { const best = s.mythic.best && s.mythic.best[b.dIdx]; return !!best && b.mythic.level <= best.level; }
+  return !!s.clears[b.dIdx];
+}
+// v0.14 鎖定：鎖住的英雄不能解雇、鎖住的裝備不會被任何方式分解
+export function toggleLock(s, kind, id) {
+  const x = kind === 'hero' ? s.heroes.find(h => h.id === id) : s.items[id];
+  if (!x) return null;
+  x.locked = !x.locked; return x.locked;
 }
 export function upgrade(s, itemId) {
   const it = s.items[itemId]; if (!it || it.up >= maxUpFor(s)) return false;

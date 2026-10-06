@@ -1,4 +1,4 @@
-/* 副本團長 v0.13.3 */
+/* 副本團長 v0.14.0 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -596,6 +596,7 @@
     "\u5DF2\u505C\u6B62\u79D8\u5883\u639B\u6A5F": "Mythic idle stopped",
     "\u76EE\u524D\u6709\u6230\u9B25\u9032\u884C\u4E2D\uFF0C\u6253\u5B8C\u518D\u958B\u59CB\u79D8\u5883\u639B\u6A5F": "A battle is in progress \u2014 finish it before starting Mythic idle",
     "\u958B\u59CB\u79D8\u5883\u639B\u6A5F\uFF1A{0} +{1}": "Mythic idle: {0} +{1}",
+    "\u9996\u6B21\u6311\u6230\u9700\u5B8C\u6574\u89C0\u6230\uFF08\u53EF\u7528 4\xD7 \u52A0\u901F\uFF09": "First attempts must be watched in full (4\xD7 speed available)",
     "\u{1F3F3} \u4E3B\u52D5\u64A4\u9000": "\u{1F3F3} Retreated",
     "\u5DF2\u5957\u7528\u63A8\u85A6\u914D\u7F6E": "Recommended setup applied",
     "\u300C{0}\u300D": "{0}",
@@ -605,6 +606,8 @@
     "\u5F37\u5316": "Upgrade",
     "\u91D1\u5E63\u6216\u7CBE\u83EF\u4E0D\u8DB3": "Not enough gold or essence",
     "\u91D1\u5E63\u4E0D\u8DB3": "Not enough gold",
+    "\u5DF2\u9396\u5B9A\uFF0C\u4E0D\u6703\u88AB\u5206\u89E3\u6216\u89E3\u96C7": "Locked. It won't be salvaged or dismissed",
+    "\u5DF2\u89E3\u9664\u9396\u5B9A": "Unlocked",
     "\u5206\u89E3\u7372\u5F97 {0} \u91D1": "Salvaged for {0} gold",
     "\u639B\u6A5F\u4E2D\u4E0D\u80FD\u66F4\u63DB\u968A\u54E1\uFF0C\u8ACB\u5148\u505C\u6B62\u639B\u6A5F": "Can't change members while idling \u2014 stop idling first",
     "{0} \u96E2\u958B\u4E86\u5718\u968A\uFF0C\u9000\u9084 {1} \u91D1{2}": "{0} left the party, refunded {1} gold{2}",
@@ -662,6 +665,9 @@
     "\u526F\u672C\u5718\u9577": "Raid Leader",
     "\u8A2D\u5B9A": "Settings",
     "\u639B\u6A5F\u4E2D": "Idling",
+    "\u5B58\u6A94\u4E2D": "Saving",
+    "\u540C\u6B65\u96F2\u7AEF\u5B58\u6A94\u2026": "Syncing cloud save\u2026",
+    "\u8B80\u53D6\u5B58\u6A94\u4E2D\u2026": "Loading save\u2026",
     "\u5E36\u9818\u4F60\u7684\u5192\u96AA\u5718\uFF0C\u653B\u4E0B\u6BCF\u4E00\u5EA7\u526F\u672C\u3002": "Lead your party through every dungeon.",
     "\u958B\u59CB\u5192\u96AA": "New adventure",
     "\u7E7C\u7E8C\u5192\u96AA": "Continue",
@@ -743,7 +749,9 @@
     '<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}</div> {5}{6} <div class="arena"> <div class="side foes"><span class="label">\u6575\u65B9\u30FB{7}</span>{8}</div> <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>': '<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}</div> {5}{6} <div class="arena"> <div class="side foes"><span class="label">Enemies \xB7 {7}</span>{8}</div> <div class="side"><span class="label">Your party</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>',
     "\u9996\u9818\u6230": "Boss",
     "\u7B2C {0} \u6CE2": "Wave {0}",
-    '<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} <button class="btn" data-act="skip">\u76F4\u63A5\u7D50\u7B97</button> <button class="btn" data-act="retreat">\u64A4\u9000</button></div></div>': '<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} <button class="btn" data-act="skip">Skip</button> <button class="btn" data-act="retreat">Retreat</button></div></div>',
+    '<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">\u64A4\u9000</button></div></div>': '<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">Retreat</button></div></div>',
+    '<button class="btn" data-act="skip">\u76F4\u63A5\u7D50\u7B97</button>': '<button class="btn" data-act="skip">Skip</button>',
+    '<button class="btn" disabled title="\u9996\u6B21\u6311\u6230\u9700\u5B8C\u6574\u89C0\u6230\uFF08\u53EF\u7528 4\xD7 \u52A0\u901F\uFF09">\u{1F512} \u7D50\u7B97</button>': '<button class="btn" disabled title="First attempts must be watched in full (4\xD7 speed available)">\u{1F512} Skip</button>',
     "\u8D85\u6642 {0}": "Over {0}",
     "\u5269 {0}": "{0} left",
     '<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">\u5269 {1}</span></div> <div class="vaultcount"><b class="num">{2}</b> \u96BB\u54E5\u5E03\u6797\u30FB<span class="num">+{3}</span> \u91D1{4}</div>': '<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">{1} left</span></div> <div class="vaultcount"><b class="num">{2}</b>  goblins \xB7 <span class="num">+{3}</span>  gold{4}</div>',
@@ -914,13 +922,18 @@
     '<h3>\u70BA {0} \u9078\u64C7{1}</h3><div class="sub" style="margin:0">\u76EE\u524D\uFF1A{2}</div> <div class="choices">{3}</div> <div class="row">{4}<button class="btn" data-act="hero" data-id="{5}">\u8FD4\u56DE</button></div>': '<h3>Choose {1} for {0}</h3><div class="sub" style="margin:0">Current: {2}</div> <div class="choices">{3}</div> <div class="row">{4}<button class="btn" data-act="hero" data-id="{5}">Back</button></div>',
     "\u7121": "None",
     '<button class="btn" data-act="unequip" data-hero="{0}" data-slot="{1}">\u5378\u4E0B</button>': '<button class="btn" data-act="unequip" data-hero="{0}" data-slot="{1}">Unequip</button>',
-    '<h3>{0}</h3><div class="sub num" style="margin:0">{1}{2}\u30FB\u88DD\u7B49 {3}\u30FB\u5F37\u5316 +{4}/{5}<br>{6}</div> <span class="label">\u88DD\u5099\u7D66</span><div class="stack">{7}</div> <div class="row">{8} <button class="btn" data-act="salvage" data-id="{9}">\u5206\u89E3 +<span class="num">{10}</span> \u91D1{11}</button></div>': '<h3>{0}</h3><div class="sub num" style="margin:0">{1} {2} \xB7 iLvl {3} \xB7 +{4}/{5}<br>{6}</div> <span class="label">Equip on</span><div class="stack">{7}</div> <div class="row">{8} <button class="btn" data-act="salvage" data-id="{9}">Salvage +<span class="num">{10}</span>  gold{11}</button></div>',
+    '<h3>{0}</h3><div class="sub num" style="margin:0">{1}{2}\u30FB\u88DD\u7B49 {3}\u30FB\u5F37\u5316 +{4}/{5}<br>{6}</div> <span class="label">\u88DD\u5099\u7D66</span><div class="stack">{7}</div> <div class="row">{8} {12}</div>': '<h3>{0}</h3><div class="sub num" style="margin:0">{1} {2} \xB7 iLvl {3} \xB7 +{4}/{5}<br>{6}</div> <span class="label">Equip on</span><div class="stack">{7}</div> <div class="row">{8} {12}</div>',
     '<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">\u76EE\u524D\uFF1A{7}</div></button>': '<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">Current: {7}</div></button>',
     "\u25B2 \u63D0\u5347": "\u25B2 Better",
     "\u8F03\u5DEE": "Worse",
     "{0}\uFF08{1}\uFF09": "{0} ({1})",
     "\u7A7A": "empty",
     '\u30FB<span class="dust num">{0}</span> \u7CBE\u83EF': '\u30FB<span class="dust num">{0}</span> Essence',
+    '<button class="btn" data-act="salvage" data-id="{0}">\u5206\u89E3 +<span class="num">{1}</span> \u91D1{2}</button>': '<button class="btn" data-act="salvage" data-id="{0}">Salvage +<span class="num">{1}</span>  gold{2}</button>',
+    "\u89E3\u9664\u9396\u5B9A": "Unlock",
+    "\u9396\u5B9A\uFF08\u907F\u514D\u8AA4\u5206\u89E3\uFF0F\u89E3\u96C7\uFF09": "Lock (prevents salvaging/dismissing)",
+    "\u{1F512} \u5DF2\u9396\u5B9A": "\u{1F512} Locked",
+    "\u{1F513} \u9396\u5B9A": "\u{1F513} Lock",
     '<button class="btn {0}" disabled>\u5F37\u5316 MAX</button>': '<button class="btn {0}" disabled>MAX</button>',
     '<h2>\u9152\u9928</h2><p class="sub">\u540D\u518A <b class="num">{0}/{1}</b>\u3002\u65B0\u82F1\u96C4\u7684\u7B49\u7D1A\u6703\u63A5\u8FD1\u4F60\u968A\u4F0D\u7684\u5E73\u5747\u3002</p> <div class="recruit"><div><span class="label">\u62DB\u52DF\u4EE4</span><b>\u76F4\u63A5\u62BD\u4E00\u4F4D\u82F1\u96C4\u52A0\u5165\u540D\u518A</b> <span class="sub num" style="margin:0">\u7B2C {2} \u62BD\u5167\u5FC5\u51FA\u53F2\u8A69\u4EE5\u4E0A{3}</span></div> <div class="row"><button class="btn main grow" data-act="scroll" data-n="1" {4}>\u55AE\u62BD <span class="num">{5}</span> \u91D1</button> <button class="btn main grow" data-act="scroll" data-n="10" {6}>\u5341\u9023 <span class="num">{7}</span> \u91D1</button></div> {8} <div class="rates">{9}</div></div> <h2 style="font-size:18px">\u4ECA\u65E5\u540D\u55AE</h2><div class="stack">': `<h2>Tavern</h2><p class="sub">Roster <b class="num">{0}/{1}</b>. New heroes join near your party's average level.</p> <div class="recruit"><div><span class="label">Recruit Scroll</span><b>Draw a hero straight into your roster</b> <span class="sub num" style="margin:0">Epic or better within {2} pulls{3}</span></div> <div class="row"><button class="btn main grow" data-act="scroll" data-n="1" {4}>\xD71 <span class="num">{5}</span> gold</button> <button class="btn main grow" data-act="scroll" data-n="10" {6}>\xD710 <span class="num">{7}</span> gold</button></div> {8} <div class="rates">{9}</div></div> <h2 style="font-size:18px">Today's recruits</h2><div class="stack">`,
     "\u30FB\u7B2C {0} \u62BD\u5167\u5FC5\u51FA\u50B3\u8AAA": " \xB7 Legendary within {0} pulls",
@@ -3212,12 +3225,12 @@
   }
   function fireHero(s, id, gear = { bag: 0, stash: 0, salvaged: 0, gold: 0 }) {
     const h = s.heroes.find((x) => x.id === id);
-    if (!h || partyLocked(s) && s.party.includes(id)) return null;
+    if (!h || h.locked || partyLocked(s) && s.party.includes(id)) return null;
     for (const sl in h.gear) {
       const iid = h.gear[sl];
       if (!iid) continue;
       h.gear[sl] = null;
-      if (s.bag.length < bagMax(s)) {
+      if (s.bag.length < bagMax(s) || s.items[iid] && s.items[iid].locked) {
         s.bag.push(iid);
         gear.bag++;
       } else if (s.stash.length < ECONOMY.stashMax) {
@@ -3236,7 +3249,7 @@
     return { ...h, refund, gear };
   }
   function fireTargets(s, maxRarity) {
-    const list = s.heroes.filter((h) => !s.party.includes(h.id) && !h.legend && (h.rarity || 0) <= Math.min(maxRarity, 3));
+    const list = s.heroes.filter((h) => !s.party.includes(h.id) && !h.legend && !h.locked && (h.rarity || 0) <= Math.min(maxRarity, 3));
     return list.length >= s.heroes.length ? list.slice(0, s.heroes.length - 1) : list;
   }
   function fireMany(s, maxRarity, dry = false) {
@@ -3259,7 +3272,7 @@
     return p.length ? p.reduce((a, h) => a + heroIlvl(h, s.items), 0) / p.length : 0;
   };
   function salvageLowIlvl(s, gap, dry = false) {
-    const lim = partyIlvl(s) - gap, ids = s.bag.filter((i) => s.items[i].rarity < 4 && !s.items[i].set && s.items[i].ilvl < lim);
+    const lim = partyIlvl(s) - gap, ids = s.bag.filter((i) => s.items[i].rarity < 4 && !s.items[i].set && !s.items[i].locked && s.items[i].ilvl < lim);
     if (dry) return { count: ids.length };
     return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
   }
@@ -3460,7 +3473,7 @@
   }
   function salvage(s, itemId) {
     const it = s.items[itemId];
-    if (!it) return 0;
+    if (!it || it.locked) return 0;
     s.bag = s.bag.filter((id) => id !== itemId);
     s.stash = (s.stash || []).filter((id) => id !== itemId);
     delete s.items[itemId];
@@ -3472,7 +3485,7 @@
     return v;
   }
   function salvageUpTo(s, maxRarity) {
-    const ids = s.bag.filter((i) => s.items[i].rarity <= maxRarity && !s.items[i].set);
+    const ids = s.bag.filter((i) => s.items[i].rarity <= maxRarity && !s.items[i].set && !s.items[i].locked);
     return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
   }
   function recommendParty(s, hints) {
@@ -3501,16 +3514,30 @@
     return ids.length;
   }
   function salvageStash(s) {
-    const gold = s.stash.reduce((g, id) => {
+    const ids = s.stash.filter((id) => !s.items[id].locked);
+    const gold = ids.reduce((g, id) => {
       const v = salvageValue(s.items[id]);
       s.dust = (s.dust || 0) + salvageDust(s.items[id]);
       delete s.items[id];
       return g + v;
     }, 0);
-    const count = s.stash.length;
-    s.stash = [];
+    s.stash = s.stash.filter((id) => !ids.includes(id));
     s.gold += gold;
-    return { count, gold };
+    return { count: ids.length, gold };
+  }
+  function skipAllowed(s, b) {
+    if (!b || b.vault || b.mythicIdle) return true;
+    if (b.mythic) {
+      const best = s.mythic.best && s.mythic.best[b.dIdx];
+      return !!best && b.mythic.level <= best.level;
+    }
+    return !!s.clears[b.dIdx];
+  }
+  function toggleLock(s, kind, id) {
+    const x = kind === "hero" ? s.heroes.find((h) => h.id === id) : s.items[id];
+    if (!x) return null;
+    x.locked = !x.locked;
+    return x.locked;
   }
   function upgrade(s, itemId) {
     const it = s.items[itemId];
@@ -3731,6 +3758,13 @@
     }
     // 由 main.js 指定
   };
+  var canSkip = (b) => {
+    try {
+      if (sessionStorage.getItem("rl-e2e") === "1") return true;
+    } catch (e) {
+    }
+    return skipAllowed(app.S, b);
+  };
 
   // src/ui/save.js
   function load() {
@@ -3814,7 +3848,8 @@
   var fmt = (n2) => Math.round(n2).toLocaleString("zh-TW");
   var pct = (a, b) => Math.max(0, Math.min(100, 100 * a / b));
   var esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var heroName = (h) => `<span class="c${h.rarity || 0}">${h.legend ? `${LEGENDS[h.cls].title}\u30FB` : ""}${h.name}</span>`;
+  var lockMark = (x) => x.locked ? '<span class="lockic" aria-label="locked">\u{1F512}</span>' : "";
+  var heroName = (h) => `${lockMark(h)}<span class="c${h.rarity || 0}">${h.legend ? `${LEGENDS[h.cls].title}\u30FB` : ""}${h.name}</span>`;
   var rarityTag = (h) => `<span class="rtag r${h.rarity || 0}">${HERO_RARITY[h.rarity || 0].name}</span>`;
   var mmss = (sec) => `${Math.floor(Math.abs(sec) / 60)}:${String(Math.abs(sec) % 60).padStart(2, "0")}`;
   function toast(msg) {
@@ -3832,7 +3867,7 @@
     return p.join(" \xB7 ");
   }
   function itemName(it) {
-    return `${slotIcon(it.slot, it.rarity)}${it.set ? '<span class="settag">T0</span>' : ""}<span class="c${it.rarity}">${it.name}</span>${it.up ? `<span class="up">+${it.up}</span>` : ""}`;
+    return `${slotIcon(it.slot, it.rarity)}${it.set ? '<span class="settag">T0</span>' : ""}<span class="c${it.rarity}">${it.name}</span>${it.up ? `<span class="up">+${it.up}</span>` : ""}${lockMark(it)}`;
   }
   function partyPower() {
     return partyHeroes(app.S).reduce((a, h) => a + heroPower(h, app.S.items), 0);
@@ -3849,7 +3884,7 @@
   var dailyOpenNow = () => app.dailyOpen != null ? app.dailyOpen : dailyPending(app.S) > 0;
 
   // src/core/version.js
-  var VERSION = "0.13.3";
+  var VERSION = "0.14.0";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -4052,7 +4087,7 @@
     if (b.vault) d.name = tx("\u5BF6\u5EAB\u30FB\u7B2C {0} \u5C64", b.vault.floor + 1);
     let h = tx('<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}</div> {5}{6} <div class="arena"> <div class="side foes"><span class="label">\u6575\u65B9\u30FB{7}</span>{8}</div> <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>', d.name, b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : "", b.tick, b.vault ? "" : `<div class="waves">`, b.vault ? "" : b.waves.map((_, i) => `<i class="${i < b.waveIdx || b.over && b.win ? "done" : i === b.waveIdx ? "cur" : ""}"></i>`).join("") + "</div>", b.mythic ? mythicTimerBar(b) : "", b.vault ? vaultBar(b) : "", b.waveIdx === b.waves.length - 1 ? tx("\u9996\u9818\u6230") : tx("\u7B2C {0} \u6CE2", b.waveIdx + 1), enemyRows(b), b.units.map((u) => unitRow(u, false)).join(""), b.log.map((l) => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, " ")}</span>${l.msg}</p>`).join(""));
     if (!b.over) {
-      h += tx('<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} <button class="btn" data-act="skip">\u76F4\u63A5\u7D50\u7B97</button> <button class="btn" data-act="retreat">\u64A4\u9000</button></div></div>', [1, 2, 4].map((x) => `<button data-act="speed" data-x="${x}" class="${app.speed === x ? "sel" : ""}">${x}\xD7</button>`).join(""), hornBtn(b));
+      h += tx('<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">\u64A4\u9000</button></div></div>', [1, 2, 4].map((x) => `<button data-act="speed" data-x="${x}" class="${app.speed === x ? "sel" : ""}">${x}\xD7</button>`).join(""), hornBtn(b), canSkip(b) ? tx('<button class="btn" data-act="skip">\u76F4\u63A5\u7D50\u7B97</button>') : tx('<button class="btn" disabled title="\u9996\u6B21\u6311\u6230\u9700\u5B8C\u6574\u89C0\u6230\uFF08\u53EF\u7528 4\xD7 \u52A0\u901F\uFF09">\u{1F512} \u7D50\u7B97</button>'));
     }
     if (b.over && app.lastResult) h += viewResult();
     return h;
@@ -4178,7 +4213,11 @@
   // src/ui/cloud.js
   var KEY3 = "raid-leader-cloud";
   var cloudEnabled = () => !!CLOUD.clientId && !!TELEMETRY.url;
-  var cloud = { info: null, busy: false, lastAuto: Date.now(), lastCheck: 0 };
+  var cloud = { info: null, busy: false, lastAuto: Date.now(), lastCheck: 0, pending: false, lastTry: 0 };
+  var chip = (on) => {
+    const el = document.getElementById("saveChip");
+    if (el) el.hidden = !on;
+  };
   var session = () => {
     try {
       return JSON.parse(localStorage.getItem(KEY3) || "null");
@@ -4298,12 +4337,16 @@
   async function upload(quiet = false, force = false) {
     if (!loggedIn() || cloud.busy || app.fresh) return;
     cloud.busy = true;
+    cloud.lastTry = Date.now();
+    chip(true);
     if (!quiet) rerender();
     const s = session();
     const r = await post({ type: "cloudsave", token: s.token, save: JSON.stringify(app.S), summary: progressText(), ver: VERSION, base: s.base || 0, force });
     cloud.busy = false;
     cloud.lastAuto = Date.now();
+    chip(false);
     if (r && r.ok) {
+      cloud.pending = false;
       synced(r.updated);
       cloud.info = { updated: toMs(r.updated), summary: progressText() };
       if (!quiet) toast(tx("\u5DF2\u4E0A\u50B3\u5230\u96F2\u7AEF"));
@@ -4350,7 +4393,14 @@
     }
   }
   function autoTick() {
-    if (cloudEnabled() && loggedIn() && dirty() && Date.now() - cloud.lastAuto > CLOUD.autoMin * 6e4) upload(true);
+    if (!cloudEnabled() || !loggedIn() || !dirty()) return;
+    if (cloud.pending && Date.now() - cloud.lastTry > 16e3) upload(true);
+    else if (Date.now() - cloud.lastAuto > CLOUD.autoMin * 6e4) upload(true);
+  }
+  function milestone() {
+    if (!cloudEnabled() || !loggedIn() || app.fresh) return;
+    cloud.pending = true;
+    if (!cloud.busy && Date.now() - cloud.lastTry > 16e3) upload(true);
   }
 
   // src/ui/views/settings.js
@@ -4499,7 +4549,7 @@
     const locked = partyLocked(app.S);
     if (locked) return tx('<div class="row"><button class="btn grow" disabled>{0}\u30FB\u639B\u6A5F\u6642\u7121\u6CD5\u66F4\u63DB\u968A\u54E1</button></div>', inParty(x) ? tx("\u51FA\u6230\u4E2D") : tx("\u5F85\u547D\u4E2D"));
     return `<div class="row">${inParty(x) ? tx('<button class="btn grow" data-act="bench" data-id="{0}">\u79FB\u51FA\u968A\u4F0D</button>', x.id) : `<button class="btn main grow" data-act="join" data-id="${x.id}" ${app.S.party.length >= ECONOMY.partyMax ? "disabled" : ""}>${app.S.party.length >= ECONOMY.partyMax ? tx("\u968A\u4F0D\u5DF2\u6EFF") : tx("\u52A0\u5165\u968A\u4F0D")}</button>`}
-    ${app.S.heroes.length > 1 ? `<button class="btn" data-act="fire" data-id="${x.id}" style="color:var(--bad)">${app.modal.confirmFire ? tx("\u78BA\u5B9A\u89E3\u96C7\uFF1F\u9000 {0} \u91D1", fmt(Math.round(hireCost(x) * RECRUIT.fireRefund))) : tx("\u89E3\u96C7")}</button>` : ""}</div>`;
+    ${lockBtn("hero", x)}${app.S.heroes.length > 1 && !x.locked ? `<button class="btn" data-act="fire" data-id="${x.id}" style="color:var(--bad)">${app.modal.confirmFire ? tx("\u78BA\u5B9A\u89E3\u96C7\uFF1F\u9000 {0} \u91D1", fmt(Math.round(hireCost(x) * RECRUIT.fireRefund))) : tx("\u89E3\u96C7")}</button>` : ""}</div>`;
   }
   function talentView(x) {
     const B = BASE_SKILLS[x.cls], specs = SPECS[x.cls], t = x.talents || {};
@@ -4526,12 +4576,28 @@
   function sheetItem(it) {
     if (!it) return "";
     const party = partyHeroes(app.S);
-    return withSet(it, tx('<h3>{0}</h3><div class="sub num" style="margin:0">{1}{2}\u30FB\u88DD\u7B49 {3}\u30FB\u5F37\u5316 +{4}/{5}<br>{6}</div> <span class="label">\u88DD\u5099\u7D66</span><div class="stack">{7}</div> <div class="row">{8} <button class="btn" data-act="salvage" data-id="{9}">\u5206\u89E3 +<span class="num">{10}</span> \u91D1{11}</button></div>', itemName(it), RARITY[it.rarity].name, SLOTS[it.slot], it.ilvl, it.up, maxUpFor(app.S), itemStatText(it), party.map((x) => {
-      const cur = x.gear[it.slot] && app.S.items[x.gear[it.slot]];
-      const better = !cur || heroItemScore(x, it) > heroItemScore(x, cur);
-      return tx('<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">\u76EE\u524D\uFF1A{7}</div></button>', x.id, it.id, cls(x).icon, x.name, cls(x).name, better ? "in" : "", better ? tx("\u25B2 \u63D0\u5347") : tx("\u8F03\u5DEE"), cur ? tx("{0}\uFF08{1}\uFF09", cur.name, cur.ilvl) : tx("\u7A7A"));
-    }).join(""), upBtn(it, ""), it.id, salvageValue(it), salvageDust(it) ? tx('\u30FB<span class="dust num">{0}</span> \u7CBE\u83EF', salvageDust(it)) : ""));
+    return withSet(it, tx(
+      '<h3>{0}</h3><div class="sub num" style="margin:0">{1}{2}\u30FB\u88DD\u7B49 {3}\u30FB\u5F37\u5316 +{4}/{5}<br>{6}</div> <span class="label">\u88DD\u5099\u7D66</span><div class="stack">{7}</div> <div class="row">{8} {12}</div>',
+      itemName(it),
+      RARITY[it.rarity].name,
+      SLOTS[it.slot],
+      it.ilvl,
+      it.up,
+      maxUpFor(app.S),
+      itemStatText(it),
+      party.map((x) => {
+        const cur = x.gear[it.slot] && app.S.items[x.gear[it.slot]];
+        const better = !cur || heroItemScore(x, it) > heroItemScore(x, cur);
+        return tx('<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">\u76EE\u524D\uFF1A{7}</div></button>', x.id, it.id, cls(x).icon, x.name, cls(x).name, better ? "in" : "", better ? tx("\u25B2 \u63D0\u5347") : tx("\u8F03\u5DEE"), cur ? tx("{0}\uFF08{1}\uFF09", cur.name, cur.ilvl) : tx("\u7A7A"));
+      }).join(""),
+      upBtn(it, ""),
+      it.id,
+      salvageValue(it),
+      salvageDust(it) ? tx('\u30FB<span class="dust num">{0}</span> \u7CBE\u83EF', salvageDust(it)) : "",
+      lockBtn("item", it) + (it.locked ? "" : tx('<button class="btn" data-act="salvage" data-id="{0}">\u5206\u89E3 +<span class="num">{1}</span> \u91D1{2}</button>', it.id, salvageValue(it), salvageDust(it) ? tx('\u30FB<span class="dust num">{0}</span> \u7CBE\u83EF', salvageDust(it)) : ""))
+    ));
   }
+  var lockBtn = (kind, x) => `<button class="btn" data-act="lock" data-kind="${kind}" data-id="${x.id}" title="${x.locked ? tx("\u89E3\u9664\u9396\u5B9A") : tx("\u9396\u5B9A\uFF08\u907F\u514D\u8AA4\u5206\u89E3\uFF0F\u89E3\u96C7\uFF09")}">${x.locked ? tx("\u{1F512} \u5DF2\u9396\u5B9A") : tx("\u{1F513} \u9396\u5B9A")}</button>`;
   function upBtn(it, size) {
     if (it.up >= maxUpFor(app.S)) return tx('<button class="btn {0}" disabled>\u5F37\u5316 MAX</button>', size);
     const g = upgradeCost(it), d = dustCost(it), ok = app.S.gold >= g && (app.S.dust || 0) >= d;
@@ -4679,10 +4745,12 @@
   }
   function finishBattle() {
     clearInterval(app.bTimer);
+    const pb = app.battle.mythic ? (app.S.mythic.best[app.battle.dIdx] || {}).level || 0 : 0;
     app.lastResult = app.battle.vault ? applyVaultResult(app.S, app.battle, partyHeroes) : app.battle.mythicIdle ? applyMythicIdleResult(app.S, app.battle) : app.battle.mythic ? applyMythicResult(app.S, app.battle) : applyResult(app.S, app.battle.dIdx, app.battle);
     dailyAfterBattle(app.S, app.battle, app.lastResult);
     save();
     const r = app.lastResult, b = app.battle;
+    if (r.first || b.mythic && !b.mythicIdle && r.record && b.mythic.level > pb) milestone();
     for (const m of newBagMilestones(app.S)) setTimeout(() => toast(tx("\u{1F392} {0}\uFF1A\u80CC\u5305 +{1} \u683C", m.name, BAG_PER_MILESTONE)), 400);
     if (b.vault) sendEvent(tx("\u5BF6\u5EAB"), tx("\u7B2C {0} \u5C64 \u6253\u5012 {1} \u96BB +{2} \u91D1", b.vault.floor + 1, r.kills, r.gold));
     else if (b.mythicIdle) {
@@ -4929,6 +4997,10 @@
         break;
       case "skip":
         if (app.battle && !app.battle.over) {
+          if (!canSkip(app.battle)) {
+            toast(tx("\u9996\u6B21\u6311\u6230\u9700\u5B8C\u6574\u89C0\u6230\uFF08\u53EF\u7528 4\xD7 \u52A0\u901F\uFF09"));
+            break;
+          }
           const b = app.battle;
           b.opts.autoHorn = true;
           if (b.waveIdx === b.waves.length - 1) b.useHorn();
@@ -5000,6 +5072,12 @@
           toast(tx("{0}\u6210\u529F +{1}", refine ? tx("\u7CBE\u7149") : tx("\u5F37\u5316"), it.up));
           save();
         } else toast(refine ? tx("\u91D1\u5E63\u6216\u7CBE\u83EF\u4E0D\u8DB3") : tx("\u91D1\u5E63\u4E0D\u8DB3"));
+        break;
+      }
+      case "lock": {
+        const on = toggleLock(app.S, t.dataset.kind, id);
+        if (on != null) toast(on ? tx("\u5DF2\u9396\u5B9A\uFF0C\u4E0D\u6703\u88AB\u5206\u89E3\u6216\u89E3\u96C7") : tx("\u5DF2\u89E3\u9664\u9396\u5B9A"));
+        save();
         break;
       }
       case "salvage":
@@ -5322,6 +5400,7 @@
     }
   });
   function showDraw(list, cost) {
+    if (list.some((x) => x.legend)) milestone();
     const sorted = [...list].sort((a, b) => (b.rarity || 0) - (a.rarity || 0)), best = sorted[0].rarity || 0;
     openModal({ type: "text", html: tx('<h3>{0}</h3> <p class="sub" style="margin:0">\u82B1\u8CBB {1} \u91D1\u30FB\u5DF2\u52A0\u5165\u540D\u518A{2}</p> <div class="drawlist">{3}</div> <div class="row"><button class="btn main grow" data-act="closebtn">\u597D</button><button class="btn" data-tab="team">\u53BB\u5718\u968A\u770B\u770B</button></div>', best === 4 ? tx("\u2728 \u50B3\u8AAA\u964D\u81E8\uFF01") : best === 3 ? tx("\u53F2\u8A69\u82F1\u96C4\u52A0\u5165\uFF01") : tx("\u62DB\u52DF\u7D50\u679C"), fmt(cost), app.S.party.length < ECONOMY.partyMax ? "" : tx("\uFF08\u968A\u4F0D\u5DF2\u6EFF\uFF0C\u5728\u5F85\u547D\u5340\uFF09"), sorted.map((x) => `<div class="drawcard r-${x.rarity || 0}"><span class="ic">${CLASSES[x.cls].icon}</span><span>${heroName(x)}</span><span class="rtag r${x.rarity || 0}">${HERO_RARITY[x.rarity || 0].name}</span><small>${CLASSES[x.cls].name}\u30FBLv${x.level}</small>${x.legend ? tx('<small class="c4">{0}\uFF1A{1}</small>', LEGENDS[x.cls].pname, LEGENDS[x.cls].desc) : ""}</div>`).join("")) });
   }
@@ -5345,19 +5424,38 @@
     $("#idleChip").textContent = tx("\u639B\u6A5F\u4E2D");
     document.title = tx("\u526F\u672C\u5718\u9577");
     document.documentElement.lang = getLang();
+    $("#saveChip").textContent = tx("\u5B58\u6A94\u4E2D");
     settleOffline();
     resumeIdle();
     render();
-    setTimeout(() => check(true), 1500);
     const after = () => {
       if (enabled() && !app.S.player.asked && !app.modal) openNick();
       else if (app.S.player.asked) setTimeout(() => sendSnapshot(), 3e3);
     };
-    showTitle(!saved, () => {
-      app.fresh = false;
-      save();
-      return !saved ? playDialog(PROLOGUE, after) : after();
-    });
+    const boot = bootScreen(), t0 = Date.now(), useCloud = !!saved && cloudEnabled() && loggedIn();
+    if (useCloud) boot.msg(tx("\u540C\u6B65\u96F2\u7AEF\u5B58\u6A94\u2026"));
+    const wait = useCloud ? Promise.race([check(true).catch(() => {
+    }), new Promise((ok) => setTimeout(ok, 6e3))]) : Promise.resolve();
+    wait.then(() => setTimeout(() => {
+      boot.done();
+      showTitle(!saved, () => {
+        app.fresh = false;
+        save();
+        return !saved ? playDialog(PROLOGUE, after) : after();
+      });
+    }, Math.max(0, 700 - (Date.now() - t0))));
+  }
+  function bootScreen() {
+    const el = document.createElement("div");
+    el.id = "boot";
+    el.innerHTML = `<div class="blogo">${tx("\u526F\u672C\u5718\u9577")}</div><div class="bbar"><i></i></div><div class="bmsg">${tx("\u8B80\u53D6\u5B58\u6A94\u4E2D\u2026")}</div>`;
+    document.body.appendChild(el);
+    return { msg: (t) => {
+      el.querySelector(".bmsg").textContent = t;
+    }, done: () => {
+      el.classList.add("out");
+      setTimeout(() => el.remove(), 260);
+    } };
   }
   function showTitle(fresh, onGo) {
     let seen = false;

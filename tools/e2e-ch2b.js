@@ -16,7 +16,7 @@ s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcde
 for (let d = 7; d <= 12; d++) s.clears[d] = 1; s.unlocked = 14; s.story.seen.push('post6', 'pre7', 'post7', 'pre8', 'post8', 'pre9', 'post9');
 const g2 = G.makeHero('guardian', 60, 0); g2.name = '第二坦'; s.heroes.push(g2);
 for (const h of s.heroes) { h.level = 60; for (const sl of Object.keys(G.SLOTS)) { const it = G.makeItem(sl, 150, 3); it.up = 10; s.items[it.id] = it; h.gear[sl] = it.id; } }
-const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); await page.addInitScript(() => sessionStorage.setItem('rl-title', '1'));
+const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); await page.addInitScript(() => (sessionStorage.setItem('rl-title', '1'), sessionStorage.setItem('rl-e2e', '1')));
 const errs = []; page.on('pageerror', e => errs.push(e.message));
 await page.addInitScript(v => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('raid-leader-save-v1', v); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(s));
 await page.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'app.test') return r.abort();

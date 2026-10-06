@@ -12,6 +12,8 @@
  * 之後改了程式：部署 → 管理部署作業 → 編輯 → 版本選「新版本」→ 部署（網址不變）
  * v0.9.3：新增「深淵最高／深淵鑰石」兩欄 → 貼上後先執行一次 setup（補表頭），再部署新版本
  * v0.10.1：新增「封鎖」欄與成績合理性檢查 → 同樣先執行 setup，再部署新版本
+ * v0.14：雲端存檔覆蓋前自動備份上一份（玩家看不到，只有管理員能還原）→ 貼上後執行一次 setup（補「雲端」表頭），再部署新版本
+ *        還原方式：打開試算表 → 上方選單「副本團長」→ 在「雲端」分頁選取該玩家那一列 → 「還原選取列的備份存檔」
  * v0.13.2：雲端存檔改成自動同步（衝突偵測）→ 貼上新版後直接部署新版本即可（不用再跑 setup）
  * v0.13：雲端存檔（Google 登入）→ 在下面 CLIENT_ID 填入 OAuth 用戶端 ID，執行一次 setup（會要求 Drive 授權），再部署新版本
  *        存檔放在你 Google Drive 的「raid-leader-saves」資料夾，一位玩家一個檔；工作表「雲端」只記 Google 帳號編號（sub），不存 Email
@@ -29,7 +31,9 @@ const TZ = 'Asia/Taipei';
 // ---------- 雲端存檔（v0.13）----------
 const CLIENT_ID = '927029065806-rcr8ur1pnnp7pnsm7g1vnjloq4h6gnpo.apps.googleusercontent.com'; // ← 貼上 Google Cloud 的 OAuth 用戶端 ID（xxxx.apps.googleusercontent.com）
 const CLOUD = { sheet: '雲端', folder: 'raid-leader-saves', sessionDays: 30, maxBytes: 2 * 1024 * 1024 };
-const CLOUD_HEAD = ['Google 帳號編號', '登入憑證', '憑證到期', '存檔檔案 ID', '最後上傳', '進度摘要', '版本'];
+const CLOUD_HEAD = ['Google 帳號編號', '登入憑證', '憑證到期', '存檔檔案 ID', '最後上傳', '進度摘要', '版本', '玩家ID', '暱稱', '備份檔案 ID', '備份時間', '備份摘要', '備份挑戰數'];
+const CC = { file: 4, at: 5, summary: 6, ver: 7, pid: 8, name: 9, bfile: 10, bat: 11, bsummary: 12, bruns: 13 }; // 「雲端」欄位（1 起算）
+const BACKUP_HOURS = 6; // 一般上傳：備份超過 6 小時才換新，且只在進度沒有倒退時換（避免被誤蓋的存檔覆蓋掉好的備份）
 const LIMIT_SEC = { snapshot: 20, event: 2, feedback: 60, login: 3, cloudsave: 15, cloudload: 3, cloudinfo: 2 }; // 同一位玩家的送出間隔下限
 
 // ---------- 初始化：建立工作表與「摘要」 ----------
@@ -215,7 +219,7 @@ function cloudLogin(d) {
   try {
     const sh = cloudSheet(), row = cloudRowBy(sh, 1, sub);
     if (row) { sh.getRange(row.r, 2, 1, 2).setValues([[token, exp]]); return { ok: true, token, updated: row.v[3] ? cloudMs(row.v[4]) : 0, summary: row.v[5] || '' }; }
-    sh.appendRow([sub, token, exp, '', '', '', '']);
+    sh.appendRow([sub, token, exp, '', '', '', '', '', '', '', '', '', '']);
     return { ok: true, token, updated: 0, summary: '' };
   } finally { lock.releaseLock(); }
 }
@@ -237,12 +241,57 @@ function cloudOp(d) {
   const lock = LockService.getScriptLock(); lock.waitLock(10000);
   try {
     let id = row.v[3];
-    if (id) DriveApp.getFileById(id).setContent(text);
+    if (id) {
+      const file = DriveApp.getFileById(id);
+      cloudBackup(sh, row, file.getBlob().getDataAsString(), runsOf(text), !!d.force);
+      file.setContent(text);
+    }
     else id = cloudFolder().createFile(row.v[0] + '.json', text, 'application/json').getId();
     const at = Date.now();
-    sh.getRange(row.r, 4, 1, 4).setValues([[id, at, clean(d.summary, 100), clean(d.ver, 10)]]);
+    sh.getRange(row.r, CC.file, 1, 6).setValues([[id, at, clean(d.summary, 100), clean(d.ver, 10), String(d.pid || ''), clean(d.name, 16)]]);
     return { ok: true, updated: at };
   } finally { lock.releaseLock(); }
+}
+// v0.14 備份：把即將被覆蓋的舊存檔複製到「<sub>.prev.json」
+//   一定備份：玩家選擇覆蓋雲端（force）、或新存檔的挑戰次數比舊的少（疑似舊進度蓋掉新進度）
+//   定期換新：沒有備份或備份超過 BACKUP_HOURS 小時，且舊存檔進度不低於目前備份
+function cloudBackup(sh, row, oldText, newRuns, force) {
+  const oldRuns = runsOf(oldText), bRuns = Number(row.v[CC.bruns - 1]) || 0, bAt = Number(row.v[CC.bat - 1]) || 0;
+  const due = !row.v[CC.bfile - 1] || Date.now() - bAt > BACKUP_HOURS * 3600e3;
+  if (!(force || newRuns < oldRuns || (due && oldRuns >= bRuns))) return;
+  let bid = row.v[CC.bfile - 1];
+  if (bid) DriveApp.getFileById(bid).setContent(oldText);
+  else bid = cloudFolder().createFile(row.v[0] + '.prev.json', oldText, 'application/json').getId();
+  sh.getRange(row.r, CC.bfile, 1, 4).setValues([[bid, Date.now(), row.v[CC.summary - 1] || '', oldRuns]]);
+}
+function runsOf(text) { try { return Number(JSON.parse(text).stats.runs) || 0; } catch (e) { return 0; } }
+
+// ---------- 管理員：還原備份（試算表上方選單「副本團長」）----------
+function onOpen() {
+  SpreadsheetApp.getUi().createMenu('副本團長').addItem('還原選取列的備份存檔', 'restoreSelectedBackup').addToUi();
+}
+// 在「雲端」分頁選取玩家那一列後執行：主存檔與備份「互換」（還原後原本的存檔變成備份，可以再換回來）
+// 玩家下次開遊戲或切回遊戲時會偵測到雲端較新，自動載入（若那台有新進度會先問玩家）
+function restoreSelectedBackup() {
+  const ui = SpreadsheetApp.getUi(), sh = SpreadsheetApp.getActiveSheet();
+  if (sh.getName() !== CLOUD.sheet) { ui.alert('請先切到「' + CLOUD.sheet + '」分頁，選取要還原的玩家那一列。'); return; }
+  const r = sh.getActiveRange().getRow();
+  if (r < 2) { ui.alert('請選取玩家那一列（不是表頭）。'); return; }
+  const v = sh.getRange(r, 1, 1, CLOUD_HEAD.length).getValues()[0];
+  if (!v[CC.file - 1] || !v[CC.bfile - 1]) { ui.alert('這位玩家還沒有備份存檔。'); return; }
+  const who = (v[CC.name - 1] || '（未記錄暱稱）') + '／' + (v[CC.pid - 1] || v[0]);
+  const ok = ui.alert('還原備份', who + '\n\n目前：' + v[CC.summary - 1] + '\n備份：' + v[CC.bsummary - 1] + '（' + Utilities.formatDate(new Date(Number(v[CC.bat - 1])), TZ, 'MM/dd HH:mm') + '）\n\n要把備份換成目前存檔嗎？（原本的存檔會變成備份，可再換回來）', ui.ButtonSet.YES_NO);
+  if (ok !== ui.Button.YES) return;
+  const lock = LockService.getScriptLock(); lock.waitLock(10000);
+  try {
+    const main = DriveApp.getFileById(v[CC.file - 1]), back = DriveApp.getFileById(v[CC.bfile - 1]);
+    const a = main.getBlob().getDataAsString(), b = back.getBlob().getDataAsString();
+    main.setContent(b); back.setContent(a);
+    const at = Date.now();
+    sh.getRange(r, CC.at, 1, 2).setValues([[at, v[CC.bsummary - 1]]]);
+    sh.getRange(r, CC.bat, 1, 3).setValues([[at, v[CC.summary - 1], runsOf(a)]]);
+  } finally { lock.releaseLock(); }
+  ui.alert('已還原。請玩家重新開啟遊戲（或切回遊戲），會自動載入還原後的進度。');
 }
 // 「最後上傳」一律回傳毫秒數（舊資料可能被試算表轉成日期）
 function cloudMs(v) { return v instanceof Date ? v.getTime() : (Number(v) || (v ? new Date(String(v).replace(' ', 'T') + '+08:00').getTime() : 0) || 0); }

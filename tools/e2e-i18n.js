@@ -20,7 +20,7 @@ const route = p => p.route('**/*', r => { const u = new URL(r.request().url()); 
 // A) 全新玩家：開始畫面 → 切英文 → 序章 → 暱稱
 {
   const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); const errs = []; page.on('pageerror', e => errs.push(e.message));
-  await route(page); await page.goto('https://app.test/'); await page.waitForTimeout(400);
+  await route(page); await page.goto('https://app.test/'); await page.waitForTimeout(1000);
   check(await page.locator('#title').isVisible() && (await page.locator('#title .tgo').innerText()) === '開始冒險', '開始畫面（中文）');
   await page.screenshot({ path: `${shots}/i18n-title-zh.png` });
   await page.click('#title [data-act="lang"][data-v="en"]'); await page.waitForTimeout(600);
@@ -46,7 +46,7 @@ const route = p => p.route('**/*', r => { const u = new URL(r.request().url()); 
   s.lastSeen = Date.now(); s.idle = null; s.player = { pid: 'abcdefgh1234', name: 'Tester', asked: true, playSec: 0 };
   s.mythic.best = { 0: { level: 5, time: 120 } }; s.dust = 40;
   const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); const errs = []; page.on('pageerror', e => errs.push(e.message));
-  await page.addInitScript(v => { sessionStorage.setItem('rl-title', '1'); localStorage.setItem('raid-leader-lang', 'en'); if (!sessionStorage.getItem('seeded')) { localStorage.setItem('raid-leader-save-v1', v); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(s));
+  await page.addInitScript(v => { (sessionStorage.setItem('rl-title', '1'), sessionStorage.setItem('rl-e2e', '1')); localStorage.setItem('raid-leader-lang', 'en'); if (!sessionStorage.getItem('seeded')) { localStorage.setItem('raid-leader-save-v1', v); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(s));
   await route(page); await page.goto('https://app.test/'); await page.waitForTimeout(500);
   const leftovers = new Set();
   const scan = async tag => { for (const l of (await page.locator('body').innerText()).split('\n')) if (CJK.test(l) && !l.includes('繁體中文')) leftovers.add(tag + ': ' + l.trim().slice(0, 80)); };

@@ -1,7 +1,7 @@
 // ===== 戰鬥分頁與結算畫面 =====
 import { tx } from '../../core/i18n.js';
 import * as G from '../../core/index.js';
-import { app } from '../state.js';
+import { app, canSkip } from '../state.js';
 import { fmt, pct, mmss, itemStatText, itemName, firstWinLine } from '../helpers.js';
 import { enemyIcon, svg, HORN } from '../icons.js';
 
@@ -27,7 +27,7 @@ export function viewBattle() {
   if (b.vault) d.name = tx('寶庫・第 {0} 層', b.vault.floor + 1);
   let h = tx('<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}</div> {5}{6} <div class="arena"> <div class="side foes"><span class="label">敵方・{7}</span>{8}</div> <div class="side"><span class="label">我方隊伍</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>', d.name, b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : '', b.tick, b.vault ? '' : `<div class="waves">`, b.vault ? '' : b.waves.map((_, i) => `<i class="${i < b.waveIdx || (b.over && b.win) ? 'done' : i === b.waveIdx ? 'cur' : ''}"></i>`).join('') + '</div>', b.mythic ? mythicTimerBar(b) : '', b.vault ? vaultBar(b) : '', b.waveIdx === b.waves.length - 1 ? tx('首領戰') : tx('第 {0} 波', b.waveIdx + 1), enemyRows(b), b.units.map(u => unitRow(u, false)).join(''), b.log.map(l => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, ' ')}</span>${l.msg}</p>`).join(''));
   if (!b.over) {
-    h += tx('<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} <button class="btn" data-act="skip">直接結算</button> <button class="btn" data-act="retreat">撤退</button></div></div>', [1, 2, 4].map(x => `<button data-act="speed" data-x="${x}" class="${app.speed === x ? 'sel' : ''}">${x}×</button>`).join(''), hornBtn(b));
+    h += tx('<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">撤退</button></div></div>', [1, 2, 4].map(x => `<button data-act="speed" data-x="${x}" class="${app.speed === x ? 'sel' : ''}">${x}×</button>`).join(''), hornBtn(b), canSkip(b) ? tx('<button class="btn" data-act="skip">直接結算</button>') : tx('<button class="btn" disabled title="首次挑戰需完整觀戰（可用 4× 加速）">🔒 結算</button>'));
   }
   if (b.over && app.lastResult) h += viewResult();
   return h;

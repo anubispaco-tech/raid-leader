@@ -14,7 +14,7 @@ const { s } = playthrough({ talents: true, stopAt: 2 });
 s.lastSeen = Date.now(); s.idle = null; s.gold = 1234; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0 };
 const cloudSave = JSON.parse(JSON.stringify(s)); cloudSave.gold = 99999;
 const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } });
-await page.addInitScript(() => { sessionStorage.setItem('rl-title', '1'); window.__RL_TEST_CLOUD_CID = 'test.apps.googleusercontent.com'; });
+await page.addInitScript(() => { (sessionStorage.setItem('rl-title', '1'), sessionStorage.setItem('rl-e2e', '1')); window.__RL_TEST_CLOUD_CID = 'test.apps.googleusercontent.com'; });
 const errs = []; page.on('pageerror', e => errs.push(e.message));
 await page.addInitScript(v => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('raid-leader-save-v1', v); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(s));
 // 一般檔案（先登記；後登記的假 GAS／假 Google 優先）

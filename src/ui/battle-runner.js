@@ -5,6 +5,7 @@ import { app, TICK_MS } from './state.js';
 import { save } from './save.js';
 import { toast, mmss } from './helpers.js';
 import { sendEvent } from './telemetry.js';
+import { milestone } from './cloud.js';
 
 export function startBattle(dIdx) {
   const p = G.partyHeroes(app.S);
@@ -59,12 +60,14 @@ function stepBattle() {
 }
 export function finishBattle() {
   clearInterval(app.bTimer);
+  const pb = app.battle.mythic ? ((app.S.mythic.best[app.battle.dIdx] || {}).level || 0) : 0; // 秘境原本的最高限時等級
   app.lastResult = app.battle.vault ? G.applyVaultResult(app.S, app.battle, G.partyHeroes)
     : app.battle.mythicIdle ? G.applyMythicIdleResult(app.S, app.battle)
     : app.battle.mythic ? G.applyMythicResult(app.S, app.battle) : G.applyResult(app.S, app.battle.dIdx, app.battle);
   G.dailyAfterBattle(app.S, app.battle, app.lastResult); // 每日任務進度、每日首勝（掛在 lastResult.firstWin）
   save();
   const r = app.lastResult, b = app.battle;
+  if (r.first || (b.mythic && !b.mythicIdle && r.record && b.mythic.level > pb)) milestone(); // 里程碑：立刻同步雲端
   for (const m of G.newBagMilestones(app.S)) setTimeout(() => toast(tx('🎒 {0}：背包 +{1} 格', m.name, G.BAG_PER_MILESTONE)), 400);
   if (b.vault) sendEvent(tx('寶庫'), tx('第 {0} 層 打倒 {1} 隻 +{2} 金', b.vault.floor + 1, r.kills, r.gold));
   else if (b.mythicIdle) { /* 掛機不送事件，避免洗版 */ }

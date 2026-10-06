@@ -16,7 +16,7 @@ s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcde
 for (let i = 0; i <= 13; i++) s.clears[i] = true; s.unlocked = 14;
 for (const h of G.partyHeroes(s)) { h.level = 60; for (const sl of Object.keys(G.SLOTS)) { const it = G.makeItem(sl, 160, 3); it.up = 10; s.items[it.id] = it; h.gear[sl] = it.id; } }
 s.mythic.key2 = 4; s.mythic.best[7] = { level: 5, time: 100 };
-const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); await page.addInitScript(() => sessionStorage.setItem('rl-title', '1'));
+const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); await page.addInitScript(() => (sessionStorage.setItem('rl-title', '1'), sessionStorage.setItem('rl-e2e', '1')));
 const errs = []; page.on('pageerror', e => errs.push(e.message));
 await page.addInitScript(v => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('raid-leader-save-v1', v); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(s));
 // 重新整理前在 sessionStorage 放 patch，下一次載入前套用到存檔（避免被離開頁面時的自動存檔蓋掉）
