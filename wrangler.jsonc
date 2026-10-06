@@ -2,5 +2,7 @@
 {
   "name": "raid-leader",
   "compatibility_date": "2026-10-01",
-  "assets": { "directory": "./public" }
+  "assets": { "directory": "./public" },
+  "workers_dev": true,      // 開啟 raid-leader.<子網域>.workers.dev 正式網址
+  "preview_urls": false     // 不產生預覽網址（避免多一個可存取的入口）
 }
