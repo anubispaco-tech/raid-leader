@@ -9,6 +9,7 @@ export * from './game.js';
 export * from './mythic.js';
 export * from './vault.js';
 export * from './advice.js';
+export * from './tutorial.js';
 export { setSeed } from './rng.js';
 export { tx, LANGS, getLang, setLang } from './i18n.js';
 export * from './daily.js';

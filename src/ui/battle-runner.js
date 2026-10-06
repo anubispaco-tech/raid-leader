@@ -87,5 +87,6 @@ export function finishBattle() {
     app.pendingRepeat = setTimeout(() => { app.pendingRepeat = null; if (app.S.idleMythic === d) startMythicIdle(d); }, 3000);
   }
   app.render(true);
+  if (!b.mythic && !b.vault && app.showStuck) app.showStuck('battle'); // v0.17 卡關指引（同層連輸）
   if (r.first && app.storyOnce) app.storyOnce('post' + b.dIdx); // 首次通關後的劇情
 }

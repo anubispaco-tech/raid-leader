@@ -37,6 +37,7 @@ function render(skipModal) {
   $('#gold').textContent = fmt(app.S.gold);
   $('#idleChip').hidden = !G.partyLocked(app.S);
   renderTabs();
+  tutTick();
   const v = $('#view');
   if (app.tab === 'dungeon') v.innerHTML = viewDungeons();
   if (app.tab === 'battle') v.innerHTML = viewBattle();
@@ -44,8 +45,38 @@ function render(skipModal) {
   if (app.tab === 'bag') v.innerHTML = viewBag();
   if (app.tab === 'tavern') v.innerHTML = viewTavern();
   if (app.tab === 'battle') { const lg = $('.log'); if (lg) lg.scrollTop = lg.scrollHeight; }
+  else if (G.tutActive(app.S) && !app.fresh) v.insertAdjacentHTML('afterbegin', coachCard());
+  tutHighlight();
   if (!skipModal) renderModal();
 }
+// ---------- v0.17 新手教學 ----------
+function tutTick() {
+  if (app.fresh) return;
+  const done = G.tutAdvance(app.S); if (!done.length) return;
+  save();
+  for (const id of done) T.sendEvent(tx('教學'), id);
+  if (done.includes('finish')) setTimeout(() => toast(tx('🎉 新手教學完成！獲得 {0} 金', G.TUT_REWARD.gold)), 300);
+}
+function coachCard() {
+  const st = G.tutCurrent(app.S); if (!st) return '';
+  const i = app.S.tut.step, n = G.TUTORIAL.length;
+  return tx('<div class="coach"><div class="cstep num">{0}/{1}</div><div class="cbody"><b>{2}</b><span>{3}</span></div><button class="linkbtn cskip" data-act="tutskip">跳過教學</button></div>', i + 1, n, st.text, st.sub);
+}
+function tutHighlight() {
+  document.querySelectorAll('.tut-hl').forEach(el => el.classList.remove('tut-hl'));
+  const st = G.tutCurrent(app.S); if (!st || app.fresh || app.modal) return;
+  const el = (app.tab === st.tab && document.querySelector('#view ' + st.sel)) || (app.tab !== st.tab && app.tab !== 'battle' && document.querySelector(`#tabs [data-tab="${st.tab}"]`));
+  if (el) el.classList.add('tut-hl');
+}
+// ---------- v0.17 卡關指引 ----------
+export function showStuck(kind) {
+  if (app.fresh || app.modal) return;
+  const r = G.stuckCheck(app.S, kind); if (!r) return;
+  save(); T.sendEvent(tx('卡關指引'), `${r.reason}・${tx('第 {0} 層', app.S.unlocked)}`);
+  const btn = b => (!b ? '' : b.tab ? `<button class="btn sm main" data-tab="${b.tab}">${b.label}</button>` : `<button class="btn sm main" data-act="${b.act}" data-closemodal="1" ${b.d != null ? `data-d="${b.d}"` : ''}>${b.label}</button>`);
+  openModal({ type: 'text', html: tx('<h3>{0}</h3><p class="sub" style="margin:0">試試下面的方法：</p><div class="stucklist">{1}</div><div class="row"><button class="btn grow" data-act="closebtn">先不用</button></div>', r.title, r.tips.map(t => `<div class="stuck"><div><b>${t.text}</b><span class="sub" style="margin:0">${t.sub}</span></div>${btn(t.btn)}</div>`).join('')) });
+}
+app.showStuck = showStuck;
 app.render = render;
 app.renderModal = renderModal;
 // 設定頁畫好後放 Google 登入按鈕、讀雲端狀態
@@ -59,6 +90,7 @@ document.addEventListener('click', e => {
   if (!t) return;
   if (t.dataset.act === 'close') { if (e.target === t) closeModal(); return; }
   if (t.dataset.tab) { app.tab = t.dataset.tab; app.modal = null; render(); window.scrollTo(0, 0); return; }
+  if (t.dataset.closemodal) app.modal = null; // v0.17 指引視窗裡的按鈕：先關視窗再執行
   const a = t.dataset.act, id = t.dataset.id;
   if (a !== 'salvageupto') app.salvConfirm = false;
   if (a !== 'firemany') app.fireConfirm = false;
@@ -143,6 +175,8 @@ document.addEventListener('click', e => {
     case 'mythichelpok': app.S.mythicHelp = true; app.mythicHelpOpen = false; save(); break;
     case 'bagview': app.bagView = t.dataset.v; break;
     case 'codexclaim': { const r = G.claimCodex(app.S, +t.dataset.v); if (r) { toast(tx('圖鑑 {0}%：獲得 {1} 金、{2} 精華', r.pct, fmt(r.gold), r.dust)); save(); } break; }
+    case 'tutskip': { const step = app.S.tut.step; G.tutSkip(app.S); save(); T.sendEvent(tx('教學'), `skip@${step}`); toast(tx('已跳過教學，「下一步」卡片會繼續提示')); break; }
+    case 'cardok': G.markCard(app.S, t.dataset.v); save(); break;
     case 'lock': { const on = G.toggleLock(app.S, t.dataset.kind, id); if (on != null) toast(on ? tx('已鎖定，不會被分解或解雇') : tx('已解除鎖定')); save(); break; }
     case 'salvage': toast(tx('分解獲得 {0} 金', G.salvage(app.S, id))); save(); app.modal = null; break;
     case 'join': if (G.partyLocked(app.S)) { toast(tx('掛機中不能更換隊員，請先停止掛機')); break; } G.joinParty(app.S, id); save(); break;
@@ -264,7 +298,7 @@ document.addEventListener('visibilitychange', () => {
   } else if (app.battle && !app.battle.over) runTimer();
   else resumeIdle();
 });
-setInterval(() => { if (!document.hidden) { T.tick(5); save(); C.autoTick(); } }, 5000);
+setInterval(() => { if (!document.hidden) { T.tick(5); save(); C.autoTick(); showStuck('time'); } }, 5000);
 document.addEventListener('input', e => { if (e.target.id === 'fbText') app.fbDraft = e.target.value; });
 document.addEventListener('change', e => {
   if (e.target.id === 'salvSel') { app.salvSel = +e.target.value; app.salvConfirm = false; render(); }

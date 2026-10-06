@@ -376,6 +376,17 @@ h3 .gi{vertical-align:-.12em}
 .cx{display:block;height:14px;border-radius:4px;border:1px dashed var(--line)}
 .cx.on{border-style:solid}.cx.r0{background:var(--r0);border-color:var(--r0)}.cx.r1{background:var(--r1);border-color:var(--r1)}.cx.r2{background:var(--r2);border-color:var(--r2)}.cx.r3{background:var(--r3);border-color:var(--r3)}.cx.r4{background:var(--r4);border-color:var(--r4);box-shadow:0 0 8px -2px var(--r4)}
 .affixnote{display:flex;gap:8px;align-items:baseline;font-size:12.5px;color:var(--muted)}.affixnote b{color:var(--brass);font-weight:500}
+/* v0.17 新手教學、卡關指引 */
+.coach{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:center;margin-top:14px;padding:12px 14px;border-radius:12px;
+  background:color-mix(in srgb,var(--brass) 12%,var(--panel));border:1px solid var(--brass)}
+.coach .cstep{grid-row:span 2;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--brass);color:var(--ink);font-weight:700;font-size:13px}
+.coach .cbody{display:grid;gap:2px;min-width:0}.coach .cbody b{font-size:15px}.coach .cbody span{font-size:13px;color:var(--fg);opacity:.85}
+.coach .cskip{grid-column:2;justify-self:end;font-size:12px;color:var(--muted)}
+.tut-hl{position:relative;z-index:1;outline:2px solid var(--brass)!important;outline-offset:2px;animation:tutpulse 1.4s ease-in-out infinite}
+@keyframes tutpulse{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--brass) 25%,transparent)}}
+.stucklist{display:grid;gap:8px}
+.stuck{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.stuck>div{display:grid;gap:2px;min-width:0}.stuck b{font-size:14px}.stuck .btn{flex:0 0 auto}
 </style>
 <div class="app">
   <header class="top">
@@ -392,7 +403,7 @@ h3 .gi{vertical-align:-.12em}
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.16.0 */
+/* 副本團長 v0.17.0 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -965,6 +976,22 @@ h3 .gi{vertical-align:-.12em}
     "\u6BCF 8 \u79D2\u96A8\u6A5F\u4E00\u540D\u968A\u54E1\u53D7\u5230\u9B54\u6CD5\u50B7\u5BB3": "Every 8s a random member takes magic damage",
     "\u58DE\u75BD": "Necrotic",
     "\u5766\u514B\u6BCF\u88AB\u653B\u64CA\u4E00\u6B21\uFF0C\u53D7\u5230\u7684\u6CBB\u7642 \u22122%\uFF0C\u6BCF\u6CE2\u91CD\u7F6E": "Each hit on the tank reduces healing it takes by 2%; resets each wave",
+    "\u958B\u6253\u7B2C\u4E00\u5834": "Start your first fight",
+    "\u9EDE\u300C\u8150\u6839\u6D1E\u7A9F\u300D\u7684\u300C\u6311\u6230\u300D\uFF0C\u968A\u4F0D\u6703\u81EA\u5DF1\u6253\u3002": "Tap Fight on Rotroot Cavern. Your party fights on its own.",
+    "\u63DB\u4E0A\u65B0\u88DD\u5099": "Equip your new gear",
+    "\u6253\u8D0F\u6703\u6389\u88DD\u5099\u3002\u6309\u300C\u4E00\u9375\u914D\u88DD\u300D\uFF0C\u81EA\u52D5\u66FF\u968A\u54E1\u63DB\u4E0A\u66F4\u597D\u7684\u3002": "Wins drop gear. Tap Auto-equip to put the better pieces on your party.",
+    "\u62DB\u52DF\u7B2C 4 \u4F4D\u968A\u54E1": "Recruit a 4th hero",
+    "\u5230\u9152\u9928\u7528\u91D1\u5E63\u62DB\u52DF\u82F1\u96C4\uFF0C\u968A\u4F0D\u6700\u591A 5 \u4EBA\u3002\u91D1\u5E63\u4E0D\u5920\u5C31\u518D\u6253\u4E00\u5834\u7B2C 1 \u5C64\u3002": "Spend gold at the Tavern to recruit heroes (up to 5 in a party). Short on gold? Run floor 1 again.",
+    "\u901A\u95DC\u7B2C 2 \u5C64": "Clear floor 2",
+    "\u6311\u6230\u300C{0}\u300D\u3002\u4E4B\u5F8C\u7684\u8DEF\uFF0C\u300C\u4E0B\u4E00\u6B65\u300D\u5361\u7247\u6703\u544A\u8A34\u4F60\u3002": "Take on {0}. After that, the Next step card will guide you.",
+    "\u300C{0}\u300D\u5361\u95DC\u4E86\u55CE\uFF1F": "Stuck on {0}?",
+    "\u4E00\u6BB5\u6642\u9593\u6C92\u6709\u65B0\u9032\u5EA6": "No new progress for a while",
+    "\u968A\u4F0D\u53EA\u6709 {0} \u4EBA": "Only {0} heroes in your party",
+    "\u88DC\u6EFF 5 \u4EBA\u6230\u529B\u5DEE\u5F88\u591A\uFF0C\u5230\u9152\u9928\u62DB\u52DF\u3002": "A full party of 5 is much stronger. Recruit at the Tavern.",
+    "\u4F9D\u9019\u5C64\u7684\u9996\u9818\u6A5F\u5236\u5099\u6230": "Prepare for this floor's boss",
+    "\u4E00\u9375\u6311\u9078\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF0C\u91DD\u5C0D\u300C{0}\u300D\u7684\u6A5F\u5236\u3002": "Pick lineup, talents and gear for {0}'s mechanics in one tap.",
+    "\u56DE\u524D\u4E00\u5C64\u639B\u6A5F": "Idle the previous floor",
+    "\u639B\u6A5F\u5237\u7B49\u7D1A\u8207\u88DD\u5099\uFF0C\u96E2\u7DDA\u4E5F\u6703\u7D2F\u7A4D\uFF0C\u518D\u56DE\u4F86\u6311\u6230\u3002": "Farm levels and gear, even offline, then come back.",
     "\u5BF6\u85CF\u54E5\u5E03\u6797": "Treasure Goblin",
     "\u968A\u4F0D\u6C92\u6709\u6210\u54E1": "Your party is empty",
     "\u9032\u5165 {0}\uFF0C\u7B2C 1 \u6CE2\u6575\u4EBA\u51FA\u73FE": "Entering {0} \u2014 wave 1 incoming",
@@ -1006,6 +1033,12 @@ h3 .gi{vertical-align:-.12em}
     "\u5718\u968A": "Party",
     "\u80CC\u5305": "Bag",
     "\u9152\u9928": "Tavern",
+    "\u6559\u5B78": "Tutorial",
+    "\u{1F389} \u65B0\u624B\u6559\u5B78\u5B8C\u6210\uFF01\u7372\u5F97 {0} \u91D1": "\u{1F389} Tutorial complete! You got {0} gold",
+    '<div class="coach"><div class="cstep num">{0}/{1}</div><div class="cbody"><b>{2}</b><span>{3}</span></div><button class="linkbtn cskip" data-act="tutskip">\u8DF3\u904E\u6559\u5B78</button></div>': '<div class="coach"><div class="cstep num">{0}/{1}</div><div class="cbody"><b>{2}</b><span>{3}</span></div><button class="linkbtn cskip" data-act="tutskip">Skip tutorial</button></div>',
+    "\u5361\u95DC\u6307\u5F15": "Stuck hint",
+    "\u7B2C {0} \u5C64": "Floor {0}",
+    '<h3>{0}</h3><p class="sub" style="margin:0">\u8A66\u8A66\u4E0B\u9762\u7684\u65B9\u6CD5\uFF1A</p><div class="stucklist">{1}</div><div class="row"><button class="btn grow" data-act="closebtn">\u5148\u4E0D\u7528</button></div>': '<h3>{0}</h3><p class="sub" style="margin:0">Try one of these:</p><div class="stucklist">{1}</div><div class="row"><button class="btn grow" data-act="closebtn">Not now</button></div>',
     "\u79D8\u5883\u6311\u6230\u9032\u884C\u4E2D": "A Mythic run is in progress",
     "\u79D8\u5883\u9AD4\u529B\u4E0D\u8DB3\uFF0C{0} \u5F8C\u56DE\u5FA9 1 \u9EDE": "Out of Mythic stamina \u2014 +1 in {0}",
     "\u5BF6\u5EAB\uFF08\u504F\u7BC4\u570D\u8F38\u51FA\uFF09": "the Vault (AoE focus)",
@@ -1029,6 +1062,7 @@ h3 .gi{vertical-align:-.12em}
     "\u91D1\u5E63\u4E0D\u8DB3": "Not enough gold",
     "\u80CC\u5305 +{0} \u683C\uFF08\u82B1\u8CBB {1} \u91D1\uFF09": "Bag +{0} slots (spent {1} gold)",
     "\u5716\u9451 {0}%\uFF1A\u7372\u5F97 {1} \u91D1\u3001{2} \u7CBE\u83EF": "Codex {0}%: received {1} gold and {2} essence",
+    "\u5DF2\u8DF3\u904E\u6559\u5B78\uFF0C\u300C\u4E0B\u4E00\u6B65\u300D\u5361\u7247\u6703\u7E7C\u7E8C\u63D0\u793A": "Tutorial skipped. The Next step card will keep giving tips",
     "\u5DF2\u9396\u5B9A\uFF0C\u4E0D\u6703\u88AB\u5206\u89E3\u6216\u89E3\u96C7": "Locked. It won't be salvaged or dismissed",
     "\u5DF2\u89E3\u9664\u9396\u5B9A": "Unlocked",
     "\u5206\u89E3\u7372\u5F97 {0} \u91D1": "Salvaged for {0} gold",
@@ -1241,12 +1275,15 @@ h3 .gi{vertical-align:-.12em}
     "\u6BCF\u5929 00:00\uFF08\u53F0\u7063\u6642\u9593\uFF09\u63DB\u65B0\u4EFB\u52D9\u3002": "New quests every day at 00:00 (Taiwan time).",
     '<div class="nextstep"><div><span class="label">\u4E0B\u4E00\u6B65</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>{2}</div>': '<div class="nextstep"><div><span class="label">Next step</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>{2}</div>',
     '<div class="vault locked"><b>\u5BF6\u5EAB</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 3 \u5C64\u300C\u6C89\u6C92\u795E\u6BBF\u300D\u5F8C\u958B\u653E\uFF1A\u6BCF\u5929 3 \u6B21\uFF0C\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\u8CFA\u5927\u91CF\u91D1\u5E63\u3002</span></div>': '<div class="vault locked"><b>Vault</b><span class="sub" style="margin:0">Unlocks after clearing Floor 3, Sunken Temple: 3 runs a day hunting treasure goblins for lots of gold.</span></div>',
+    "\u5BF6\u5EAB\u662F\u4EC0\u9EBC": "What is the Vault?",
+    "\u6BCF\u5929 {0} \u6B21\u3001\u6BCF\u6B21 60 \u79D2\uFF0C\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\u63DB\u91D1\u5E63\u3002\u91D1\u5E63\u7528\u4F86\u62DB\u52DF\u82F1\u96C4\u3001\u5F37\u5316\u88DD\u5099\u3002\u5C64\u6578\u8D8A\u9AD8\u6BCF\u96BB\u8D8A\u503C\u9322\uFF0C\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002": "{0} runs a day, 60 seconds each: defeat treasure goblins for gold to recruit heroes and upgrade gear. Higher floors pay more per goblin, so your highest floor usually earns the most.",
     '<div class="vault"><div class="mhead"><div><span class="label">\u5BF6\u5EAB</span><b>60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797</b></div><span class="vleft num">\u4ECA\u5929\u5269 {0}/{1}</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">\u7B2C {3} \u5C64\uFF1A\u6BCF\u96BB <b class="num">{4}</b> \u91D1\uFF0C\u6700\u591A\u7B97 {5} \u96BB\u30FB\u6700\u4F73 {6} \u96BB\u3002\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">\u5099\u6230</button></div></div>': '<div class="vault"><div class="mhead"><div><span class="label">Vault</span><b>60s of treasure goblins</b></div><span class="vleft num">{0}/{1} left today</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">Floor {3}:  <b class="num">{4}</b>  gold each, up to {5} \xB7 best {6}. Your highest floor usually pays most.</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">Prep</button></div></div>',
     "\u660E\u5929 00:00 \u518D\u4F86": "Come back at 00:00",
     '<div class="mythic locked"><b>\u50B3\u5947\u79D8\u5883</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 7 \u5C64\u300C\u9F8D\u7720\u9AD8\u5854\u300D\u5F8C\u89E3\u9396\uFF1A\u7121\u9650\u5C64\u6578\u3001\u9650\u6642\u6311\u6230\u3001\u6BCF\u65E5\u8A5E\u7DB4\u3002</span></div>': '<div class="mythic locked"><b>Mythic+</b><span class="sub" style="margin:0">Unlocks after clearing Floor 7, Dragonsleep Spire: endless levels, timed runs, daily affixes.</span></div>',
     '<div class="stamina"><span class="label">\u79D8\u5883\u9AD4\u529B</span><b class="num">{0}/{1}</b><span class="sub num" style="margin:0">{2}</span></div>': '<div class="stamina"><span class="label">Mythic stamina</span><b class="num">{0}/{1}</b><span class="sub num" style="margin:0">{2}</span></div>',
     "{0} \u5F8C +1": "+1 in {0}",
     "\u5DF2\u6EFF": "Full",
+    "\u898F\u5247\u548C\u50B3\u5947\u79D8\u5883\u4E00\u6A23\uFF0C\u4F46\u526F\u672C\u63DB\u6210\u7B2C\u4E8C\u7AE0\u3001\u5F37\u5EA6\u4EE5\u7B2C 14 \u5C64\u70BA\u57FA\u6E96\uFF0C\u6709\u81EA\u5DF1\u7684\u4E00\u9846\u9470\u77F3\uFF08\u9AD4\u529B\u5171\u7528\uFF09\u3002\u6389\u843D\u88DD\u7B49\u66F4\u9AD8\uFF0C\u9650\u6642\u901A\u95DC\u6709\u6A5F\u6703\u6389 T0 \u8077\u696D\u5957\u88DD\u3002": "Same rules as Mythic+, but with Chapter 2 dungeons scaled from floor 14 and its own keystone (stamina is shared). Higher item level drops, and timed runs can drop T0 class set pieces.",
     '<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>\u76EE\u524D\u9470\u77F3</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">\u4ECA\u65E5\u8A5E\u7DB4\uFF0C\u6BCF\u5929 00:00 \u66F4\u63DB\u3002\u624B\u52D5\u6311\u6230\u6BCF\u5834\u8017 1 \u9EDE\u9AD4\u529B\uFF0C\u6BCF {6} \u5206\u9418\u56DE 1 \u9EDE\u3001\u4E0A\u9650 {7}\u3002<b>\u79D8\u5883\u639B\u6A5F</b>\uFF1A\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u639B\u6A5F\uFF0C\u56FA\u5B9A\u6253\u8A72\u526F\u672C\u6700\u4F73 \u2212{2}\uFF0C\u4E0D\u8017\u9AD4\u529B\u3001\u9470\u77F3\u4E0D\u8B8A\u3001\u734E\u52F5 {3}%\uFF0C\u96E2\u7DDA\u4E5F\u6703\u7D2F\u7A4D\u3002</p> {8} <div class="mlist">': `<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>Keystone</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">Today's affixes change daily at 00:00. Each manual run costs 1 stamina; you regain 1 every {6} min, up to {7}.<b>Mythic idle</b>: any dungeon you have timed can be idled at its best \u2212{2}. No stamina cost, key unchanged, {3}% rewards, and it keeps going offline.</p> {8} <div class="mlist">`,
     "\u8003\u9A57{0}": "Tests {0}",
     "+{0} \u8D77\u751F\u6548": "From +{0}",
@@ -1259,6 +1296,7 @@ h3 .gi{vertical-align:-.12em}
     "\u639B\u6A5F +{0}": "Idle +{0}",
     '<span class="sugtag">\u63A8\u85A6</span>': '<span class="sugtag">Suggested</span>',
     '<button class="btn sm grow" data-act="mythicall">\u986F\u793A\u5176\u4ED6 {0} \u500B\u526F\u672C</button><p class="sub" style="margin:0">\u5148\u5F9E\u63A8\u85A6\u7684\u526F\u672C\u9650\u6642\u901A\u95DC\u4E00\u6B21\uFF0C\u5176\u4ED6\u526F\u672C\u96A8\u6642\u90FD\u80FD\u6253\uFF0C\u9470\u77F3\u7B49\u7D1A\u5171\u7528\u3002</p>': '<button class="btn sm grow" data-act="mythicall">Show the other {0} dungeons</button><p class="sub" style="margin:0">Time the suggested dungeon once first. The others are open anytime and share the same keystone.</p>',
+    "\u77E5\u9053\u4E86": "Got it",
     '<div class="row" style="justify-content:flex-end;margin:-4px 0 8px"><button class="linkbtn" data-act="mythichelp">\uFF1F\u79D8\u5883\u600E\u9EBC\u73A9</button></div>': '<div class="row" style="justify-content:flex-end;margin:-4px 0 8px"><button class="linkbtn" data-act="mythichelp">? How Mythic works</button></div>',
     '<div class="mguide"><b class="mgt">\u79D8\u5883\u600E\u9EBC\u73A9</b> <div class="mcmp"><span></span><b>\u4E3B\u7DDA</b><b>\u79D8\u5883</b> <span>\u76EE\u7684</span><span>\u63A8\u9032\u5287\u60C5\u3001\u89E3\u9396\u65B0\u5C64</span><span>\u91CD\u8907\u5237\u540C\u4E00\u6279\u526F\u672C\uFF0C\u62FF\u66F4\u9AD8\u88DD\u7B49\u7684\u88DD\u5099</span> <span>\u96E3\u5EA6</span><span>\u6BCF\u5C64\u56FA\u5B9A</span><span>\u770B\u9470\u77F3\u7B49\u7D1A\uFF1A\u8D8A\u9AD8\u6575\u4EBA\u8D8A\u786C\uFF0C+{0} \u8D77\u6709\u8A5E\u7DB4</span> <span>\u6642\u9593</span><span>\u4E0D\u9650\u6642</span><span>\u6709\u9650\u6642\uFF0C\u9650\u6642\u5167\u901A\u95DC\u624D\u5347\u7D1A</span> <span>\u734E\u52F5</span><span>\u9996\u901A\u4FDD\u5E95\u7A00\u6709</span><span>\u9470\u77F3\u8D8A\u9AD8\u88DD\u7B49\u8D8A\u9AD8\uFF0C+{1} \u8D77\u53EF\u80FD\u6389\u50B3\u8AAA</span></div> <ol class="msteps"><li>\u9EDE<b>\u63A8\u85A6</b>\u526F\u672C\u7684\u300C\u6311\u6230\u300D\uFF0C\u7528\u76EE\u524D\u9470\u77F3\u7B49\u7D1A\u958B\u6253\u3002</li><li>\u9650\u6642\u5167\u901A\u95DC\uFF1A\u9470\u77F3 +1\uFF0C\u6253\u5F97\u5920\u5FEB +2\uFF1B\u8D85\u6642\u3001\u5931\u6557\u6216\u64A4\u9000\uFF1A\u9470\u77F3 \u22121\u3002</li><li>\u6240\u6709\u79D8\u5883\u526F\u672C\u5171\u7528\u540C\u4E00\u9846\u9470\u77F3\uFF0C\u63DB\u526F\u672C\u6253\u4E0D\u6703\u91CD\u4F86\u3002</li><li>\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u958B\u300C\u79D8\u5883\u639B\u6A5F\u300D\uFF0C\u96E2\u7DDA\u4E5F\u6703\u6162\u6162\u5237\u3002</li></ol> <div class="row"><button class="btn sm main" data-act="mythichelpok">\u77E5\u9053\u4E86</button></div></div>': `<div class="mguide"><b class="mgt">How Mythic works</b> <div class="mcmp"><span></span><b>Story</b><b>Mythic</b> <span>Goal</span><span>Advance the story and unlock floors</span><span>Rerun the same dungeons for higher item level gear</span> <span>Difficulty</span><span>Fixed per floor</span><span>Set by keystone level: higher means tougher enemies, affixes from +{0}</span> <span>Timer</span><span>None</span><span>Timed; finish in time to level up the key</span> <span>Rewards</span><span>First clear guarantees rare</span><span>Higher key, higher item level; legendaries can drop from +{1}</span></div> <ol class="msteps"><li>Tap Fight on the <b>Suggested</b> dungeon to run it at your current key level.</li><li>Finish in time: key +1, or +2 if fast enough. Over time, wipe or retreat: key \u22121.</li><li>All Mythic dungeons share one keystone, so switching dungeons doesn't reset it.</li><li>Dungeons you've timed can be idled, and progress keeps building offline.</li></ol> <div class="row"><button class="btn sm main" data-act="mythichelpok">Got it</button></div></div>`,
     "\u5929\u68AF\u66AB\u6642\u8B80\u4E0D\u5230\uFF0C\u7A0D\u5F8C\u518D\u8A66\u3002": "Ladder unavailable \u2014 try again later.",
@@ -1266,7 +1304,6 @@ h3 .gi{vertical-align:-.12em}
     '<p class="sub" style="margin:0">\u9084\u6C92\u6709\u4EBA\u4E0A\u699C\uFF0C\u6436\u7B2C\u4E00\u5427\u3002</p>': `<p class="sub" style="margin:0">No one's on the board yet \u2014 be the first.</p>`,
     "\u6DF1\u6DF5 +{0}": "Abyssal +{0}",
     "\u79D8\u5883 +{0}": "Mythic +{0}",
-    "\u7B2C {0} \u5C64": "Floor {0}",
     '<div class="boardcard"><div class="row" style="align-items:baseline"><b>\u5929\u68AF</b><span class="sub" style="margin:0 0 0 auto">{0}\u30FB<button class="linkbtn" data-act="nick">{1}</button></span></div>{2} <p class="sub" style="margin:0">\u5148\u6BD4\u6DF1\u6DF5\u79D8\u5883\u3001\u518D\u6BD4\u50B3\u5947\u79D8\u5883\u7684\u6700\u9AD8\u9650\u6642\u7B49\u7D1A\u3002\u4F60\u7684\u6210\u7E3E\u6BCF 5 \u5206\u9418\u4E0A\u50B3\u4E00\u6B21\u3002</p></div>': '<div class="boardcard"><div class="row" style="align-items:baseline"><b>Ladder</b><span class="sub" style="margin:0 0 0 auto">{0}\u30FB<button class="linkbtn" data-act="nick">{1}</button></span></div>{2} <p class="sub" style="margin:0">Ranked by best timed Abyssal+ level, then Mythic+. Your score uploads every 5 minutes.</p></div>',
     "\u4F60\u662F\u300C{0}\u300D": 'You are "{0}"',
     "\u6539\u66B1\u7A31": "Rename",
@@ -3567,6 +3604,8 @@ h3 .gi{vertical-align:-.12em}
       failStreak: 0,
       player: newPlayer(),
       bagSeen: [],
+      tut: { step: 0, done: false },
+      cards: [],
       recruit: { sinceEpic: 0, sinceLegend: 0, total: 0 },
       vault: { day: "", used: 0, runs: 0, best: {} },
       dust: 0,
@@ -3586,6 +3625,10 @@ h3 .gi{vertical-align:-.12em}
   function migrate(s) {
     s.stats = s.stats || { runs: 0, wins: 0 };
     s.bagBought = Math.max(0, Math.min(ECONOMY.bagBuy.max, Math.floor(Number(s.bagBought) || 0)));
+    if (!s.tut || typeof s.tut !== "object") s.tut = { step: 0, done: (s.stats.runs || 0) > 0 };
+    s.tut.step = Math.max(0, Math.min(4, Math.floor(Number(s.tut.step) || 0)));
+    if (s.clears && s.clears[1]) s.tut.done = true;
+    if (!Array.isArray(s.cards)) s.cards = [];
     if (!s.codex || typeof s.codex !== "object" || Array.isArray(s.codex)) s.codex = {};
     if (!Array.isArray(s.codexClaimed)) s.codexClaimed = [];
     for (const it of Object.values(s.items || {})) {
@@ -4212,6 +4255,72 @@ h3 .gi{vertical-align:-.12em}
     return null;
   }
 
+  // src/core/tutorial.js
+  var TUTORIAL = [
+    { id: "fight1", text: tx("\u958B\u6253\u7B2C\u4E00\u5834"), sub: tx("\u9EDE\u300C\u8150\u6839\u6D1E\u7A9F\u300D\u7684\u300C\u6311\u6230\u300D\uFF0C\u968A\u4F0D\u6703\u81EA\u5DF1\u6253\u3002"), tab: "dungeon", sel: '[data-act="fight"][data-d="0"]', done: (s) => s.stats.runs >= 1 },
+    { id: "equip", text: tx("\u63DB\u4E0A\u65B0\u88DD\u5099"), sub: tx("\u6253\u8D0F\u6703\u6389\u88DD\u5099\u3002\u6309\u300C\u4E00\u9375\u914D\u88DD\u300D\uFF0C\u81EA\u52D5\u66FF\u968A\u54E1\u63DB\u4E0A\u66F4\u597D\u7684\u3002"), tab: "dungeon", sel: '[data-act="autoequip"]', done: (s) => s.stats.runs >= 1 && !hasUpgrade(s) },
+    { id: "hire", text: tx("\u62DB\u52DF\u7B2C 4 \u4F4D\u968A\u54E1"), sub: tx("\u5230\u9152\u9928\u7528\u91D1\u5E63\u62DB\u52DF\u82F1\u96C4\uFF0C\u968A\u4F0D\u6700\u591A 5 \u4EBA\u3002\u91D1\u5E63\u4E0D\u5920\u5C31\u518D\u6253\u4E00\u5834\u7B2C 1 \u5C64\u3002"), tab: "tavern", sel: '[data-act="hire"]', done: (s) => s.party.length >= 4 },
+    { id: "clear2", text: tx("\u901A\u95DC\u7B2C 2 \u5C64"), sub: tx("\u6311\u6230\u300C{0}\u300D\u3002\u4E4B\u5F8C\u7684\u8DEF\uFF0C\u300C\u4E0B\u4E00\u6B65\u300D\u5361\u7247\u6703\u544A\u8A34\u4F60\u3002", DUNGEONS[1].name), tab: "dungeon", sel: '[data-act="fight"][data-d="1"]', done: (s) => !!s.clears[1] }
+  ];
+  var TUT_REWARD = { gold: 300 };
+  var tutActive = (s) => !!s.tut && !s.tut.done;
+  var tutCurrent = (s) => tutActive(s) ? TUTORIAL[s.tut.step] || null : null;
+  function tutAdvance(s) {
+    const done = [];
+    while (tutActive(s) && TUTORIAL[s.tut.step] && TUTORIAL[s.tut.step].done(s)) {
+      done.push(TUTORIAL[s.tut.step].id);
+      s.tut.step++;
+    }
+    if (tutActive(s) && s.tut.step >= TUTORIAL.length) {
+      s.tut.done = true;
+      s.gold += TUT_REWARD.gold;
+      done.push("finish");
+    }
+    return done;
+  }
+  function tutSkip(s) {
+    if (tutActive(s)) {
+      s.tut.done = true;
+      s.tut.skipped = s.tut.step;
+    }
+  }
+  var STUCK = { sec: 20 * 60, fails: 3 };
+  var topOf = (s) => s.unlocked - 1;
+  function stuckCheck(s, kind) {
+    if (tutActive(s)) return null;
+    const p = s.prog || (s.prog = { top: topOf(s), at: s.player.playSec, warned: false, failWarned: 0 });
+    if (topOf(s) !== p.top) {
+      p.top = topOf(s);
+      p.at = s.player.playSec;
+      p.warned = false;
+      p.failWarned = 0;
+    }
+    const top = topOf(s), dn = DUNGEONS[top] ? DUNGEONS[top].name : "";
+    if (kind === "battle" && (s.failStreak || 0) >= STUCK.fails && s.failStreak > p.failWarned && s.idle == null) {
+      p.failWarned = s.failStreak + 1;
+      return { reason: "fails", title: tx("\u300C{0}\u300D\u5361\u95DC\u4E86\u55CE\uFF1F", dn), tips: stuckTips(s, true) };
+    }
+    if (kind === "time" && !p.warned && s.player.playSec - p.at >= STUCK.sec && top < DUNGEONS.length - 1) {
+      p.warned = true;
+      return { reason: "time", title: tx("\u4E00\u6BB5\u6642\u9593\u6C92\u6709\u65B0\u9032\u5EA6"), tips: stuckTips(s, false) };
+    }
+    return null;
+  }
+  function stuckTips(s, lost) {
+    const tips = [], n2 = nextStep(s), party = partyHeroes(s), top = topOf(s);
+    if (n2 && n2.btn) tips.push({ text: n2.text, sub: n2.sub, btn: n2.btn });
+    if (party.length < ECONOMY.partyMax) tips.push({ text: tx("\u968A\u4F0D\u53EA\u6709 {0} \u4EBA", party.length), sub: tx("\u88DC\u6EFF 5 \u4EBA\u6230\u529B\u5DEE\u5F88\u591A\uFF0C\u5230\u9152\u9928\u62DB\u52DF\u3002"), btn: { label: tx("\u524D\u5F80\u9152\u9928"), tab: "tavern" } });
+    tips.push({ text: tx("\u4F9D\u9019\u5C64\u7684\u9996\u9818\u6A5F\u5236\u5099\u6230"), sub: tx("\u4E00\u9375\u6311\u9078\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF0C\u91DD\u5C0D\u300C{0}\u300D\u7684\u6A5F\u5236\u3002", DUNGEONS[top].name), btn: { label: tx("\u4E00\u9375\u5099\u6230"), act: "prepare", d: top } });
+    if (lost && top > 0) tips.push({ text: tx("\u56DE\u524D\u4E00\u5C64\u639B\u6A5F"), sub: tx("\u639B\u6A5F\u5237\u7B49\u7D1A\u8207\u88DD\u5099\uFF0C\u96E2\u7DDA\u4E5F\u6703\u7D2F\u7A4D\uFF0C\u518D\u56DE\u4F86\u6311\u6230\u3002"), btn: { label: tx("\u639B\u6A5F\u5237\u300C{0}\u300D", DUNGEONS[top - 1].name), act: "idle", d: top - 1 } });
+    const seen = /* @__PURE__ */ new Set();
+    return tips.filter((t) => seen.has(t.text) ? false : seen.add(t.text)).slice(0, 3);
+  }
+  var seenCard = (s, id) => (s.cards || []).includes(id);
+  function markCard(s, id) {
+    s.cards = s.cards || [];
+    if (!s.cards.includes(id)) s.cards.push(id);
+  }
+
   // src/core/achievements.js
   var ACH_CATS = [
     { id: "story", name: tx("\u4E3B\u7DDA") },
@@ -4463,7 +4572,7 @@ h3 .gi{vertical-align:-.12em}
   var dailyOpenNow = () => app.dailyOpen != null ? app.dailyOpen : dailyPending(app.S) > 0;
 
   // src/core/version.js
-  var VERSION = "0.16.0";
+  var VERSION = "0.17.0";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -4581,7 +4690,7 @@ h3 .gi{vertical-align:-.12em}
     const floors = vaultFloors(S), left = vaultLeft(S);
     const f = floors.includes(app.vaultFloor) ? app.vaultFloor : floors[floors.length - 1];
     const best = S.vault.best[f] || 0;
-    return tx('<div class="vault"><div class="mhead"><div><span class="label">\u5BF6\u5EAB</span><b>60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797</b></div><span class="vleft num">\u4ECA\u5929\u5269 {0}/{1}</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">\u7B2C {3} \u5C64\uFF1A\u6BCF\u96BB <b class="num">{4}</b> \u91D1\uFF0C\u6700\u591A\u7B97 {5} \u96BB\u30FB\u6700\u4F73 {6} \u96BB\u3002\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">\u5099\u6230</button></div></div>', left, VAULT.daily, floors.map((i) => `<button data-act="vaultfloor" data-d="${i}" class="${i === f ? "sel" : ""}">${i + 1}</button>`).join(""), f + 1, fmt(vaultGoldPerKill(f)), vaultMaxKills(f), best, f, left ? "" : "disabled", left ? tx("\u9032\u5165\u5BF6\u5EAB") : tx("\u660E\u5929 00:00 \u518D\u4F86"));
+    return (vaultUnlocked(S) ? infoCard("vault", tx("\u5BF6\u5EAB\u662F\u4EC0\u9EBC"), tx("\u6BCF\u5929 {0} \u6B21\u3001\u6BCF\u6B21 60 \u79D2\uFF0C\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\u63DB\u91D1\u5E63\u3002\u91D1\u5E63\u7528\u4F86\u62DB\u52DF\u82F1\u96C4\u3001\u5F37\u5316\u88DD\u5099\u3002\u5C64\u6578\u8D8A\u9AD8\u6BCF\u96BB\u8D8A\u503C\u9322\uFF0C\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002", VAULT.daily)) : "") + tx('<div class="vault"><div class="mhead"><div><span class="label">\u5BF6\u5EAB</span><b>60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797</b></div><span class="vleft num">\u4ECA\u5929\u5269 {0}/{1}</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">\u7B2C {3} \u5C64\uFF1A\u6BCF\u96BB <b class="num">{4}</b> \u91D1\uFF0C\u6700\u591A\u7B97 {5} \u96BB\u30FB\u6700\u4F73 {6} \u96BB\u3002\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">\u5099\u6230</button></div></div>', left, VAULT.daily, floors.map((i) => `<button data-act="vaultfloor" data-d="${i}" class="${i === f ? "sel" : ""}">${i + 1}</button>`).join(""), f + 1, fmt(vaultGoldPerKill(f)), vaultMaxKills(f), best, f, left ? "" : "disabled", left ? tx("\u9032\u5165\u5BF6\u5EAB") : tx("\u660E\u5929 00:00 \u518D\u4F86"));
   }
   function mythicSection() {
     const S = app.S;
@@ -4591,7 +4700,7 @@ h3 .gi{vertical-align:-.12em}
     const st = stamina(S), nx = staminaNext(S), max = MYTHIC.stamina.max;
     const sta = tx('<div class="stamina"><span class="label">\u79D8\u5883\u9AD4\u529B</span><b class="num">{0}/{1}</b><span class="sub num" style="margin:0">{2}</span></div>', st.pts, max, nx ? tx("{0} \u5F8C +1", mmss(Math.ceil(nx / 1e3))) : tx("\u5DF2\u6EFF"));
     const key = tierKey(S, tier), today = dailyAffixes(), active = activeAffixes(key);
-    let h = tabs + mythicGuide() + tx(
+    let h = tabs + (tier === 2 ? infoCard("abyss", tx("\u6DF1\u6DF5\u79D8\u5883"), tx("\u898F\u5247\u548C\u50B3\u5947\u79D8\u5883\u4E00\u6A23\uFF0C\u4F46\u526F\u672C\u63DB\u6210\u7B2C\u4E8C\u7AE0\u3001\u5F37\u5EA6\u4EE5\u7B2C 14 \u5C64\u70BA\u57FA\u6E96\uFF0C\u6709\u81EA\u5DF1\u7684\u4E00\u9846\u9470\u77F3\uFF08\u9AD4\u529B\u5171\u7528\uFF09\u3002\u6389\u843D\u88DD\u7B49\u66F4\u9AD8\uFF0C\u9650\u6642\u901A\u95DC\u6709\u6A5F\u6703\u6389 T0 \u8077\u696D\u5957\u88DD\u3002")) : "") + mythicGuide() + tx(
       '<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>\u76EE\u524D\u9470\u77F3</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">\u4ECA\u65E5\u8A5E\u7DB4\uFF0C\u6BCF\u5929 00:00 \u66F4\u63DB\u3002\u624B\u52D5\u6311\u6230\u6BCF\u5834\u8017 1 \u9EDE\u9AD4\u529B\uFF0C\u6BCF {6} \u5206\u9418\u56DE 1 \u9EDE\u3001\u4E0A\u9650 {7}\u3002<b>\u79D8\u5883\u639B\u6A5F</b>\uFF1A\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u639B\u6A5F\uFF0C\u56FA\u5B9A\u6253\u8A72\u526F\u672C\u6700\u4F73 \u2212{2}\uFF0C\u4E0D\u8017\u9AD4\u529B\u3001\u9470\u77F3\u4E0D\u8B8A\u3001\u734E\u52F5 {3}%\uFF0C\u96E2\u7DDA\u4E5F\u6703\u7D2F\u7A4D\u3002</p> {8} <div class="mlist">',
       key,
       today.map((a, i) => `<div class="affix ${active.includes(a) ? "on" : ""}"><b>${AFFIXES[a].name}</b><span>${AFFIXES[a].desc}</span><small>${active.includes(a) ? tx("\u8003\u9A57{0}", AFFIXES[a].test) : tx("+{0} \u8D77\u751F\u6548", MYTHIC.affixAt[i])}</small></div>`).join(""),
@@ -4613,6 +4722,10 @@ h3 .gi{vertical-align:-.12em}
     if (!all) h += tx('<button class="btn sm grow" data-act="mythicall">\u986F\u793A\u5176\u4ED6 {0} \u500B\u526F\u672C</button><p class="sub" style="margin:0">\u5148\u5F9E\u63A8\u85A6\u7684\u526F\u672C\u9650\u6642\u901A\u95DC\u4E00\u6B21\uFF0C\u5176\u4ED6\u526F\u672C\u96A8\u6642\u90FD\u80FD\u6253\uFF0C\u9470\u77F3\u7B49\u7D1A\u5171\u7528\u3002</p>', f1 - f0);
     return h + `</div></div>`;
   }
+  function infoCard(id, title, body) {
+    if (seenCard(app.S, id)) return "";
+    return `<div class="mguide"><b class="mgt">${title}</b><p class="sub" style="margin:0">${body}</p><div class="row"><button class="btn sm main" data-act="cardok" data-v="${id}">${tx("\u77E5\u9053\u4E86")}</button></div></div>`;
+  }
   function mythicGuide() {
     const S = app.S, open = !S.mythicHelp || app.mythicHelpOpen;
     if (!open) return tx('<div class="row" style="justify-content:flex-end;margin:-4px 0 8px"><button class="linkbtn" data-act="mythichelp">\uFF1F\u79D8\u5883\u600E\u9EBC\u73A9</button></div>');
@@ -4631,7 +4744,7 @@ h3 .gi{vertical-align:-.12em}
   }
   function viewDungeons() {
     const lv = avgPartyLv(), il = avgPartyIlvl();
-    let h = dailyCard() + nextStepCard() + tx('<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv{0}</b>\u30FB\u88DD\u7B49 <b class="num">{1}</b>\u30FB\u6230\u529B <b class="num">{2}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u90FD\u6709\u5F31\u9EDE\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\uFF0C\u6216\u56DE\u982D\u5237\u88DD\u5099\u3002</p>', lv, il, fmt(partyPower()));
+    let h = (tutActive(app.S) ? "" : dailyCard()) + nextStepCard() + tx('<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv{0}</b>\u30FB\u88DD\u7B49 <b class="num">{1}</b>\u30FB\u6230\u529B <b class="num">{2}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u90FD\u6709\u5F31\u9EDE\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\uFF0C\u6216\u56DE\u982D\u5237\u88DD\u5099\u3002</p>', lv, il, fmt(partyPower()));
     const S = app.S, mode = app.mode || "story";
     const modes = [["story", tx("\u4E3B\u7DDA")], ["mythic", tx("\u79D8\u5883")], ["vault", tx("\u5BF6\u5EAB")], ["event", tx("\u6D3B\u52D5")]];
     h += `<div class="seg modes">${modes.map(([k, n2]) => `<button data-act="mode" data-v="${k}" class="${mode === k ? "sel" : ""}">${n2}</button>`).join("")}</div>`;
@@ -5413,6 +5526,7 @@ h3 .gi{vertical-align:-.12em}
       }, 3e3);
     }
     app.render(true);
+    if (!b.mythic && !b.vault && app.showStuck) app.showStuck("battle");
     if (r.first && app.storyOnce) app.storyOnce("post" + b.dIdx);
   }
 
@@ -5433,6 +5547,7 @@ h3 .gi{vertical-align:-.12em}
     $("#gold").textContent = fmt(app.S.gold);
     $("#idleChip").hidden = !partyLocked(app.S);
     renderTabs();
+    tutTick();
     const v = $("#view");
     if (app.tab === "dungeon") v.innerHTML = viewDungeons();
     if (app.tab === "battle") v.innerHTML = viewBattle();
@@ -5442,9 +5557,41 @@ h3 .gi{vertical-align:-.12em}
     if (app.tab === "battle") {
       const lg = $(".log");
       if (lg) lg.scrollTop = lg.scrollHeight;
-    }
+    } else if (tutActive(app.S) && !app.fresh) v.insertAdjacentHTML("afterbegin", coachCard());
+    tutHighlight();
     if (!skipModal) renderModal();
   }
+  function tutTick() {
+    if (app.fresh) return;
+    const done = tutAdvance(app.S);
+    if (!done.length) return;
+    save();
+    for (const id of done) sendEvent(tx("\u6559\u5B78"), id);
+    if (done.includes("finish")) setTimeout(() => toast(tx("\u{1F389} \u65B0\u624B\u6559\u5B78\u5B8C\u6210\uFF01\u7372\u5F97 {0} \u91D1", TUT_REWARD.gold)), 300);
+  }
+  function coachCard() {
+    const st = tutCurrent(app.S);
+    if (!st) return "";
+    const i = app.S.tut.step, n2 = TUTORIAL.length;
+    return tx('<div class="coach"><div class="cstep num">{0}/{1}</div><div class="cbody"><b>{2}</b><span>{3}</span></div><button class="linkbtn cskip" data-act="tutskip">\u8DF3\u904E\u6559\u5B78</button></div>', i + 1, n2, st.text, st.sub);
+  }
+  function tutHighlight() {
+    document.querySelectorAll(".tut-hl").forEach((el2) => el2.classList.remove("tut-hl"));
+    const st = tutCurrent(app.S);
+    if (!st || app.fresh || app.modal) return;
+    const el = app.tab === st.tab && document.querySelector("#view " + st.sel) || app.tab !== st.tab && app.tab !== "battle" && document.querySelector(`#tabs [data-tab="${st.tab}"]`);
+    if (el) el.classList.add("tut-hl");
+  }
+  function showStuck(kind) {
+    if (app.fresh || app.modal) return;
+    const r = stuckCheck(app.S, kind);
+    if (!r) return;
+    save();
+    sendEvent(tx("\u5361\u95DC\u6307\u5F15"), `${r.reason}\u30FB${tx("\u7B2C {0} \u5C64", app.S.unlocked)}`);
+    const btn = (b) => !b ? "" : b.tab ? `<button class="btn sm main" data-tab="${b.tab}">${b.label}</button>` : `<button class="btn sm main" data-act="${b.act}" data-closemodal="1" ${b.d != null ? `data-d="${b.d}"` : ""}>${b.label}</button>`;
+    openModal({ type: "text", html: tx('<h3>{0}</h3><p class="sub" style="margin:0">\u8A66\u8A66\u4E0B\u9762\u7684\u65B9\u6CD5\uFF1A</p><div class="stucklist">{1}</div><div class="row"><button class="btn grow" data-act="closebtn">\u5148\u4E0D\u7528</button></div>', r.title, r.tips.map((t) => `<div class="stuck"><div><b>${t.text}</b><span class="sub" style="margin:0">${t.sub}</span></div>${btn(t.btn)}</div>`).join("")) });
+  }
+  app.showStuck = showStuck;
   app.render = render;
   app.renderModal = renderModal;
   app.afterModal = () => {
@@ -5469,6 +5616,7 @@ h3 .gi{vertical-align:-.12em}
       window.scrollTo(0, 0);
       return;
     }
+    if (t.dataset.closemodal) app.modal = null;
     const a = t.dataset.act, id = t.dataset.id;
     if (a !== "salvageupto") app.salvConfirm = false;
     if (a !== "firemany") app.fireConfirm = false;
@@ -5738,6 +5886,18 @@ h3 .gi{vertical-align:-.12em}
         }
         break;
       }
+      case "tutskip": {
+        const step = app.S.tut.step;
+        tutSkip(app.S);
+        save();
+        sendEvent(tx("\u6559\u5B78"), `skip@${step}`);
+        toast(tx("\u5DF2\u8DF3\u904E\u6559\u5B78\uFF0C\u300C\u4E0B\u4E00\u6B65\u300D\u5361\u7247\u6703\u7E7C\u7E8C\u63D0\u793A"));
+        break;
+      }
+      case "cardok":
+        markCard(app.S, t.dataset.v);
+        save();
+        break;
       case "lock": {
         const on = toggleLock(app.S, t.dataset.kind, id);
         if (on != null) toast(on ? tx("\u5DF2\u9396\u5B9A\uFF0C\u4E0D\u6703\u88AB\u5206\u89E3\u6216\u89E3\u96C7") : tx("\u5DF2\u89E3\u9664\u9396\u5B9A"));
@@ -6046,6 +6206,7 @@ h3 .gi{vertical-align:-.12em}
       tick(5);
       save();
       autoTick();
+      showStuck("time");
     }
   }, 5e3);
   document.addEventListener("input", (e) => {

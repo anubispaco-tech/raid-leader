@@ -47,7 +47,7 @@ function vaultSection() {
   const floors = G.vaultFloors(S), left = G.vaultLeft(S);
   const f = floors.includes(app.vaultFloor) ? app.vaultFloor : floors[floors.length - 1];
   const best = S.vault.best[f] || 0;
-  return tx('<div class="vault"><div class="mhead"><div><span class="label">寶庫</span><b>60 秒打寶藏哥布林</b></div><span class="vleft num">今天剩 {0}/{1}</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">第 {3} 層：每隻 <b class="num">{4}</b> 金，最多算 {5} 隻・最佳 {6} 隻。打你目前最高的那層通常最賺。</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">備戰</button></div></div>', left, G.VAULT.daily, floors.map(i => `<button data-act="vaultfloor" data-d="${i}" class="${i === f ? 'sel' : ''}">${i + 1}</button>`).join(''), f + 1, fmt(G.vaultGoldPerKill(f)), G.vaultMaxKills(f), best, f, left ? '' : 'disabled', left ? tx('進入寶庫') : tx('明天 00:00 再來'));
+  return (G.vaultUnlocked(S) ? infoCard('vault', tx('寶庫是什麼'), tx('每天 {0} 次、每次 60 秒，打寶藏哥布林換金幣。金幣用來招募英雄、強化裝備。層數越高每隻越值錢，打你目前最高的那層通常最賺。', G.VAULT.daily)) : '') + tx('<div class="vault"><div class="mhead"><div><span class="label">寶庫</span><b>60 秒打寶藏哥布林</b></div><span class="vleft num">今天剩 {0}/{1}</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">第 {3} 層：每隻 <b class="num">{4}</b> 金，最多算 {5} 隻・最佳 {6} 隻。打你目前最高的那層通常最賺。</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">備戰</button></div></div>', left, G.VAULT.daily, floors.map(i => `<button data-act="vaultfloor" data-d="${i}" class="${i === f ? 'sel' : ''}">${i + 1}</button>`).join(''), f + 1, fmt(G.vaultGoldPerKill(f)), G.vaultMaxKills(f), best, f, left ? '' : 'disabled', left ? tx('進入寶庫') : tx('明天 00:00 再來'));
 }
 // ---------- 傳奇秘境 ----------
 function mythicSection() {
@@ -59,7 +59,7 @@ function mythicSection() {
   const st = G.stamina(S), nx = G.staminaNext(S), max = G.MYTHIC.stamina.max;
   const sta = tx('<div class="stamina"><span class="label">秘境體力</span><b class="num">{0}/{1}</b><span class="sub num" style="margin:0">{2}</span></div>', st.pts, max, nx ? tx('{0} 後 +1', mmss(Math.ceil(nx / 1000))) : tx('已滿'));
   const key = G.tierKey(S, tier), today = G.dailyAffixes(), active = G.activeAffixes(key);
-  let h = tabs + mythicGuide() + tx('<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>目前鑰石</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">今日詞綴，每天 00:00 更換。手動挑戰每場耗 1 點體力，每 {6} 分鐘回 1 點、上限 {7}。<b>秘境掛機</b>：限時通關過的副本可以掛機，固定打該副本最佳 −{2}，不耗體力、鑰石不變、獎勵 {3}%，離線也會累積。</p> {8} <div class="mlist">',
+  let h = tabs + (tier === 2 ? infoCard('abyss', tx('深淵秘境'), tx('規則和傳奇秘境一樣，但副本換成第二章、強度以第 14 層為基準，有自己的一顆鑰石（體力共用）。掉落裝等更高，限時通關有機會掉 T0 職業套裝。')) : '') + mythicGuide() + tx('<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>目前鑰石</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">今日詞綴，每天 00:00 更換。手動挑戰每場耗 1 點體力，每 {6} 分鐘回 1 點、上限 {7}。<b>秘境掛機</b>：限時通關過的副本可以掛機，固定打該副本最佳 −{2}，不耗體力、鑰石不變、獎勵 {3}%，離線也會累積。</p> {8} <div class="mlist">',
     key, today.map((a, i) => `<div class="affix ${active.includes(a) ? 'on' : ''}"><b>${G.AFFIXES[a].name}</b><span>${G.AFFIXES[a].desc}</span><small>${active.includes(a) ? tx('考驗{0}', G.AFFIXES[a].test) : tx('+{0} 起生效', G.MYTHIC.affixAt[i])}</small></div>`).join(''), G.MYTHIC.idleBelow, Math.round(G.MYTHIC.idleMult * 100),
     tier === 2 ? tx('深淵秘境') : tx('傳奇秘境'), sta, G.MYTHIC.stamina.regenMin, max,
     tier === 2 ? tx('<p class="sub" style="margin:0">深淵秘境以第 14 層的強度為基準，掉落裝等更高，限時通關有機會掉職業套裝。</p>') : open2 ? '' : tx('<p class="sub" style="margin:0">通關第 14 層「深淵之心」後解鎖深淵秘境。</p>'));
@@ -73,6 +73,11 @@ function mythicSection() {
   }
   if (!all) h += tx('<button class="btn sm grow" data-act="mythicall">顯示其他 {0} 個副本</button><p class="sub" style="margin:0">先從推薦的副本限時通關一次，其他副本隨時都能打，鑰石等級共用。</p>', f1 - f0);
   return h + `</div></div>`;
+}
+// v0.17 新系統說明卡：第一次看到時顯示，按「知道了」後不再出現
+function infoCard(id, title, body) {
+  if (G.seenCard(app.S, id)) return '';
+  return `<div class="mguide"><b class="mgt">${title}</b><p class="sub" style="margin:0">${body}</p><div class="row"><button class="btn sm main" data-act="cardok" data-v="${id}">${tx('知道了')}</button></div></div>`;
 }
 // v0.15 秘境說明卡：第一次進秘境自動展開，按「知道了」收起，之後點「？秘境怎麼玩」再打開
 function mythicGuide() {
@@ -93,7 +98,7 @@ function boardCard() {
 }
 export function viewDungeons() {
   const lv = avgPartyLv(), il = avgPartyIlvl();
-  let h = dailyCard() + nextStepCard() + tx('<h2>副本</h2><p class="sub">隊伍平均 <b class="num">Lv{0}</b>・裝等 <b class="num">{1}</b>・戰力 <b class="num">{2}</b>　｜　每隻首領都有弱點，打不過就換陣容，或回頭刷裝備。</p>', lv, il, fmt(partyPower()));
+  let h = (G.tutActive(app.S) ? '' : dailyCard()) + nextStepCard() + tx('<h2>副本</h2><p class="sub">隊伍平均 <b class="num">Lv{0}</b>・裝等 <b class="num">{1}</b>・戰力 <b class="num">{2}</b>　｜　每隻首領都有弱點，打不過就換陣容，或回頭刷裝備。</p>', lv, il, fmt(partyPower()));
   // 遊玩分類：主線／秘境／寶庫／活動（之後的節慶、裝備副本放「活動」）
   const S = app.S, mode = app.mode || 'story';
   const modes = [['story', tx('主線')], ['mythic', tx('秘境')], ['vault', tx('寶庫')], ['event', tx('活動')]];

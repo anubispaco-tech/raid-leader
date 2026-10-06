@@ -43,6 +43,7 @@ export function newGame() {
   const s = { v: SAVE_VERSION, gold: ECONOMY.startGold, heroes: [], items: {}, bag: [], party: [], unlocked: 1, clears: {},
     tavern: [], idle: null, lastSeen: Date.now(), stats: { runs: 0, wins: 0 }, autoSalvageBelow: 0, keepRarity: ECONOMY.defaultKeepRarity, stash: [], created: Date.now(),
     mythic: { key: MYTHIC.startKey, key2: MYTHIC.startKey, best: {}, runs: 0, timed: 0 }, failStreak: 0, player: newPlayer(), bagSeen: [],
+    tut: { step: 0, done: false }, cards: [],
     recruit: { sinceEpic: 0, sinceLegend: 0, total: 0 }, vault: { day: '', used: 0, runs: 0, best: {} }, dust: 0, idleMythic: null, salvageIlvlGap: 0, story: { seen: [] } };
   for (const c of HERO.starters) { const h = makeHero(c); h.name = uniqueName(s); s.heroes.push(h); s.party.push(h.id); }
   rollTavern(s);
@@ -52,6 +53,11 @@ export function newGame() {
 export function migrate(s) {
   s.stats = s.stats || { runs: 0, wins: 0 };
   s.bagBought = Math.max(0, Math.min(ECONOMY.bagBuy.max, Math.floor(Number(s.bagBought) || 0))); // v0.15
+  // v0.17 教學：已經玩過的舊存檔直接視為完成
+  if (!s.tut || typeof s.tut !== 'object') s.tut = { step: 0, done: (s.stats.runs || 0) > 0 };
+  s.tut.step = Math.max(0, Math.min(4, Math.floor(Number(s.tut.step) || 0)));
+  if (s.clears && s.clears[1]) s.tut.done = true; // 已經通關第 2 層：不需要教學
+  if (!Array.isArray(s.cards)) s.cards = [];
   // v0.16 舊裝備補上基底代號；圖鑑登錄目前持有的裝備
   if (!s.codex || typeof s.codex !== 'object' || Array.isArray(s.codex)) s.codex = {};
   if (!Array.isArray(s.codexClaimed)) s.codexClaimed = [];
