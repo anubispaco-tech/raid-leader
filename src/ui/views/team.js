@@ -16,8 +16,13 @@ export function viewTeam() {
       if (!x) return tx('<div class="slot emptyslot">空位</div>');
       return `<button class="slot r-${x.rarity || 0}" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div><div class="n c${x.rarity || 0}">${x.name}</div><div class="lv num">Lv${x.level}</div><div class="rl role-${G.roleOf(x)}"></div></button>`;
     }).join(''), c.tank, c.heal, c.dps, fmt(partyPower()), !c.tank ? tx('<span style="color:var(--warn)">缺坦克</span>') : '', !c.heal ? tx('<span style="color:var(--warn)">缺治療</span>') : '', app.S.heroes.length, G.ECONOMY.rosterMax, fireBar());
-  const sorted = [...app.S.heroes].sort((a, b) => (inParty(b) - inParty(a)) || (b.rarity || 0) - (a.rarity || 0) || b.level - a.level);
-  for (const x of sorted) h += heroCard(x);
+  // v0.15 名冊分成「出戰隊伍」與「待命」兩區；篩選只影響待命區
+  const byQ = (a, b) => (b.rarity || 0) - (a.rarity || 0) || b.level - a.level;
+  const f = app.teamFilter || 'all', match = x => f === 'all' || G.roleOf(x) === f || x.cls === f;
+  const bench = app.S.heroes.filter(x => !inParty(x)).sort(byQ), shown = bench.filter(match);
+  h += tx('<div class="rhead in"><b>出戰隊伍</b><span class="sub num">{0}/{1}</span></div>', party.length, G.ECONOMY.partyMax) + party.map(heroCard).join('');
+  h += tx('<div class="rhead"><b>待命</b><span class="sub num">{0}</span></div>', f === 'all' ? bench.length : `${shown.length}/${bench.length}`) + filterBar(bench);
+  h += shown.length ? shown.map(heroCard).join('') : `<div class="empty" style="margin:0;padding:20px">${bench.length ? tx('沒有符合篩選的待命英雄') : tx('沒有待命英雄，到酒館招募吧。')}</div>`;
   h += `</div><p class="sub" style="margin-top:12px">${tx('暱稱、存檔、語言與意見回饋，在左上角「設定」。')}</p>`;
   return h;
 }
@@ -25,6 +30,13 @@ function heroCard(x) {
   const st = G.heroStats(x, app.S.items);
   const need = G.xpNeed(x.level);
   return tx('<button class="hero r-{0}" data-act="hero" data-id="{1}"><div class="ic">{2}</div> <div class="nm">{3}{4}<small>{5}{6}・<span class="num">Lv{7}</span></small>{8}</div> <span class="tag {9}">{10}</span> <div class="st num"><span>生命 {11}</span><span>威力 {12}</span><span>暴擊 {13}%</span><span>裝等 {14}</span></div> <div class="xpbar"><i style="width:{15}%"></i></div></button>', x.rarity || 0, x.id, cls(x).icon, heroName(x), rarityTag(x), cls(x).name, x.spec ? `・${G.SPECS[x.cls][x.spec].name}` : '', x.level, G.pendingPicks(x) ? tx('<span class="newpick">可選天賦</span>') : '', inParty(x) ? 'in' : '', inParty(x) ? tx('出戰中') : tx('待命'), fmt(st.hp), st.pow, Math.round(st.crit * 100), G.heroIlvl(x, app.S.items), x.level >= G.HERO.maxLevel ? 100 : pct(x.xp, need));
+}
+// 篩選：職責（坦／補／輸出）＋名冊裡有的職業
+function filterBar(bench) {
+  const f = app.teamFilter || 'all', cnt = k => bench.filter(x => G.roleOf(x) === k || x.cls === k).length;
+  const roles = [['all', tx('全部'), bench.length], ['tank', tx('坦'), cnt('tank')], ['heal', tx('補'), cnt('heal')], ['dps', tx('輸出'), cnt('dps')]];
+  const classes = Object.keys(G.CLASSES).filter(k => bench.some(x => x.cls === k)).map(k => [k, G.CLASSES[k].icon, cnt(k), G.CLASSES[k].name]);
+  return `<div class="tfilter">${[...roles, ...classes].map(([k, label, n, title]) => `<button class="tf ${f === k ? 'sel' : ''}" data-act="teamfilter" data-v="${k}" ${title ? `aria-label="${title}" title="${title}"` : ''}>${label}<small class="num">${n}</small></button>`).join('')}</div>`;
 }
 // 一鍵解雇：只解雇待命英雄（出戰中、傳說不會被選到），裝備自動卸下
 function fireBar() {

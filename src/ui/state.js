@@ -13,4 +13,5 @@ export const app = {
 };
 
 // v0.14 首次挑戰不能直接結算；自動化測試（sessionStorage rl-e2e）例外
+export const e2eMode = () => { try { return sessionStorage.getItem('rl-e2e') === '1'; } catch (e) { return false; } };
 export const canSkip = b => { try { if (sessionStorage.getItem('rl-e2e') === '1') return true; } catch (e) { /* ignore */ } return G.skipAllowed(app.S, b); };

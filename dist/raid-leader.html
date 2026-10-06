@@ -346,6 +346,21 @@ h3 .gi{vertical-align:-.12em}
 .achwhen{font-size:11px;white-space:nowrap}
 /* v0.13 雲端存檔 */
 .gsi{min-height:44px;display:flex;align-items:center}
+
+/* v0.15 團隊分區與篩選、套裝簡述、秘境引導 */
+.rhead{display:flex;align-items:baseline;gap:8px;margin:8px 0 -4px}.rhead b{font-size:14px}.rhead.in b{color:var(--brass)}
+.stack .hero.r-0:has(.tag.in),.stack .hero:has(.tag.in){border-color:var(--brass-d);background:color-mix(in srgb,var(--brass) 7%,var(--panel))}
+.tfilter{display:flex;gap:6px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none}
+.tf{flex:0 0 auto;display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--panel);font-size:13px}
+.tf small{color:var(--muted);font-size:11px}.tf.sel{border-color:var(--brass);color:var(--brass)}.tf.sel small{color:var(--brass)}
+.setmini{grid-column:1/-1;font-size:11.5px;color:var(--r3);line-height:1.35}
+.mguide{background:var(--panel);border:1px solid color-mix(in srgb,var(--r4) 45%,var(--line));border-radius:12px;padding:14px;display:grid;gap:10px;margin-bottom:12px}
+.mgt{font-family:var(--f-display);font-size:18px;color:var(--r4)}
+.mcmp{display:grid;grid-template-columns:auto 1fr 1.4fr;gap:6px 10px;font-size:12.5px;line-height:1.4}
+.mcmp>b{font-size:13px;color:var(--brass)}.mcmp>span:nth-child(3n+1){color:var(--muted);white-space:nowrap}
+.msteps{margin:0;padding-left:20px;display:grid;gap:4px;font-size:13px}
+.mrow2.sug{outline:1px solid var(--r4);background:color-mix(in srgb,var(--r4) 10%,var(--panel2))}
+.sugtag{font-size:11px;font-weight:700;color:var(--ink);background:var(--r4);border-radius:999px;padding:1px 7px;margin-left:6px;vertical-align:1px}
 </style>
 <div class="app">
   <header class="top">
@@ -362,7 +377,7 @@ h3 .gi{vertical-align:-.12em}
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.14.0 */
+/* 副本團長 v0.15.0 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -970,6 +985,7 @@ h3 .gi{vertical-align:-.12em}
     "\u5F37\u5316": "Upgrade",
     "\u91D1\u5E63\u6216\u7CBE\u83EF\u4E0D\u8DB3": "Not enough gold or essence",
     "\u91D1\u5E63\u4E0D\u8DB3": "Not enough gold",
+    "\u80CC\u5305 +{0} \u683C\uFF08\u82B1\u8CBB {1} \u91D1\uFF09": "Bag +{0} slots (spent {1} gold)",
     "\u5DF2\u9396\u5B9A\uFF0C\u4E0D\u6703\u88AB\u5206\u89E3\u6216\u89E3\u96C7": "Locked. It won't be salvaged or dismissed",
     "\u5DF2\u89E3\u9664\u9396\u5B9A": "Unlocked",
     "\u5206\u89E3\u7372\u5F97 {0} \u91D1": "Salvaged for {0} gold",
@@ -1084,6 +1100,10 @@ h3 .gi{vertical-align:-.12em}
     "\u30FB\u6DF1\u6DF5 +{0}": " \xB7 Abyssal +{0}",
     '<h3>{0} \u6210\u5C31</h3><div class="achsum"><b class="num">{1}</b><span class="sub num" style="margin:0">/ {2} \u9EDE\u30FB\u5DF2\u5B8C\u6210 {3}/{4}</span></div>': '<h3>{0} Achievements</h3><div class="achsum"><b class="num">{1}</b><span class="sub num" style="margin:0">/ {2} pts \xB7 {3}/{4} done</span></div>',
     '<span class="better">\u25B2 \u53EF\u63D0\u5347</span>': '<span class="better">\u25B2 Upgrade</span>',
+    "{0}\u5C08\u5C6C\u30FB2 \u4EF6\uFF1A{1}": "{0} only \xB7 2-piece: {1}",
+    '<div class="set"><span style="margin:0">\u91D1\u5E63\u64F4\u5145 <span class="sub num">{0}/{1}</span></span>{2}</div>': '<div class="set"><span style="margin:0">Buy with gold <span class="sub num">{0}/{1}</span></span>{2}</div>',
+    '<span class="num okc">\u5DF2\u5168\u90E8\u64F4\u5145</span>': '<span class="num okc">Fully expanded</span>',
+    '<button class="btn sm main" data-act="buybag" {0}>+{1} \u683C\u30FB<span class="num">{2}</span> \u91D1</button>': '<button class="btn sm main" data-act="buybag" {0}>+{1} slots \xB7 <span class="num">{2}</span> gold</button>',
     '<h2>\u80CC\u5305 <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">\u7CBE\u83EF <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">\u5206\u89E3\u7CBE\u826F\u4EE5\u4E0A\u7684\u88DD\u5099\u6703\u5F97\u5230\u7CBE\u83EF\u3002\u901A\u95DC\u7B2C 7 \u5C64\u5F8C\uFF0C\u53EF\u7528\u7CBE\u83EF\u628A\u88DD\u5099\u7CBE\u7149\u5230 +6 ~ +{4}\u3002</p>': '<h2>Bag <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">Essence <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">Salvaging Uncommon or better gear yields essence. After clearing Floor 7, use essence to refine gear to +6 ~ +{4}.</p>',
     '<div class="stashbox"><div class="row" style="align-items:center"><b>\u6230\u5229\u54C1\u7BB1</b><span class="sub num" style="margin:0">{0}/{1}</span> <span class="sub" style="margin:0 0 0 auto">\u80CC\u5305\u6EFF\u6642\u6389\u843D\u7684\u88DD\u5099</span></div> <div class="stack">{2} {3}</div> <div class="row"><button class="btn sm main grow" data-act="takestash" {4}>{5}</button> <button class="btn sm" data-act="salvagestash">\u5168\u90E8\u5206\u89E3</button></div></div>': '<div class="stashbox"><div class="row" style="align-items:center"><b>Loot chest</b><span class="sub num" style="margin:0">{0}/{1}</span> <span class="sub" style="margin:0 0 0 auto">Drops received while your bag was full</span></div> <div class="stack">{2} {3}</div> <div class="row"><button class="btn sm main grow" data-act="takestash" {4}>{5}</button> <button class="btn sm" data-act="salvagestash">Salvage all</button></div></div>',
     '<div class="sub" style="margin:0">\u9084\u6709 {0} \u4EF6</div>': '<div class="sub" style="margin:0">{0} more</div>',
@@ -1179,16 +1199,20 @@ h3 .gi{vertical-align:-.12em}
     '<div class="stamina"><span class="label">\u79D8\u5883\u9AD4\u529B</span><b class="num">{0}/{1}</b><span class="sub num" style="margin:0">{2}</span></div>': '<div class="stamina"><span class="label">Mythic stamina</span><b class="num">{0}/{1}</b><span class="sub num" style="margin:0">{2}</span></div>',
     "{0} \u5F8C +1": "+1 in {0}",
     "\u5DF2\u6EFF": "Full",
-    '<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>\u76EE\u524D\u9470\u77F3</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">\u4ECA\u65E5\u8A5E\u7DB4\uFF0C\u6BCF\u5929 00:00 \u66F4\u63DB\u3002\u9650\u6642\u5167\u901A\u95DC\uFF0C\u9470\u77F3 +1\uFF0C\u6253\u5F97\u5920\u5FEB +2\uFF1B\u8D85\u6642\u6216\u5931\u6557\uFF08\u542B\u64A4\u9000\uFF09\uFF0C\u9470\u77F3 \u22121\u3002\u624B\u52D5\u6311\u6230\u6BCF\u5834\u8017 1 \u9EDE\u9AD4\u529B\uFF0C\u6BCF {6} \u5206\u9418\u56DE 1 \u9EDE\u3001\u4E0A\u9650 {7}\u3002<b>\u79D8\u5883\u639B\u6A5F</b>\uFF1A\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u639B\u6A5F\uFF0C\u56FA\u5B9A\u6253\u8A72\u526F\u672C\u6700\u4F73 \u2212{2}\uFF0C\u4E0D\u8017\u9AD4\u529B\u3001\u9470\u77F3\u4E0D\u8B8A\u3001\u734E\u52F5 {3}%\uFF0C\u96E2\u7DDA\u4E5F\u6703\u7D2F\u7A4D\u3002</p> {8} <div class="mlist">': `<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>Keystone</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">Today's affixes; they change daily at 00:00. Beat the timer: key +1, or +2 if fast enough. Over time or failed (including retreat): key \u22121. Each manual run costs 1 stamina; 1 point regenerates every {6} min, up to {7}. <b>Mythic idle</b>: any dungeon you have timed can be idled at its best \u2212{2}. No stamina cost, key unchanged, {3}% rewards, and it keeps going offline.</p> {8} <div class="mlist">`,
+    '<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>\u76EE\u524D\u9470\u77F3</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">\u4ECA\u65E5\u8A5E\u7DB4\uFF0C\u6BCF\u5929 00:00 \u66F4\u63DB\u3002\u624B\u52D5\u6311\u6230\u6BCF\u5834\u8017 1 \u9EDE\u9AD4\u529B\uFF0C\u6BCF {6} \u5206\u9418\u56DE 1 \u9EDE\u3001\u4E0A\u9650 {7}\u3002<b>\u79D8\u5883\u639B\u6A5F</b>\uFF1A\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u639B\u6A5F\uFF0C\u56FA\u5B9A\u6253\u8A72\u526F\u672C\u6700\u4F73 \u2212{2}\uFF0C\u4E0D\u8017\u9AD4\u529B\u3001\u9470\u77F3\u4E0D\u8B8A\u3001\u734E\u52F5 {3}%\uFF0C\u96E2\u7DDA\u4E5F\u6703\u7D2F\u7A4D\u3002</p> {8} <div class="mlist">': `<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>Keystone</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">Today's affixes change daily at 00:00. Each manual run costs 1 stamina; you regain 1 every {6} min, up to {7}.<b>Mythic idle</b>: any dungeon you have timed can be idled at its best \u2212{2}. No stamina cost, key unchanged, {3}% rewards, and it keeps going offline.</p> {8} <div class="mlist">`,
     "\u8003\u9A57{0}": "Tests {0}",
     "+{0} \u8D77\u751F\u6548": "From +{0}",
     '<p class="sub" style="margin:0">\u6DF1\u6DF5\u79D8\u5883\u4EE5\u7B2C 14 \u5C64\u7684\u5F37\u5EA6\u70BA\u57FA\u6E96\uFF0C\u6389\u843D\u88DD\u7B49\u66F4\u9AD8\uFF0C\u9650\u6642\u901A\u95DC\u6709\u6A5F\u6703\u6389\u8077\u696D\u5957\u88DD\u3002</p>': '<p class="sub" style="margin:0">Abyssal+ is scaled from floor XIV: higher item level, and timed runs can drop class set pieces.</p>',
     '<p class="sub" style="margin:0">\u901A\u95DC\u7B2C 14 \u5C64\u300C\u6DF1\u6DF5\u4E4B\u5FC3\u300D\u5F8C\u89E3\u9396\u6DF1\u6DF5\u79D8\u5883\u3002</p>': '<p class="sub" style="margin:0">Clear floor XIV "Heart of the Abyss" to unlock Abyssal+.</p>',
-    '<div class="mrow2"><div class="mname"><b>{0}</b><span class="sub num" style="margin:0">\u9650\u6642 {1}\u30FB{2}</span></div> {3} <button class="btn sm" data-act="recommend-mythic" data-d="{4}" aria-label="\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099">\u5099\u6230</button> <button class="btn sm main" data-act="mythic" data-d="{5}">\u6311\u6230 +{6}</button></div>': '<div class="mrow2"><div class="mname"><b>{0}</b><span class="sub num" style="margin:0">Limit {1} \xB7 {2}</span></div> {3} <button class="btn sm" data-act="recommend-mythic" data-d="{4}" aria-label="One-tap prep: lineup, talents, gear">Prep</button> <button class="btn sm main" data-act="mythic" data-d="{5}">Start +{6}</button></div>',
+    '<div class="mrow2 {7}"><div class="mname"><b>{0}{8}</b><span class="sub num" style="margin:0">\u9650\u6642 {1}\u30FB{2}</span></div> {3} <button class="btn sm" data-act="recommend-mythic" data-d="{4}" aria-label="\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099">\u5099\u6230</button> <button class="btn sm main" data-act="mythic" data-d="{5}">\u6311\u6230 +{6}</button></div>': '<div class="mrow2 {7}"><div class="mname"><b>{0}{8}</b><span class="sub num" style="margin:0">Limit {1} \xB7 {2}</span></div> {3} <button class="btn sm" data-act="recommend-mythic" data-d="{4}" aria-label="One-tap prep: lineup, talents, gear">Prep</button> <button class="btn sm main" data-act="mythic" data-d="{5}">Start +{6}</button></div>',
     "\u6700\u4F73 +{0}\uFF08{1}\uFF09": "Best +{0} ({1})",
     "\u9084\u6C92\u9650\u6642\u901A\u95DC": "Not timed yet",
     "\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62": "Idling \xB7 Stop",
     "\u639B\u6A5F +{0}": "Idle +{0}",
+    '<span class="sugtag">\u63A8\u85A6</span>': '<span class="sugtag">Suggested</span>',
+    '<button class="btn sm grow" data-act="mythicall">\u986F\u793A\u5176\u4ED6 {0} \u500B\u526F\u672C</button><p class="sub" style="margin:0">\u5148\u5F9E\u63A8\u85A6\u7684\u526F\u672C\u9650\u6642\u901A\u95DC\u4E00\u6B21\uFF0C\u5176\u4ED6\u526F\u672C\u96A8\u6642\u90FD\u80FD\u6253\uFF0C\u9470\u77F3\u7B49\u7D1A\u5171\u7528\u3002</p>': '<button class="btn sm grow" data-act="mythicall">Show the other {0} dungeons</button><p class="sub" style="margin:0">Time the suggested dungeon once first. The others are open anytime and share the same keystone.</p>',
+    '<div class="row" style="justify-content:flex-end;margin:-4px 0 8px"><button class="linkbtn" data-act="mythichelp">\uFF1F\u79D8\u5883\u600E\u9EBC\u73A9</button></div>': '<div class="row" style="justify-content:flex-end;margin:-4px 0 8px"><button class="linkbtn" data-act="mythichelp">? How Mythic works</button></div>',
+    '<div class="mguide"><b class="mgt">\u79D8\u5883\u600E\u9EBC\u73A9</b> <div class="mcmp"><span></span><b>\u4E3B\u7DDA</b><b>\u79D8\u5883</b> <span>\u76EE\u7684</span><span>\u63A8\u9032\u5287\u60C5\u3001\u89E3\u9396\u65B0\u5C64</span><span>\u91CD\u8907\u5237\u540C\u4E00\u6279\u526F\u672C\uFF0C\u62FF\u66F4\u9AD8\u88DD\u7B49\u7684\u88DD\u5099</span> <span>\u96E3\u5EA6</span><span>\u6BCF\u5C64\u56FA\u5B9A</span><span>\u770B\u9470\u77F3\u7B49\u7D1A\uFF1A\u8D8A\u9AD8\u6575\u4EBA\u8D8A\u786C\uFF0C+{0} \u8D77\u6709\u8A5E\u7DB4</span> <span>\u6642\u9593</span><span>\u4E0D\u9650\u6642</span><span>\u6709\u9650\u6642\uFF0C\u9650\u6642\u5167\u901A\u95DC\u624D\u5347\u7D1A</span> <span>\u734E\u52F5</span><span>\u9996\u901A\u4FDD\u5E95\u7A00\u6709</span><span>\u9470\u77F3\u8D8A\u9AD8\u88DD\u7B49\u8D8A\u9AD8\uFF0C+{1} \u8D77\u53EF\u80FD\u6389\u50B3\u8AAA</span></div> <ol class="msteps"><li>\u9EDE<b>\u63A8\u85A6</b>\u526F\u672C\u7684\u300C\u6311\u6230\u300D\uFF0C\u7528\u76EE\u524D\u9470\u77F3\u7B49\u7D1A\u958B\u6253\u3002</li><li>\u9650\u6642\u5167\u901A\u95DC\uFF1A\u9470\u77F3 +1\uFF0C\u6253\u5F97\u5920\u5FEB +2\uFF1B\u8D85\u6642\u3001\u5931\u6557\u6216\u64A4\u9000\uFF1A\u9470\u77F3 \u22121\u3002</li><li>\u6240\u6709\u79D8\u5883\u526F\u672C\u5171\u7528\u540C\u4E00\u9846\u9470\u77F3\uFF0C\u63DB\u526F\u672C\u6253\u4E0D\u6703\u91CD\u4F86\u3002</li><li>\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u958B\u300C\u79D8\u5883\u639B\u6A5F\u300D\uFF0C\u96E2\u7DDA\u4E5F\u6703\u6162\u6162\u5237\u3002</li></ol> <div class="row"><button class="btn sm main" data-act="mythichelpok">\u77E5\u9053\u4E86</button></div></div>': `<div class="mguide"><b class="mgt">How Mythic works</b> <div class="mcmp"><span></span><b>Story</b><b>Mythic</b> <span>Goal</span><span>Advance the story and unlock floors</span><span>Rerun the same dungeons for higher item level gear</span> <span>Difficulty</span><span>Fixed per floor</span><span>Set by keystone level: higher means tougher enemies, affixes from +{0}</span> <span>Timer</span><span>None</span><span>Timed; finish in time to level up the key</span> <span>Rewards</span><span>First clear guarantees rare</span><span>Higher key, higher item level; legendaries can drop from +{1}</span></div> <ol class="msteps"><li>Tap Fight on the <b>Suggested</b> dungeon to run it at your current key level.</li><li>Finish in time: key +1, or +2 if fast enough. Over time, wipe or retreat: key \u22121.</li><li>All Mythic dungeons share one keystone, so switching dungeons doesn't reset it.</li><li>Dungeons you've timed can be idled, and progress keeps building offline.</li></ol> <div class="row"><button class="btn sm main" data-act="mythichelpok">Got it</button></div></div>`,
     "\u5929\u68AF\u66AB\u6642\u8B80\u4E0D\u5230\uFF0C\u7A0D\u5F8C\u518D\u8A66\u3002": "Ladder unavailable \u2014 try again later.",
     "\u8B80\u53D6\u4E2D\u2026": "Loading\u2026",
     '<p class="sub" style="margin:0">\u9084\u6C92\u6709\u4EBA\u4E0A\u699C\uFF0C\u6436\u7B2C\u4E00\u5427\u3002</p>': `<p class="sub" style="margin:0">No one's on the board yet \u2014 be the first.</p>`,
@@ -1316,10 +1340,16 @@ h3 .gi{vertical-align:-.12em}
     '<div class="slot emptyslot">\u7A7A\u4F4D</div>': '<div class="slot emptyslot">Empty</div>',
     '<span style="color:var(--warn)">\u7F3A\u5766\u514B</span>': '<span style="color:var(--warn)">No tank</span>',
     '<span style="color:var(--warn)">\u7F3A\u6CBB\u7642</span>': '<span style="color:var(--warn)">No healer</span>',
+    '<div class="rhead in"><b>\u51FA\u6230\u968A\u4F0D</b><span class="sub num">{0}/{1}</span></div>': '<div class="rhead in"><b>Active party</b><span class="sub num">{0}/{1}</span></div>',
+    '<div class="rhead"><b>\u5F85\u547D</b><span class="sub num">{0}</span></div>': '<div class="rhead"><b>Bench</b><span class="sub num">{0}</span></div>',
+    "\u6C92\u6709\u7B26\u5408\u7BE9\u9078\u7684\u5F85\u547D\u82F1\u96C4": "No benched heroes match this filter",
+    "\u6C92\u6709\u5F85\u547D\u82F1\u96C4\uFF0C\u5230\u9152\u9928\u62DB\u52DF\u5427\u3002": "No benched heroes. Recruit some at the Tavern.",
     "\u66B1\u7A31\u3001\u5B58\u6A94\u3001\u8A9E\u8A00\u8207\u610F\u898B\u56DE\u994B\uFF0C\u5728\u5DE6\u4E0A\u89D2\u300C\u8A2D\u5B9A\u300D\u3002": "Nickname, save data, language and feedback are under Settings (top left).",
     '<button class="hero r-{0}" data-act="hero" data-id="{1}"><div class="ic">{2}</div> <div class="nm">{3}{4}<small>{5}{6}\u30FB<span class="num">Lv{7}</span></small>{8}</div> <span class="tag {9}">{10}</span> <div class="st num"><span>\u751F\u547D {11}</span><span>\u5A01\u529B {12}</span><span>\u66B4\u64CA {13}%</span><span>\u88DD\u7B49 {14}</span></div> <div class="xpbar"><i style="width:{15}%"></i></div></button>': '<button class="hero r-{0}" data-act="hero" data-id="{1}"><div class="ic">{2}</div> <div class="nm">{3}{4}<small>{5}{6}\u30FB<span class="num">Lv{7}</span></small>{8}</div> <span class="tag {9}">{10}</span> <div class="st num"><span>HP {11}</span><span>Power {12}</span><span>Crit {13}%</span><span>iLvl {14}</span></div> <div class="xpbar"><i style="width:{15}%"></i></div></button>',
     '<span class="newpick">\u53EF\u9078\u5929\u8CE6</span>': '<span class="newpick">Talent ready</span>',
     "\u5F85\u547D": "Bench",
+    "\u5766": "Tank",
+    "\u88DC": "Heal",
     '<div class="toolbar"><label class="selwrap"><span>\u89E3\u96C7\u5F85\u547D</span><select id="fireSel" aria-label="\u89E3\u96C7\u54C1\u8CEA">{0}</select></label> <button class="btn sm {1}" data-act="firemany" {2}>{3}</button></div> <p class="sub" style="margin:4px 0 8px">\u53EA\u89E3\u96C7\u5F85\u547D\u4E2D\u7684\u82F1\u96C4\uFF0C\u50B3\u8AAA\u4E0D\u6703\u88AB\u9078\u5230\uFF1B\u8EAB\u4E0A\u88DD\u5099\u81EA\u52D5\u5378\u56DE\u80CC\u5305\u3002</p>': '<div class="toolbar"><label class="selwrap"><span>Dismiss bench</span><select id="fireSel" aria-label="Dismiss quality">{0}</select></label> <button class="btn sm {1}" data-act="firemany" {2}>{3}</button></div> <p class="sub" style="margin:4px 0 8px">Only benched heroes are dismissed, never Legendaries; their gear returns to your bag.</p>',
     "\u6C92\u6709\u7B26\u5408\u7684\u82F1\u96C4": "No matching heroes",
     "\u78BA\u5B9A\u89E3\u96C7 {0} \u4EBA\uFF1F\u9000 {1} \u91D1": "Dismiss {0}? Refund {1} gold",
@@ -2233,6 +2263,8 @@ h3 .gi{vertical-align:-.12em}
     // 強化費用 = base × (等級+1) × (1 + 裝等/10)
     salvageMult: 1.5,
     // 分解金幣 = 裝等 × 稀有度倍率 × salvageMult
+    salvageRefund: 0.8,
+    // v0.15 分解返還強化金幣與精煉精華的比例（< 1，避免強化→分解套利）
     staToHp: 2
     // 1 耐力 = 2 生命
   };
@@ -2444,6 +2476,8 @@ h3 .gi{vertical-align:-.12em}
     rosterMax: 30,
     bagMax: 50,
     // bagMax = 起始格數，達成里程碑再擴充（見 BAG_MILESTONES）
+    bagBuy: { slots: 10, base: 2e3, mult: 1.8, max: 10 },
+    // v0.15 金幣擴充背包：每次 +10 格，價格 ×1.8，最多 10 次
     stashMax: 100,
     // 戰利品箱：背包滿時暫存，需手動取出
     defaultKeepRarity: 2,
@@ -2502,12 +2536,17 @@ h3 .gi{vertical-align:-.12em}
   var itemPow = (it) => Math.round(it.pow * upMult(it));
   var itemSta = (it) => Math.round(it.sta * upMult(it));
   var itemScore = (it) => it.ilvl * RARITY[it.rarity].mult * upMult(it);
-  var salvageValue = (it) => Math.round(it.ilvl * RARITY[it.rarity].mult * GEAR.salvageMult);
+  var upSpent = (it) => {
+    let g = 0;
+    for (let u = 0; u < (it.up || 0); u++) g += Math.round(GEAR.upCostBase * (u + 1) * (1 + it.ilvl / 10));
+    return g;
+  };
+  var salvageValue = (it) => Math.round(it.ilvl * RARITY[it.rarity].mult * GEAR.salvageMult) + Math.floor(upSpent(it) * (GEAR.salvageRefund ?? 0));
   var dustCost = (it) => it.up >= GEAR.refineFrom ? (it.up - GEAR.refineFrom + 1) * GEAR.dustPerStep : 0;
   var salvageDust = (it) => {
     let spent = 0;
     for (let u = GEAR.refineFrom; u < (it.up || 0); u++) spent += (u - GEAR.refineFrom + 1) * GEAR.dustPerStep;
-    return (GEAR.salvageDust[it.rarity] || 0) + Math.floor(spent / 2);
+    return (GEAR.salvageDust[it.rarity] || 0) + Math.floor(spent * (GEAR.salvageRefund ?? 0.5));
   };
   var upgradeCost = (it) => Math.round(GEAR.upCostBase * (it.up + 1) * (1 + it.ilvl / 10));
 
@@ -3424,6 +3463,7 @@ h3 .gi{vertical-align:-.12em}
   }
   function migrate(s) {
     s.stats = s.stats || { runs: 0, wins: 0 };
+    s.bagBought = Math.max(0, Math.min(ECONOMY.bagBuy.max, Math.floor(Number(s.bagBought) || 0)));
     if (s.autoSalvageBelow == null) s.autoSalvageBelow = s.autoSalvageCommon ? 1 : 0;
     delete s.autoSalvageCommon;
     if (s.keepRarity == null) s.keepRarity = ECONOMY.defaultKeepRarity;
@@ -3624,7 +3664,15 @@ h3 .gi{vertical-align:-.12em}
     for (const h of list) refund += fireHero(s, h.id, gear).refund;
     return { count: list.length, refund, gear };
   }
-  var bagMax = (s) => ECONOMY.bagMax + BAG_PER_MILESTONE * BAG_MILESTONES.filter((m) => m.test(s)).length;
+  var bagMax = (s) => ECONOMY.bagMax + BAG_PER_MILESTONE * BAG_MILESTONES.filter((m) => m.test(s)).length + ECONOMY.bagBuy.slots * (s.bagBought || 0);
+  var bagBuyCost = (s) => (s.bagBought || 0) >= ECONOMY.bagBuy.max ? null : Math.round(ECONOMY.bagBuy.base * ECONOMY.bagBuy.mult ** (s.bagBought || 0) / 100) * 100;
+  function buyBag(s) {
+    const c = bagBuyCost(s);
+    if (c == null || s.gold < c) return false;
+    s.gold -= c;
+    s.bagBought = (s.bagBought || 0) + 1;
+    return c;
+  }
   function newBagMilestones(s) {
     s.bagSeen = s.bagSeen || [];
     const fresh = BAG_MILESTONES.filter((m) => m.test(s) && !s.bagSeen.includes(m.id));
@@ -3889,6 +3937,17 @@ h3 .gi{vertical-align:-.12em}
     s.gold += gold;
     return { count: ids.length, gold };
   }
+  function mythicSuggest(s, f0, f1) {
+    let pick3 = f0, lv = Infinity;
+    for (let i = f0; i <= f1; i++) {
+      const b = s.mythic.best[i], l = b ? b.level : 0;
+      if (l < lv) {
+        lv = l;
+        pick3 = i;
+      }
+    }
+    return pick3;
+  }
   function skipAllowed(s, b) {
     if (!b || b.vault || b.mythicIdle) return true;
     if (b.mythic) {
@@ -4122,6 +4181,13 @@ h3 .gi{vertical-align:-.12em}
     }
     // 由 main.js 指定
   };
+  var e2eMode = () => {
+    try {
+      return sessionStorage.getItem("rl-e2e") === "1";
+    } catch (e) {
+      return false;
+    }
+  };
   var canSkip = (b) => {
     try {
       if (sessionStorage.getItem("rl-e2e") === "1") return true;
@@ -4248,7 +4314,7 @@ h3 .gi{vertical-align:-.12em}
   var dailyOpenNow = () => app.dailyOpen != null ? app.dailyOpen : dailyPending(app.S) > 0;
 
   // src/core/version.js
-  var VERSION = "0.14.0";
+  var VERSION = "0.15.0";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -4376,8 +4442,8 @@ h3 .gi{vertical-align:-.12em}
     const st = stamina(S), nx = staminaNext(S), max = MYTHIC.stamina.max;
     const sta = tx('<div class="stamina"><span class="label">\u79D8\u5883\u9AD4\u529B</span><b class="num">{0}/{1}</b><span class="sub num" style="margin:0">{2}</span></div>', st.pts, max, nx ? tx("{0} \u5F8C +1", mmss(Math.ceil(nx / 1e3))) : tx("\u5DF2\u6EFF"));
     const key = tierKey(S, tier), today = dailyAffixes(), active = activeAffixes(key);
-    let h = tabs + tx(
-      '<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>\u76EE\u524D\u9470\u77F3</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">\u4ECA\u65E5\u8A5E\u7DB4\uFF0C\u6BCF\u5929 00:00 \u66F4\u63DB\u3002\u9650\u6642\u5167\u901A\u95DC\uFF0C\u9470\u77F3 +1\uFF0C\u6253\u5F97\u5920\u5FEB +2\uFF1B\u8D85\u6642\u6216\u5931\u6557\uFF08\u542B\u64A4\u9000\uFF09\uFF0C\u9470\u77F3 \u22121\u3002\u624B\u52D5\u6311\u6230\u6BCF\u5834\u8017 1 \u9EDE\u9AD4\u529B\uFF0C\u6BCF {6} \u5206\u9418\u56DE 1 \u9EDE\u3001\u4E0A\u9650 {7}\u3002<b>\u79D8\u5883\u639B\u6A5F</b>\uFF1A\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u639B\u6A5F\uFF0C\u56FA\u5B9A\u6253\u8A72\u526F\u672C\u6700\u4F73 \u2212{2}\uFF0C\u4E0D\u8017\u9AD4\u529B\u3001\u9470\u77F3\u4E0D\u8B8A\u3001\u734E\u52F5 {3}%\uFF0C\u96E2\u7DDA\u4E5F\u6703\u7D2F\u7A4D\u3002</p> {8} <div class="mlist">',
+    let h = tabs + mythicGuide() + tx(
+      '<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>\u76EE\u524D\u9470\u77F3</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">\u4ECA\u65E5\u8A5E\u7DB4\uFF0C\u6BCF\u5929 00:00 \u66F4\u63DB\u3002\u624B\u52D5\u6311\u6230\u6BCF\u5834\u8017 1 \u9EDE\u9AD4\u529B\uFF0C\u6BCF {6} \u5206\u9418\u56DE 1 \u9EDE\u3001\u4E0A\u9650 {7}\u3002<b>\u79D8\u5883\u639B\u6A5F</b>\uFF1A\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u639B\u6A5F\uFF0C\u56FA\u5B9A\u6253\u8A72\u526F\u672C\u6700\u4F73 \u2212{2}\uFF0C\u4E0D\u8017\u9AD4\u529B\u3001\u9470\u77F3\u4E0D\u8B8A\u3001\u734E\u52F5 {3}%\uFF0C\u96E2\u7DDA\u4E5F\u6703\u7D2F\u7A4D\u3002</p> {8} <div class="mlist">',
       key,
       today.map((a, i) => `<div class="affix ${active.includes(a) ? "on" : ""}"><b>${AFFIXES[a].name}</b><span>${AFFIXES[a].desc}</span><small>${active.includes(a) ? tx("\u8003\u9A57{0}", AFFIXES[a].test) : tx("+{0} \u8D77\u751F\u6548", MYTHIC.affixAt[i])}</small></div>`).join(""),
       MYTHIC.idleBelow,
@@ -4388,12 +4454,20 @@ h3 .gi{vertical-align:-.12em}
       max,
       tier === 2 ? tx('<p class="sub" style="margin:0">\u6DF1\u6DF5\u79D8\u5883\u4EE5\u7B2C 14 \u5C64\u7684\u5F37\u5EA6\u70BA\u57FA\u6E96\uFF0C\u6389\u843D\u88DD\u7B49\u66F4\u9AD8\uFF0C\u9650\u6642\u901A\u95DC\u6709\u6A5F\u6703\u6389\u8077\u696D\u5957\u88DD\u3002</p>') : open2 ? "" : tx('<p class="sub" style="margin:0">\u901A\u95DC\u7B2C 14 \u5C64\u300C\u6DF1\u6DF5\u4E4B\u5FC3\u300D\u5F8C\u89E3\u9396\u6DF1\u6DF5\u79D8\u5883\u3002</p>')
     );
-    const [f0, f1] = tierFloors(tier);
+    const [f0, f1] = tierFloors(tier), sug = mythicSuggest(S, f0, f1);
+    const fresh = !Array.from({ length: f1 - f0 + 1 }, (_, k) => S.mythic.best[f0 + k]).some(Boolean), all = !fresh || app.mythicAll || e2eMode();
     for (let i = f0; i <= f1; i++) {
+      if (!all && i !== sug) continue;
       const d = DUNGEONS[i], best = S.mythic.best[i];
-      h += tx('<div class="mrow2"><div class="mname"><b>{0}</b><span class="sub num" style="margin:0">\u9650\u6642 {1}\u30FB{2}</span></div> {3} <button class="btn sm" data-act="recommend-mythic" data-d="{4}" aria-label="\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099">\u5099\u6230</button> <button class="btn sm main" data-act="mythic" data-d="{5}">\u6311\u6230 +{6}</button></div>', d.name, mmss(mythicTimer(i)), best ? tx("\u6700\u4F73 +{0}\uFF08{1}\uFF09", best.level, mmss(best.time)) : tx("\u9084\u6C92\u9650\u6642\u901A\u95DC"), mythicIdleLevel(S, i) ? `<button class="btn sm ${S.idleMythic === i ? "on" : ""}" data-act="idlemythic" data-d="${i}">${S.idleMythic === i ? tx("\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62") : tx("\u639B\u6A5F +{0}", mythicIdleLevel(S, i))}</button>` : "", i, i, key);
+      h += tx('<div class="mrow2 {7}"><div class="mname"><b>{0}{8}</b><span class="sub num" style="margin:0">\u9650\u6642 {1}\u30FB{2}</span></div> {3} <button class="btn sm" data-act="recommend-mythic" data-d="{4}" aria-label="\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099">\u5099\u6230</button> <button class="btn sm main" data-act="mythic" data-d="{5}">\u6311\u6230 +{6}</button></div>', d.name, mmss(mythicTimer(i)), best ? tx("\u6700\u4F73 +{0}\uFF08{1}\uFF09", best.level, mmss(best.time)) : tx("\u9084\u6C92\u9650\u6642\u901A\u95DC"), mythicIdleLevel(S, i) ? `<button class="btn sm ${S.idleMythic === i ? "on" : ""}" data-act="idlemythic" data-d="${i}">${S.idleMythic === i ? tx("\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62") : tx("\u639B\u6A5F +{0}", mythicIdleLevel(S, i))}</button>` : "", i, i, key, i === sug ? "sug" : "", i === sug ? tx('<span class="sugtag">\u63A8\u85A6</span>') : "");
     }
+    if (!all) h += tx('<button class="btn sm grow" data-act="mythicall">\u986F\u793A\u5176\u4ED6 {0} \u500B\u526F\u672C</button><p class="sub" style="margin:0">\u5148\u5F9E\u63A8\u85A6\u7684\u526F\u672C\u9650\u6642\u901A\u95DC\u4E00\u6B21\uFF0C\u5176\u4ED6\u526F\u672C\u96A8\u6642\u90FD\u80FD\u6253\uFF0C\u9470\u77F3\u7B49\u7D1A\u5171\u7528\u3002</p>', f1 - f0);
     return h + `</div></div>`;
+  }
+  function mythicGuide() {
+    const S = app.S, open = !S.mythicHelp || app.mythicHelpOpen;
+    if (!open) return tx('<div class="row" style="justify-content:flex-end;margin:-4px 0 8px"><button class="linkbtn" data-act="mythichelp">\uFF1F\u79D8\u5883\u600E\u9EBC\u73A9</button></div>');
+    return tx('<div class="mguide"><b class="mgt">\u79D8\u5883\u600E\u9EBC\u73A9</b> <div class="mcmp"><span></span><b>\u4E3B\u7DDA</b><b>\u79D8\u5883</b> <span>\u76EE\u7684</span><span>\u63A8\u9032\u5287\u60C5\u3001\u89E3\u9396\u65B0\u5C64</span><span>\u91CD\u8907\u5237\u540C\u4E00\u6279\u526F\u672C\uFF0C\u62FF\u66F4\u9AD8\u88DD\u7B49\u7684\u88DD\u5099</span> <span>\u96E3\u5EA6</span><span>\u6BCF\u5C64\u56FA\u5B9A</span><span>\u770B\u9470\u77F3\u7B49\u7D1A\uFF1A\u8D8A\u9AD8\u6575\u4EBA\u8D8A\u786C\uFF0C+{0} \u8D77\u6709\u8A5E\u7DB4</span> <span>\u6642\u9593</span><span>\u4E0D\u9650\u6642</span><span>\u6709\u9650\u6642\uFF0C\u9650\u6642\u5167\u901A\u95DC\u624D\u5347\u7D1A</span> <span>\u734E\u52F5</span><span>\u9996\u901A\u4FDD\u5E95\u7A00\u6709</span><span>\u9470\u77F3\u8D8A\u9AD8\u88DD\u7B49\u8D8A\u9AD8\uFF0C+{1} \u8D77\u53EF\u80FD\u6389\u50B3\u8AAA</span></div> <ol class="msteps"><li>\u9EDE<b>\u63A8\u85A6</b>\u526F\u672C\u7684\u300C\u6311\u6230\u300D\uFF0C\u7528\u76EE\u524D\u9470\u77F3\u7B49\u7D1A\u958B\u6253\u3002</li><li>\u9650\u6642\u5167\u901A\u95DC\uFF1A\u9470\u77F3 +1\uFF0C\u6253\u5F97\u5920\u5FEB +2\uFF1B\u8D85\u6642\u3001\u5931\u6557\u6216\u64A4\u9000\uFF1A\u9470\u77F3 \u22121\u3002</li><li>\u6240\u6709\u79D8\u5883\u526F\u672C\u5171\u7528\u540C\u4E00\u9846\u9470\u77F3\uFF0C\u63DB\u526F\u672C\u6253\u4E0D\u6703\u91CD\u4F86\u3002</li><li>\u9650\u6642\u901A\u95DC\u904E\u7684\u526F\u672C\u53EF\u4EE5\u958B\u300C\u79D8\u5883\u639B\u6A5F\u300D\uFF0C\u96E2\u7DDA\u4E5F\u6703\u6162\u6162\u5237\u3002</li></ol> <div class="row"><button class="btn sm main" data-act="mythichelpok">\u77E5\u9053\u4E86</button></div></div>', MYTHIC.affixAt[0], MYTHIC.legendFrom);
   }
   function boardCard() {
     const lb2 = leaderboard();
@@ -4510,8 +4584,12 @@ h3 .gi{vertical-align:-.12em}
       if (!x) return tx('<div class="slot emptyslot">\u7A7A\u4F4D</div>');
       return `<button class="slot r-${x.rarity || 0}" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div><div class="n c${x.rarity || 0}">${x.name}</div><div class="lv num">Lv${x.level}</div><div class="rl role-${roleOf(x)}"></div></button>`;
     }).join(""), c.tank, c.heal, c.dps, fmt(partyPower()), !c.tank ? tx('<span style="color:var(--warn)">\u7F3A\u5766\u514B</span>') : "", !c.heal ? tx('<span style="color:var(--warn)">\u7F3A\u6CBB\u7642</span>') : "", app.S.heroes.length, ECONOMY.rosterMax, fireBar());
-    const sorted = [...app.S.heroes].sort((a, b) => inParty(b) - inParty(a) || (b.rarity || 0) - (a.rarity || 0) || b.level - a.level);
-    for (const x of sorted) h += heroCard(x);
+    const byQ = (a, b) => (b.rarity || 0) - (a.rarity || 0) || b.level - a.level;
+    const f = app.teamFilter || "all", match = (x) => f === "all" || roleOf(x) === f || x.cls === f;
+    const bench = app.S.heroes.filter((x) => !inParty(x)).sort(byQ), shown = bench.filter(match);
+    h += tx('<div class="rhead in"><b>\u51FA\u6230\u968A\u4F0D</b><span class="sub num">{0}/{1}</span></div>', party.length, ECONOMY.partyMax) + party.map(heroCard).join("");
+    h += tx('<div class="rhead"><b>\u5F85\u547D</b><span class="sub num">{0}</span></div>', f === "all" ? bench.length : `${shown.length}/${bench.length}`) + filterBar(bench);
+    h += shown.length ? shown.map(heroCard).join("") : `<div class="empty" style="margin:0;padding:20px">${bench.length ? tx("\u6C92\u6709\u7B26\u5408\u7BE9\u9078\u7684\u5F85\u547D\u82F1\u96C4") : tx("\u6C92\u6709\u5F85\u547D\u82F1\u96C4\uFF0C\u5230\u9152\u9928\u62DB\u52DF\u5427\u3002")}</div>`;
     h += `</div><p class="sub" style="margin-top:12px">${tx("\u66B1\u7A31\u3001\u5B58\u6A94\u3001\u8A9E\u8A00\u8207\u610F\u898B\u56DE\u994B\uFF0C\u5728\u5DE6\u4E0A\u89D2\u300C\u8A2D\u5B9A\u300D\u3002")}</p>`;
     return h;
   }
@@ -4519,6 +4597,12 @@ h3 .gi{vertical-align:-.12em}
     const st = heroStats(x, app.S.items);
     const need = xpNeed(x.level);
     return tx('<button class="hero r-{0}" data-act="hero" data-id="{1}"><div class="ic">{2}</div> <div class="nm">{3}{4}<small>{5}{6}\u30FB<span class="num">Lv{7}</span></small>{8}</div> <span class="tag {9}">{10}</span> <div class="st num"><span>\u751F\u547D {11}</span><span>\u5A01\u529B {12}</span><span>\u66B4\u64CA {13}%</span><span>\u88DD\u7B49 {14}</span></div> <div class="xpbar"><i style="width:{15}%"></i></div></button>', x.rarity || 0, x.id, cls(x).icon, heroName(x), rarityTag(x), cls(x).name, x.spec ? `\u30FB${SPECS[x.cls][x.spec].name}` : "", x.level, pendingPicks(x) ? tx('<span class="newpick">\u53EF\u9078\u5929\u8CE6</span>') : "", inParty(x) ? "in" : "", inParty(x) ? tx("\u51FA\u6230\u4E2D") : tx("\u5F85\u547D"), fmt(st.hp), st.pow, Math.round(st.crit * 100), heroIlvl(x, app.S.items), x.level >= HERO.maxLevel ? 100 : pct(x.xp, need));
+  }
+  function filterBar(bench) {
+    const f = app.teamFilter || "all", cnt = (k) => bench.filter((x) => roleOf(x) === k || x.cls === k).length;
+    const roles = [["all", tx("\u5168\u90E8"), bench.length], ["tank", tx("\u5766"), cnt("tank")], ["heal", tx("\u88DC"), cnt("heal")], ["dps", tx("\u8F38\u51FA"), cnt("dps")]];
+    const classes = Object.keys(CLASSES).filter((k) => bench.some((x) => x.cls === k)).map((k) => [k, CLASSES[k].icon, cnt(k), CLASSES[k].name]);
+    return `<div class="tfilter">${[...roles, ...classes].map(([k, label, n2, title]) => `<button class="tf ${f === k ? "sel" : ""}" data-act="teamfilter" data-v="${k}" ${title ? `aria-label="${title}" title="${title}"` : ""}>${label}<small class="num">${n2}</small></button>`).join("")}</div>`;
   }
   function fireBar() {
     const sel = app.fireSel ?? 0, d = fireMany(app.S, sel, true);
@@ -4536,8 +4620,13 @@ h3 .gi{vertical-align:-.12em}
   var itemRow = (it, act = "item") => `<button class="item rar${it.rarity}" data-act="${act}" data-id="${it.id}">
     <div class="in">${itemName(it)}${bestUpgradeFor(it) ? tx('<span class="better">\u25B2 \u53EF\u63D0\u5347</span>') : ""}</div>
     <div class="il">${SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div>
-    <div class="is num">${RARITY[it.rarity].name}\u30FB${itemStatText(it)}</div></button>`;
-  var salvCount = () => app.S.bag.filter((id) => app.S.items[id].rarity <= (app.salvSel ?? 0) && !app.S.items[id].set).length;
+    <div class="is num">${RARITY[it.rarity].name}\u30FB${itemStatText(it)}</div>${setMini(it)}</button>`;
+  var setMini = (it) => it.set ? `<div class="setmini">${tx("{0}\u5C08\u5C6C\u30FB2 \u4EF6\uFF1A{1}", CLASSES[it.set].name, SETS[it.set].d2)}</div>` : "";
+  var salvCount = () => app.S.bag.filter((id) => app.S.items[id].rarity <= (app.salvSel ?? 0) && !app.S.items[id].set && !app.S.items[id].locked).length;
+  function buyRow(S) {
+    const c = bagBuyCost(S), n2 = S.bagBought || 0, B = ECONOMY.bagBuy;
+    return tx('<div class="set"><span style="margin:0">\u91D1\u5E63\u64F4\u5145 <span class="sub num">{0}/{1}</span></span>{2}</div>', n2, B.max, c == null ? tx('<span class="num okc">\u5DF2\u5168\u90E8\u64F4\u5145</span>') : tx('<button class="btn sm main" data-act="buybag" {0}>+{1} \u683C\u30FB<span class="num">{2}</span> \u91D1</button>', S.gold >= c ? "" : "disabled", B.slots, fmt(c)));
+  }
   function viewBag() {
     const S = app.S, E = ECONOMY;
     const items2 = S.bag.map((id) => S.items[id]).filter(Boolean).filter((it) => app.invFilter === "all" || it.slot === app.invFilter || app.invFilter === "armor" && ARMOR_SLOTS.includes(it.slot) || app.invFilter === "set" && it.set).sort((a, b) => itemScore(b) - itemScore(a));
@@ -4552,7 +4641,7 @@ h3 .gi{vertical-align:-.12em}
       h += `<div class="toolbar"><span class="sub" style="margin:0">${tx("\u6BD4\u5E73\u5747\u88DD\u7B49\u4F4E {0} \u4EE5\u4E0A", gap)}</span><button class="btn sm" data-act="salvlow" ${n2 ? "" : "disabled"}>${tx("\u5206\u89E3\u4F4E\u88DD\u7B49\uFF08{0} \u4EF6\uFF09", n2)}</button></div>`;
     }
     h += items2.length ? `<div class="stack">${items2.map((it) => itemRow(it)).join("")}</div>` : tx('<div class="empty">\u80CC\u5305\u662F\u7A7A\u7684\u3002\u901A\u95DC\u526F\u672C\u6703\u6389\u843D\u88DD\u5099\u3002</div>');
-    h += tx('<h2 style="font-size:18px">\u6230\u5229\u54C1\u8A2D\u5B9A</h2><div class="settings"> <div class="set"><span>\u6389\u843D\u6642\u81EA\u52D5\u5206\u89E3</span>{0}</div> <div class="set"><span>\u80CC\u5305\u6EFF\u5F8C\u53EA\u4FDD\u7559</span>{1}</div> <div class="set"><span>\u4F9D\u88DD\u7B49\u81EA\u52D5\u5206\u89E3</span>{6}</div> <p class="sub" style="margin:0">\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\uFF0C\u7B26\u5408\u54C1\u8CEA\u7684\u88DD\u5099\u6703\u5148\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF08\u6700\u591A {2} \u4EF6\uFF09\uFF0C\u5176\u4ED6\u81EA\u52D5\u63DB\u6210\u91D1\u5E63\u3002</p></div> <h2 style="font-size:18px">\u80CC\u5305\u64F4\u5145 <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>', seg("autosalv", S.autoSalvageBelow, [[0, tx("\u95DC\u9589")], [1, tx("\u666E\u901A")], [2, tx("\u7CBE\u826F\u4EE5\u4E0B")]]), seg("keeprar", S.keepRarity, [[1, tx("\u7CBE\u826F\u4EE5\u4E0A")], [2, tx("\u7A00\u6709\u4EE5\u4E0A")], [3, tx("\u53F2\u8A69")]]), E.stashMax, cap, E.bagMax + BAG_PER_MILESTONE * BAG_MILESTONES.length, BAG_MILESTONES.map((m) => tx('<div class="set"><span class="{0}" style="margin:0">{1}{2}</span><span class="num {3}" style="margin:0">+{4} \u683C</span></div>', m.test(S) ? "" : "sub", m.test(S) ? "\u2713 " : "", m.name, m.test(S) ? "okc" : "sub", BAG_PER_MILESTONE)).join(""), seg("ilvlgap", S.salvageIlvlGap || 0, [[0, tx("\u95DC\u9589")], [10, tx("\u4F4E 10 \u4EE5\u4E0A")], [20, tx("\u4F4E 20 \u4EE5\u4E0A")]]));
+    h += tx('<h2 style="font-size:18px">\u6230\u5229\u54C1\u8A2D\u5B9A</h2><div class="settings"> <div class="set"><span>\u6389\u843D\u6642\u81EA\u52D5\u5206\u89E3</span>{0}</div> <div class="set"><span>\u80CC\u5305\u6EFF\u5F8C\u53EA\u4FDD\u7559</span>{1}</div> <div class="set"><span>\u4F9D\u88DD\u7B49\u81EA\u52D5\u5206\u89E3</span>{6}</div> <p class="sub" style="margin:0">\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\uFF0C\u7B26\u5408\u54C1\u8CEA\u7684\u88DD\u5099\u6703\u5148\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF08\u6700\u591A {2} \u4EF6\uFF09\uFF0C\u5176\u4ED6\u81EA\u52D5\u63DB\u6210\u91D1\u5E63\u3002</p></div> <h2 style="font-size:18px">\u80CC\u5305\u64F4\u5145 <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>', seg("autosalv", S.autoSalvageBelow, [[0, tx("\u95DC\u9589")], [1, tx("\u666E\u901A")], [2, tx("\u7CBE\u826F\u4EE5\u4E0B")]]), seg("keeprar", S.keepRarity, [[1, tx("\u7CBE\u826F\u4EE5\u4E0A")], [2, tx("\u7A00\u6709\u4EE5\u4E0A")], [3, tx("\u53F2\u8A69")]]), E.stashMax, cap, E.bagMax + BAG_PER_MILESTONE * BAG_MILESTONES.length + E.bagBuy.slots * E.bagBuy.max, buyRow(S) + BAG_MILESTONES.map((m) => tx('<div class="set"><span class="{0}" style="margin:0">{1}{2}</span><span class="num {3}" style="margin:0">+{4} \u683C</span></div>', m.test(S) ? "" : "sub", m.test(S) ? "\u2713 " : "", m.name, m.test(S) ? "okc" : "sub", BAG_PER_MILESTONE)).join(""), seg("ilvlgap", S.salvageIlvlGap || 0, [[0, tx("\u95DC\u9589")], [10, tx("\u4F4E 10 \u4EE5\u4E0A")], [20, tx("\u4F4E 20 \u4EE5\u4E0A")]]));
     h += `<p class="sub" style="margin:4px 0 0">${tx("\u4F9D\u88DD\u7B49\uFF1A\u6BD4\u51FA\u6230\u968A\u54E1\u5E73\u5747\u88DD\u7B49\uFF08\u76EE\u524D {0}\uFF09\u4F4E\u9019\u9EBC\u591A\u7684\u6389\u843D\u76F4\u63A5\u5206\u89E3\uFF0C\u50B3\u8AAA\u9664\u5916\u3002", Math.round(partyIlvl(S)))}</p>`;
     return h;
   }
@@ -5438,6 +5527,26 @@ h3 .gi{vertical-align:-.12em}
         } else toast(refine ? tx("\u91D1\u5E63\u6216\u7CBE\u83EF\u4E0D\u8DB3") : tx("\u91D1\u5E63\u4E0D\u8DB3"));
         break;
       }
+      case "buybag": {
+        const c = buyBag(app.S);
+        toast(c ? tx("\u80CC\u5305 +{0} \u683C\uFF08\u82B1\u8CBB {1} \u91D1\uFF09", ECONOMY.bagBuy.slots, fmt(c)) : tx("\u91D1\u5E63\u4E0D\u8DB3"));
+        save();
+        break;
+      }
+      case "teamfilter":
+        app.teamFilter = t.dataset.v;
+        break;
+      case "mythicall":
+        app.mythicAll = true;
+        break;
+      case "mythichelp":
+        app.mythicHelpOpen = true;
+        break;
+      case "mythichelpok":
+        app.S.mythicHelp = true;
+        app.mythicHelpOpen = false;
+        save();
+        break;
       case "lock": {
         const on = toggleLock(app.S, t.dataset.kind, id);
         if (on != null) toast(on ? tx("\u5DF2\u9396\u5B9A\uFF0C\u4E0D\u6703\u88AB\u5206\u89E3\u6216\u89E3\u96C7") : tx("\u5DF2\u89E3\u9664\u9396\u5B9A"));

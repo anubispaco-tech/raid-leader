@@ -11,9 +11,15 @@ const seg = (act, cur, opts) => `<div class="seg">${opts.map(([v, n]) => `<butto
 const itemRow = (it, act = 'item') => `<button class="item rar${it.rarity}" data-act="${act}" data-id="${it.id}">
     <div class="in">${itemName(it)}${bestUpgradeFor(it) ? tx('<span class="better">▲ 可提升</span>') : ''}</div>
     <div class="il">${G.SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div>
-    <div class="is num">${G.RARITY[it.rarity].name}・${itemStatText(it)}</div></button>`;
+    <div class="is num">${G.RARITY[it.rarity].name}・${itemStatText(it)}</div>${setMini(it)}</button>`;
+// v0.15 T0 套裝在列表上直接顯示簡短效果
+const setMini = it => (it.set ? `<div class="setmini">${tx('{0}專屬・2 件：{1}', G.CLASSES[it.set].name, G.SETS[it.set].d2)}</div>` : '');
 
-const salvCount = () => app.S.bag.filter(id => app.S.items[id].rarity <= (app.salvSel ?? 0) && !app.S.items[id].set).length;
+const salvCount = () => app.S.bag.filter(id => app.S.items[id].rarity <= (app.salvSel ?? 0) && !app.S.items[id].set && !app.S.items[id].locked).length;
+function buyRow(S) {
+  const c = G.bagBuyCost(S), n = S.bagBought || 0, B = G.ECONOMY.bagBuy;
+  return tx('<div class="set"><span style="margin:0">金幣擴充 <span class="sub num">{0}/{1}</span></span>{2}</div>', n, B.max, c == null ? tx('<span class="num okc">已全部擴充</span>') : tx('<button class="btn sm main" data-act="buybag" {0}>+{1} 格・<span class="num">{2}</span> 金</button>', S.gold >= c ? '' : 'disabled', B.slots, fmt(c)));
+}
 export function viewBag() {
   const S = app.S, E = G.ECONOMY;
   const items = S.bag.map(id => S.items[id]).filter(Boolean)
@@ -28,7 +34,7 @@ export function viewBag() {
   { const gap = S.salvageIlvlGap || 10, n = G.salvageLowIlvl(S, gap, true).count;
     h += `<div class="toolbar"><span class="sub" style="margin:0">${tx('比平均裝等低 {0} 以上', gap)}</span><button class="btn sm" data-act="salvlow" ${n ? '' : 'disabled'}>${tx('分解低裝等（{0} 件）', n)}</button></div>`; }
   h += items.length ? `<div class="stack">${items.map(it => itemRow(it)).join('')}</div>` : tx('<div class="empty">背包是空的。通關副本會掉落裝備。</div>');
-  h += tx('<h2 style="font-size:18px">戰利品設定</h2><div class="settings"> <div class="set"><span>掉落時自動分解</span>{0}</div> <div class="set"><span>背包滿後只保留</span>{1}</div> <div class="set"><span>依裝等自動分解</span>{6}</div> <p class="sub" style="margin:0">背包滿了以後，符合品質的裝備會先放進戰利品箱（最多 {2} 件），其他自動換成金幣。</p></div> <h2 style="font-size:18px">背包擴充 <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>', seg('autosalv', S.autoSalvageBelow, [[0, tx('關閉')], [1, tx('普通')], [2, tx('精良以下')]]), seg('keeprar', S.keepRarity, [[1, tx('精良以上')], [2, tx('稀有以上')], [3, tx('史詩')]]), E.stashMax, cap, E.bagMax + G.BAG_PER_MILESTONE * G.BAG_MILESTONES.length, G.BAG_MILESTONES.map(m => tx('<div class="set"><span class="{0}" style="margin:0">{1}{2}</span><span class="num {3}" style="margin:0">+{4} 格</span></div>', m.test(S) ? '' : 'sub', m.test(S) ? '✓ ' : '', m.name, m.test(S) ? 'okc' : 'sub', G.BAG_PER_MILESTONE)).join(''), seg('ilvlgap', S.salvageIlvlGap || 0, [[0, tx('關閉')], [10, tx('低 10 以上')], [20, tx('低 20 以上')]]));
+  h += tx('<h2 style="font-size:18px">戰利品設定</h2><div class="settings"> <div class="set"><span>掉落時自動分解</span>{0}</div> <div class="set"><span>背包滿後只保留</span>{1}</div> <div class="set"><span>依裝等自動分解</span>{6}</div> <p class="sub" style="margin:0">背包滿了以後，符合品質的裝備會先放進戰利品箱（最多 {2} 件），其他自動換成金幣。</p></div> <h2 style="font-size:18px">背包擴充 <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>', seg('autosalv', S.autoSalvageBelow, [[0, tx('關閉')], [1, tx('普通')], [2, tx('精良以下')]]), seg('keeprar', S.keepRarity, [[1, tx('精良以上')], [2, tx('稀有以上')], [3, tx('史詩')]]), E.stashMax, cap, E.bagMax + G.BAG_PER_MILESTONE * G.BAG_MILESTONES.length + E.bagBuy.slots * E.bagBuy.max, buyRow(S) + G.BAG_MILESTONES.map(m => tx('<div class="set"><span class="{0}" style="margin:0">{1}{2}</span><span class="num {3}" style="margin:0">+{4} 格</span></div>', m.test(S) ? '' : 'sub', m.test(S) ? '✓ ' : '', m.name, m.test(S) ? 'okc' : 'sub', G.BAG_PER_MILESTONE)).join(''), seg('ilvlgap', S.salvageIlvlGap || 0, [[0, tx('關閉')], [10, tx('低 10 以上')], [20, tx('低 20 以上')]]));
   h += `<p class="sub" style="margin:4px 0 0">${tx('依裝等：比出戰隊員平均裝等（目前 {0}）低這麼多的掉落直接分解，傳說除外。', Math.round(G.partyIlvl(S)))}</p>`;
   return h;
 }

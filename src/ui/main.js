@@ -136,6 +136,11 @@ document.addEventListener('click', e => {
     case 'unequip': G.unequip(app.S, t.dataset.hero, t.dataset.slot); save(); app.modal = { type: 'hero', id: t.dataset.hero }; break;
     case 'up': { const it = app.S.items[id], refine = it && it.up >= G.GEAR.refineFrom;
       if (G.upgrade(app.S, id)) { toast(tx('{0}成功 +{1}', refine ? tx('精煉') : tx('強化'), it.up)); save(); } else toast(refine ? tx('金幣或精華不足') : tx('金幣不足')); break; }
+    case 'buybag': { const c = G.buyBag(app.S); toast(c ? tx('背包 +{0} 格（花費 {1} 金）', G.ECONOMY.bagBuy.slots, fmt(c)) : tx('金幣不足')); save(); break; }
+    case 'teamfilter': app.teamFilter = t.dataset.v; break;
+    case 'mythicall': app.mythicAll = true; break;
+    case 'mythichelp': app.mythicHelpOpen = true; break;
+    case 'mythichelpok': app.S.mythicHelp = true; app.mythicHelpOpen = false; save(); break;
     case 'lock': { const on = G.toggleLock(app.S, t.dataset.kind, id); if (on != null) toast(on ? tx('已鎖定，不會被分解或解雇') : tx('已解除鎖定')); save(); break; }
     case 'salvage': toast(tx('分解獲得 {0} 金', G.salvage(app.S, id))); save(); app.modal = null; break;
     case 'join': if (G.partyLocked(app.S)) { toast(tx('掛機中不能更換隊員，請先停止掛機')); break; } G.joinParty(app.S, id); save(); break;

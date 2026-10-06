@@ -75,6 +75,7 @@ export const GEAR = {
   salvageDust: [0, 1, 2, 4, 10],    // 分解得到的精華（依品質）
   upCostBase: 15,                   // 強化費用 = base × (等級+1) × (1 + 裝等/10)
   salvageMult: 1.5,                 // 分解金幣 = 裝等 × 稀有度倍率 × salvageMult
+  salvageRefund: 0.8,               // v0.15 分解返還強化金幣與精煉精華的比例（< 1，避免強化→分解套利）
   staToHp: 2,                       // 1 耐力 = 2 生命
 };
 
@@ -232,6 +233,7 @@ export const ECONOMY = {
   hireBase: 30, hirePerLevel: 25,
   refreshCost: 10,
   partyMax: 5, rosterMax: 30, bagMax: 50, // bagMax = 起始格數，達成里程碑再擴充（見 BAG_MILESTONES）
+  bagBuy: { slots: 10, base: 2000, mult: 1.8, max: 10 }, // v0.15 金幣擴充背包：每次 +10 格，價格 ×1.8，最多 10 次
   stashMax: 100,                    // 戰利品箱：背包滿時暫存，需手動取出
   defaultKeepRarity: 2,             // 背包滿後只保留此品質以上（2 = 稀有）
   offlineCapHours: 8,

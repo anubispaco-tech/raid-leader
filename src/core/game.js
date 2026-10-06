@@ -50,6 +50,7 @@ export function newGame() {
 // 舊存檔補欄位（之後加天賦等新欄位時在這裡升級）
 export function migrate(s) {
   s.stats = s.stats || { runs: 0, wins: 0 };
+  s.bagBought = Math.max(0, Math.min(ECONOMY.bagBuy.max, Math.floor(Number(s.bagBought) || 0))); // v0.15
   // v1 → v2：自動分解改成品質門檻、加入戰利品箱
   if (s.autoSalvageBelow == null) s.autoSalvageBelow = s.autoSalvageCommon ? 1 : 0;
   delete s.autoSalvageCommon;
@@ -210,7 +211,13 @@ export function fireMany(s, maxRarity, dry = false) {
 
 // ---------- 戰鬥結算 ----------
 // ---------- 背包容量 ----------
-export const bagMax = s => ECONOMY.bagMax + BAG_PER_MILESTONE * BAG_MILESTONES.filter(m => m.test(s)).length;
+export const bagMax = s => ECONOMY.bagMax + BAG_PER_MILESTONE * BAG_MILESTONES.filter(m => m.test(s)).length + ECONOMY.bagBuy.slots * (s.bagBought || 0);
+// v0.15 金幣擴充背包：第 n 次（0 起）價格 = base × mult^n，取整到百
+export const bagBuyCost = s => ((s.bagBought || 0) >= ECONOMY.bagBuy.max ? null : Math.round(ECONOMY.bagBuy.base * ECONOMY.bagBuy.mult ** (s.bagBought || 0) / 100) * 100);
+export function buyBag(s) {
+  const c = bagBuyCost(s); if (c == null || s.gold < c) return false;
+  s.gold -= c; s.bagBought = (s.bagBought || 0) + 1; return c;
+}
 // 回傳新達成（還沒通知過）的里程碑，並記錄為已通知
 export function newBagMilestones(s) {
   s.bagSeen = s.bagSeen || [];
@@ -401,6 +408,12 @@ export function salvageStash(s) {
   const gold = ids.reduce((g, id) => { const v = salvageValue(s.items[id]); s.dust = (s.dust || 0) + salvageDust(s.items[id]); delete s.items[id]; return g + v; }, 0);
   s.stash = s.stash.filter(id => !ids.includes(id)); s.gold += gold;
   return { count: ids.length, gold };
+}
+// v0.15 秘境推薦副本：該階層裡最佳限時等級最低的（沒限時過的優先），同分取前面的
+export function mythicSuggest(s, f0, f1) {
+  let pick = f0, lv = Infinity;
+  for (let i = f0; i <= f1; i++) { const b = s.mythic.best[i], l = b ? b.level : 0; if (l < lv) { lv = l; pick = i; } }
+  return pick;
 }
 // v0.14 直接結算限制：首次挑戰的副本、該副本秘境還沒限時過的鑰石等級，要完整觀戰（寶庫、秘境掛機不受限）
 export function skipAllowed(s, b) {

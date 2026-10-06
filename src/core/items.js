@@ -38,12 +38,14 @@ export const upMult = it => 1 + GEAR.upBonus * (it.up || 0);
 export const itemPow = it => Math.round(it.pow * upMult(it));
 export const itemSta = it => Math.round(it.sta * upMult(it));
 export const itemScore = it => it.ilvl * RARITY[it.rarity].mult * upMult(it);
-export const salvageValue = it => Math.round(it.ilvl * RARITY[it.rarity].mult * GEAR.salvageMult);
+// 分解金幣 = 基本值 + 強化花費 × salvageRefund（v0.15）
+export const upSpent = it => { let g = 0; for (let u = 0; u < (it.up || 0); u++) g += Math.round(GEAR.upCostBase * (u + 1) * (1 + it.ilvl / 10)); return g; };
+export const salvageValue = it => Math.round(it.ilvl * RARITY[it.rarity].mult * GEAR.salvageMult) + Math.floor(upSpent(it) * (GEAR.salvageRefund ?? 0));
 export const dustCost = it => it.up >= GEAR.refineFrom ? (it.up - GEAR.refineFrom + 1) * GEAR.dustPerStep : 0;
-// 分解精華 = 品質基本值 + 精煉投入的一半
+// 分解精華 = 品質基本值 + 精煉投入 × salvageRefund（v0.15 由一半提高到 80%）
 export const salvageDust = it => {
   let spent = 0; for (let u = GEAR.refineFrom; u < (it.up || 0); u++) spent += (u - GEAR.refineFrom + 1) * GEAR.dustPerStep;
-  return (GEAR.salvageDust[it.rarity] || 0) + Math.floor(spent / 2);
+  return (GEAR.salvageDust[it.rarity] || 0) + Math.floor(spent * (GEAR.salvageRefund ?? 0.5));
 };
 export const upgradeCost = it => Math.round(GEAR.upCostBase * (it.up + 1) * (1 + it.ilvl / 10));
 export const slotKeys = () => Object.keys(SLOTS);

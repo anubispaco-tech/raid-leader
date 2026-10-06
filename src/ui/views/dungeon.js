@@ -1,7 +1,7 @@
 // ===== 副本分頁 =====
 import { tx } from '../../core/i18n.js';
 import * as G from '../../core/index.js';
-import { app } from '../state.js';
+import { app, e2eMode } from '../state.js';
 import { dungeonIcon } from '../icons.js';
 import { fmt, mmss, esc, partyPower, avgPartyIlvl, avgPartyLv, dailyOpenNow } from '../helpers.js';
 import { leaderboard } from '../telemetry.js';
@@ -59,16 +59,26 @@ function mythicSection() {
   const st = G.stamina(S), nx = G.staminaNext(S), max = G.MYTHIC.stamina.max;
   const sta = tx('<div class="stamina"><span class="label">秘境體力</span><b class="num">{0}/{1}</b><span class="sub num" style="margin:0">{2}</span></div>', st.pts, max, nx ? tx('{0} 後 +1', mmss(Math.ceil(nx / 1000))) : tx('已滿'));
   const key = G.tierKey(S, tier), today = G.dailyAffixes(), active = G.activeAffixes(key);
-  let h = tabs + tx('<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>目前鑰石</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">今日詞綴，每天 00:00 更換。限時內通關，鑰石 +1，打得夠快 +2；超時或失敗（含撤退），鑰石 −1。手動挑戰每場耗 1 點體力，每 {6} 分鐘回 1 點、上限 {7}。<b>秘境掛機</b>：限時通關過的副本可以掛機，固定打該副本最佳 −{2}，不耗體力、鑰石不變、獎勵 {3}%，離線也會累積。</p> {8} <div class="mlist">',
+  let h = tabs + mythicGuide() + tx('<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>目前鑰石</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">今日詞綴，每天 00:00 更換。手動挑戰每場耗 1 點體力，每 {6} 分鐘回 1 點、上限 {7}。<b>秘境掛機</b>：限時通關過的副本可以掛機，固定打該副本最佳 −{2}，不耗體力、鑰石不變、獎勵 {3}%，離線也會累積。</p> {8} <div class="mlist">',
     key, today.map((a, i) => `<div class="affix ${active.includes(a) ? 'on' : ''}"><b>${G.AFFIXES[a].name}</b><span>${G.AFFIXES[a].desc}</span><small>${active.includes(a) ? tx('考驗{0}', G.AFFIXES[a].test) : tx('+{0} 起生效', G.MYTHIC.affixAt[i])}</small></div>`).join(''), G.MYTHIC.idleBelow, Math.round(G.MYTHIC.idleMult * 100),
     tier === 2 ? tx('深淵秘境') : tx('傳奇秘境'), sta, G.MYTHIC.stamina.regenMin, max,
     tier === 2 ? tx('<p class="sub" style="margin:0">深淵秘境以第 14 層的強度為基準，掉落裝等更高，限時通關有機會掉職業套裝。</p>') : open2 ? '' : tx('<p class="sub" style="margin:0">通關第 14 層「深淵之心」後解鎖深淵秘境。</p>'));
-  const [f0, f1] = G.tierFloors(tier);
+  const [f0, f1] = G.tierFloors(tier), sug = G.mythicSuggest(S, f0, f1);
+  // v0.15 這一階還沒限時通關過：只顯示推薦的副本，其他收起來，避免一下子亮一整排
+  const fresh = !Array.from({ length: f1 - f0 + 1 }, (_, k) => S.mythic.best[f0 + k]).some(Boolean), all = !fresh || app.mythicAll || e2eMode(); // 舊的自動化測試（rl-e2e）直接顯示全部
   for (let i = f0; i <= f1; i++) {
+    if (!all && i !== sug) continue;
     const d = G.DUNGEONS[i], best = S.mythic.best[i];
-    h += tx('<div class="mrow2"><div class="mname"><b>{0}</b><span class="sub num" style="margin:0">限時 {1}・{2}</span></div> {3} <button class="btn sm" data-act="recommend-mythic" data-d="{4}" aria-label="一鍵備戰：陣容、天賦、裝備">備戰</button> <button class="btn sm main" data-act="mythic" data-d="{5}">挑戰 +{6}</button></div>', d.name, mmss(G.mythicTimer(i)), best ? tx('最佳 +{0}（{1}）', best.level, mmss(best.time)) : tx('還沒限時通關'), G.mythicIdleLevel(S, i) ? `<button class="btn sm ${S.idleMythic === i ? 'on' : ''}" data-act="idlemythic" data-d="${i}">${S.idleMythic === i ? tx('掛機中・停止') : tx('掛機 +{0}', G.mythicIdleLevel(S, i))}</button>` : '', i, i, key);
+    h += tx('<div class="mrow2 {7}"><div class="mname"><b>{0}{8}</b><span class="sub num" style="margin:0">限時 {1}・{2}</span></div> {3} <button class="btn sm" data-act="recommend-mythic" data-d="{4}" aria-label="一鍵備戰：陣容、天賦、裝備">備戰</button> <button class="btn sm main" data-act="mythic" data-d="{5}">挑戰 +{6}</button></div>', d.name, mmss(G.mythicTimer(i)), best ? tx('最佳 +{0}（{1}）', best.level, mmss(best.time)) : tx('還沒限時通關'), G.mythicIdleLevel(S, i) ? `<button class="btn sm ${S.idleMythic === i ? 'on' : ''}" data-act="idlemythic" data-d="${i}">${S.idleMythic === i ? tx('掛機中・停止') : tx('掛機 +{0}', G.mythicIdleLevel(S, i))}</button>` : '', i, i, key, i === sug ? 'sug' : '', i === sug ? tx('<span class="sugtag">推薦</span>') : '');
   }
+  if (!all) h += tx('<button class="btn sm grow" data-act="mythicall">顯示其他 {0} 個副本</button><p class="sub" style="margin:0">先從推薦的副本限時通關一次，其他副本隨時都能打，鑰石等級共用。</p>', f1 - f0);
   return h + `</div></div>`;
+}
+// v0.15 秘境說明卡：第一次進秘境自動展開，按「知道了」收起，之後點「？秘境怎麼玩」再打開
+function mythicGuide() {
+  const S = app.S, open = !S.mythicHelp || app.mythicHelpOpen;
+  if (!open) return tx('<div class="row" style="justify-content:flex-end;margin:-4px 0 8px"><button class="linkbtn" data-act="mythichelp">？秘境怎麼玩</button></div>');
+  return tx('<div class="mguide"><b class="mgt">秘境怎麼玩</b> <div class="mcmp"><span></span><b>主線</b><b>秘境</b> <span>目的</span><span>推進劇情、解鎖新層</span><span>重複刷同一批副本，拿更高裝等的裝備</span> <span>難度</span><span>每層固定</span><span>看鑰石等級：越高敵人越硬，+{0} 起有詞綴</span> <span>時間</span><span>不限時</span><span>有限時，限時內通關才升級</span> <span>獎勵</span><span>首通保底稀有</span><span>鑰石越高裝等越高，+{1} 起可能掉傳說</span></div> <ol class="msteps"><li>點<b>推薦</b>副本的「挑戰」，用目前鑰石等級開打。</li><li>限時內通關：鑰石 +1，打得夠快 +2；超時、失敗或撤退：鑰石 −1。</li><li>所有秘境副本共用同一顆鑰石，換副本打不會重來。</li><li>限時通關過的副本可以開「秘境掛機」，離線也會慢慢刷。</li></ol> <div class="row"><button class="btn sm main" data-act="mythichelpok">知道了</button></div></div>', G.MYTHIC.affixAt[0], G.MYTHIC.legendFrom);
 }
 // ---------- 天梯（排行榜）----------
 function boardCard() {

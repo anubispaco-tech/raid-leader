@@ -341,3 +341,18 @@ h3 .gi{vertical-align:-.12em}
 .achwhen{font-size:11px;white-space:nowrap}
 /* v0.13 雲端存檔 */
 .gsi{min-height:44px;display:flex;align-items:center}
+
+/* v0.15 團隊分區與篩選、套裝簡述、秘境引導 */
+.rhead{display:flex;align-items:baseline;gap:8px;margin:8px 0 -4px}.rhead b{font-size:14px}.rhead.in b{color:var(--brass)}
+.stack .hero.r-0:has(.tag.in),.stack .hero:has(.tag.in){border-color:var(--brass-d);background:color-mix(in srgb,var(--brass) 7%,var(--panel))}
+.tfilter{display:flex;gap:6px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none}
+.tf{flex:0 0 auto;display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--panel);font-size:13px}
+.tf small{color:var(--muted);font-size:11px}.tf.sel{border-color:var(--brass);color:var(--brass)}.tf.sel small{color:var(--brass)}
+.setmini{grid-column:1/-1;font-size:11.5px;color:var(--r3);line-height:1.35}
+.mguide{background:var(--panel);border:1px solid color-mix(in srgb,var(--r4) 45%,var(--line));border-radius:12px;padding:14px;display:grid;gap:10px;margin-bottom:12px}
+.mgt{font-family:var(--f-display);font-size:18px;color:var(--r4)}
+.mcmp{display:grid;grid-template-columns:auto 1fr 1.4fr;gap:6px 10px;font-size:12.5px;line-height:1.4}
+.mcmp>b{font-size:13px;color:var(--brass)}.mcmp>span:nth-child(3n+1){color:var(--muted);white-space:nowrap}
+.msteps{margin:0;padding-left:20px;display:grid;gap:4px;font-size:13px}
+.mrow2.sug{outline:1px solid var(--r4);background:color-mix(in srgb,var(--r4) 10%,var(--panel2))}
+.sugtag{font-size:11px;font-weight:700;color:var(--ink);background:var(--r4);border-radius:999px;padding:1px 7px;margin-left:6px;vertical-align:1px}
