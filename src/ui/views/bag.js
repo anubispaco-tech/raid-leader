@@ -3,6 +3,7 @@ import { tx } from '../../core/i18n.js';
 import * as G from '../../core/index.js';
 import { app } from '../state.js';
 import { itemStatText, itemName, fmt, gainFor, pctText, gearRuleCard } from '../helpers.js';
+import { svg, setGlyph } from '../icons.js';
 
 // v0.19 對出戰隊員的提升：「▲ 名字 +N%」；目前不比較好但強化後會更好 →「潛力」；隊上沒人能穿 → 灰字
 function gainNote(it) {
@@ -26,12 +27,32 @@ function buyRow(S) {
   const c = G.bagBuyCost(S), n = S.bagBought || 0, B = G.ECONOMY.bagBuy;
   return tx('<div class="set"><span style="margin:0">金幣擴充 <span class="sub num">{0}/{1}</span></span>{2}</div>', n, B.max, c == null ? tx('<span class="num okc">已全部擴充</span>') : tx('<button class="btn sm main" data-act="buybag" {0}>+{1} 格・<span class="num">{2}</span> 金</button>', S.gold >= c ? '' : 'disabled', B.slots, fmt(c)));
 }
-// v0.16 背包／圖鑑切換
-const bagTabs = () => { const c = G.codexStats(app.S), ready = G.CODEX_REWARDS.some(r => c.pct >= r.pct && !app.S.codexClaimed.includes(r.pct));
-  return `<div class="seg modes"><button data-act="bagview" data-v="bag" class="${app.bagView !== 'codex' ? 'sel' : ''}">${tx('背包')}</button><button data-act="bagview" data-v="codex" class="${app.bagView === 'codex' ? 'sel' : ''}">${tx('圖鑑 {0}%', c.pct)}${ready ? ' <span class="pip">!</span>' : ''}</button></div>`; };
+// v0.16 背包／圖鑑切換（v0.21 圖鑑分「套裝」與「一般裝備」，里程碑獎勵只算一般裝備）
+const bagTabs = () => { const c = G.codexStats(app.S), sc = G.setCodexStats(app.S), ready = G.CODEX_REWARDS.some(r => c.pct >= r.pct && !app.S.codexClaimed.includes(r.pct));
+  return `<div class="seg modes"><button data-act="bagview" data-v="bag" class="${app.bagView !== 'codex' ? 'sel' : ''}">${tx('背包')}</button><button data-act="bagview" data-v="codex" class="${app.bagView === 'codex' ? 'sel' : ''}">${tx('圖鑑 {0}/{1}', sc.got, sc.total)}${ready ? ' <span class="pip">!</span>' : ''}</button></div>`; };
 function viewCodex() {
-  const S = app.S, c = G.codexStats(S), has = k => !!S.codex[k];
-  let h = bagTabs() + tx('<h2>圖鑑 <span class="sub num">{0}/{1}</span></h2><p class="sub" style="margin:0 0 8px">拿到過的裝備會亮起來（自動分解的也算）。一般裝備以「種類＋稀有度」為一格，套裝以「職業＋部位」為一格。</p>', c.got, c.total);
+  const S = app.S, c = G.codexStats(S), sc = G.setCodexStats(S), ready = G.CODEX_REWARDS.some(r => c.pct >= r.pct && !S.codexClaimed.includes(r.pct));
+  const base = app.cxView === 'base';
+  let h = bagTabs() + `<div class="seg cxtabs"><button data-act="cxview" data-v="set" class="${base ? '' : 'sel'}">${tx('職業套裝 {0}/{1}', sc.got, sc.total)}</button><button data-act="cxview" data-v="base" class="${base ? 'sel' : ''}">${tx('一般裝備 {0}%', c.pct)}${ready ? ' <span class="pip">!</span>' : ''}</button></div>`;
+  return h + (base ? codexBase(S, c) : codexSets(S, sc));
+}
+// 套裝圖鑑：每職業一列、四個部位；拿到 T0 亮、升到 T0.5 加金框
+function codexSets(S, sc) {
+  const has = k => !!S.codex[k];
+  let h = tx('<p class="sub" style="margin:0 0 8px">第二章、深淵秘境、每日寶箱都會掉 T0 套裝（缺的部位優先）。傳奇秘境限時 +{0} 後，可以用 {1} 精華把 T0 升成 T0.5（傳說）。</p>', G.SET_T5.key, G.SET_T5.dust);
+  h += `<div class="cxbar"><i style="width:${(sc.got / sc.total) * 100}%"></i></div><div class="cxsets">`;
+  for (const cls of Object.keys(G.SETS)) {
+    const n0 = G.ARMOR_SLOTS.filter(sl => has(`set:${cls}:${sl}`)).length, n5 = G.ARMOR_SLOTS.filter(sl => has(`set:${cls}:${sl}:5`)).length;
+    h += `<div class="cxset"><div class="cxsh">${G.CLASSES[cls].icon}<b>${G.SETS[cls].name}</b><small class="num">T0 ${n0}/4・T0.5 ${n5}/4</small></div><div class="cxpieces">${G.ARMOR_SLOTS.map(sl => {
+      const k0 = has(`set:${cls}:${sl}`), k5 = has(`set:${cls}:${sl}:5`);
+      return `<div class="cxp ${k0 || k5 ? 'on' : ''} ${k5 ? 't5' : ''}">${svg(setGlyph(cls, sl), 'gi-' + cls)}<small>${G.SET_PIECE[sl]}</small></div>`; }).join('')}</div>
+      <div class="cxbonus"><span>${tx('2 件')}：${G.SETS[cls].d2}</span><span>${tx('4 件')}：${G.SETS[cls].d4}</span></div></div>`;
+  }
+  return h + '</div>';
+}
+function codexBase(S, c) {
+  const has = k => !!S.codex[k];
+  let h = tx('<p class="sub" style="margin:0 0 8px">拿到過的裝備會亮起來（自動分解的也算），以「種類＋稀有度」為一格。<span class="num">{0}/{1}</span></p>', c.got, c.total);
   h += `<div class="cxbar"><i style="width:${(c.got / c.total) * 100}%"></i></div><div class="cxmiles">${G.CODEX_REWARDS.map(r => {
     const done = S.codexClaimed.includes(r.pct), ok = c.pct >= r.pct;
     return `<button class="cxm ${done ? 'done' : ok ? 'ready' : ''}" data-act="codexclaim" data-v="${r.pct}" ${ok && !done ? '' : 'disabled'}><b class="num">${r.pct}%</b><small class="num">${done ? tx('已領取') : `${fmt(r.gold)} ${tx('金')}・${r.dust}✦`}</small></button>`; }).join('')}</div>`;
@@ -41,8 +62,6 @@ function viewCodex() {
     h += `<div class="cxslot label">${G.SLOTS[slot]}</div>`;
     h += list.map(([key, name]) => `<div class="cxrow"><span class="${G.RARITY.some((_, r) => has(`${key}:${r}`)) ? '' : 'sub'}">${tx(name)}</span>${G.RARITY.map((_, r) => cell(`${key}:${r}`, r)).join('')}</div>`).join('');
   }
-  h += `<div class="cxslot label">${tx('T0 職業套裝')}</div><div class="cxhead"><span></span>${G.ARMOR_SLOTS.map(sl => `<b>${G.SLOTS[sl]}</b>`).join('')}</div>`;
-  h += Object.keys(G.SETS).map(cls => `<div class="cxrow sets"><span>${G.CLASSES[cls].icon}${G.SETS[cls].name}</span>${G.ARMOR_SLOTS.map(sl => cell(`set:${cls}:${sl}`, 3)).join('')}</div>`).join('');
   return h;
 }
 // 目前篩選下、背包清單上看得到的裝備（多選的「全選」也用這份）

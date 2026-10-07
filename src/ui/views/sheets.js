@@ -72,7 +72,14 @@ function setLine(x) {
 export function setInfo(it) {
   if (!it.set) return '';
   const S = G.SETS[it.set];
-  return `<div class="setline"><b class="c3">T0「${S.name}」</b><span>${tx('{0}專屬套裝', G.CLASSES[it.set].name)}</span><span>${tx('2 件')}：${S.d2}</span><span>${tx('4 件')}：${S.d4}</span></div>`;
+  return `<div class="setline"><b class="c${it.rarity}">${it.t5 ? 'T0.5' : 'T0'}「${S.name}」</b><span>${tx('{0}專屬套裝', G.CLASSES[it.set].name)}</span><span>${tx('2 件')}：${S.d2}</span><span>${tx('4 件')}：${S.d4}</span>${t5Box(it)}</div>`;
+}
+// v0.21 T0.5 升級：史詩 → 傳說（稀有度倍率 1.75 → 2.1，約 +20%），保留裝等與強化；套裝效果不變、與 T0 混穿照算件數
+function t5Box(it) {
+  if (it.t5) return `<span class="t5done">${tx('已升級 T0.5（傳說）')}</span>`;
+  const c = G.setT5Check(app.S, it.id), T = G.SET_T5, gain = Math.round((G.RARITY[T.rarity].mult / G.RARITY[it.rarity].mult - 1) * 100);
+  const why = c.why === 'key' ? tx('傳奇秘境限時 +{0} 解鎖（目前最佳 +{1}）', T.key, G.mythicBestLevel(app.S, 1)) : c.why === 'dust' ? tx('精華不足（{0}/{1}）', fmt(app.S.dust || 0), T.dust) : '';
+  return `<div class="t5box"><button class="btn sm ${c.ok ? 'main' : ''}" data-act="sett5" data-id="${it.id}" ${c.ok ? '' : 'disabled'}>${tx('升級 T0.5')} <span class="dust num">${T.dust}✦</span></button><small>${tx('變成傳說、屬性 +{0}%，保留裝等與強化', gain)}${why ? `<br><span class="warnc">${why}</span>` : ''}</small></div>`;
 }
 function heroActions(x) {
   const locked = G.partyLocked(app.S);

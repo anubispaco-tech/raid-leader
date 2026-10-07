@@ -1,5 +1,5 @@
 // ===== 裝備 =====
-import { RARITY, SLOTS, SLOT_STATS, SLOT_NAMES, PREFIX, GEAR, SETS, SET_PIECE, ARMOR_SLOTS, ITEM_BASES, BASE_INFO, ITEM_TIERS, GEAR_AFFIX, CLASSES, ARMOR_TYPES, LOOT } from './config.js';
+import { RARITY, SLOTS, SLOT_STATS, SLOT_NAMES, PREFIX, GEAR, SETS, SET_PIECE, ARMOR_SLOTS, ITEM_BASES, BASE_INFO, ITEM_TIERS, GEAR_AFFIX, CLASSES, ARMOR_TYPES, LOOT, SET_T5 } from './config.js';
 import { tx } from './i18n.js';
 import { roleOf } from './classes/index.js';
 import { R, rnd, pick, uid } from './rng.js';
@@ -37,11 +37,10 @@ export function guessBase(it) {
   return best;
 }
 // v0.16 圖鑑：一般裝備以「基底＋稀有度」為一格，套裝以「職業＋部位」為一格
-export const codexKey = it => (it.set ? `set:${it.set}:${it.slot}` : it.base ? `${it.base}:${it.rarity}` : null);
-export const codexAllKeys = () => [
-  ...Object.keys(BASE_INFO).flatMap(b => RARITY.map((_, r) => `${b}:${r}`)),
-  ...Object.keys(SETS).flatMap(c => ARMOR_SLOTS.map(sl => `set:${c}:${sl}`)),
-];
+export const codexKey = it => (it.set ? `set:${it.set}:${it.slot}${it.t5 ? ':5' : ''}` : it.base ? `${it.base}:${it.rarity}` : null);
+// v0.21 圖鑑拆成兩本：套裝（6 職業×4 部位×T0／T0.5，不給獎勵）與一般裝備（里程碑獎勵只算這本）
+export const codexAllKeys = () => Object.keys(BASE_INFO).flatMap(b => RARITY.map((_, r) => `${b}:${r}`));
+export const setCodexKeys = () => Object.keys(SETS).flatMap(c => ARMOR_SLOTS.flatMap(sl => [`set:${c}:${sl}`, `set:${c}:${sl}:5`]));
 // 詞綴對英雄的價值：坦克看耐力、其他看威力；暴擊對非坦克加分
 export const affixFit = (role, it) => {
   const A = GEAR_AFFIX[it.affix]; if (!A) return 1;
@@ -90,6 +89,12 @@ export function makeSetItem(cls, slot, ilvl) {
   return it;
 }
 export const randomArmorSlot = () => pick(ARMOR_SLOTS);
+// v0.21 防重複：優先掉這個職業還沒有的部位（身上、背包、戰利品箱都算有）；四件都有就隨機。都只抽一次亂數
+export function setDropSlot(s, cls) {
+  const own = new Set(Object.values((s && s.items) || {}).filter(it => it && it.set === cls).map(it => it.slot));
+  const miss = ARMOR_SLOTS.filter(sl => !own.has(sl));
+  return pick(miss.length ? miss : ARMOR_SLOTS);
+}
 // 套裝件數與啟動的效果
 export function setMods(h, items) {
   const set = SETS[h.cls]; if (!set) return {};
@@ -113,6 +118,7 @@ export const dustCost = it => it.up >= GEAR.refineFrom ? (it.up - GEAR.refineFro
 // 分解精華 = 品質基本值 + 精煉投入 × salvageRefund（v0.15 由一半提高到 80%）
 export const salvageDust = it => {
   let spent = 0; for (let u = GEAR.refineFrom; u < (it.up || 0); u++) spent += (u - GEAR.refineFrom + 1) * GEAR.dustPerStep;
+  if (it.t5) spent += SET_T5.dust; // v0.21 T0.5 投入的精華也照比例退
   return (GEAR.salvageDust[it.rarity] || 0) + Math.floor(spent * (GEAR.salvageRefund ?? 0.5));
 };
 export const upgradeCost = it => Math.round(GEAR.upCostBase * (it.up + 1) * (1 + it.ilvl / 10));

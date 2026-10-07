@@ -481,3 +481,29 @@ h3 .gi{vertical-align:-.12em}
 .mselbar .mcount{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;font-size:14px;font-weight:700;line-height:1.2}
 .mselbar .mcount small{font-size:11px;font-weight:500;color:var(--muted)}
 .mselbar .btn{flex:0 0 auto}
+/* v0.21 套裝 T0.5、圖鑑、可能掉落 */
+.settag.t5{background:var(--r4)!important;color:var(--ink,#111)!important}
+.t5box{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+.t5box small{font-size:11.5px;color:var(--muted);line-height:1.35;flex:1 1 160px}
+.t5done{color:var(--r4);font-weight:700}
+.cxtabs{margin:0 0 10px}
+.cxsets{display:grid;gap:10px;margin-top:10px}
+.cxset{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px;display:grid;gap:8px}
+.cxsh{display:flex;align-items:center;gap:6px} .cxsh .gi{width:20px;height:20px} .cxsh small{margin-left:auto;color:var(--muted);font-size:12px}
+.cxpieces{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cxp{display:grid;justify-items:center;gap:2px;padding:6px 2px;border:1px solid var(--line);border-radius:8px;background:#0e1218;opacity:.32;filter:grayscale(1)}
+.cxp.on{opacity:1;filter:none;border-color:color-mix(in srgb,var(--r3) 70%,var(--line))}
+.cxp.t5{border-color:var(--r4);box-shadow:0 0 10px -4px var(--r4)}
+.cxp .gi{width:34px;height:34px} .cxp small{font-size:11px;color:var(--muted)}
+.cxbonus{display:grid;gap:2px;font-size:12px;color:var(--muted)}
+.drops{margin-top:8px;border-top:1px dashed var(--line);padding-top:6px}
+.dropbtn{background:none;border:0;color:var(--muted);font:inherit;font-size:13px;padding:2px 0;cursor:pointer}
+.drops.open .dropbtn{color:var(--fg)}
+.dropbody{display:grid;gap:4px;margin-top:4px;font-size:12.5px}
+.drow{display:grid;grid-template-columns:64px 1fr;gap:8px;align-items:baseline} .drow .label{margin:0}
+.drow span:last-child{display:flex;flex-wrap:wrap;gap:2px 8px} .drow small{font-size:11px}
+.dsets{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:2px}
+.dset{display:flex;align-items:center;gap:3px;font-size:12px} .dset b{font-weight:600;margin-right:2px}
+.dset i{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:5px;border:1px solid var(--line);opacity:.3;filter:grayscale(1)}
+.dset i.on{opacity:1;filter:none} .dset i.t5{border-color:var(--r4)} .dset .gi{width:18px;height:18px}
+.dg .drops{grid-column:1/-1}

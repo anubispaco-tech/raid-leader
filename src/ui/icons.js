@@ -26,11 +26,21 @@ export const BASE_GLYPH = {
   buckle: 'belt-buckles', runestone: 'rune-stone',
 }; // v0.18.2 左上角遊戲圖示（點了開設定）
 
+// v0.21 T0 套裝：每職業 4 部位各一張（依職業上色）
+export const SET_GLYPH = {
+  guardian: { head: 'black-knight-helm', chest: 'chest-armor', hands: 'metal-hand', legs: 'armor-cuisses' },
+  rogue: { head: 'hooded-assassin', chest: 'ninja-armor', hands: 'fist', legs: 'tabi-boot' },
+  druid: { head: 'wooden-helmet', chest: 'layered-armor', hands: 'bracer', legs: 'fur-boot' },
+  shaman: { head: 'totem-mask', chest: 'spiked-armor', hands: 'evil-hand', legs: 'boots' },
+  cleric: { head: 'laurel-crown', chest: 'cape-armor', hands: 'glowing-hands', legs: 'sandal' },
+  mage: { head: 'pointy-hat', chest: 'wing-cloak', hands: 'magic-palm', legs: 'leather-boot' },
+};
+export const setGlyph = (cls, slot) => (SET_GLYPH[cls] && SET_GLYPH[cls][slot]) || SLOT_GLYPH[slot];
 export const svg = (name, cls = '') => DATA[name]
   ? `<svg class="gi ${cls}" viewBox="0 0 512 512" aria-hidden="true"><path d="${DATA[name]}"/></svg>` : '';
 export const classIcon = cls => svg(CLASS_GLYPH[cls], 'gi-' + cls);
 export const slotIcon = (slot, rarity = 0) => svg(SLOT_GLYPH[slot], 'c' + rarity);
-export const itemIcon = it => svg((!it.set && BASE_GLYPH[it.base]) || SLOT_GLYPH[it.slot], 'c' + it.rarity);
+export const itemIcon = it => (it.set ? svg(setGlyph(it.set, it.slot), 'gi-' + it.set) : svg(BASE_GLYPH[it.base] || SLOT_GLYPH[it.slot], 'c' + it.rarity));
 export const dungeonIcon = i => { const g = BOSS_GLYPH[i]; return svg(Array.isArray(g) ? g[0] : g, 'gi-boss'); };
 // 戰鬥中的敵人：依名字找首領圖示，其餘是小怪／寶藏哥布林
 const byName = {};

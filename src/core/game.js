@@ -2,13 +2,13 @@
 // 所有函式都接收存檔物件 s 並直接修改它；畫面層只呼叫這裡，不自己改存檔。
 import { CLASSES, HERO, SLOTS, DUNGEONS, REWARD, ECONOMY, GEAR, BAG_MILESTONES, BAG_PER_MILESTONE, HERO_RARITY, LEGENDS, RECRUIT } from './config.js';
 import { R, rnd, rint, pick } from './rng.js';
-import { makeItem, rollLoot, canEquip, rollRarity, itemScore, heroItemScore, makeSetItem, randomArmorSlot, salvageValue, salvageDust, upgradeCost, dustCost, codexKey, codexAllKeys, guessBase } from './items.js';
+import { makeItem, rollLoot, canEquip, rollRarity, itemScore, heroItemScore, makeSetItem, setDropSlot, salvageValue, salvageDust, upgradeCost, dustCost, codexKey, codexAllKeys, setCodexKeys, guessBase } from './items.js';
 import { CODEX_REWARDS } from './config.js';
 import { makeHero, gainXp, heroPower, roleOf, heroIlvl } from './heroes.js';
 import { getLang } from './i18n.js';
 import { dungeonInfo } from './dungeons.js';
 import { SPECS, TALENT_ROWS, SPEC_LEVEL, applyRecommend } from './talents.js';
-import { MYTHIC, CH1_TOP, SET_DROP, RARITY } from './config.js';
+import { MYTHIC, CH1_TOP, SET_DROP, SET_T5, RARITY, mythicBestLevel } from './config.js';
 import { bump } from './daily.js';
 import { mythicRewards, keyChange, mythicBattleOpts, keyOf, setKey, mythicTier } from './mythic.js';
 import { Battle } from './battle.js';
@@ -121,6 +121,7 @@ function normalizeTypes(s) {
     if (!it || typeof it !== 'object' || !SLOTS[it.slot]) { delete s.items[id]; continue; }
     it.rarity = int(it.rarity, 0, IR); it.ilvl = int(it.ilvl, 1, 9999); it.up = int(it.up, 0, GEAR.maxUp);
     if (typeof it.name !== 'string') it.name = '?';
+    if (it.t5 && it.set) { it.t5 = 1; it.rarity = SET_T5.rarity; } else delete it.t5;
   }
   const ids = new Set(s.heroes.map(h => h.id));
   s.party = (s.party || []).filter(id => ids.has(id));
@@ -280,7 +281,7 @@ export function applyResult(s, dIdx, battle) {
     if (dIdx + 1 >= s.unlocked && dIdx + 1 < DUNGEONS.length) s.unlocked = dIdx + 2;
   }
   // 第二章：T0 套裝部件（出戰隊員其中一人的職業）
-  if (battle.win && dIdx > CH1_TOP && party.length && R() < SET_DROP.chance) rw.loot.push(makeSetItem(pick(party).cls, randomArmorSlot(), dungeonInfo(dIdx).dropIlvl + 2));
+  if (battle.win && dIdx > CH1_TOP && party.length && R() < SET_DROP.chance) rw.loot.push(makeSetDrop(s, pick(party).cls, dungeonInfo(dIdx).dropIlvl + 2));
   const dest = rw.loot.map(it => (it.set ? addSetLoot(s, it) : addLoot(s, it)));
   const kept = rw.loot.filter((_, i) => dest[i] === 'bag'), stashed = rw.loot.filter((_, i) => dest[i] === 'stash');
   return { ...rw, first, lvUps, kept, stashed, salvaged: dest.filter(d => d === 'salvaged').length };
@@ -306,7 +307,7 @@ export function applyMythicResult(s, battle) {
   // 深淵秘境限時通關：和第二章主線一樣有機會掉職業套裝
   const party = partyHeroes(s);
   if (kc.inTime && mythicTier(M.dIdx) === 2 && party.length && R() < SET_DROP.chance)
-    rw.loot.push(makeSetItem(pick(party).cls, randomArmorSlot(), rw.loot[0].ilvl));
+    rw.loot.push(makeSetDrop(s, pick(party).cls, rw.loot[0].ilvl));
   s.stats.runs++; if (battle.win) s.stats.wins++;
   s.mythic.runs++; if (kc.inTime) s.mythic.timed++; if (kc.delta === 2) s.stats.fast = (s.stats.fast || 0) + 1;
   s.gold += rw.gold;
@@ -439,8 +440,32 @@ export function salvageStash(s) {
   s.stash = s.stash.filter(id => !ids.includes(id)); s.gold += gold;
   return { count: ids.length, gold };
 }
+// ---------- v0.21 套裝：防重複掉落、T0.5 升級 ----------
+export const makeSetDrop = (s, cls, ilvl) => makeSetItem(cls, setDropSlot(s, cls), ilvl);
+// 能不能升 T0.5：回傳 { ok, why }（why：notset／done／key／dust）
+export function setT5Check(s, id) {
+  const it = s.items[id];
+  if (!it || !it.set) return { ok: false, why: 'notset' };
+  if (it.t5) return { ok: false, why: 'done' };
+  if (mythicBestLevel(s, 1) < SET_T5.key) return { ok: false, why: 'key' };
+  if ((s.dust || 0) < SET_T5.dust) return { ok: false, why: 'dust' };
+  return { ok: true };
+}
+// 升級：保留裝等、強化等級；名稱不變（顯示 T0.5 標籤），稀有度變傳說
+export function upgradeSetT5(s, id) {
+  if (!setT5Check(s, id).ok) return false;
+  const it = s.items[id];
+  s.dust -= SET_T5.dust; it.t5 = 1; it.rarity = SET_T5.rarity; codexAdd(s, it); bump(s, 'upgrade');
+  return true;
+}
+// 已投入的 T0.5 精華（分解時照精煉的比例退）
+export const t5Spent = it => (it && it.t5 ? SET_T5.dust : 0);
 // ---------- v0.16 圖鑑 ----------
 export function codexAdd(s, it) { const k = codexKey(it); if (k && s.codex && !s.codex[k]) s.codex[k] = 1; }
+export function setCodexStats(s) {
+  const all = setCodexKeys(), got = all.filter(k => s.codex && s.codex[k]).length;
+  return { got, total: all.length };
+}
 export function codexStats(s) {
   const all = codexAllKeys(), got = all.filter(k => s.codex && s.codex[k]).length;
   return { got, total: all.length, pct: Math.floor((got / all.length) * 100) };

@@ -234,6 +234,9 @@ document.addEventListener('click', e => {
     case 'mythichelp': app.mythicHelpOpen = true; break;
     case 'mythichelpok': app.S.mythicHelp = true; app.mythicHelpOpen = false; save(); break;
     case 'bagview': app.bagView = t.dataset.v; break;
+    case 'cxview': app.cxView = t.dataset.v; break;
+    case 'drops': app.dropOpen = app.dropOpen === t.dataset.v ? null : t.dataset.v; break;
+    case 'sett5': if (G.upgradeSetT5(app.S, id)) { const it = app.S.items[id]; toast(tx('{0} 升級為 T0.5（傳說）', it.name)); T.sendEvent(tx('套裝升級'), `${it.set}:${it.slot}`); save(); } else toast(tx('還不能升級')); break;
     case 'codexclaim': { const r = G.claimCodex(app.S, +t.dataset.v); if (r) { toast(tx('圖鑑 {0}%：獲得 {1} 金、{2} 精華', r.pct, fmt(r.gold), r.dust)); save(); } break; }
     case 'tutskip': { const step = app.S.tut.step; G.tutSkip(app.S); save(); T.sendEvent(tx('教學'), `skip@${step}`); toast(tx('已跳過教學，「下一步」卡片會繼續提示')); break; }
     case 'cardok': G.markCard(app.S, t.dataset.v); save(); break;

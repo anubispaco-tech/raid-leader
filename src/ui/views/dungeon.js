@@ -2,10 +2,47 @@
 import { tx } from '../../core/i18n.js';
 import * as G from '../../core/index.js';
 import { app, e2eMode } from '../state.js';
-import { dungeonIcon } from '../icons.js';
+import { dungeonIcon, svg, setGlyph } from '../icons.js';
 import { fmt, mmss, esc, partyPower, avgPartyIlvl, avgPartyLv, dailyOpenNow, gearRuleCard } from '../helpers.js';
 import { leaderboard } from '../telemetry.js';
 
+// ---------- v0.21 可能掉落 ----------
+// 稀有度機率：rollRarity 由高往低累加 weight；minR 以下併進 minR
+function rarityOdds(minR = 0, legend = 0) {
+  const w = G.RARITY.map(r => r.weight), out = G.RARITY.map(() => 0);
+  w.forEach((x, i) => { out[Math.max(i, minR)] += x * (1 - legend); });
+  out[G.RARITY.length - 1] += legend;
+  return out.map((p, i) => (p > 0.0005 ? `<span class="c${i}">${G.RARITY[i].name} ${p >= 0.1 ? Math.round(p * 100) : (p * 100).toFixed(1).replace(/\.0$/, '')}%</span>` : '')).filter(Boolean).join(' ');
+}
+// 出戰職業的套裝收集：亮 = 有、暗 = 缺（缺的部位優先掉）、T0.5 加外框
+function setChips() {
+  const S = app.S, cl = [...new Set(G.partyHeroes(S).map(h => h.cls))];
+  return `<div class="dsets">${cl.map(c => { const own = {}; Object.values(S.items).forEach(it => { if (it.set === c) own[it.slot] = Math.max(own[it.slot] || 0, it.t5 ? 2 : 1); });
+    return `<span class="dset"><b>${G.CLASSES[c].name}</b>${G.ARMOR_SLOTS.map(sl => `<i class="${own[sl] ? 'on' : ''} ${own[sl] === 2 ? 't5' : ''}" title="${G.SLOTS[sl]}">${svg(setGlyph(c, sl), 'gi-' + c)}</i>`).join('')}</span>`; }).join('')}</div>`;
+}
+export function dropsBox(key, rows, sets) {
+  const open = app.dropOpen === key;
+  return `<div class="drops ${open ? 'open' : ''}"><button class="dropbtn" data-act="drops" data-v="${key}" aria-expanded="${open}">${tx('可能掉落')} <span aria-hidden="true">${open ? '▴' : '▾'}</span></button>${open ? `<div class="dropbody">${rows.map(([k, v]) => `<div class="drow"><span class="label">${k}</span><span>${v}</span></div>`).join('')}${sets ? setChips() : ''}</div>` : ''}</div>`;
+}
+function storyDrops(i) {
+  const d = G.dungeonInfo(i), R = G.REWARD, rows = [
+    [tx('裝備'), tx('{0}～{1} 件・裝等 {2}～{3}', R.baseDrops, R.baseDrops + 1, d.dropIlvl - 1, d.dropIlvl + 2) + `<small class="sub">${tx('（{0}% 多一件）', Math.round(R.doubleDropChance * 100))}</small>`],
+    [tx('稀有度'), rarityOdds(0)],
+  ];
+  if (!(app.S.clears[i])) rows.push([tx('首通'), tx('第一件至少{0}', G.RARITY[R.firstClearMinRarity].name)]);
+  const ch2 = i > G.CH1_TOP;
+  if (ch2) rows.push([tx('T0 套裝'), tx('勝利 {0}% 掉一件（出戰職業、缺的部位優先）', Math.round(G.SET_DROP.chance * 100))]);
+  return dropsBox('d' + i, rows, ch2);
+}
+function mythicDrops(tier, key) {
+  const M = G.MYTHIC, il = tier === 2 ? M.ch2.dropBase + M.ch2.dropPerLevel * key : M.dropBase + M.dropPerLevel * key;
+  const legend = key >= M.legendFrom ? Math.min(M.legendMax, M.legendBase + M.legendPerLevel * (key - M.legendFrom)) : 0;
+  const rows = [[tx('裝備'), tx('限時 3 件、超時 2 件・裝等約 {0}', il)], [tx('稀有度'), rarityOdds(1, legend)]];
+  if (!legend) rows.push([tx('傳說'), tx('+{0} 起有機會掉落', M.legendFrom)]);
+  if (tier === 2) rows.push([tx('T0 套裝'), tx('限時通關 {0}% 掉一件（出戰職業、缺的部位優先）', Math.round(G.SET_DROP.chance * 100))]);
+  else rows.push([tx('T0.5 升級'), G.mythicBestLevel(app.S, 1) >= G.SET_T5.key ? tx('已解鎖（最佳 +{0}）', G.mythicBestLevel(app.S, 1)) : tx('傳奇秘境限時 +{0} 解鎖（目前最佳 +{1}）', G.SET_T5.key, G.mythicBestLevel(app.S, 1))]);
+  return dropsBox('m' + tier, rows, tier === 2);
+}
 // ---------- 下一步建議卡 ----------
 // ---------- 每日：任務、首勝、簽到 ----------
 function signinText(r) {
@@ -62,7 +99,7 @@ function mythicSection() {
   let h = tabs + (tier === 2 ? infoCard('abyss', tx('深淵秘境'), tx('規則和傳奇秘境一樣，但副本換成第二章、強度以第 14 層為基準，有自己的一顆鑰石（體力共用）。掉落裝等更高，限時通關有機會掉 T0 職業套裝。')) : '') + mythicGuide() + tx('<div class="mythic"><div class="mhead"><div><span class="label">{4}</span><b>目前鑰石</b></div><span class="keystone num">+{0}</span></div> {5} <div class="affixes">{1}</div> <p class="sub" style="margin:0">今日詞綴，每天 00:00 更換。手動挑戰每場耗 1 點體力，每 {6} 分鐘回 1 點、上限 {7}。<b>秘境掛機</b>：限時通關過的副本可以掛機，固定打該副本最佳 −{2}，不耗體力、鑰石不變、獎勵 {3}%，離線也會累積。</p> {8} <div class="mlist">',
     key, today.map((a, i) => `<div class="affix ${active.includes(a) ? 'on' : ''}"><b>${G.AFFIXES[a].name}</b><span>${G.AFFIXES[a].desc}</span><small>${active.includes(a) ? tx('考驗{0}', G.AFFIXES[a].test) : tx('+{0} 起生效', G.MYTHIC.affixAt[i])}</small></div>`).join(''), G.MYTHIC.idleBelow, Math.round(G.MYTHIC.idleMult * 100),
     tier === 2 ? tx('深淵秘境') : tx('傳奇秘境'), sta, G.MYTHIC.stamina.regenMin, max,
-    tier === 2 ? tx('<p class="sub" style="margin:0">深淵秘境以第 14 層的強度為基準，掉落裝等更高，限時通關有機會掉職業套裝。</p>') : open2 ? '' : tx('<p class="sub" style="margin:0">通關第 14 層「深淵之心」後解鎖深淵秘境。</p>'));
+    (tier === 2 ? tx('<p class="sub" style="margin:0">深淵秘境以第 14 層的強度為基準，掉落裝等更高，限時通關有機會掉職業套裝。</p>') : open2 ? '' : tx('<p class="sub" style="margin:0">通關第 14 層「深淵之心」後解鎖深淵秘境。</p>')) + mythicDrops(tier, key));
   const [f0, f1] = G.tierFloors(tier), sug = G.mythicSuggest(S, f0, f1);
   // v0.15 這一階還沒限時通關過：只顯示推薦的副本，其他收起來，避免一下子亮一整排
   const fresh = !Array.from({ length: f1 - f0 + 1 }, (_, k) => S.mythic.best[f0 + k]).some(Boolean), all = !fresh || app.mythicAll || e2eMode(); // 舊的自動化測試（rl-e2e）直接顯示全部
@@ -115,8 +152,8 @@ export function viewDungeons() {
     if (i < chs[ch].floors[0] || i > chs[ch].floors[1]) return;
     const d = G.dungeonInfo(i), locked = i >= app.S.unlocked, clears = app.S.clears[i] || 0;
     const idleHere = app.S.idle === i;
-    h += tx('<div class="dg {0}"> <div class="tier">{1}<small>第 {2} 層</small></div> <h3>{3}<span class="boss">首領・{4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>建議 <b class="num {6}">Lv{7}</b></span> <span>裝等 <b class="num {8}">{9}</b></span> <span>掉落 <b class="num">{10}</b></span> <span>通關 <b class="num">{11}</b> 次</span> </div> <div class="acts">{12} </div></div>', locked ? 'locked' : '', G.ROMAN[i] + dungeonIcon(i), i + 1, d.name, d.boss, d.tip, lv >= d.recLevel ? 'ok' : 'low', d.recLevel, il >= d.recIlvl ? 'ok' : 'low', d.recIlvl, d.dropIlvl, clears, locked ? tx('<span class="sub" style="margin:0">先通關上一層</span>') :
-        tx('<button class="btn main grow" data-act="fight" data-d="{0}">挑戰</button> <button class="btn {1}" data-act="idle" data-d="{2}" {3}>{4}</button> <button class="btn" data-act="prepare" data-d="{5}" aria-label="{6}">備戰</button>', i, idleHere ? 'on' : '', i, clears ? '' : tx('disabled title="通關一次後才能掛機"'), idleHere ? tx('掛機中・停止') : tx('掛機刷'), i, G.partyLocked(app.S) ? tx('一鍵備戰：掛機中只調天賦、裝備') : tx('一鍵備戰：陣容、天賦、裝備')));
+    h += tx('<div class="dg {0}"> <div class="tier">{1}<small>第 {2} 層</small></div> <h3>{3}<span class="boss">首領・{4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>建議 <b class="num {6}">Lv{7}</b></span> <span>裝等 <b class="num {8}">{9}</b></span> <span>掉落 <b class="num">{10}</b></span> <span>通關 <b class="num">{11}</b> 次</span> </div> <div class="acts">{12} </div>{13}</div>', locked ? 'locked' : '', G.ROMAN[i] + dungeonIcon(i), i + 1, d.name, d.boss, d.tip, lv >= d.recLevel ? 'ok' : 'low', d.recLevel, il >= d.recIlvl ? 'ok' : 'low', d.recIlvl, d.dropIlvl, clears, locked ? tx('<span class="sub" style="margin:0">先通關上一層</span>') :
+        tx('<button class="btn main grow" data-act="fight" data-d="{0}">挑戰</button> <button class="btn {1}" data-act="idle" data-d="{2}" {3}>{4}</button> <button class="btn" data-act="prepare" data-d="{5}" aria-label="{6}">備戰</button>', i, idleHere ? 'on' : '', i, clears ? '' : tx('disabled title="通關一次後才能掛機"'), idleHere ? tx('掛機中・停止') : tx('掛機刷'), i, G.partyLocked(app.S) ? tx('一鍵備戰：掛機中只調天賦、裝備') : tx('一鍵備戰：陣容、天賦、裝備')), locked ? '' : storyDrops(i));
   });
   h += `</div>` + tx('<div class="howto" style="margin-top:16px"><b>備戰</b>：依這層首領的弱點，自動排好陣容、天賦與裝備（掛機中陣容鎖定，只調天賦與裝備）。<br><b>掛機刷</b>：自動重複挑戰，關掉頁面也會累積（最多 {0} 小時），回來時一次結算。<br><b>存檔</b>：進度存在這支手機的瀏覽器。要換手機玩，點左上角的雙劍圖示開啟設定，匯出存檔碼。</div>', G.ECONOMY.offlineCapHours);
   return h;
