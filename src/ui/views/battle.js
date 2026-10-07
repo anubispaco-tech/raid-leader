@@ -26,10 +26,9 @@ export function viewBattle() {
   if (!app.battle) return tx('<h2>戰鬥</h2><div class="empty">目前沒有進行中的戰鬥。<br>到「副本」選一層開始挑戰。<br><br><button class="btn main" data-tab="dungeon">前往副本</button></div>');
   const d = G.dungeonInfo(app.battle.dIdx), b = app.battle;
   if (b.vault) d.name = tx('寶庫・第 {0} 層', b.vault.floor + 1);
+  if (prefs.fx !== 'off') return viewBattleGrid(b, d) + ctrlBar(b);
   let h = tx('<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}{13}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">敵方・{7}</span>{8}</div> <div class="side"><span class="label">我方隊伍</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>', d.name, b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : '', b.tick, b.vault ? '' : `<div class="waves">`, b.vault ? '' : b.waves.map((_, i) => `<i class="${i < b.waveIdx || (b.over && b.win) ? 'done' : i === b.waveIdx ? 'cur' : ''}"></i>`).join('') + '</div>', b.mythic ? mythicTimerBar(b) : '', b.vault ? vaultBar(b) : '', b.waveIdx === b.waves.length - 1 ? tx('首領戰') : tx('第 {0} 波', b.waveIdx + 1), enemyRows(b), b.units.map(u => unitRow(u, false)).join(''), b.log.map(l => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, ' ')}</span>${l.msg}</p>`).join(''), prefs.fx !== 'off' ? '<div id="gridSlot" class="gridslot"></div>' : '', prefs.fx !== 'off' ? ' compact' : '', (prefs.fx !== 'off' ? isoBtn() : '') + muteBtn());
-  if (!b.over) {
-    h += tx('<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">撤退</button></div></div>', [1, 2, 4].map(x => `<button data-act="speed" data-x="${x}" class="${app.speed === x ? 'sel' : ''}">${x}×</button>`).join(''), hornBtn(b), canSkip(b) ? tx('<button class="btn" data-act="skip">直接結算</button>') : tx('<button class="btn" disabled title="首次挑戰需完整觀戰（可用 4× 加速）">🔒 結算</button>'));
-  }
+  h += ctrlBar(b);
   if (b.over && app.lastResult) h += viewResult();
   return h;
 }
@@ -42,6 +41,29 @@ function mythicTimerBar(b) {
 function vaultBar(b) {
   const left = Math.max(0, b.vault.dur - b.tick), f = b.vault.floor, cap = G.vaultMaxKills(f);
   return tx('<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">剩 {1}</span></div> <div class="vaultcount"><b class="num">{2}</b> 隻哥布林・<span class="num">+{3}</span> 金{4}</div>', pct(b.tick, b.vault.dur), mmss(left), b.kills, fmt(Math.min(b.kills, cap) * G.vaultGoldPerKill(f)), b.kills >= cap ? tx('（已達金幣上限）') : tx('<span class="sub" style="margin:0">　金幣算到 {0} 隻</span>', cap));
+}
+// v0.20.1 格子模式（手機優先）：標題 → 結算（打完時置頂）→ 敵方一行血條 → 格子 → 我方橫排血條 → 戰鬥紀錄
+function viewBattleGrid(b, d) {
+  let h = `<div class="bhead"><h2>${d.name}${b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : ''}</h2><span class="sub num" style="margin:0">${b.tick}s</span> ${b.vault ? '' : `<div class="waves">${b.waves.map((_, i) => `<i class="${i < b.waveIdx || (b.over && b.win) ? 'done' : i === b.waveIdx ? 'cur' : ''}"></i>`).join('')}</div>`}${isoBtn()}${muteBtn()}</div>`;
+  h += (b.mythic ? mythicTimerBar(b) : '') + (b.vault ? vaultBar(b) : '');
+  if (b.over && app.lastResult) h += viewResult();
+  h += foeBar(b) + '<div id="gridSlot" class="gridslot"></div>' + partyStrip(b);
+  h += `<div class="log short" aria-live="polite">${b.log.map(l => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, ' ')}</span>${l.msg}</p>`).join('')}</div>`;
+  return h;
+}
+// 敵方只留一行：首領戰顯示首領血條（雙首領兩條），小怪波顯示剩幾隻＋合計血量
+function foeBar(b) {
+  const bosses = b.enemies.filter(e => e.boss);
+  if (bosses.length) return `<div class="foebar">${bosses.map(e => `<div class="fb ${e.hp <= 0 ? 'dead' : ''}"><span class="ic">${enemyIcon(e)}</span><span class="nm">${e.name}${e.bshield > 0 ? ` <small class="shield">${tx('護盾')}</small>` : ''}${e.casting ? ` <small class="casting">${tx('讀條中')}</small>` : ''}</span><span class="num">${Math.ceil(pct(e.hp, e.max))}%</span><span class="bar"><i class="enemy-bar" style="width:${pct(e.hp, e.max)}%"></i></span></div>`).join('')}</div>`;
+  const alive = b.enemies.filter(e => e.hp > 0), hp = alive.reduce((a, e) => a + e.hp, 0), max = b.enemies.reduce((a, e) => a + e.max, 0) || 1;
+  return `<div class="foebar"><div class="fb"><span class="nm">${b.waveIdx === b.waves.length - 1 ? tx('首領戰') : tx('第 {0} 波', b.waveIdx + 1)}・${tx('剩 {0} 隻', alive.length)}</span><span class="num">${Math.ceil(pct(hp, max))}%</span><span class="bar"><i class="enemy-bar" style="width:${pct(hp, max)}%"></i></span></div></div>`;
+}
+// 我方 5 人一排：職業圖示＋血條＋百分比（名字放在 title／aria-label）
+function partyStrip(b) {
+  return `<div class="pstrip">${b.units.map(u => `<div class="pc ${u.hp <= 0 ? 'dead' : ''}" title="${u.name}" aria-label="${u.name} ${Math.ceil(pct(u.hp, u.max))}%"><span class="ic">${u.icon}</span><span class="num">${u.hp <= 0 ? '✕' : Math.ceil(pct(u.hp, u.max)) + '%'}</span><span class="bar"><i class="role-${u.role}" style="width:${pct(u.hp, u.max)}%"></i></span></div>`).join('')}</div>`;
+}
+function ctrlBar(b) {
+  return b.over ? '' : tx('<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">撤退</button></div></div>', [1, 2, 4].map(x => `<button data-act="speed" data-x="${x}" class="${app.speed === x ? 'sel' : ''}">${x}×</button>`).join(''), hornBtn(b), canSkip(b) ? tx('<button class="btn" data-act="skip">直接結算</button>') : tx('<button class="btn" disabled title="首次挑戰需完整觀戰（可用 4× 加速）">🔒 結算</button>'));
 }
 // v0.20 立體／平面快速切換（顯示目前的視角）
 function isoBtn() {

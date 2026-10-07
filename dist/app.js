@@ -1,4 +1,4 @@
-/* 副本團長 v0.20.0 */
+/* 副本團長 v0.20.1 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -654,6 +654,7 @@
     "\u5361\u95DC\u6307\u5F15": "Stuck hint",
     "\u7B2C {0} \u5C64": "Floor {0}",
     '<h3>{0}</h3><p class="sub" style="margin:0">\u8A66\u8A66\u4E0B\u9762\u7684\u65B9\u6CD5\uFF1A</p><div class="stucklist">{1}</div><div class="row"><button class="btn grow" data-act="closebtn">\u5148\u4E0D\u7528</button></div>': '<h3>{0}</h3><p class="sub" style="margin:0">Try one of these:</p><div class="stucklist">{1}</div><div class="row"><button class="btn grow" data-act="closebtn">Not now</button></div>',
+    "\u5DF2\u9396\u5B9A\u7684\u88DD\u5099\u4E0D\u80FD\u5206\u89E3": "Locked gear can't be salvaged",
     "\u79D8\u5883\u6311\u6230\u9032\u884C\u4E2D": "A Mythic run is in progress",
     "\u79D8\u5883\u9AD4\u529B\u4E0D\u8DB3\uFF0C{0} \u5F8C\u56DE\u5FA9 1 \u9EDE": "Out of Mythic stamina \u2014 +1 in {0}",
     "\u5BF6\u5EAB\uFF08\u504F\u7BC4\u570D\u8F38\u51FA\uFF09": "the Vault (AoE focus)",
@@ -672,6 +673,8 @@
     "\u6230\u9B25\u7279\u6548": "Battle effects",
     "\u5B8C\u6574": "Full",
     "\u7C21\u5316": "Simple",
+    "\u5206\u89E3 {0} \u4EF6\uFF0C\u7372\u5F97 {1} \u91D1": "Salvaged {0} item(s) for {1} gold",
+    "\u3001{0} \u7CBE\u83EF": ", {0} essence",
     "\u{1F3F3} \u4E3B\u52D5\u64A4\u9000": "\u{1F3F3} Retreated",
     "\u5DF2\u5957\u7528\u63A8\u85A6\u914D\u7F6E": "Recommended setup applied",
     "\u300C{0}\u300D": "{0}",
@@ -699,7 +702,6 @@
     "\u4EFB\u52D9\u734E\u52F5": "Quest reward",
     "\u6BCF\u65E5\u5BF6\u7BB1": "Daily chest",
     "\u7C3D\u5230\u7B2C {0} \u5929": "Check-in day {0}",
-    "\u5206\u89E3 {0} \u4EF6\uFF0C\u7372\u5F97 {1} \u91D1": "Salvaged {0} item(s) for {1} gold",
     "\u6C92\u6709\u7B26\u5408\u7684\u88DD\u5099": "No matching gear",
     "\u5F37\u5316 {0} \u6B21\uFF0C\u82B1\u8CBB {1} \u91D1": "Upgraded \xD7{0} for {1} gold",
     "\u80CC\u5305\u548C\u6230\u5229\u54C1\u7BB1\u90FD\u6EFF\u4E86\uFF0C\u9084\u6709 {0} \u4EF6\u6C92\u5378\u4E0B": "Bag and loot chest are full \u2014 {0} item(s) left equipped",
@@ -823,6 +825,12 @@
     "\u5DF2\u9818\u53D6": "Claimed",
     "\u91D1": "gold",
     "T0 \u8077\u696D\u5957\u88DD": "T0 class sets",
+    "\u5DF2\u9078 {0} \u4EF6": "{0} selected",
+    "\u7CBE\u83EF": "Essence",
+    "\u5168\u9078": "Select all",
+    "\u53D6\u6D88": "Cancel",
+    "\u542B\u53F2\u8A69\uFF0F\u5957\u88DD\uFF0C\u78BA\u5B9A\uFF1F": "Includes epic/set \u2014 sure?",
+    "\u5206\u89E3": "Salvage",
     '<h2>\u80CC\u5305 <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">\u7CBE\u83EF <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">\u5206\u89E3\u7CBE\u826F\u4EE5\u4E0A\u7684\u88DD\u5099\u6703\u5F97\u5230\u7CBE\u83EF\u3002\u901A\u95DC\u7B2C 7 \u5C64\u5F8C\uFF0C\u53EF\u7528\u7CBE\u83EF\u628A\u88DD\u5099\u7CBE\u7149\u5230 +6 ~ +{4}\u3002</p>': '<h2>Bag <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">Essence <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">Salvaging Uncommon or better gear yields essence. After clearing Floor 7, use essence to refine gear to +6 ~ +{4}.</p>',
     '<div class="stashbox"><div class="row" style="align-items:center"><b>\u6230\u5229\u54C1\u7BB1</b><span class="sub num" style="margin:0">{0}/{1}</span> <span class="sub" style="margin:0 0 0 auto">\u80CC\u5305\u6EFF\u6642\u6389\u843D\u7684\u88DD\u5099</span></div> <div class="stack">{2} {3}</div> <div class="row"><button class="btn sm main grow" data-act="takestash" {4}>{5}</button> <button class="btn sm" data-act="salvagestash">\u5168\u90E8\u5206\u89E3</button></div></div>': '<div class="stashbox"><div class="row" style="align-items:center"><b>Loot chest</b><span class="sub num" style="margin:0">{0}/{1}</span> <span class="sub" style="margin:0 0 0 auto">Drops received while your bag was full</span></div> <div class="stack">{2} {3}</div> <div class="row"><button class="btn sm main grow" data-act="takestash" {4}>{5}</button> <button class="btn sm" data-act="salvagestash">Salvage all</button></div></div>',
     '<div class="sub" style="margin:0">\u9084\u6709 {0} \u4EF6</div>': '<div class="sub" style="margin:0">{0} more</div>',
@@ -836,6 +844,8 @@
     "\u5206\u89E3\uFF08{0} \u4EF6\uFF09": "Salvage ({0})",
     "\u6BD4\u5E73\u5747\u88DD\u7B49\u4F4E {0} \u4EE5\u4E0A": "{0}+ below avg iLvl",
     "\u5206\u89E3\u4F4E\u88DD\u7B49\uFF08{0} \u4EF6\uFF09": "Salvage low iLvl ({0})",
+    "\u9577\u6309\u88DD\u5099\u53EF\u4EE5\u591A\u9078\u4E00\u8D77\u5206\u89E3": "Long-press an item to select several and salvage them together",
+    "\u591A\u9078": "Select",
     '<div class="empty">\u80CC\u5305\u662F\u7A7A\u7684\u3002\u901A\u95DC\u526F\u672C\u6703\u6389\u843D\u88DD\u5099\u3002</div>': '<div class="empty">Your bag is empty. Clearing dungeons drops gear.</div>',
     '<h2 style="font-size:18px">\u6230\u5229\u54C1\u8A2D\u5B9A</h2><div class="settings"> <div class="set"><span>\u6389\u843D\u6642\u81EA\u52D5\u5206\u89E3</span>{0}</div> <div class="set"><span>\u80CC\u5305\u6EFF\u5F8C\u53EA\u4FDD\u7559</span>{1}</div> <div class="set"><span>\u4F9D\u88DD\u7B49\u81EA\u52D5\u5206\u89E3</span>{6}</div> <p class="sub" style="margin:0">\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\uFF0C\u7B26\u5408\u54C1\u8CEA\u7684\u88DD\u5099\u6703\u5148\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF08\u6700\u591A {2} \u4EF6\uFF09\uFF0C\u5176\u4ED6\u81EA\u52D5\u63DB\u6210\u91D1\u5E63\u3002</p></div> <h2 style="font-size:18px">\u80CC\u5305\u64F4\u5145 <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>': '<h2 style="font-size:18px">Loot settings</h2><div class="settings"> <div class="set"><span>Auto-salvage drops</span>{0}</div> <div class="set"><span>When bag is full, keep</span>{1}</div> <div class="set"><span>Auto-salvage by iLvl</span>{6}</div> <p class="sub" style="margin:0">Once your bag is full, gear of that quality goes to the loot chest (up to {2}); the rest is turned into gold.</p></div> <h2 style="font-size:18px">Bag expansions <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>',
     "\u95DC\u9589": "Off",
@@ -852,14 +862,17 @@
     '<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}{13}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">\u6575\u65B9\u30FB{7}</span>{8}</div> <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>': '<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}{13}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">Enemies \xB7 {7}</span>{8}</div> <div class="side"><span class="label">Your party</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>',
     "\u9996\u9818\u6230": "Boss",
     "\u7B2C {0} \u6CE2": "Wave {0}",
-    '<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">\u64A4\u9000</button></div></div>': '<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">Retreat</button></div></div>',
-    '<button class="btn" data-act="skip">\u76F4\u63A5\u7D50\u7B97</button>': '<button class="btn" data-act="skip">Skip</button>',
-    '<button class="btn" disabled title="\u9996\u6B21\u6311\u6230\u9700\u5B8C\u6574\u89C0\u6230\uFF08\u53EF\u7528 4\xD7 \u52A0\u901F\uFF09">\u{1F512} \u7D50\u7B97</button>': '<button class="btn" disabled title="First attempts must be watched in full (4\xD7 speed available)">\u{1F512} Skip</button>',
     "\u8D85\u6642 {0}": "Over {0}",
     "\u5269 {0}": "{0} left",
     '<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">\u5269 {1}</span></div> <div class="vaultcount"><b class="num">{2}</b> \u96BB\u54E5\u5E03\u6797\u30FB<span class="num">+{3}</span> \u91D1{4}</div>': '<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">{1} left</span></div> <div class="vaultcount"><b class="num">{2}</b>  goblins \xB7 <span class="num">+{3}</span>  gold{4}</div>',
     "\uFF08\u5DF2\u9054\u91D1\u5E63\u4E0A\u9650\uFF09": " (gold cap reached)",
     '<span class="sub" style="margin:0">\u3000\u91D1\u5E63\u7B97\u5230 {0} \u96BB</span>': '<span class="sub" style="margin:0"> Gold counts up to {0}</span>',
+    "\u8B77\u76FE": "Shield",
+    "\u8B80\u689D\u4E2D": "Casting",
+    "\u5269 {0} \u96BB": "{0} left",
+    '<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">\u64A4\u9000</button></div></div>': '<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">Retreat</button></div></div>',
+    '<button class="btn" data-act="skip">\u76F4\u63A5\u7D50\u7B97</button>': '<button class="btn" data-act="skip">Skip</button>',
+    '<button class="btn" disabled title="\u9996\u6B21\u6311\u6230\u9700\u5B8C\u6574\u89C0\u6230\uFF08\u53EF\u7528 4\xD7 \u52A0\u901F\uFF09">\u{1F512} \u7D50\u7B97</button>': '<button class="btn" disabled title="First attempts must be watched in full (4\xD7 speed available)">\u{1F512} Skip</button>',
     "\u5207\u63DB\u6210\u5E73\u9762\u8996\u89D2": "Switch to flat view",
     "\u5207\u63DB\u6210\u7ACB\u9AD4\u8996\u89D2": "Switch to 3D view",
     "\u95DC\u9589\u97F3\u6548": "Mute sound",
@@ -3859,6 +3872,15 @@
     bump(s, "salvage");
     return v;
   }
+  function salvageMany(s, ids, dry = false) {
+    const list = [...new Set(ids)].filter((id) => s.bag.includes(id) && s.items[id] && !s.items[id].locked);
+    const r = { count: list.length, gold: 0, dust: 0, precious: list.some((id) => s.items[id].rarity >= 3 || s.items[id].set) };
+    for (const id of list) {
+      r.dust += salvageDust(s.items[id]);
+      r.gold += dry ? salvageValue(s.items[id]) : salvage(s, id);
+    }
+    return r;
+  }
   function salvageUpTo(s, maxRarity) {
     const ids = s.bag.filter((i) => s.items[i].rarity <= maxRarity && !s.items[i].set && !s.items[i].locked);
     return { count: ids.length, gold: ids.reduce((g, i) => g + salvage(s, i), 0) };
@@ -4521,7 +4543,7 @@
   }
 
   // src/core/version.js
-  var VERSION = "0.20.0";
+  var VERSION = "0.20.1";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -4860,10 +4882,9 @@
     if (!app.battle) return tx('<h2>\u6230\u9B25</h2><div class="empty">\u76EE\u524D\u6C92\u6709\u9032\u884C\u4E2D\u7684\u6230\u9B25\u3002<br>\u5230\u300C\u526F\u672C\u300D\u9078\u4E00\u5C64\u958B\u59CB\u6311\u6230\u3002<br><br><button class="btn main" data-tab="dungeon">\u524D\u5F80\u526F\u672C</button></div>');
     const d = dungeonInfo(app.battle.dIdx), b = app.battle;
     if (b.vault) d.name = tx("\u5BF6\u5EAB\u30FB\u7B2C {0} \u5C64", b.vault.floor + 1);
+    if (prefs.fx !== "off") return viewBattleGrid(b, d) + ctrlBar(b);
     let h = tx('<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}{13}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">\u6575\u65B9\u30FB{7}</span>{8}</div> <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>', d.name, b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : "", b.tick, b.vault ? "" : `<div class="waves">`, b.vault ? "" : b.waves.map((_, i) => `<i class="${i < b.waveIdx || b.over && b.win ? "done" : i === b.waveIdx ? "cur" : ""}"></i>`).join("") + "</div>", b.mythic ? mythicTimerBar(b) : "", b.vault ? vaultBar(b) : "", b.waveIdx === b.waves.length - 1 ? tx("\u9996\u9818\u6230") : tx("\u7B2C {0} \u6CE2", b.waveIdx + 1), enemyRows(b), b.units.map((u) => unitRow(u, false)).join(""), b.log.map((l) => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, " ")}</span>${l.msg}</p>`).join(""), prefs.fx !== "off" ? '<div id="gridSlot" class="gridslot"></div>' : "", prefs.fx !== "off" ? " compact" : "", (prefs.fx !== "off" ? isoBtn() : "") + muteBtn());
-    if (!b.over) {
-      h += tx('<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">\u64A4\u9000</button></div></div>', [1, 2, 4].map((x) => `<button data-act="speed" data-x="${x}" class="${app.speed === x ? "sel" : ""}">${x}\xD7</button>`).join(""), hornBtn(b), canSkip(b) ? tx('<button class="btn" data-act="skip">\u76F4\u63A5\u7D50\u7B97</button>') : tx('<button class="btn" disabled title="\u9996\u6B21\u6311\u6230\u9700\u5B8C\u6574\u89C0\u6230\uFF08\u53EF\u7528 4\xD7 \u52A0\u901F\uFF09">\u{1F512} \u7D50\u7B97</button>'));
-    }
+    h += ctrlBar(b);
     if (b.over && app.lastResult) h += viewResult();
     return h;
   }
@@ -4876,6 +4897,26 @@
   function vaultBar(b) {
     const left = Math.max(0, b.vault.dur - b.tick), f = b.vault.floor, cap = vaultMaxKills(f);
     return tx('<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">\u5269 {1}</span></div> <div class="vaultcount"><b class="num">{2}</b> \u96BB\u54E5\u5E03\u6797\u30FB<span class="num">+{3}</span> \u91D1{4}</div>', pct(b.tick, b.vault.dur), mmss(left), b.kills, fmt(Math.min(b.kills, cap) * vaultGoldPerKill(f)), b.kills >= cap ? tx("\uFF08\u5DF2\u9054\u91D1\u5E63\u4E0A\u9650\uFF09") : tx('<span class="sub" style="margin:0">\u3000\u91D1\u5E63\u7B97\u5230 {0} \u96BB</span>', cap));
+  }
+  function viewBattleGrid(b, d) {
+    let h = `<div class="bhead"><h2>${d.name}${b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : ""}</h2><span class="sub num" style="margin:0">${b.tick}s</span> ${b.vault ? "" : `<div class="waves">${b.waves.map((_, i) => `<i class="${i < b.waveIdx || b.over && b.win ? "done" : i === b.waveIdx ? "cur" : ""}"></i>`).join("")}</div>`}${isoBtn()}${muteBtn()}</div>`;
+    h += (b.mythic ? mythicTimerBar(b) : "") + (b.vault ? vaultBar(b) : "");
+    if (b.over && app.lastResult) h += viewResult();
+    h += foeBar(b) + '<div id="gridSlot" class="gridslot"></div>' + partyStrip(b);
+    h += `<div class="log short" aria-live="polite">${b.log.map((l) => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, " ")}</span>${l.msg}</p>`).join("")}</div>`;
+    return h;
+  }
+  function foeBar(b) {
+    const bosses = b.enemies.filter((e) => e.boss);
+    if (bosses.length) return `<div class="foebar">${bosses.map((e) => `<div class="fb ${e.hp <= 0 ? "dead" : ""}"><span class="ic">${enemyIcon(e)}</span><span class="nm">${e.name}${e.bshield > 0 ? ` <small class="shield">${tx("\u8B77\u76FE")}</small>` : ""}${e.casting ? ` <small class="casting">${tx("\u8B80\u689D\u4E2D")}</small>` : ""}</span><span class="num">${Math.ceil(pct(e.hp, e.max))}%</span><span class="bar"><i class="enemy-bar" style="width:${pct(e.hp, e.max)}%"></i></span></div>`).join("")}</div>`;
+    const alive = b.enemies.filter((e) => e.hp > 0), hp = alive.reduce((a, e) => a + e.hp, 0), max = b.enemies.reduce((a, e) => a + e.max, 0) || 1;
+    return `<div class="foebar"><div class="fb"><span class="nm">${b.waveIdx === b.waves.length - 1 ? tx("\u9996\u9818\u6230") : tx("\u7B2C {0} \u6CE2", b.waveIdx + 1)}\u30FB${tx("\u5269 {0} \u96BB", alive.length)}</span><span class="num">${Math.ceil(pct(hp, max))}%</span><span class="bar"><i class="enemy-bar" style="width:${pct(hp, max)}%"></i></span></div></div>`;
+  }
+  function partyStrip(b) {
+    return `<div class="pstrip">${b.units.map((u) => `<div class="pc ${u.hp <= 0 ? "dead" : ""}" title="${u.name}" aria-label="${u.name} ${Math.ceil(pct(u.hp, u.max))}%"><span class="ic">${u.icon}</span><span class="num">${u.hp <= 0 ? "\u2715" : Math.ceil(pct(u.hp, u.max)) + "%"}</span><span class="bar"><i class="role-${u.role}" style="width:${pct(u.hp, u.max)}%"></i></span></div>`).join("")}</div>`;
+  }
+  function ctrlBar(b) {
+    return b.over ? "" : tx('<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">\u64A4\u9000</button></div></div>', [1, 2, 4].map((x) => `<button data-act="speed" data-x="${x}" class="${app.speed === x ? "sel" : ""}">${x}\xD7</button>`).join(""), hornBtn(b), canSkip(b) ? tx('<button class="btn" data-act="skip">\u76F4\u63A5\u7D50\u7B97</button>') : tx('<button class="btn" disabled title="\u9996\u6B21\u6311\u6230\u9700\u5B8C\u6574\u89C0\u6230\uFF08\u53EF\u7528 4\xD7 \u52A0\u901F\uFF09">\u{1F512} \u7D50\u7B97</button>'));
   }
   function isoBtn() {
     return `<button class="hbtn viewbtn ${prefs.iso ? "on" : ""}" data-act="isotog" aria-pressed="${prefs.iso}" aria-label="${prefs.iso ? tx("\u5207\u63DB\u6210\u5E73\u9762\u8996\u89D2") : tx("\u5207\u63DB\u6210\u7ACB\u9AD4\u8996\u89D2")}">${prefs.iso ? "3D" : "2D"}</button>`;
@@ -4961,8 +5002,8 @@
     return "";
   }
   var seg = (act, cur2, opts) => `<div class="seg">${opts.map(([v, n2]) => `<button data-act="${act}" data-v="${v}" class="${cur2 === v ? "sel" : ""}">${n2}</button>`).join("")}</div>`;
-  var itemRow = (it, act = "item") => `<button class="item rar${it.rarity}" data-act="${act}" data-id="${it.id}">
-    <div class="in">${itemName(it)}${gainNote(it)}</div>
+  var itemRow = (it, act = "item", bag = false, sel = null) => `<button class="item rar${it.rarity}${bag ? " bagitem" : ""}${sel && sel.has(it.id) ? " picked" : ""}${sel && it.locked ? " nopick" : ""}" data-act="${sel ? "msel" : act}" data-id="${it.id}"${sel ? ` aria-pressed="${sel.has(it.id)}"` : ""}>
+    <div class="in">${sel ? `<span class="tick" aria-hidden="true"></span>` : ""}${itemName(it)}${gainNote(it)}</div>
     <div class="il">${SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div>
     <div class="is num">${RARITY[it.rarity].name}\u30FB${itemStatText(it)}</div>${setMini(it)}</button>`;
   var setMini = (it) => it.set ? `<div class="setmini">${tx("{0}\u5C08\u5C6C\u30FB2 \u4EF6\uFF1A{1}", CLASSES[it.set].name, SETS[it.set].d2)}</div>` : "";
@@ -4992,10 +5033,20 @@
     h += Object.keys(SETS).map((cls2) => `<div class="cxrow sets"><span>${CLASSES[cls2].icon}${SETS[cls2].name}</span>${ARMOR_SLOTS.map((sl) => cell(`set:${cls2}:${sl}`, 3)).join("")}</div>`).join("");
     return h;
   }
+  function visibleBag() {
+    const S = app.S;
+    return S.bag.map((id) => S.items[id]).filter(Boolean).filter((it) => app.invFilter === "all" || it.slot === app.invFilter || app.invFilter === "armor" && ARMOR_SLOTS.includes(it.slot) || app.invFilter === "set" && it.set).sort((a, b) => itemScore(b) - itemScore(a));
+  }
+  function mselBar() {
+    const r = salvageMany(app.S, [...app.msel], true);
+    return `<div class="ctrlbar mselbar"><div class="ctrl"><span class="mcount">${tx("\u5DF2\u9078 {0} \u4EF6", r.count)}<small class="num">+${fmt(r.gold)} ${tx("\u91D1")}${r.dust ? ` \u30FB+${fmt(r.dust)} ${tx("\u7CBE\u83EF")}` : ""}</small></span>
+    <button class="btn" data-act="mselall">${tx("\u5168\u9078")}</button><button class="btn" data-act="mselcancel">${tx("\u53D6\u6D88")}</button>
+    <button class="btn ${app.mselConfirm ? "danger" : "main"}" data-act="mselgo" ${r.count ? "" : "disabled"}>${app.mselConfirm ? tx("\u542B\u53F2\u8A69\uFF0F\u5957\u88DD\uFF0C\u78BA\u5B9A\uFF1F") : tx("\u5206\u89E3")}</button></div></div>`;
+  }
   function viewBag() {
     if (app.bagView === "codex") return viewCodex();
     const S = app.S, E = ECONOMY;
-    const items2 = S.bag.map((id) => S.items[id]).filter(Boolean).filter((it) => app.invFilter === "all" || it.slot === app.invFilter || app.invFilter === "armor" && ARMOR_SLOTS.includes(it.slot) || app.invFilter === "set" && it.set).sort((a, b) => itemScore(b) - itemScore(a));
+    const items2 = visibleBag();
     const cap = bagMax(S), full = S.bag.length >= cap;
     let h = gearRuleCard("bag") + bagTabs() + tx('<h2>\u80CC\u5305 <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">\u7CBE\u83EF <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">\u5206\u89E3\u7CBE\u826F\u4EE5\u4E0A\u7684\u88DD\u5099\u6703\u5F97\u5230\u7CBE\u83EF\u3002\u901A\u95DC\u7B2C 7 \u5C64\u5F8C\uFF0C\u53EF\u7528\u7CBE\u83EF\u628A\u88DD\u5099\u7CBE\u7149\u5230 +6 ~ +{4}\u3002</p>', full ? "warnc" : "", S.bag.length, cap, fmt(S.dust || 0), GEAR.maxUp);
     if (S.stash.length) {
@@ -5006,7 +5057,9 @@
       const gap = S.salvageIlvlGap || 10, n2 = salvageLowIlvl(S, gap, true).count;
       h += `<div class="toolbar"><span class="sub" style="margin:0">${tx("\u6BD4\u5E73\u5747\u88DD\u7B49\u4F4E {0} \u4EE5\u4E0A", gap)}</span><button class="btn sm" data-act="salvlow" ${n2 ? "" : "disabled"}>${tx("\u5206\u89E3\u4F4E\u88DD\u7B49\uFF08{0} \u4EF6\uFF09", n2)}</button></div>`;
     }
-    h += items2.length ? `<div class="stack">${items2.map((it) => itemRow(it)).join("")}</div>` : tx('<div class="empty">\u80CC\u5305\u662F\u7A7A\u7684\u3002\u901A\u95DC\u526F\u672C\u6703\u6389\u843D\u88DD\u5099\u3002</div>');
+    if (items2.length && !app.msel) h += `<div class="toolbar"><span class="sub" style="margin:0">${tx("\u9577\u6309\u88DD\u5099\u53EF\u4EE5\u591A\u9078\u4E00\u8D77\u5206\u89E3")}</span><button class="btn sm" data-act="mselon">${tx("\u591A\u9078")}</button></div>`;
+    h += items2.length ? `<div class="stack baglist">${items2.map((it) => itemRow(it, "item", true, app.msel)).join("")}</div>` : tx('<div class="empty">\u80CC\u5305\u662F\u7A7A\u7684\u3002\u901A\u95DC\u526F\u672C\u6703\u6389\u843D\u88DD\u5099\u3002</div>');
+    if (app.msel) h += mselBar();
     h += tx('<h2 style="font-size:18px">\u6230\u5229\u54C1\u8A2D\u5B9A</h2><div class="settings"> <div class="set"><span>\u6389\u843D\u6642\u81EA\u52D5\u5206\u89E3</span>{0}</div> <div class="set"><span>\u80CC\u5305\u6EFF\u5F8C\u53EA\u4FDD\u7559</span>{1}</div> <div class="set"><span>\u4F9D\u88DD\u7B49\u81EA\u52D5\u5206\u89E3</span>{6}</div> <p class="sub" style="margin:0">\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\uFF0C\u7B26\u5408\u54C1\u8CEA\u7684\u88DD\u5099\u6703\u5148\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF08\u6700\u591A {2} \u4EF6\uFF09\uFF0C\u5176\u4ED6\u81EA\u52D5\u63DB\u6210\u91D1\u5E63\u3002</p></div> <h2 style="font-size:18px">\u80CC\u5305\u64F4\u5145 <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>', seg("autosalv", S.autoSalvageBelow, [[0, tx("\u95DC\u9589")], [1, tx("\u666E\u901A")], [2, tx("\u7CBE\u826F\u4EE5\u4E0B")]]), seg("keeprar", S.keepRarity, [[1, tx("\u7CBE\u826F\u4EE5\u4E0A")], [2, tx("\u7A00\u6709\u4EE5\u4E0A")], [3, tx("\u53F2\u8A69")]]), E.stashMax, cap, E.bagMax + BAG_PER_MILESTONE * BAG_MILESTONES.length + E.bagBuy.slots * E.bagBuy.max, buyRow(S) + BAG_MILESTONES.map((m) => tx('<div class="set"><span class="{0}" style="margin:0">{1}{2}</span><span class="num {3}" style="margin:0">+{4} \u683C</span></div>', m.test(S) ? "" : "sub", m.test(S) ? "\u2713 " : "", m.name, m.test(S) ? "okc" : "sub", BAG_PER_MILESTONE)).join(""), seg("ilvlgap", S.salvageIlvlGap || 0, [[0, tx("\u95DC\u9589")], [10, tx("\u4F4E 10 \u4EE5\u4E0A")], [20, tx("\u4F4E 20 \u4EE5\u4E0A")]]));
     h += `<p class="sub" style="margin:4px 0 0">${tx("\u4F9D\u88DD\u7B49\uFF1A\u6BD4\u51FA\u6230\u968A\u54E1\u5E73\u5747\u88DD\u7B49\uFF08\u76EE\u524D {0}\uFF09\u4F4E\u9019\u9EBC\u591A\u7684\u6389\u843D\u76F4\u63A5\u5206\u89E3\uFF0C\u50B3\u8AAA\u9664\u5916\u3002", Math.round(partyIlvl(S)))}</p>`;
     return h;
@@ -6377,6 +6430,7 @@
       }, 3e3);
     }
     app.render(true);
+    if (app.tab === "battle") window.scrollTo({ top: 0, behavior: "smooth" });
     if (!b.mythic && !b.vault && app.showStuck) app.showStuck("battle");
     if (r.first && app.storyOnce) app.storyOnce("post" + b.dIdx);
   }
@@ -6454,8 +6508,55 @@
   };
   app.openModal = openModal;
   app.renderTabs = renderTabs;
+  {
+    let lp = null;
+    const stop = () => {
+      if (lp) {
+        clearTimeout(lp.t);
+        lp = null;
+      }
+    };
+    document.addEventListener("pointerdown", (e) => {
+      const el = e.target.closest(".bagitem");
+      if (!el || app.msel || e.button > 0) return;
+      lp = { x: e.clientX, y: e.clientY, t: setTimeout(() => {
+        lp = null;
+        const it = app.S.items[el.dataset.id];
+        if (!it) return;
+        app.msel = new Set(it.locked ? [] : [it.id]);
+        app.lpFired = true;
+        if (it.locked) toast(tx("\u5DF2\u9396\u5B9A\u7684\u88DD\u5099\u4E0D\u80FD\u5206\u89E3"));
+        try {
+          navigator.vibrate && navigator.vibrate(15);
+        } catch (er) {
+        }
+        render(true);
+        setTimeout(() => {
+          app.lpFired = false;
+        }, 800);
+      }, 450) };
+    });
+    document.addEventListener("pointermove", (e) => {
+      if (lp && Math.hypot(e.clientX - lp.x, e.clientY - lp.y) > 10) stop();
+    });
+    document.addEventListener("pointerup", () => {
+      stop();
+      if (app.lpFired) setTimeout(() => {
+        app.lpFired = false;
+      }, 0);
+    });
+    document.addEventListener("pointercancel", stop);
+    document.addEventListener("contextmenu", (e) => {
+      if (e.target.closest(".bagitem")) e.preventDefault();
+    });
+  }
   document.addEventListener("click", (e) => {
     unlock();
+    if (app.lpFired) {
+      app.lpFired = false;
+      e.preventDefault();
+      return;
+    }
     const t = e.target.closest("[data-tab],[data-act]");
     if (!t) return;
     if (t.dataset.act === "close") {
@@ -6465,6 +6566,7 @@
     if (t.dataset.tab) {
       app.tab = t.dataset.tab;
       app.modal = null;
+      app.msel = null;
       render();
       window.scrollTo(0, 0);
       return;
@@ -6473,6 +6575,7 @@
     const a = t.dataset.act, id = t.dataset.id;
     if (a !== "salvageupto") app.salvConfirm = false;
     if (a !== "firemany") app.fireConfirm = false;
+    if (a !== "mselgo") app.mselConfirm = false;
     switch (a) {
       case "fight": {
         const d = +t.dataset.d;
@@ -6664,6 +6767,43 @@
         if (app.modal) renderModal();
         else render(true);
         return;
+      }
+      case "mselon":
+        app.msel = /* @__PURE__ */ new Set();
+        break;
+      case "mselcancel":
+        app.msel = null;
+        break;
+      case "msel": {
+        const it = app.S.items[id];
+        if (!app.msel || !it) break;
+        if (it.locked) {
+          toast(tx("\u5DF2\u9396\u5B9A\u7684\u88DD\u5099\u4E0D\u80FD\u5206\u89E3"));
+          break;
+        }
+        if (app.msel.has(id)) app.msel.delete(id);
+        else app.msel.add(id);
+        break;
+      }
+      case "mselall":
+        if (app.msel) {
+          for (const it of visibleBag()) if (!it.locked) app.msel.add(it.id);
+        }
+        break;
+      case "mselgo": {
+        if (!app.msel) break;
+        const d = salvageMany(app.S, [...app.msel], true);
+        if (!d.count) break;
+        if (d.precious && !app.mselConfirm) {
+          app.mselConfirm = true;
+          break;
+        }
+        app.mselConfirm = false;
+        const r = salvageMany(app.S, [...app.msel]);
+        app.msel = null;
+        toast(tx("\u5206\u89E3 {0} \u4EF6\uFF0C\u7372\u5F97 {1} \u91D1", r.count, fmt(r.gold)) + (r.dust ? tx("\u3001{0} \u7CBE\u83EF", fmt(r.dust)) : ""));
+        save();
+        break;
       }
       case "gzoom":
         zoomBy(+t.dataset.v);

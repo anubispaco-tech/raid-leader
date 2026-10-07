@@ -391,6 +391,13 @@ export function salvage(s, itemId) {
   s.bag = s.bag.filter(id => id !== itemId); s.stash = (s.stash || []).filter(id => id !== itemId); delete s.items[itemId];
   const v = salvageValue(it); s.gold += v; s.dust = (s.dust || 0) + salvageDust(it); s.stats.salvaged = (s.stats.salvaged || 0) + 1; bump(s, 'salvage'); return v;
 }
+// v0.20.1 多選分解：只處理背包裡、沒鎖定的；dry=true 只試算（金幣、精華、是否含史詩以上或套裝）
+export function salvageMany(s, ids, dry = false) {
+  const list = [...new Set(ids)].filter(id => s.bag.includes(id) && s.items[id] && !s.items[id].locked);
+  const r = { count: list.length, gold: 0, dust: 0, precious: list.some(id => s.items[id].rarity >= 3 || s.items[id].set) };
+  for (const id of list) { r.dust += salvageDust(s.items[id]); r.gold += dry ? salvageValue(s.items[id]) : salvage(s, id); }
+  return r;
+}
 // 分解背包中品質 ≤ maxRarity 的裝備（0 = 普通，1 = 精良以下）
 export function salvageUpTo(s, maxRarity) {
   const ids = s.bag.filter(i => s.items[i].rarity <= maxRarity && !s.items[i].set && !s.items[i].locked); // 套裝、鎖定不會被批次分解

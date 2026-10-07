@@ -40,7 +40,7 @@ await page.click('[data-tab="bag"]'); await page.waitForTimeout(200);
 await page.screenshot({ path: shot('icons-bag.png') });
 await page.click('[data-tab="dungeon"]'); await nav(page, 'story0'); await page.click('.dg [data-act="fight"][data-d="6"]'); await page.waitForTimeout(400);
 await page.click('[data-act="speed"][data-x="4"]').catch(() => {}); await page.waitForTimeout(5000);
-check(await page.locator('.unit .ic .gi').count() >= 6, '戰鬥單位有圖示：' + await page.locator('.unit .ic .gi').count());
+{ const n = await page.locator('.unit .ic .gi, .pstrip .ic .gi, .foebar .ic .gi, .glab .gi').count(); check(n >= 6, '戰鬥單位有圖示：' + n); }
 check(await page.locator('.log .gi').count() > 0, '戰鬥紀錄裡的職業圖示');
 await page.screenshot({ path: shot('icons-battle.png') });
 check(!errs.length, '無 JS 錯誤 ' + errs.join(';'));

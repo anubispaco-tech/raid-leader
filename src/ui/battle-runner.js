@@ -92,6 +92,7 @@ export function finishBattle() {
     app.pendingRepeat = setTimeout(() => { app.pendingRepeat = null; if (app.S.idleMythic === d) startMythicIdle(d); }, 3000);
   }
   app.render(true);
+  if (app.tab === 'battle') window.scrollTo({ top: 0, behavior: 'smooth' }); // v0.20.1 結算在最上面：打完捲回頂端
   if (!b.mythic && !b.vault && app.showStuck) app.showStuck('battle'); // v0.17 卡關指引（同層連輸）
   if (r.first && app.storyOnce) app.storyOnce('post' + b.dIdx); // 首次通關後的劇情
 }

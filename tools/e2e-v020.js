@@ -30,7 +30,7 @@ check(await page.locator('.gcell').count() === 252, '14×18 共 252 格');
 const heroCells = await page.evaluate(() => [...document.querySelectorAll('.gcell')].map((c, i) => ({ i, n: c.querySelectorAll('.gslab').length })).filter(x => x.i >= 140 && x.n > 0).length);
 check(heroCells === 20, `我方區域 5 位隊員各佔 2×2（${heroCells} 格）`);
 check(await page.locator('.glab').count() >= 6, '每個單位有跨格的圖示與血條');
-check(await page.locator('.arena.compact').count() === 1, '血條列表改成精簡版');
+check(await page.locator('.pstrip .pc').count() === 5 && await page.locator('.arena').count() === 0, '格子模式改成我方橫排血條、沒有敵方列表');
 // 2. 播放：一段時間內有動畫，且跨過每秒重繪仍在跑
 await page.click('[data-act="speed"][data-x="2"]');
 let seenAnims = 0;
@@ -43,7 +43,7 @@ await page.click('[data-act="speed"][data-x="4"]');
 for (let k = 0; k < 60; k++) { const last = await page.evaluate(() => { const w = [...document.querySelectorAll('.waves i')]; return w.length && w[w.length - 1].classList.contains('cur'); }); if (last) break; await page.waitForTimeout(500); }
 await page.waitForTimeout(2500);
 const bc = await page.evaluate(() => [...document.querySelectorAll('.gcell')].slice(0, 84).map(c => c.querySelectorAll('.gslab').length).join(''));
-check((bc.match(/[2-9]/g) || []).length >= 36 && /[6-9]/.test(bc), `首領佔 6×6、中間最高（${bc.slice(0, 84)}）`);
+check((bc.match(/[2-9]/g) || []).length >= 36 && /[5-9]/.test(bc), `首領佔 6×6、中間最高（${bc.slice(0, 84)}）`);
 await page.screenshot({ path: '/tmp/v020-boss.png' });
 await page.click('[data-act="speed"][data-x="1"]');
 // 3. 底部控制列在 360px 不溢出

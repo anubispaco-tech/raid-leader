@@ -9,7 +9,7 @@ import { $, fmt, toast, hero, mmss, itemName, dailyOpenNow, firstWinLine } from 
 import { viewDungeons } from './views/dungeon.js';
 import { viewBattle } from './views/battle.js';
 import { viewTeam } from './views/team.js';
-import { viewBag } from './views/bag.js';
+import { viewBag, visibleBag } from './views/bag.js';
 import { viewTavern } from './views/tavern.js';
 import { renderModal, openModal, closeModal, playDialog } from './views/sheets.js';
 import { PROLOGUE, STORY } from './story.js';
@@ -90,16 +90,39 @@ app.openModal = openModal;
 app.renderTabs = renderTabs;
 
 // ---------- 事件 ----------
+// v0.20.1 背包長按（約 0.45 秒、沒移動）進入多選並選起這件
+{
+  let lp = null;
+  const stop = () => { if (lp) { clearTimeout(lp.t); lp = null; } };
+  document.addEventListener('pointerdown', e => {
+    const el = e.target.closest('.bagitem'); if (!el || app.msel || e.button > 0) return;
+    lp = { x: e.clientX, y: e.clientY, t: setTimeout(() => {
+      lp = null; const it = app.S.items[el.dataset.id]; if (!it) return;
+      app.msel = new Set(it.locked ? [] : [it.id]); app.lpFired = true;
+      if (it.locked) toast(tx('已鎖定的裝備不能分解'));
+      try { navigator.vibrate && navigator.vibrate(15); } catch (er) { /* 不支援就算了 */ }
+      render(true);
+      setTimeout(() => { app.lpFired = false; }, 800); // 萬一放開時沒有觸發 click
+    }, 450) };
+  });
+  document.addEventListener('pointermove', e => { if (lp && Math.hypot(e.clientX - lp.x, e.clientY - lp.y) > 10) stop(); });
+  // 放開後同一輪事件裡如果有 click 會先被吃掉；長按時清單已重畫，click 常常不會發生，所以放開後就清掉旗標
+  document.addEventListener('pointerup', () => { stop(); if (app.lpFired) setTimeout(() => { app.lpFired = false; }, 0); });
+  document.addEventListener('pointercancel', stop);
+  document.addEventListener('contextmenu', e => { if (e.target.closest('.bagitem')) e.preventDefault(); });
+}
 document.addEventListener('click', e => {
   SFX.unlock(); // v0.20 瀏覽器要求：使用者點過畫面後才能出聲
+  if (app.lpFired) { app.lpFired = false; e.preventDefault(); return; } // v0.20.1 長按剛觸發多選：吃掉放開時的那一下點擊
   const t = e.target.closest('[data-tab],[data-act]');
   if (!t) return;
   if (t.dataset.act === 'close') { if (e.target === t) closeModal(); return; }
-  if (t.dataset.tab) { app.tab = t.dataset.tab; app.modal = null; render(); window.scrollTo(0, 0); return; }
+  if (t.dataset.tab) { app.tab = t.dataset.tab; app.modal = null; app.msel = null; render(); window.scrollTo(0, 0); return; }
   if (t.dataset.closemodal) app.modal = null; // v0.17 指引視窗裡的按鈕：先關視窗再執行
   const a = t.dataset.act, id = t.dataset.id;
   if (a !== 'salvageupto') app.salvConfirm = false;
   if (a !== 'firemany') app.fireConfirm = false;
+  if (a !== 'mselgo') app.mselConfirm = false;
   switch (a) {
     case 'fight': { const d = +t.dataset.d; stopIdleFor(d); const go = () => { startBattle(d); app.tab = 'battle'; render(); };
       if (!storyOnce(d === G.CH1_TOP + 1 ? ['post' + G.CH1_TOP, 'pre' + d] : 'pre' + d, go)) go(); return; }
@@ -167,6 +190,23 @@ document.addEventListener('click', e => {
       if (k === 'fx') T.sendEvent(tx('戰鬥特效'), { full: tx('完整'), lite: tx('簡化'), off: tx('關') }[val]);
       if (app.modal) renderModal(); else render(true);
       return;
+    }
+    case 'mselon': app.msel = new Set(); break;
+    case 'mselcancel': app.msel = null; break;
+    case 'msel': {
+      const it = app.S.items[id]; if (!app.msel || !it) break;
+      if (it.locked) { toast(tx('已鎖定的裝備不能分解')); break; }
+      if (app.msel.has(id)) app.msel.delete(id); else app.msel.add(id);
+      break;
+    }
+    case 'mselall': if (app.msel) for (const it of visibleBag()) if (!it.locked) app.msel.add(it.id); break;
+    case 'mselgo': {
+      if (!app.msel) break;
+      const d = G.salvageMany(app.S, [...app.msel], true); if (!d.count) break;
+      if (d.precious && !app.mselConfirm) { app.mselConfirm = true; break; } // 含史詩以上或套裝：再按一次確認
+      app.mselConfirm = false;
+      const r = G.salvageMany(app.S, [...app.msel]); app.msel = null;
+      toast(tx('分解 {0} 件，獲得 {1} 金', r.count, fmt(r.gold)) + (r.dust ? tx('、{0} 精華', fmt(r.dust)) : '')); save(); break;
     }
     case 'gzoom': zoomBy(+t.dataset.v); return;
     case 'isotog': setPref('iso', !prefs.iso); render(true); return;
