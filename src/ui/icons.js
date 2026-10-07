@@ -39,7 +39,8 @@ G.DUNGEONS.forEach((d, i) => {
   if (d.twin) d.twin.forEach((t, k) => { byName[t.name] = Array.isArray(g) ? g[k] : g; });
   byName[d.boss] = Array.isArray(g) ? g[0] : g;
 });
-export const enemyIcon = e => svg(e.goblin ? GOBLIN : e.boss ? (byName[e.name] || 'crowned-skull') : TRASH, e.boss ? 'gi-boss' : 'gi-foe');
+export const enemyGlyph = e => e.goblin ? GOBLIN : e.boss ? (byName[e.name] || 'crowned-skull') : TRASH;
+export const enemyIcon = e => svg(enemyGlyph(e), e.boss ? 'gi-boss' : 'gi-foe');
 
 // 啟動時呼叫：職業包的 icon（戰鬥紀錄、名冊等處用的）換成 SVG；金幣圖示改成遮罩
 export function installIcons() {

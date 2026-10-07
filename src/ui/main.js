@@ -20,6 +20,9 @@ import { esc, heroName } from './helpers.js';
 import { VERSION } from '../core/version.js';
 import { installIcons, svg, BRAND } from './icons.js';
 import * as C from './cloud.js';
+import { mountGrid } from './grid.js';
+import { prefs, setPref } from './prefs.js';
+import * as SFX from './sfx.js';
 
 // ---------- 分頁 ----------
 const ICONS = {
@@ -46,7 +49,7 @@ function render(skipModal) {
   if (app.tab === 'team') v.innerHTML = viewTeam();
   if (app.tab === 'bag') v.innerHTML = viewBag();
   if (app.tab === 'tavern') v.innerHTML = viewTavern();
-  if (app.tab === 'battle') { const lg = $('.log'); if (lg) lg.scrollTop = lg.scrollHeight; }
+  if (app.tab === 'battle') { const lg = $('.log'); if (lg) lg.scrollTop = lg.scrollHeight; mountGrid($('#gridSlot'), app.battle); }
   else if (G.tutActive(app.S) && !app.fresh) v.insertAdjacentHTML('afterbegin', coachCard());
   tutHighlight();
   if (!skipModal) renderModal();
@@ -88,6 +91,7 @@ app.renderTabs = renderTabs;
 
 // ---------- 事件 ----------
 document.addEventListener('click', e => {
+  SFX.unlock(); // v0.20 瀏覽器要求：使用者點過畫面後才能出聲
   const t = e.target.closest('[data-tab],[data-act]');
   if (!t) return;
   if (t.dataset.act === 'close') { if (e.target === t) closeModal(); return; }
@@ -154,7 +158,17 @@ document.addEventListener('click', e => {
       if (!canSkip(app.battle)) { toast(tx('首次挑戰需完整觀戰（可用 4× 加速）')); break; }
       const b = app.battle; b.opts.autoHorn = true; // 直接結算視同掛機：首領戰自動吹號角
       if (b.waveIdx === b.waves.length - 1) b.useHorn();
-      b.runToEnd(); finishBattle(); } break;
+      b.fxq = null; b.runToEnd(); finishBattle(); } break;
+    case 'pref': { // v0.20 戰鬥畫面偏好（特效、立體視角、音效），存在這台裝置
+      const k = t.dataset.k, v = t.dataset.v, val = k === 'fx' ? v : v === '1';
+      if (prefs[k] === val) break;
+      setPref(k, val);
+      if (k === 'sound') { if (val) { SFX.unlock(); SFX.play('heal'); } T.sendEvent(tx('音效設定'), val ? tx('開') : tx('關')); }
+      if (k === 'fx') T.sendEvent(tx('戰鬥特效'), { full: tx('完整'), lite: tx('簡化'), off: tx('關') }[val]);
+      if (app.modal) renderModal(); else render(true);
+      return;
+    }
+    case 'mute': setPref('sound', !prefs.sound); if (prefs.sound) { SFX.unlock(); SFX.play('heal'); } T.sendEvent(tx('音效設定'), prefs.sound ? tx('開') : tx('關')); render(true); return;
     case 'retreat': if (app.battle && !app.battle.over) { clearInterval(app.bTimer); app.battle.over = true; app.battle.win = false; app.battle.push(tx('🏳 主動撤退'), 'bad'); app.lastResult = app.battle.vault ? G.applyVaultResult(app.S, app.battle, G.partyHeroes) : app.battle.mythicIdle ? G.applyMythicIdleResult(app.S, app.battle) : app.battle.mythic ? G.applyMythicResult(app.S, app.battle) : G.applyResult(app.S, app.battle.dIdx, app.battle); if (app.S.idle === app.battle.dIdx) app.S.idle = null; if (app.battle.mythicIdle) app.S.idleMythic = null; save(); } break;
     case 'hero': openModal({ type: 'hero', id, view: app.modal && app.modal.id === id ? app.modal.view : undefined }); return;
     case 'heroview': app.modal = { type: 'hero', id, view: t.dataset.v }; break;

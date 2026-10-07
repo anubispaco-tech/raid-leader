@@ -1,4 +1,4 @@
-/* 副本團長 v0.19.0 */
+/* 副本團長 v0.20.0 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -664,6 +664,12 @@
     "\u76EE\u524D\u6709\u6230\u9B25\u9032\u884C\u4E2D\uFF0C\u6253\u5B8C\u518D\u958B\u59CB\u79D8\u5883\u639B\u6A5F": "A battle is in progress \u2014 finish it before starting Mythic idle",
     "\u958B\u59CB\u79D8\u5883\u639B\u6A5F\uFF1A{0} +{1}": "Mythic idle: {0} +{1}",
     "\u9996\u6B21\u6311\u6230\u9700\u5B8C\u6574\u89C0\u6230\uFF08\u53EF\u7528 4\xD7 \u52A0\u901F\uFF09": "First attempts must be watched in full (4\xD7 speed available)",
+    "\u97F3\u6548\u8A2D\u5B9A": "Sound setting",
+    "\u958B": "On",
+    "\u95DC": "Off",
+    "\u6230\u9B25\u7279\u6548": "Battle effects",
+    "\u5B8C\u6574": "Full",
+    "\u7C21\u5316": "Simple",
     "\u{1F3F3} \u4E3B\u52D5\u64A4\u9000": "\u{1F3F3} Retreated",
     "\u5DF2\u5957\u7528\u63A8\u85A6\u914D\u7F6E": "Recommended setup applied",
     "\u300C{0}\u300D": "{0}",
@@ -841,7 +847,7 @@
     '<div class="more">\u53E6\u5916 {0} \u96BB</div>': '<div class="more">+{0} more</div>',
     '<h2>\u6230\u9B25</h2><div class="empty">\u76EE\u524D\u6C92\u6709\u9032\u884C\u4E2D\u7684\u6230\u9B25\u3002<br>\u5230\u300C\u526F\u672C\u300D\u9078\u4E00\u5C64\u958B\u59CB\u6311\u6230\u3002<br><br><button class="btn main" data-tab="dungeon">\u524D\u5F80\u526F\u672C</button></div>': '<h2>Battle</h2><div class="empty">No battle in progress.<br>Pick a floor in Dungeons to start.<br><br><button class="btn main" data-tab="dungeon">Go to Dungeons</button></div>',
     "\u5BF6\u5EAB\u30FB\u7B2C {0} \u5C64": "Vault \xB7 Floor {0}",
-    '<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}</div> {5}{6} <div class="arena"> <div class="side foes"><span class="label">\u6575\u65B9\u30FB{7}</span>{8}</div> <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>': '<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}</div> {5}{6} <div class="arena"> <div class="side foes"><span class="label">Enemies \xB7 {7}</span>{8}</div> <div class="side"><span class="label">Your party</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>',
+    '<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">\u6575\u65B9\u30FB{7}</span>{8}</div> <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>': '<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">Enemies \xB7 {7}</span>{8}</div> <div class="side"><span class="label">Your party</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>',
     "\u9996\u9818\u6230": "Boss",
     "\u7B2C {0} \u6CE2": "Wave {0}",
     '<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">\u64A4\u9000</button></div></div>': '<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">Retreat</button></div></div>',
@@ -852,6 +858,8 @@
     '<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">\u5269 {1}</span></div> <div class="vaultcount"><b class="num">{2}</b> \u96BB\u54E5\u5E03\u6797\u30FB<span class="num">+{3}</span> \u91D1{4}</div>': '<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">{1} left</span></div> <div class="vaultcount"><b class="num">{2}</b>  goblins \xB7 <span class="num">+{3}</span>  gold{4}</div>',
     "\uFF08\u5DF2\u9054\u91D1\u5E63\u4E0A\u9650\uFF09": " (gold cap reached)",
     '<span class="sub" style="margin:0">\u3000\u91D1\u5E63\u7B97\u5230 {0} \u96BB</span>': '<span class="sub" style="margin:0"> Gold counts up to {0}</span>',
+    "\u95DC\u9589\u97F3\u6548": "Mute sound",
+    "\u958B\u555F\u97F3\u6548": "Unmute sound",
     '<button class="btn horn {0}" data-act="horn" {1} aria-label="\u82F1\u52C7\u865F\u89D2">{3}{2}</button>': '<button class="btn horn {0}" data-act="horn" {1} aria-label="Heroic Horn">{3}{2}</button>',
     "\u5DF2\u7528": "Used",
     "\u865F\u89D2": "Horn",
@@ -970,6 +978,11 @@
     "\u532F\u51FA\u5B58\u6A94\u78BC": "Export save code",
     "\u532F\u5165": "Import",
     "\u91CD\u65B0\u958B\u59CB": "Start over",
+    "\u6230\u9B25\u756B\u9762": "Battle screen",
+    "\u683C\u5B50\u7279\u6548": "Grid effects",
+    "\u7ACB\u9AD4\u8996\u89D2": "3D view",
+    "\u97F3\u6548": "Sound",
+    "\u300C\u7C21\u5316\u300D\u53EA\u4FDD\u7559\u547D\u4E2D\u8207\u9996\u9818\u6A5F\u5236\u7684\u9583\u720D\uFF1B\u300C\u95DC\u300D\u6539\u56DE\u6587\u5B57\u5217\u8868\u3002\u8A2D\u5B9A\u53EA\u5B58\u5728\u9019\u53F0\u88DD\u7F6E\u3002": '"Simple" keeps only hit and boss-mechanic flashes; "Off" goes back to the text list. Saved on this device only.',
     "\u610F\u898B\u56DE\u994B": "Feedback",
     "\u54EA\u88E1\u597D\u73A9\u3001\u54EA\u88E1\u5361\u4F4F\u3001\u60F3\u8981\u4EC0\u9EBC\u529F\u80FD\u90FD\u53EF\u4EE5\u5BEB": "What's fun, where you got stuck, what you'd like to see\u2026",
     "\u6703\u9644\u4E0A\u66B1\u7A31\u300C{0}\u300D\u8207\u76EE\u524D\u9032\u5EA6": 'Sent with your nickname "{0}" and progress',
@@ -2563,8 +2576,8 @@
       addHp: Math.round(B.addHp * sh),
       addAtk: B.addAtk * sa
     });
-    const last = d.twin ? d.twin.map((t) => boss(t.name, t.mech, 0.6, 0.8)) : [boss(d.boss, d.mech)];
-    return [trash(), trash(), last];
+    const last2 = d.twin ? d.twin.map((t) => boss(t.name, t.mech, 0.6, 0.8)) : [boss(d.boss, d.mech)];
+    return [trash(), trash(), last2];
   }
   var mechHints = (i) => {
     const d = DUNGEONS[i];
@@ -2575,18 +2588,23 @@
   var BOSS_MECHS = {
     enrage(b, e, m) {
       if (b.waveTick < m.at) return 1;
-      if (b.waveTick === m.at) b.push(tx("\u{1F525} {0} \u72C2\u66B4\u4E86\uFF01\u50B7\u5BB3\u5927\u589E", e.name), "warn");
+      if (b.waveTick === m.at) {
+        b.push(tx("\u{1F525} {0} \u72C2\u66B4\u4E86\uFF01\u50B7\u5BB3\u5927\u589E", e.name), "warn");
+        b.fx({ k: "phase", s: e.id });
+      }
       return m.mult;
     },
     pulse(b, e, m) {
       if (b.waveTick % m.every) return 1;
       b.push(tx("\u{1F4A5} {0} \u65BD\u653E\u7BC4\u570D\u653B\u64CA", e.name), "warn");
+      b.fx({ k: "pulse", s: e.id });
       for (const u of b.alive()) b.hitHero(u, e.atk * m.dmg * b.weakMult(e), "magic");
       return 1;
     },
     buster(b, e, m, tgt) {
       if (b.waveTick % m.every) return 1;
       b.push(tx("\u26A1 {0} \u5C0D {1} \u91CD\u64CA", e.name, tgt.name), "warn");
+      b.fx({ k: "buster", s: e.id, t: tgt.id });
       b.isBuster = true;
       return m.mult;
     },
@@ -2600,6 +2618,7 @@
       u.curse = b.tick + m.dur;
       u.cursePct = m.pct;
       b.push(tx("\u2620 {0} \u8A5B\u5492\u4E86 {1}", e.name, u.name), "warn");
+      b.fx({ k: "curse", s: e.id, t: u.id, dur: m.dur });
       return 1;
     },
     // 讀條：time 秒後全隊受到魔法傷害（攻擊 × mult）；能打斷的職業會在讀條時打斷
@@ -2607,6 +2626,7 @@
       if (b.waveTick % m.every || e.casting) return 1;
       e.casting = { until: b.tick + m.time, mult: m.mult };
       b.push(tx("\u{1F4D6} {0} \u958B\u59CB\u8B80\u689D\uFF08{1} \u79D2\uFF09", e.name, m.time), "warn");
+      b.fx({ k: "cast", s: e.id, time: m.time });
       return 1;
     },
     // 護盾：獲得最大生命 pct 的護盾，window 秒內沒打破就回復 heal 的生命
@@ -2616,6 +2636,7 @@
       e.bshieldUntil = b.tick + m.window;
       e.bshieldHeal = m.heal;
       b.push(tx("\u{1F6E1} {0} \u5F35\u958B\u8B77\u76FE\uFF01{1} \u79D2\u5167\u6253\u7834\u5B83", e.name, m.window), "warn");
+      b.fx({ k: "shield", s: e.id });
       return 1;
     },
     // 轉階段：生命低於 at 時攻擊永久 ×atk
@@ -2624,6 +2645,7 @@
         e.phased = true;
         e.atk *= m.atk;
         b.push(tx("\u{1F311} {0} \u9032\u5165\u7B2C\u4E8C\u968E\u6BB5\uFF01\u653B\u64CA\u5927\u589E", e.name), "warn");
+        b.fx({ k: "phase", s: e.id });
       }
       return 1;
     },
@@ -2633,6 +2655,7 @@
         e.bonded = true;
         e.atk *= m.mult;
         b.push(tx("\u{1F4A2} {0} \u60B2\u61A4\u4EA4\u52A0\uFF0C\u653B\u64CA\u5927\u589E", e.name), "warn");
+        b.fx({ k: "phase", s: e.id });
       }
       return 1;
     },
@@ -2640,6 +2663,7 @@
       if (b.waveTick % m.every) return 1;
       for (let k = 0; k < m.n; k++) b.enemies.push({ name: tx("\u53EC\u559A\u7269"), hp: e.addHp, max: e.addHp, atk: e.addAtk, boss: false, id: uid() });
       b.push(tx("\u{1F300} {0} \u53EC\u559A\u4E86 {1} \u96BB\u5C0F\u602A", e.name, m.n), "warn");
+      b.fx({ k: "summon", s: e.id });
       return 1;
     }
   };
@@ -2722,6 +2746,10 @@
     foes() {
       return this.enemies.filter((e) => e.hp > 0);
     }
+    // v0.20 演出事件：只有畫面層設了 fxq 才記錄（模擬不受影響），不使用亂數
+    fx(ev) {
+      if (this.fxq) this.fxq.push(ev);
+    }
     push(msg, cls2 = "") {
       this.log.push({ t: this.tick, msg, cls: cls2 });
       if (this.log.length > 80) this.log.shift();
@@ -2737,6 +2765,7 @@
       if (this.horn.used || this.over) return false;
       this.horn.used = true;
       this.horn.until = this.tick + RAID_HORN.dur;
+      this.fx({ k: "horn" });
       this.push(tx("\u{1F4EF} \u82F1\u52C7\u865F\u89D2\uFF01\u5168\u968A\u50B7\u5BB3\u8207\u6CBB\u7642 +{0}%\uFF0C\u6301\u7E8C {1} \u79D2", Math.round(RAID_HORN.bonus * 100), RAID_HORN.dur), "info");
       return true;
     }
@@ -2747,6 +2776,7 @@
     startLust(src, dur, haste, proc = 0, procMult = 1) {
       if (this.lust.used || this.over) return false;
       Object.assign(this.lust, { used: true, until: this.tick + dur, haste, proc, procMult, src });
+      this.fx({ k: "lust", s: src.id });
       this.push(tx("\u{1F941} {0} \u65BD\u653E\u55DC\u8840\uFF01\u5168\u968A\u51FA\u624B\u901F\u5EA6 +{1}%\uFF0C\u6301\u7E8C {2} \u79D2", src.name, Math.round(haste * 100), dur), "info");
       return true;
     }
@@ -2782,11 +2812,15 @@
         const ab = Math.min(e.bshield, amt);
         e.bshield -= ab;
         e.hp += ab;
-        if (e.bshield === 0) this.push(tx("\u{1F4A5} {0} \u7684\u8B77\u76FE\u88AB\u6253\u7834\u4E86", e.name), "good");
+        if (e.bshield === 0) {
+          this.push(tx("\u{1F4A5} {0} \u7684\u8B77\u76FE\u88AB\u6253\u7834\u4E86", e.name), "good");
+          this.fx({ k: "sbreak", t: e.id });
+        }
       }
       e.hp -= amt;
       u.dmgDone += amt;
       if (o.skill || o.dot) u.skillDmg += amt;
+      this.fx({ k: "hit", s: u.id, t: e.id, crit, aoe: !!o.aoe, dot: !!o.dot, proc: !!o.proc, skill: !!o.skill });
       if (u.hk.afterHit) u.hk.afterHit(this, u, e, amt, o);
       if (this.lust.proc && !o.dot && !o.proc && this.lustActive() && R() < this.lust.proc) {
         const L2 = this.lust, t = e.hp > amt ? e : this.foes().find((x) => x !== e);
@@ -2798,6 +2832,7 @@
         if (e.goblin) this.kills = (this.kills || 0) + 1;
         if (u.lh.onKill) u.lh.onKill(this, u, e);
         this.push(tx("{0} \u88AB\u64CA\u6BBA", e.name), e.boss ? "good" : "");
+        this.fx({ k: "kill", t: e.id, boss: !!e.boss });
         if (!e.boss && this.has("bolstering")) {
           const rest = this.foes().filter((x) => !x.boss);
           for (const x of rest) {
@@ -2832,6 +2867,7 @@
       amt -= absorbed;
       u.hp = Math.max(0, u.hp - amt);
       u.taken += amt;
+      this.fx({ k: "hurt", s: attacker ? attacker.id : null, t: u.id, kind });
       if (u.role === "tank" && kind !== "magic" && this.has("necrotic")) u.necro = Math.min(40, u.necro + 1);
       if (kind !== "magic" && m.counter && attacker && R() < m.counter) this.hitEnemy(u, attacker, u.pow);
       this.lifeSavers(u);
@@ -2846,6 +2882,7 @@
         u.hp = Math.max(1, u.hp);
         u.buf.immune = this.tick + dur;
         this.skillLog(u, name);
+        this.fx({ k: "immune", t: u.id });
       };
       if (u.hk.lifeSaver) u.hk.lifeSaver(this, u, save2);
       if (u.mods.iceBlock) save2("ice", 0.3, u.mods.iceBlock, tx("\u5BD2\u51B0\u5C4F\u969C"));
@@ -2857,9 +2894,11 @@
         priest.used.redemption = true;
         u.hp = Math.round(u.max * priest.mods.redemption);
         this.skillLog(priest, tx("\u6551\u8D16"), u);
+        this.fx({ k: "heal", s: priest.id, t: u.id, big: true });
         return;
       }
       this.push(tx("\u{1F480} {0}\uFF08{1}\uFF09\u9663\u4EA1", u.name, u.pack.name), "bad");
+      this.fx({ k: "die", t: u.id });
     }
     heal(src, tgt, amt, raw = false) {
       if (tgt.hp <= 0) return 0;
@@ -2867,6 +2906,7 @@
       const h = Math.min(tgt.max - tgt.hp, Math.round(amt * (raw ? 1 : this.healMult(src)) * necro));
       tgt.hp += h;
       src.healDone += h;
+      if (h > 0) this.fx({ k: "heal", s: src.id, t: tgt.id });
       if (src.lh.onHeal && !raw) src.lh.onHeal(this, src, tgt, amt, h);
       return h;
     }
@@ -2876,6 +2916,7 @@
       if (caster && u.pack.kick && u.pack.kick(u) && (u.cd.kick || 0) <= this.tick) {
         caster.casting = null;
         u.cd.kick = this.tick + (u.mods.kickCd || 12);
+        this.fx({ k: "kick", s: u.id, t: caster.id });
         this.skillLog(u, tx("\u6253\u65B7"), caster);
         return true;
       }
@@ -2885,6 +2926,7 @@
           c.curse = 0;
           u.cd.dispel = this.tick + (u.mods.dispelCd || 6);
           this.skillLog(u, tx("\u6DE8\u5316"), c);
+          this.fx({ k: "dispel", s: u.id, t: c.id });
           return true;
         }
       }
@@ -2912,6 +2954,7 @@
         const h = Math.round(e.max * e.bshieldHeal);
         e.hp = Math.min(e.max, e.hp + h);
         this.push(tx("\u{1F49A} \u8B77\u76FE\u6C92\u88AB\u6253\u7834\uFF0C{0} \u56DE\u5FA9\u4E86 {1} \u751F\u547D", e.name, h), "bad");
+        this.fx({ k: "sfail", t: e.id });
       }
       for (const u of this.alive()) if (u.curse > this.tick) this.hitHero(u, u.max * u.cursePct, "magic");
       for (const u of this.alive()) {
@@ -2949,11 +2992,13 @@
         const c = e.casting;
         e.casting = null;
         this.push(tx("\u{1F4A5} {0} \u8B80\u689D\u5B8C\u6210\uFF0C\u5168\u968A\u53D7\u5230\u91CD\u5275", e.name), "bad");
+        this.fx({ k: "blast", s: e.id });
         for (const u of this.alive()) this.hitHero(u, e.atk * c.mult * this.weakMult(e), "magic");
       }
       if (this.has("volcanic") && this.waveTick % 8 === 0 && this.alive().length) {
         const u = pick(this.alive());
         this.push(tx("\u{1F30B} \u706B\u5C71\u7206\u767C\uFF0C{0} \u53D7\u5230\u50B7\u5BB3", u.name), "warn");
+        this.fx({ k: "volc", t: u.id });
         this.hitHero(u, this.mythic.volcanic, "magic");
       }
       if (this.mythic && this.tick === this.mythic.timer && !this.over) this.push(tx("\u23F0 \u8D85\u904E\u9650\u6642\uFF01\u4ECD\u53EF\u6253\u5B8C\uFF0C\u4F46\u9470\u77F3\u6703\u964D\u7D1A"), "bad");
@@ -2964,6 +3009,7 @@
         this.over = true;
         this.win = false;
         this.push(tx("\u2620\uFE0F \u5718\u6EC5\u2026"), "bad");
+        this.fx({ k: "end", win: false });
         return;
       }
       if (!this.foes().length) {
@@ -2972,10 +3018,12 @@
           for (const u of this.alive()) u.hp = Math.min(u.max, u.hp + Math.round(u.max * DUNGEON.waveHeal));
           this.push(this.waveIdx === this.waves.length - 1 ? tx("\u{1F451} \u9996\u9818 {0} \u73FE\u8EAB\uFF01", this.waves[this.waveIdx][0].name) : tx("\u7B2C {0} \u6CE2\u6575\u4EBA\u4F86\u8972", this.waveIdx + 1), "info");
           this.loadWave();
+          this.fx({ k: "wave", boss: this.waveIdx === this.waves.length - 1 });
         } else {
           this.over = true;
           this.win = true;
           this.push(tx("\u{1F3C6} \u526F\u672C\u901A\u95DC\uFF01"), "good");
+          this.fx({ k: "end", win: true });
         }
       }
       if (this.tick >= this.maxTicks && !this.over) {
@@ -2983,10 +3031,12 @@
           this.over = true;
           this.win = true;
           this.push(tx("\u23F0 \u6642\u9593\u5230\uFF01\u5171\u6253\u5012 {0} \u96BB\u5BF6\u85CF\u54E5\u5E03\u6797", this.kills || 0), "good");
+          this.fx({ k: "end", win: true });
         } else {
           this.over = true;
           this.win = false;
           this.push(tx("\u231B \u6642\u9593\u8017\u76E1\uFF0C\u64A4\u9000"), "bad");
+          this.fx({ k: "end", win: false });
         }
       }
     }
@@ -3919,10 +3969,10 @@
   }
   function hasUpgrade(s) {
     return partyHeroes(s).some((h) => Object.keys(SLOTS).some((slot) => {
-      const cur = h.gear[slot] && s.items[h.gear[slot]];
+      const cur2 = h.gear[slot] && s.items[h.gear[slot]];
       return s.bag.some((id) => {
         const it = s.items[id];
-        return it.slot === slot && canEquip(h, it) && (!cur || heroItemScore(h, it) > heroItemScore(h, cur));
+        return it.slot === slot && canEquip(h, it) && (!cur2 || heroItemScore(h, it) > heroItemScore(h, cur2));
       });
     }));
   }
@@ -3931,13 +3981,13 @@
     const list = heroId ? s.heroes.filter((h) => h.id === heroId) : partyHeroes(s);
     for (const h of list) {
       for (const slot of Object.keys(SLOTS)) {
-        const cur = h.gear[slot] && s.items[h.gear[slot]];
+        const cur2 = h.gear[slot] && s.items[h.gear[slot]];
         let best = null;
         for (const id of s.bag) {
           const it = s.items[id];
           if (it.slot === slot && canEquip(h, it) && (!best || heroItemScore(h, it) > heroItemScore(h, best))) best = it;
         }
-        if (best && (!cur || heroItemScore(h, best) > heroItemScore(h, cur))) {
+        if (best && (!cur2 || heroItemScore(h, best) > heroItemScore(h, cur2))) {
           if (!dry) equip(s, h.id, best.id);
           changed++;
         }
@@ -4381,7 +4431,8 @@
     });
     byName[d.boss] = Array.isArray(g) ? g[0] : g;
   });
-  var enemyIcon = (e) => svg(e.goblin ? GOBLIN : e.boss ? byName[e.name] || "crowned-skull" : TRASH, e.boss ? "gi-boss" : "gi-foe");
+  var enemyGlyph = (e) => e.goblin ? GOBLIN : e.boss ? byName[e.name] || "crowned-skull" : TRASH;
+  var enemyIcon = (e) => svg(enemyGlyph(e), e.boss ? "gi-boss" : "gi-foe");
   function installIcons() {
     for (const [k, p] of Object.entries(CLASSES)) if (CLASS_GLYPH[k]) p.icon = classIcon(k);
     const coin = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="${icon_data_default[COIN]}"/></svg>`)}`;
@@ -4427,16 +4478,16 @@
     for (const h of partyHeroes(app.S)) {
       if (!canEquip(h, it)) continue;
       any = true;
-      const cur = h.gear[it.slot] && app.S.items[h.gear[it.slot]];
-      if (!cur) {
+      const cur2 = h.gear[it.slot] && app.S.items[h.gear[it.slot]];
+      if (!cur2) {
         if (!best || best.pct !== Infinity) best = { h, pct: Infinity };
         continue;
       }
-      const base = heroItemScore(h, cur), g = heroItemScore(h, it) / base - 1;
+      const base = heroItemScore(h, cur2), g = heroItemScore(h, it) / base - 1;
       if (g > 5e-3 && (!best || g > best.pct)) best = { h, pct: g };
-      if ((cur.up || 0) > (it.up || 0)) {
-        const p = heroItemScoreAt(h, it, cur.up) / base - 1;
-        if (p > 5e-3 && (!pot || p > pot.pct)) pot = { h, pct: p, up: cur.up };
+      if ((cur2.up || 0) > (it.up || 0)) {
+        const p = heroItemScoreAt(h, it, cur2.up) / base - 1;
+        if (p > 5e-3 && (!pot || p > pot.pct)) pot = { h, pct: p, up: cur2.up };
       }
     }
     return { best, pot, any };
@@ -4466,7 +4517,7 @@
   }
 
   // src/core/version.js
-  var VERSION = "0.19.0";
+  var VERSION = "0.20.0";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -4761,6 +4812,28 @@
     return h;
   }
 
+  // src/ui/prefs.js
+  var KEY3 = "raid-leader-prefs";
+  var FX_LEVELS = ["full", "lite", "off"];
+  var prefs = { fx: "full", iso: false, sound: true };
+  try {
+    const v = JSON.parse(localStorage.getItem(KEY3) || "{}");
+    if (FX_LEVELS.includes(v.fx)) prefs.fx = v.fx;
+    if (typeof v.iso === "boolean") prefs.iso = v.iso;
+    if (typeof v.sound === "boolean") prefs.sound = v.sound;
+  } catch (e) {
+  }
+  function setPref(k, v) {
+    if (k === "fx" && !FX_LEVELS.includes(v)) return;
+    if ((k === "iso" || k === "sound") && typeof v !== "boolean") return;
+    if (!(k in prefs)) return;
+    prefs[k] = v;
+    try {
+      localStorage.setItem(KEY3, JSON.stringify(prefs));
+    } catch (e) {
+    }
+  }
+
   // src/ui/views/battle.js
   var MAX_FOE_ROWS = 4;
   function enemyRows(b) {
@@ -4781,7 +4854,7 @@
     if (!app.battle) return tx('<h2>\u6230\u9B25</h2><div class="empty">\u76EE\u524D\u6C92\u6709\u9032\u884C\u4E2D\u7684\u6230\u9B25\u3002<br>\u5230\u300C\u526F\u672C\u300D\u9078\u4E00\u5C64\u958B\u59CB\u6311\u6230\u3002<br><br><button class="btn main" data-tab="dungeon">\u524D\u5F80\u526F\u672C</button></div>');
     const d = dungeonInfo(app.battle.dIdx), b = app.battle;
     if (b.vault) d.name = tx("\u5BF6\u5EAB\u30FB\u7B2C {0} \u5C64", b.vault.floor + 1);
-    let h = tx('<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}</div> {5}{6} <div class="arena"> <div class="side foes"><span class="label">\u6575\u65B9\u30FB{7}</span>{8}</div> <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>', d.name, b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : "", b.tick, b.vault ? "" : `<div class="waves">`, b.vault ? "" : b.waves.map((_, i) => `<i class="${i < b.waveIdx || b.over && b.win ? "done" : i === b.waveIdx ? "cur" : ""}"></i>`).join("") + "</div>", b.mythic ? mythicTimerBar(b) : "", b.vault ? vaultBar(b) : "", b.waveIdx === b.waves.length - 1 ? tx("\u9996\u9818\u6230") : tx("\u7B2C {0} \u6CE2", b.waveIdx + 1), enemyRows(b), b.units.map((u) => unitRow(u, false)).join(""), b.log.map((l) => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, " ")}</span>${l.msg}</p>`).join(""));
+    let h = tx('<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}{13}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">\u6575\u65B9\u30FB{7}</span>{8}</div> <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>', d.name, b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : "", b.tick, b.vault ? "" : `<div class="waves">`, b.vault ? "" : b.waves.map((_, i) => `<i class="${i < b.waveIdx || b.over && b.win ? "done" : i === b.waveIdx ? "cur" : ""}"></i>`).join("") + "</div>", b.mythic ? mythicTimerBar(b) : "", b.vault ? vaultBar(b) : "", b.waveIdx === b.waves.length - 1 ? tx("\u9996\u9818\u6230") : tx("\u7B2C {0} \u6CE2", b.waveIdx + 1), enemyRows(b), b.units.map((u) => unitRow(u, false)).join(""), b.log.map((l) => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, " ")}</span>${l.msg}</p>`).join(""), prefs.fx !== "off" ? '<div id="gridSlot" class="gridslot"></div>' : "", prefs.fx !== "off" ? " compact" : "", muteBtn());
     if (!b.over) {
       h += tx('<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">\u64A4\u9000</button></div></div>', [1, 2, 4].map((x) => `<button data-act="speed" data-x="${x}" class="${app.speed === x ? "sel" : ""}">${x}\xD7</button>`).join(""), hornBtn(b), canSkip(b) ? tx('<button class="btn" data-act="skip">\u76F4\u63A5\u7D50\u7B97</button>') : tx('<button class="btn" disabled title="\u9996\u6B21\u6311\u6230\u9700\u5B8C\u6574\u89C0\u6230\uFF08\u53EF\u7528 4\xD7 \u52A0\u901F\uFF09">\u{1F512} \u7D50\u7B97</button>'));
     }
@@ -4797,6 +4870,9 @@
   function vaultBar(b) {
     const left = Math.max(0, b.vault.dur - b.tick), f = b.vault.floor, cap = vaultMaxKills(f);
     return tx('<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">\u5269 {1}</span></div> <div class="vaultcount"><b class="num">{2}</b> \u96BB\u54E5\u5E03\u6797\u30FB<span class="num">+{3}</span> \u91D1{4}</div>', pct(b.tick, b.vault.dur), mmss(left), b.kills, fmt(Math.min(b.kills, cap) * vaultGoldPerKill(f)), b.kills >= cap ? tx("\uFF08\u5DF2\u9054\u91D1\u5E63\u4E0A\u9650\uFF09") : tx('<span class="sub" style="margin:0">\u3000\u91D1\u5E63\u7B97\u5230 {0} \u96BB</span>', cap));
+  }
+  function muteBtn() {
+    return `<button class="mute ${prefs.sound ? "" : "off"}" data-act="mute" aria-pressed="${prefs.sound}" aria-label="${prefs.sound ? tx("\u95DC\u9589\u97F3\u6548") : tx("\u958B\u555F\u97F3\u6548")}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/>${prefs.sound ? '<path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/>' : '<path d="m16 9 5 6M21 9l-5 6"/>'}</svg></button>`;
   }
   function hornBtn(b) {
     const on = b.hornActive(), left = b.horn.until - b.tick;
@@ -4875,7 +4951,7 @@
     if (!g.any) return `<span class="nofit">${tx("\u968A\u4E0A\u6C92\u4EBA\u80FD\u7A7F")}</span>`;
     return "";
   }
-  var seg = (act, cur, opts) => `<div class="seg">${opts.map(([v, n2]) => `<button data-act="${act}" data-v="${v}" class="${cur === v ? "sel" : ""}">${n2}</button>`).join("")}</div>`;
+  var seg = (act, cur2, opts) => `<div class="seg">${opts.map(([v, n2]) => `<button data-act="${act}" data-v="${v}" class="${cur2 === v ? "sel" : ""}">${n2}</button>`).join("")}</div>`;
   var itemRow = (it, act = "item") => `<button class="item rar${it.rarity}" data-act="${act}" data-id="${it.id}">
     <div class="in">${itemName(it)}${gainNote(it)}</div>
     <div class="il">${SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div>
@@ -4945,7 +5021,7 @@
   }
 
   // src/ui/cloud.js
-  var KEY3 = "raid-leader-cloud";
+  var KEY4 = "raid-leader-cloud";
   var cloudEnabled = () => !!CLOUD.clientId && !!TELEMETRY.url;
   var cloud = { info: null, busy: false, lastAuto: Date.now(), lastCheck: 0, pending: false, lastTry: 0 };
   var chip = (on) => {
@@ -4954,14 +5030,14 @@
   };
   var session = () => {
     try {
-      return JSON.parse(localStorage.getItem(KEY3) || "null");
+      return JSON.parse(localStorage.getItem(KEY4) || "null");
     } catch (e) {
       return null;
     }
   };
   var setSession = (v) => {
     try {
-      v ? localStorage.setItem(KEY3, JSON.stringify(v)) : localStorage.removeItem(KEY3);
+      v ? localStorage.setItem(KEY4, JSON.stringify(v)) : localStorage.removeItem(KEY4);
     } catch (e) {
     }
   };
@@ -5170,15 +5246,16 @@
     <p class="sub" style="margin:0">${cloud.busy ? tx("\u4E0A\u50B3\u4E2D\u2026") : i ? i.updated ? tx("\u5DF2\u767B\u5165\u30FB\u96F2\u7AEF\u6700\u5F8C\u5099\u4EFD {0}\uFF08{1}\uFF09", fmtTime(i.updated), esc(i.summary || "\u2014")) : tx("\u5DF2\u767B\u5165\u30FB\u96F2\u7AEF\u9084\u6C92\u6709\u5B58\u6A94") : tx("\u5DF2\u767B\u5165\u30FB\u8B80\u53D6\u96F2\u7AEF\u72C0\u614B\u4E2D\u2026")}<br>${tx("\u81EA\u52D5\u540C\u6B65\uFF1A\u958B\u555F\u904A\u6232\u6642\u8F09\u5165\u8F03\u65B0\u7684\u96F2\u7AEF\u9032\u5EA6\uFF1B\u6709\u65B0\u9032\u5EA6\u6642\u6BCF {0} \u5206\u9418\u3001\u4EE5\u53CA\u96E2\u958B\u904A\u6232\u6642\u81EA\u52D5\u4E0A\u50B3\u3002", CLOUD.autoMin)}</p>
     <div class="row"><button class="btn main" data-act="cloudup" ${cloud.busy ? "disabled" : ""}>${tx("\u7ACB\u5373\u4E0A\u50B3")}</button><button class="btn" data-act="clouddown">${tx("\u5F9E\u96F2\u7AEF\u4E0B\u8F09")}</button><button class="btn" data-act="cloudout">${tx("\u767B\u51FA")}</button></div>`;
   }
+  var seg2 = (k, opts, cur2) => `<div class="seg sm">${opts.map(([v, n2]) => `<button data-act="pref" data-k="${k}" data-v="${v}" class="${v === cur2 ? "sel" : ""}">${n2}</button>`).join("")}</div>`;
   var row = (label, value) => `<div class="set"><span>${label}</span>${value}</div>`;
   function sheetSettings() {
     const S = app.S, p = S.player, sec = p.playSec || 0;
-    const play = sec >= 3600 ? tx("{0} \u5C0F\u6642 {1} \u5206", Math.floor(sec / 3600), Math.floor(sec % 3600 / 60)) : tx("{0} \u5206\u9418", Math.floor(sec / 60));
+    const play2 = sec >= 3600 ? tx("{0} \u5C0F\u6642 {1} \u5206", Math.floor(sec / 3600), Math.floor(sec % 3600 / 60)) : tx("{0} \u5206\u9418", Math.floor(sec / 60));
     let h = `<h3>${tx("\u8A2D\u5B9A")}</h3>
     <span class="label">${tx("\u5E33\u865F")}</span><div class="settings">
       ${row(tx("\u66B1\u7A31"), `<span class="row" style="align-items:center;margin:0"><b>${esc(p.name || tx("\u533F\u540D"))}</b><button class="btn sm" data-act="nick">${tx("\u4FEE\u6539")}</button></span>`)}
       ${row(tx("\u73A9\u5BB6 ID"), `<span class="num sub" style="margin:0">${esc(p.pid)}</span>`)}
-      ${row(tx("\u904A\u73A9\u6642\u9593"), `<span class="num">${play}</span>`)}
+      ${row(tx("\u904A\u73A9\u6642\u9593"), `<span class="num">${play2}</span>`)}
       ${row(tx("\u6210\u5C31"), `<button class="btn sm" data-act="ach">${tx("{0} \u9EDE\u30FB\u67E5\u770B", achPoints(S))}</button>`)}
       ${row(tx("\u6230\u7E3E"), `<span class="num">${tx("\u5171\u6311\u6230 {0} \u6B21\u30FB\u901A\u95DC {1} \u6B21", fmt(S.stats.runs), fmt(S.stats.wins))}</span>`)}
     </div>
@@ -5186,6 +5263,12 @@
     <span class="label">${tx("\u5B58\u6A94")}</span>
     <p class="sub" style="margin:0">${tx("\u9032\u5EA6\u5B58\u5728\u9019\u53F0\u88DD\u7F6E\u7684\u700F\u89BD\u5668\u3002\u63DB\u88DD\u7F6E\u524D\uFF0C\u5148\u532F\u51FA\u5B58\u6A94\u78BC\u3002")}</p>
     <div class="row"><button class="btn" data-act="export">${tx("\u532F\u51FA\u5B58\u6A94\u78BC")}</button><button class="btn" data-act="import">${tx("\u532F\u5165")}</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">${tx("\u91CD\u65B0\u958B\u59CB")}</button></div>
+    <span class="label">${tx("\u6230\u9B25\u756B\u9762")}</span><div class="settings">
+      ${row(tx("\u683C\u5B50\u7279\u6548"), seg2("fx", [["full", tx("\u5B8C\u6574")], ["lite", tx("\u7C21\u5316")], ["off", tx("\u95DC")]], prefs.fx))}
+      ${row(tx("\u7ACB\u9AD4\u8996\u89D2"), seg2("iso", [["0", tx("\u95DC")], ["1", tx("\u958B")]], prefs.iso ? "1" : "0"))}
+      ${row(tx("\u97F3\u6548"), seg2("sound", [["1", tx("\u958B")], ["0", tx("\u95DC")]], prefs.sound ? "1" : "0"))}
+    </div>
+    <p class="sub" style="margin:0">${tx("\u300C\u7C21\u5316\u300D\u53EA\u4FDD\u7559\u547D\u4E2D\u8207\u9996\u9818\u6A5F\u5236\u7684\u9583\u720D\uFF1B\u300C\u95DC\u300D\u6539\u56DE\u6587\u5B57\u5217\u8868\u3002\u8A2D\u5B9A\u53EA\u5B58\u5728\u9019\u53F0\u88DD\u7F6E\u3002")}</p>
     <span class="label">${getLang() === "en" ? "Language" : "\u8A9E\u8A00 \xB7 Language"}</span>
     <div class="seg">${LANGS.map((l) => `<button data-act="lang" data-v="${l.id}" class="${l.id === getLang() ? "sel" : ""}">${l.name}</button>`).join("")}</div>`;
     if (enabled()) h += `<span class="label">${tx("\u610F\u898B\u56DE\u994B")}</span>
@@ -5266,10 +5349,10 @@
     if (app.afterModal) app.afterModal();
   }
   function sheetDialog(m) {
-    const L2 = m.lines[m.i], last = m.i >= m.lines.length - 1;
+    const L2 = m.lines[m.i], last2 = m.i >= m.lines.length - 1;
     return `<div class="dlg" data-act="dlgnext">${L2.who ? `<b class="who">${L2.who}</b>` : ""}<p class="${L2.who ? "" : "narr"}">${L2.text}</p>
     <div class="row" style="align-items:center"><span class="sub num" style="margin:0">${m.i + 1}/${m.lines.length}</span>
-    <button class="btn sm" data-act="dlgskip" style="margin-left:auto">${tx("\u8DF3\u904E")}</button><button class="btn sm main" data-act="dlgnext">${last ? tx("\u958B\u59CB") : tx("\u7E7C\u7E8C \u25B8")}</button></div></div>`;
+    <button class="btn sm" data-act="dlgskip" style="margin-left:auto">${tx("\u8DF3\u904E")}</button><button class="btn sm main" data-act="dlgnext">${last2 ? tx("\u958B\u59CB") : tx("\u7E7C\u7E8C \u25B8")}</button></div></div>`;
   }
   function sheetHero(x) {
     if (!x) return "";
@@ -5326,17 +5409,17 @@
     return h;
   }
   function sheetPick() {
-    const x = hero(app.modal.id), slot = app.modal.slot, cur = x.gear[slot] && app.S.items[x.gear[slot]];
+    const x = hero(app.modal.id), slot = app.modal.slot, cur2 = x.gear[slot] && app.S.items[x.gear[slot]];
     const all = app.S.bag.map((id) => app.S.items[id]).filter((it) => it.slot === slot), list = all.filter((it) => canEquip(x, it)).sort((a, b) => heroItemScore(x, b) - heroItemScore(x, a));
-    const hidden = all.length - list.length, base = cur ? heroItemScore(x, cur) : 0;
+    const hidden = all.length - list.length, base = cur2 ? heroItemScore(x, cur2) : 0;
     const gainTag = (it) => {
-      if (!cur) return '<span class="better">\u25B2</span>';
+      if (!cur2) return '<span class="better">\u25B2</span>';
       const g = heroItemScore(x, it) / base - 1;
       if (g > 5e-3) return `<span class="better">\u25B2 ${pctText(g)}</span>`;
-      const p = (cur.up || 0) > (it.up || 0) ? heroItemScoreAt(x, it, cur.up) / base - 1 : 0;
+      const p = (cur2.up || 0) > (it.up || 0) ? heroItemScoreAt(x, it, cur2.up) / base - 1 : 0;
       return p > 5e-3 ? `<span class="potential">${tx("\u6F5B\u529B {0}", pctText(p))}</span>` : "";
     };
-    return tx('<h3>\u70BA {0} \u9078\u64C7{1}</h3><div class="sub" style="margin:0">\u76EE\u524D\uFF1A{2}</div> <div class="choices">{3}</div> <div class="row">{4}<button class="btn" data-act="hero" data-id="{5}">\u8FD4\u56DE</button></div>', x.name, SLOTS[slot], cur ? itemName(cur) + "\u30FB" + itemStatText(cur) : tx("\u7121"), list.map((it) => `<button class="item rar${it.rarity}" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="in">${itemName(it)}${gainTag(it)}</div><div class="il"><b class="num">${it.ilvl}</b></div><div class="is num">${itemStatText(it)}</div></button>`).join("") + (hidden ? tx('<p class="sub" style="margin:0">\u53E6\u6709 {0} \u4EF6{1}\u4E0D\u80FD\u7A7F\uFF08\u7532\u985E\u6216\u6B66\u5668\u4E0D\u7B26\uFF09</p>', hidden, cls(x).name) : ""), cur ? tx('<button class="btn" data-act="unequip" data-hero="{0}" data-slot="{1}">\u5378\u4E0B</button>', x.id, slot) : "", x.id);
+    return tx('<h3>\u70BA {0} \u9078\u64C7{1}</h3><div class="sub" style="margin:0">\u76EE\u524D\uFF1A{2}</div> <div class="choices">{3}</div> <div class="row">{4}<button class="btn" data-act="hero" data-id="{5}">\u8FD4\u56DE</button></div>', x.name, SLOTS[slot], cur2 ? itemName(cur2) + "\u30FB" + itemStatText(cur2) : tx("\u7121"), list.map((it) => `<button class="item rar${it.rarity}" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="in">${itemName(it)}${gainTag(it)}</div><div class="il"><b class="num">${it.ilvl}</b></div><div class="is num">${itemStatText(it)}</div></button>`).join("") + (hidden ? tx('<p class="sub" style="margin:0">\u53E6\u6709 {0} \u4EF6{1}\u4E0D\u80FD\u7A7F\uFF08\u7532\u985E\u6216\u6B66\u5668\u4E0D\u7B26\uFF09</p>', hidden, cls(x).name) : ""), cur2 ? tx('<button class="btn" data-act="unequip" data-hero="{0}" data-slot="{1}">\u5378\u4E0B</button>', x.id, slot) : "", x.id);
   }
   var withSet = (it, html) => html.replace('<span class="label">', affixLine(it) + setInfo(it) + '<span class="label">');
   function sheetItem(it) {
@@ -5352,12 +5435,12 @@
       maxUpFor(app.S),
       itemStatText(it),
       party.map((x) => {
-        const cur = x.gear[it.slot] && app.S.items[x.gear[it.slot]];
+        const cur2 = x.gear[it.slot] && app.S.items[x.gear[it.slot]];
         if (!canEquip(x, it)) return tx('<button class="hero off" disabled><div class="ic">{0}</div><div class="nm">{1}<small>{2}</small></div><span class="tag">\u4E0D\u80FD\u7A7F</span><div class="st">{3}</div></button>', cls(x).icon, x.name, cls(x).name, it.slot === "weapon" ? tx("\u4E0D\u6703\u7528\u9019\u7A2E\u6B66\u5668") : it.set ? tx("\u5176\u4ED6\u8077\u696D\u7684\u5957\u88DD") : tx("\u53EA\u80FD\u7A7F{0}\u4EE5\u4E0B", ARMOR_TYPES[cls(x).armorType].name));
-        const base = cur ? heroItemScore(x, cur) : 0, g = cur ? heroItemScore(x, it) / base - 1 : Infinity;
-        const p = cur && (cur.up || 0) > (it.up || 0) ? heroItemScoreAt(x, it, cur.up) / base - 1 : 0, better = g > 5e-3;
+        const base = cur2 ? heroItemScore(x, cur2) : 0, g = cur2 ? heroItemScore(x, it) / base - 1 : Infinity;
+        const p = cur2 && (cur2.up || 0) > (it.up || 0) ? heroItemScoreAt(x, it, cur2.up) / base - 1 : 0, better = g > 5e-3;
         const fit = isFitArmor(x, it) ? tx("\u30FB\u672C\u8077 +{0}%", Math.round(GEAR.fitBonus * 100)) : "";
-        return tx('<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">\u76EE\u524D\uFF1A{7}{8}{9}</div></button>', x.id, it.id, cls(x).icon, x.name, cls(x).name, better ? "in" : "", better ? tx("\u25B2 {0}", pctText(g)) : tx("\u8F03\u5DEE"), cur ? tx("{0}\uFF08{1}\uFF09", cur.name, cur.ilvl) : tx("\u7A7A"), p > 5e-3 && !better ? tx("\u30FB\u5F37\u5316\u5230 +{0} \u6703 {1}", cur.up, pctText(p)) : "", fit);
+        return tx('<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">\u76EE\u524D\uFF1A{7}{8}{9}</div></button>', x.id, it.id, cls(x).icon, x.name, cls(x).name, better ? "in" : "", better ? tx("\u25B2 {0}", pctText(g)) : tx("\u8F03\u5DEE"), cur2 ? tx("{0}\uFF08{1}\uFF09", cur2.name, cur2.ilvl) : tx("\u7A7A"), p > 5e-3 && !better ? tx("\u30FB\u5F37\u5316\u5230 +{0} \u6703 {1}", cur2.up, pctText(p)) : "", fit);
       }).join(""),
       upBtn(it, "") + " " + upManyBtn(it),
       it.id,
@@ -5452,6 +5535,654 @@
     ]
   };
 
+  // src/ui/sfx.js
+  var ctx = null;
+  var master = null;
+  var noiseBuf = null;
+  var last = {};
+  var GAP = { hit: 90, heal: 260, kill: 140, hurt: 200, dot: 300 };
+  function ac() {
+    if (ctx) return ctx;
+    const C = window.AudioContext || window.webkitAudioContext;
+    if (!C) return null;
+    ctx = new C();
+    master = ctx.createGain();
+    master.gain.value = 0.22;
+    master.connect(ctx.destination);
+    const n2 = Math.floor(ctx.sampleRate * 0.6);
+    noiseBuf = ctx.createBuffer(1, n2, ctx.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    let x = 2463534242;
+    for (let i = 0; i < n2; i++) {
+      x ^= x << 13;
+      x ^= x >>> 17;
+      x ^= x << 5;
+      d[i] = (x >>> 0) / 4294967296 * 2 - 1;
+    }
+    return ctx;
+  }
+  function unlock() {
+    if (!prefs.sound) return;
+    const c = ac();
+    if (c && c.state === "suspended") c.resume().catch(() => {
+    });
+  }
+  function env(g, t0, vol, att, dur) {
+    g.gain.setValueAtTime(1e-4, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + att);
+    g.gain.exponentialRampToValueAtTime(1e-4, t0 + dur);
+  }
+  function tone(f0, f1, dur, type = "square", vol = 0.4, at2 = 0) {
+    const t0 = ctx.currentTime + at2, o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(f0, t0);
+    o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t0 + dur);
+    env(g, t0, vol, 6e-3, dur);
+    o.connect(g);
+    g.connect(master);
+    o.start(t0);
+    o.stop(t0 + dur + 0.02);
+  }
+  function noise(dur, vol = 0.4, freq = 1200, type = "bandpass", at2 = 0) {
+    const t0 = ctx.currentTime + at2, s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    s.buffer = noiseBuf;
+    f.type = type;
+    f.frequency.value = freq;
+    f.Q.value = 0.9;
+    env(g, t0, vol, 4e-3, dur);
+    s.connect(f);
+    f.connect(g);
+    g.connect(master);
+    s.start(t0);
+    s.stop(t0 + dur + 0.02);
+  }
+  var SOUNDS = {
+    hit: () => noise(0.05, 0.18, 2600),
+    dot: () => noise(0.04, 0.08, 3800),
+    crit: () => {
+      noise(0.09, 0.45, 1800);
+      tone(520, 140, 0.14, "sawtooth", 0.22);
+    },
+    hurt: () => noise(0.07, 0.16, 700, "lowpass"),
+    heal: () => {
+      tone(520, 880, 0.16, "sine", 0.22);
+      tone(780, 1170, 0.16, "sine", 0.12, 0.05);
+    },
+    kick: () => {
+      tone(1400, 600, 0.07, "triangle", 0.35);
+      noise(0.05, 0.25, 4e3);
+    },
+    cast: () => {
+      tone(330, 330, 0.12, "square", 0.16);
+      tone(440, 440, 0.12, "square", 0.16, 0.16);
+    },
+    blast: () => {
+      noise(0.45, 0.6, 380, "lowpass");
+      tone(160, 45, 0.4, "sawtooth", 0.25);
+    },
+    pulse: () => {
+      noise(0.3, 0.45, 500, "lowpass");
+      tone(120, 60, 0.3, "square", 0.18);
+    },
+    buster: () => {
+      noise(0.18, 0.5, 900, "lowpass");
+      tone(220, 70, 0.18, "square", 0.22);
+    },
+    shield: () => {
+      tone(300, 620, 0.25, "sine", 0.25);
+      tone(450, 930, 0.25, "sine", 0.12, 0.04);
+    },
+    sbreak: () => {
+      noise(0.2, 0.4, 5200, "highpass");
+      tone(1200, 300, 0.2, "triangle", 0.2);
+    },
+    curse: () => tone(300, 180, 0.3, "triangle", 0.2),
+    kill: () => tone(660, 990, 0.06, "square", 0.14),
+    bosskill: () => {
+      [523, 659, 784, 1047].forEach((f, i) => tone(f, f, 0.16, "square", 0.2, i * 0.09));
+      noise(0.4, 0.3, 600, "lowpass");
+    },
+    die: () => tone(330, 70, 0.45, "sawtooth", 0.22),
+    boss: () => {
+      tone(110, 110, 0.22, "square", 0.25);
+      tone(98, 98, 0.35, "square", 0.25, 0.24);
+    },
+    horn: () => {
+      tone(392, 392, 0.18, "sawtooth", 0.2);
+      tone(523, 523, 0.32, "sawtooth", 0.22, 0.18);
+    },
+    win: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, f, 0.2, "square", 0.2, i * 0.11)),
+    lose: () => [392, 330, 262, 196].forEach((f, i) => tone(f, f * 0.98, 0.24, "triangle", 0.24, i * 0.14))
+  };
+  function play(name, at2 = 0) {
+    if (!prefs.sound || !ctx || ctx.state !== "running" || !SOUNDS[name]) return;
+    if (document.hidden) return;
+    const now2 = performance.now() + at2 * 1e3;
+    if (GAP[name] && last[name] && now2 - last[name] < GAP[name]) return;
+    last[name] = now2;
+    try {
+      if (at2 > 0) setTimeout(() => SOUNDS[name](), at2 * 1e3);
+      else SOUNDS[name]();
+    } catch (e) {
+    }
+  }
+
+  // src/ui/grid.js
+  var ROWS = 9;
+  var COLS = 7;
+  var MID = 4;
+  var COL = {
+    phys: "#f4ead0",
+    enemy: "#ff4d5e",
+    heal: "#57e09a",
+    shield: "#7fe3ff",
+    cast: "#ff8a3d",
+    curse: "#b072ff",
+    bolt: "#ffe14d",
+    gold: "#e8c06a",
+    white: "#ffffff"
+  };
+  var CLASS_COL = { guardian: "#5d8ff0", cleric: "#4fc17f", rogue: "#e3664f", mage: "#f08a4b", druid: "#8bc34a", shaman: "#5fb8e8" };
+  var BOSS_COL = "#b13e53";
+  var BOSS_PHASE = "#d8344a";
+  var FOE_COL = "#7a3a46";
+  var GOBLIN_COL = "#b8902e";
+  var DEAD_COL = "#3a4150";
+  var HERO_SLOTS = {
+    tank: [[5, 3], [5, 2], [5, 4]],
+    heal: [[7, 3], [7, 2], [7, 4]],
+    dps: [[6, 2], [6, 4], [6, 1], [6, 5], [7, 1], [7, 5], [8, 3]]
+  };
+  var ANY_HERO = [];
+  for (let r = 5; r < ROWS; r++) for (let c = 0; c < COLS; c++) ANY_HERO.push([r, c]);
+  var FOE_SLOTS = [[3, 3], [3, 2], [3, 4], [3, 1], [3, 5], [1, 0], [1, 6], [3, 0], [3, 6], [2, 0], [2, 6], [0, 0], [0, 6], [2, 1], [2, 5], [1, 1], [1, 5], [0, 3], [1, 3], [2, 3]];
+  var TRASH_SLOTS = [[2, 3], [2, 2], [2, 4], [1, 3], [1, 1], [1, 5], [2, 1], [2, 5], [3, 3], [0, 3], [1, 2], [1, 4], [3, 2], [3, 4], [2, 0], [2, 6], [0, 1], [0, 5], [3, 1], [3, 5]];
+  var root = null;
+  var board = null;
+  var cells = [];
+  var cur = null;
+  var waveSeen = -1;
+  var owners = /* @__PURE__ */ new Map();
+  var ghosts = /* @__PURE__ */ new Map();
+  var longAnims = /* @__PURE__ */ new Map();
+  var shakeAt = 0;
+  var at = (p) => cells[p[0]][p[1]];
+  var dist = (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1]));
+  function build() {
+    root = document.createElement("div");
+    root.className = "gstage";
+    board = document.createElement("div");
+    board.className = "gboard";
+    board.setAttribute("aria-hidden", "true");
+    root.appendChild(board);
+    cells = [];
+    for (let r = 0; r < ROWS; r++) {
+      cells.push([]);
+      for (let c = 0; c < COLS; c++) {
+        const el = document.createElement("div");
+        el.className = "gcell" + (r === MID ? " gmid" : "");
+        const floor = document.createElement("div");
+        floor.className = "gfloor";
+        const stack = document.createElement("div");
+        stack.className = "gstack";
+        const hp = document.createElement("div");
+        hp.className = "ghp";
+        hp.hidden = true;
+        hp.appendChild(document.createElement("i"));
+        const fx2 = document.createElement("div");
+        fx2.className = "gfx";
+        el.append(floor, stack, hp, fx2);
+        board.appendChild(el);
+        cells[r].push({ el, stack, hp, fx: fx2, base: 0, bonus: 0, color: null, glyph: "", shield: false, owner: null, sig: "" });
+      }
+    }
+  }
+  function clearCell(c) {
+    c.gen = (c.gen || 0) + 1;
+    Object.assign(c, { base: 0, bonus: 0, color: null, glyph: "", shield: false, owner: null });
+    c.hp.hidden = true;
+  }
+  function shade(hex, f) {
+    const n2 = parseInt(hex.slice(1), 16), ch = (s) => Math.round((n2 >> s & 255) * f);
+    return `rgb(${ch(16)},${ch(8)},${ch(0)})`;
+  }
+  function paint(c) {
+    const n2 = Math.max(0, c.base + c.bonus), sig = `${n2}|${c.color}|${c.glyph}|${c.shield}`;
+    if (sig === c.sig) return;
+    c.sig = sig;
+    c.stack.textContent = "";
+    for (let i = 0; i < n2; i++) {
+      const s = document.createElement("div");
+      s.className = "gslab";
+      s.style.setProperty("--i", i);
+      s.style.background = shade(c.color || DEAD_COL, 0.42 + 0.58 * (i + 1) / n2);
+      if (i === n2 - 1 && c.glyph) s.innerHTML = c.glyph;
+      c.stack.appendChild(s);
+    }
+    if (c.shield) {
+      const s = document.createElement("div");
+      s.className = "gslab gshield";
+      s.style.setProperty("--i", n2);
+      c.stack.appendChild(s);
+    }
+    const top = n2 + (c.shield ? 1 : 0);
+    c.fx.style.setProperty("--top", top);
+    c.hp.style.setProperty("--top", top);
+  }
+  function place(id, kind, unit, list, center) {
+    for (const p of list) at(p).owner = id;
+    owners.set(id, { kind, unit, cells: list, center: center || list[0] });
+  }
+  function freeOf(list) {
+    return list.find((p) => !at(p).owner);
+  }
+  function placeHeroes(b) {
+    for (const u of b.units) {
+      const p = freeOf(HERO_SLOTS[u.role] || []) || freeOf(ANY_HERO);
+      if (!p) continue;
+      place(u.id, "hero", u, [p]);
+    }
+  }
+  function bossBlocks(n2) {
+    if (n2 <= 1) return [{ r: 0, c: 2 }];
+    return [{ r: 0, c: 0 }, { r: 0, c: 4 }];
+  }
+  function placeFoe(e, hasBoss) {
+    const p = freeOf(hasBoss ? FOE_SLOTS : TRASH_SLOTS);
+    if (!p) return false;
+    place(e.id, "foe", e, [p]);
+    return true;
+  }
+  function placeWave(b) {
+    for (let r = 0; r <= MID; r++) for (let c = 0; c < COLS; c++) {
+      const cl = at([r, c]);
+      if (cl.owner) drop(cl.owner);
+      clearCell(cl);
+    }
+    const bosses = b.enemies.filter((e) => e.boss), blocks = bossBlocks(bosses.length);
+    bosses.slice(0, 2).forEach((e, i) => {
+      const { r, c } = blocks[i], list = [];
+      for (let y = 0; y < 3; y++) for (let x = 0; x < 3; x++) list.push([r + y, c + x]);
+      place(e.id, "boss", e, list, [r + 1, c + 1]);
+    });
+    for (const e of b.enemies) if (!e.boss && e.hp > 0) placeFoe(e, bosses.length > 0);
+    waveSeen = b.waveIdx;
+  }
+  function drop(id) {
+    const o = owners.get(id);
+    if (o) {
+      ghosts.set(id, o);
+      owners.delete(id);
+    }
+  }
+  function reset(b) {
+    owners = /* @__PURE__ */ new Map();
+    for (const k of [...longAnims.keys()]) stopLong(k);
+    for (const row2 of cells) for (const c of row2) {
+      clearCell(c);
+      c.sig = "";
+    }
+    placeHeroes(b);
+    placeWave(b);
+    cur = b;
+  }
+  function syncGrid(b) {
+    if (!root) build();
+    if (b !== cur) reset(b);
+    else if (b.waveIdx !== waveSeen) placeWave(b);
+    const hasBoss = b.enemies.some((e) => e.boss);
+    for (const e of b.enemies) if (!owners.has(e.id) && e.hp > 0 && placeFoe(e, hasBoss)) flashCells(owners.get(e.id).cells, COL.curse, { dur: 500, peak: 0.8 });
+    for (const [id, o] of owners) {
+      const u = o.unit, dead = u.hp <= 0;
+      if (o.kind === "hero") {
+        const c = at(o.center);
+        Object.assign(c, dead ? { base: 1, color: DEAD_COL, glyph: svg(CLASS_GLYPH[u.cls]) } : { base: u.role === "tank" ? 3 : 2, color: CLASS_COL[u.cls] || "#8e97a6", glyph: svg(CLASS_GLYPH[u.cls]) });
+        c.shield = !dead && u.shield > 0;
+        setHp(c, dead ? 0 : u.hp / u.max);
+      } else if (o.kind === "boss") {
+        for (const p of o.cells) {
+          const c = at(p), d = dist(p, o.center);
+          Object.assign(c, dead ? { base: d ? 0 : 1, color: DEAD_COL, glyph: "" } : { base: (d ? p[0] !== o.center[0] && p[1] !== o.center[1] ? 3 : 4 : 6) + (u.phased || u.bonded ? 2 : 0), color: u.phased || u.bonded ? BOSS_PHASE : BOSS_COL, glyph: d ? "" : svg(enemyGlyph(u)) });
+          c.shield = !dead && u.bshield > 0;
+        }
+        setHp(at(o.center), dead ? 0 : u.hp / u.max);
+      } else {
+        const c = at(o.center);
+        if (dead) {
+          clearCell(c);
+          drop(id);
+          continue;
+        }
+        Object.assign(c, { base: 2, color: u.goblin ? GOBLIN_COL : FOE_COL, glyph: svg(enemyGlyph(u)) });
+        setHp(c, u.hp / u.max);
+      }
+    }
+    for (const row2 of cells) for (const c of row2) paint(c);
+  }
+  function setHp(c, f) {
+    c.hp.hidden = false;
+    c.hp.firstChild.style.width = Math.max(0, Math.min(100, f * 100)) + "%";
+    c.hp.classList.toggle("low", f < 0.35);
+  }
+  function mountGrid(slot, b) {
+    if (!slot || !b) return;
+    syncGrid(b);
+    root.classList.toggle("iso", prefs.iso);
+    root.classList.toggle("lite", prefs.fx === "lite");
+    slot.appendChild(root);
+  }
+  function flash(p, o) {
+    const c = at(p), col = o.color;
+    const frames = o.outline ? [{ opacity: 0, background: "transparent", boxShadow: `inset 0 0 0 3px ${col}` }, { opacity: 1, offset: 0.4 }, { opacity: 0 }] : [{ opacity: 0, background: col, boxShadow: "none" }, { opacity: o.peak ?? 0.9, offset: 0.3 }, { opacity: 0 }];
+    return c.fx.animate(frames, { duration: o.dur ?? 300, delay: o.delay ?? 0, iterations: o.times ?? 1, easing: "ease-out" });
+  }
+  function flashCells(list, color, o = {}) {
+    return list.map((p) => flash(p, { color, ...o }));
+  }
+  function lift(p, k, ms, delay = 0) {
+    const c = at(p), g = c.gen;
+    setTimeout(() => {
+      if (c.gen !== g) return;
+      c.bonus += k;
+      paint(c);
+      setTimeout(() => {
+        if (c.gen !== g) return;
+        c.bonus -= k;
+        paint(c);
+      }, ms);
+    }, delay);
+  }
+  function line(a, b) {
+    const pts = [];
+    let [y0, x0] = a;
+    const [y1, x1] = b;
+    const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+    let err = dx + dy;
+    for (; ; ) {
+      pts.push([y0, x0]);
+      if (x0 === x1 && y0 === y1) break;
+      const e2 = 2 * err;
+      if (e2 >= dy) {
+        err += dy;
+        x0 += sx;
+      }
+      if (e2 <= dx) {
+        err += dx;
+        y0 += sy;
+      }
+    }
+    return pts;
+  }
+  function projectile(a, b, color, step, delay) {
+    const path = line(a, b).slice(1, -1);
+    path.forEach((p, i) => flash(p, { color, delay: delay + i * step, dur: Math.max(120, step * 4), peak: 0.75 }));
+    return delay + path.length * step;
+  }
+  function ring(src, list, color, step, o = {}) {
+    for (const p of list) flash(p, { color, delay: (o.delay || 0) + dist(p, src) * step, dur: o.dur || 380, peak: o.peak ?? 0.5 });
+  }
+  function area(r0, r1) {
+    const o = [];
+    for (let r = r0; r <= r1; r++) for (let c = 0; c < COLS; c++) o.push([r, c]);
+    return o;
+  }
+  function shake(px) {
+    if (!root || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const now2 = performance.now();
+    if (now2 - shakeAt < 400) return;
+    shakeAt = now2;
+    root.animate([{ transform: "translate(0,0)" }, { transform: `translate(${px}px,${-px / 2}px)` }, { transform: `translate(${-px}px,${px / 2}px)` }, { transform: "translate(0,0)" }], { duration: 240 });
+  }
+  function stopLong(key) {
+    const l = longAnims.get(key);
+    if (l) {
+      l.forEach((a) => a.cancel());
+      longAnims.delete(key);
+    }
+  }
+  var NOISY = /* @__PURE__ */ new Set(["hit", "hurt", "heal"]);
+  function playFx(b, evs, tickMs) {
+    if (!evs.length || !root || !root.isConnected || b !== cur || prefs.fx === "off") {
+      ghosts.clear();
+      return;
+    }
+    if (evs.length > 200) evs = evs.filter((e) => e.k === "end" || e.k === "kill" && e.boss);
+    const lite = prefs.fx === "lite";
+    const span = tickMs * 0.75, step = Math.max(14, Math.min(45, tickMs / 22));
+    const own = (id) => owners.get(id) || ghosts.get(id);
+    const ctr = (id) => {
+      const o = own(id);
+      return o && o.center;
+    };
+    const partyCells = () => [...owners.values()].filter((o) => o.kind === "hero").map((o) => o.center);
+    const foeCells = () => [...owners.values()].filter((o) => o.kind !== "hero").flatMap((o) => o.cells);
+    let shots = 0;
+    const maxShots = lite ? 0 : 10;
+    const seen = /* @__PURE__ */ new Set();
+    const big = evs.filter((e) => !NOISY.has(e.k)).length, nNoisy = evs.length - big;
+    let ni = 0;
+    evs.forEach((e, idx) => {
+      const d = NOISY.has(e.k) ? Math.round(span * (ni++ / Math.max(1, nNoisy))) : Math.round(span * (idx / evs.length) * 0.5);
+      const s = ctr(e.s), t = ctr(e.t);
+      switch (e.k) {
+        case "hit": {
+          if (!t) break;
+          const o = own(e.s), col = e.proc ? COL.bolt : o ? CLASS_COL[o.unit.cls] || COL.phys : COL.phys;
+          if (e.dot) {
+            const key = "dot" + e.t;
+            if (lite || seen.has(key)) break;
+            seen.add(key);
+            flash(t, { color: col, delay: d, dur: 220, peak: 0.3 });
+            play("dot");
+            break;
+          }
+          if (e.aoe) {
+            const key = "aoe" + e.s;
+            if (seen.has(key)) break;
+            seen.add(key);
+            const list = foeCells();
+            ring(s || t, list, col, lite ? 0 : step * 1.5, { delay: d, dur: 360, peak: 0.55 });
+            play("hit", d / 1e3);
+            break;
+          }
+          let hitAt = d;
+          if (s && shots < maxShots) {
+            shots++;
+            hitAt = projectile(s, t, col, step, d);
+          }
+          if (e.crit) {
+            flash(t, { color: col, delay: hitAt, dur: 480, peak: 1 });
+            lift(t, 2, Math.max(300, tickMs * 0.6), hitAt);
+            play("crit", hitAt / 1e3);
+          } else {
+            flash(t, { color: col, delay: hitAt, dur: 160, peak: 0.85 });
+            play("hit", hitAt / 1e3);
+          }
+          break;
+        }
+        case "hurt": {
+          if (!t) break;
+          const so = own(e.s);
+          if (e.kind === "magic") {
+            const key2 = "mg" + e.t;
+            if (seen.has(key2)) break;
+            seen.add(key2);
+            flash(t, { color: COL.curse, delay: d, dur: 260, peak: 0.35 });
+            break;
+          }
+          let hitAt = d;
+          if (so && so.kind === "boss" && !seen.has("bossatk" + e.s) && !lite) {
+            seen.add("bossatk" + e.s);
+            hitAt = projectile(so.center, t, COL.enemy, step, d);
+          }
+          const key = "hurt" + e.t;
+          if (seen.has(key)) break;
+          seen.add(key);
+          flash(t, { color: COL.enemy, delay: hitAt, dur: 200, peak: 0.55 });
+          play("hurt", hitAt / 1e3);
+          break;
+        }
+        case "heal": {
+          if (!t) break;
+          if (e.big) {
+            flash(t, { color: COL.heal, delay: d, dur: 900, peak: 1 });
+            lift(t, 2, 900, d);
+            play("heal", d / 1e3);
+            break;
+          }
+          const key = "heal" + e.t;
+          if (seen.has(key)) break;
+          seen.add(key);
+          let hitAt = d;
+          if (s && e.s !== e.t && !lite && !seen.has("healer" + e.s)) {
+            seen.add("healer" + e.s);
+            hitAt = projectile(s, t, COL.heal, step * 1.8, d);
+          }
+          flash(t, { color: COL.heal, delay: hitAt, dur: 600, peak: 0.55 });
+          lift(t, 1, 500, hitAt);
+          play("heal", hitAt / 1e3);
+          break;
+        }
+        case "kick": {
+          stopLong("cast" + e.t);
+          const hitAt = s && t && !lite ? projectile(s, t, COL.white, step * 0.7, d) : d;
+          if (t) flash(t, { color: COL.white, delay: hitAt, dur: 140, times: 3, peak: 1 });
+          play("kick", hitAt / 1e3);
+          break;
+        }
+        case "dispel":
+          stopLong("curse" + e.t);
+          if (t) flash(t, { color: COL.heal, delay: d, dur: 500, peak: 0.9 });
+          play("heal", d / 1e3);
+          break;
+        case "cast": {
+          if (!s) break;
+          stopLong("cast" + e.s);
+          const total = e.time * tickMs, list = partyCells(), anims = [];
+          const slowN = Math.max(1, Math.floor(total * 0.6 / 700)), fastStart = slowN * 700, fastN = Math.max(2, Math.floor((total - fastStart) / 180));
+          for (const p of list) {
+            anims.push(flash(p, { color: COL.cast, outline: true, dur: 700, times: slowN, delay: d }));
+            anims.push(flash(p, { color: COL.cast, outline: true, dur: 180, times: fastN, delay: d + fastStart }));
+          }
+          anims.push(flash(s, { color: COL.cast, dur: 400, times: Math.max(2, Math.floor(total / 400)), peak: 0.6, delay: d }));
+          longAnims.set("cast" + e.s, anims);
+          play("cast", d / 1e3);
+          break;
+        }
+        case "blast": {
+          stopLong("cast" + e.s);
+          for (const p of area(MID, ROWS - 1)) flash(p, { color: COL.cast, delay: d + (p[0] - MID) * step * 2, dur: 420, peak: 0.9 });
+          setTimeout(() => shake(5), d + 120);
+          play("blast", d / 1e3);
+          break;
+        }
+        case "pulse":
+          if (s) {
+            ring(s, area(0, ROWS - 1), COL.enemy, lite ? 0 : step * 2, { delay: d, dur: 380, peak: 0.45 });
+            setTimeout(() => shake(4), d + 150);
+            play("pulse", d / 1e3);
+          }
+          break;
+        case "buster": {
+          const hitAt = s && t && !lite ? projectile(s, t, COL.enemy, step * 0.8, d) : d;
+          if (t) {
+            flash(t, { color: COL.enemy, delay: hitAt, dur: 420, peak: 1 });
+            lift(t, -1, 500, hitAt);
+          }
+          setTimeout(() => shake(3), hitAt);
+          play("buster", hitAt / 1e3);
+          break;
+        }
+        case "curse": {
+          if (!t) break;
+          stopLong("curse" + e.t);
+          longAnims.set("curse" + e.t, [flash(t, { color: COL.curse, outline: true, dur: 900, times: Math.max(1, Math.round(e.dur * tickMs / 900)), delay: d })]);
+          play("curse", d / 1e3);
+          break;
+        }
+        case "shield": {
+          const o = owners.get(e.s);
+          if (o) flashCells(o.cells, COL.shield, { delay: d, dur: 420, peak: 0.8 });
+          play("shield", d / 1e3);
+          break;
+        }
+        case "sbreak": {
+          const o = owners.get(e.t);
+          if (o) flashCells(o.cells, COL.shield, { delay: d, dur: 140, times: 3, peak: 1 });
+          play("sbreak", d / 1e3);
+          break;
+        }
+        case "sfail": {
+          const o = owners.get(e.t);
+          if (o) flashCells(o.cells, COL.heal, { delay: d, dur: 700, peak: 0.7 });
+          play("heal", d / 1e3);
+          break;
+        }
+        case "phase": {
+          const o = owners.get(e.s);
+          if (o) flashCells(o.cells, COL.enemy, { delay: d, dur: 600, peak: 0.95 });
+          setTimeout(() => shake(6), d);
+          play("boss", d / 1e3);
+          break;
+        }
+        case "summon": {
+          const o = owners.get(e.s);
+          if (o) flashCells(o.cells, COL.curse, { delay: d, dur: 500, peak: 0.6 });
+          break;
+        }
+        case "kill": {
+          const o = own(e.t), list = o ? o.cells : t ? [t] : [];
+          flashCells(list, COL.white, { delay: d, dur: 380, peak: 1 });
+          if (e.boss) {
+            const c = o && o.center || t;
+            if (c) ring(c, area(0, ROWS - 1), COL.gold, step * 2, { delay: d + 150, dur: 500, peak: 0.5 });
+            play("bosskill", d / 1e3);
+          } else play("kill", d / 1e3);
+          break;
+        }
+        case "die":
+          if (t) flash(t, { color: COL.enemy, delay: d, dur: 600, peak: 1 });
+          play("die", d / 1e3);
+          break;
+        case "immune":
+          if (t) flash(t, { color: COL.shield, delay: d, dur: 600, peak: 0.9 });
+          break;
+        case "volc":
+          if (t) flash(t, { color: COL.cast, delay: d, dur: 500, peak: 0.85 });
+          break;
+        case "horn": {
+          const pc = partyCells();
+          ring([6, 3], area(MID + 1, ROWS - 1), COL.gold, step * 2, { delay: d, dur: 500, peak: 0.5 });
+          pc.forEach((p) => lift(p, 1, 700, d));
+          play("horn", d / 1e3);
+          break;
+        }
+        case "lust": {
+          ring(s || [6, 3], area(MID + 1, ROWS - 1), COL.bolt, step * 2, { delay: d, dur: 450, peak: 0.45 });
+          play("horn", d / 1e3);
+          break;
+        }
+        case "wave":
+          if (e.boss) {
+            const o = [...owners.values()].find((x) => x.kind === "boss");
+            if (o) {
+              flashCells(o.cells, COL.enemy, { delay: d, dur: 700, peak: 0.8 });
+              o.cells.forEach((p) => lift(p, 2, 600, d));
+            }
+            play("boss", d / 1e3);
+          }
+          break;
+        case "end": {
+          const list = area(0, ROWS - 1);
+          for (const p of list) flash(p, { color: e.win ? COL.gold : COL.enemy, delay: d + (e.win ? ROWS - 1 - p[0] : p[0]) * step * 2, dur: 520, peak: e.win ? 0.45 : 0.3 });
+          play(e.win ? "win" : "lose", d / 1e3);
+          break;
+        }
+      }
+    });
+    ghosts.clear();
+  }
+
   // src/ui/battle-runner.js
   function startBattle(dIdx) {
     const p = partyHeroes(app.S);
@@ -5520,6 +6251,7 @@
   }
   function runTimer() {
     clearInterval(app.bTimer);
+    if (app.battle && !app.battle.over && !app.battle.fxq) app.battle.fxq = [];
     app.bTimer = setInterval(stepBattle, TICK_MS / app.speed);
   }
   function stepBattle() {
@@ -5527,10 +6259,13 @@
       clearInterval(app.bTimer);
       return;
     }
-    app.battle.step();
-    if (app.battle.over) finishBattle();
+    const b = app.battle;
+    b.step();
+    const evs = b.fxq ? b.fxq.splice(0) : [];
+    if (b.over) finishBattle();
     else if (app.tab === "battle") app.render(true);
     else app.renderTabs();
+    if (app.tab === "battle") playFx(b, evs, TICK_MS / app.speed);
   }
   function finishBattle() {
     clearInterval(app.bTimer);
@@ -5600,6 +6335,7 @@
     if (app.tab === "battle") {
       const lg = $(".log");
       if (lg) lg.scrollTop = lg.scrollHeight;
+      mountGrid($("#gridSlot"), app.battle);
     } else if (tutActive(app.S) && !app.fresh) v.insertAdjacentHTML("afterbegin", coachCard());
     tutHighlight();
     if (!skipModal) renderModal();
@@ -5646,6 +6382,7 @@
   app.openModal = openModal;
   app.renderTabs = renderTabs;
   document.addEventListener("click", (e) => {
+    unlock();
     const t = e.target.closest("[data-tab],[data-act]");
     if (!t) return;
     if (t.dataset.act === "close") {
@@ -5834,10 +6571,36 @@
           const b = app.battle;
           b.opts.autoHorn = true;
           if (b.waveIdx === b.waves.length - 1) b.useHorn();
+          b.fxq = null;
           b.runToEnd();
           finishBattle();
         }
         break;
+      case "pref": {
+        const k = t.dataset.k, v = t.dataset.v, val = k === "fx" ? v : v === "1";
+        if (prefs[k] === val) break;
+        setPref(k, val);
+        if (k === "sound") {
+          if (val) {
+            unlock();
+            play("heal");
+          }
+          sendEvent(tx("\u97F3\u6548\u8A2D\u5B9A"), val ? tx("\u958B") : tx("\u95DC"));
+        }
+        if (k === "fx") sendEvent(tx("\u6230\u9B25\u7279\u6548"), { full: tx("\u5B8C\u6574"), lite: tx("\u7C21\u5316"), off: tx("\u95DC") }[val]);
+        if (app.modal) renderModal();
+        else render(true);
+        return;
+      }
+      case "mute":
+        setPref("sound", !prefs.sound);
+        if (prefs.sound) {
+          unlock();
+          play("heal");
+        }
+        sendEvent(tx("\u97F3\u6548\u8A2D\u5B9A"), prefs.sound ? tx("\u958B") : tx("\u95DC"));
+        render(true);
+        return;
       case "retreat":
         if (app.battle && !app.battle.over) {
           clearInterval(app.bTimer);

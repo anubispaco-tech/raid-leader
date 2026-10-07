@@ -4,6 +4,7 @@ import * as G from '../../core/index.js';
 import { app, canSkip } from '../state.js';
 import { fmt, pct, mmss, itemStatText, itemName, firstWinLine } from '../helpers.js';
 import { enemyIcon, svg, HORN } from '../icons.js';
+import { prefs } from '../prefs.js';
 
 // 敵方最多顯示 4 列、固定高度，召喚物變多時不會把下面的東西往下推
 const MAX_FOE_ROWS = 4;
@@ -25,7 +26,7 @@ export function viewBattle() {
   if (!app.battle) return tx('<h2>戰鬥</h2><div class="empty">目前沒有進行中的戰鬥。<br>到「副本」選一層開始挑戰。<br><br><button class="btn main" data-tab="dungeon">前往副本</button></div>');
   const d = G.dungeonInfo(app.battle.dIdx), b = app.battle;
   if (b.vault) d.name = tx('寶庫・第 {0} 層', b.vault.floor + 1);
-  let h = tx('<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}</div> {5}{6} <div class="arena"> <div class="side foes"><span class="label">敵方・{7}</span>{8}</div> <div class="side"><span class="label">我方隊伍</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>', d.name, b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : '', b.tick, b.vault ? '' : `<div class="waves">`, b.vault ? '' : b.waves.map((_, i) => `<i class="${i < b.waveIdx || (b.over && b.win) ? 'done' : i === b.waveIdx ? 'cur' : ''}"></i>`).join('') + '</div>', b.mythic ? mythicTimerBar(b) : '', b.vault ? vaultBar(b) : '', b.waveIdx === b.waves.length - 1 ? tx('首領戰') : tx('第 {0} 波', b.waveIdx + 1), enemyRows(b), b.units.map(u => unitRow(u, false)).join(''), b.log.map(l => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, ' ')}</span>${l.msg}</p>`).join(''));
+  let h = tx('<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}{13}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">敵方・{7}</span>{8}</div> <div class="side"><span class="label">我方隊伍</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>', d.name, b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : '', b.tick, b.vault ? '' : `<div class="waves">`, b.vault ? '' : b.waves.map((_, i) => `<i class="${i < b.waveIdx || (b.over && b.win) ? 'done' : i === b.waveIdx ? 'cur' : ''}"></i>`).join('') + '</div>', b.mythic ? mythicTimerBar(b) : '', b.vault ? vaultBar(b) : '', b.waveIdx === b.waves.length - 1 ? tx('首領戰') : tx('第 {0} 波', b.waveIdx + 1), enemyRows(b), b.units.map(u => unitRow(u, false)).join(''), b.log.map(l => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, ' ')}</span>${l.msg}</p>`).join(''), prefs.fx !== 'off' ? '<div id="gridSlot" class="gridslot"></div>' : '', prefs.fx !== 'off' ? ' compact' : '', muteBtn());
   if (!b.over) {
     h += tx('<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">撤退</button></div></div>', [1, 2, 4].map(x => `<button data-act="speed" data-x="${x}" class="${app.speed === x ? 'sel' : ''}">${x}×</button>`).join(''), hornBtn(b), canSkip(b) ? tx('<button class="btn" data-act="skip">直接結算</button>') : tx('<button class="btn" disabled title="首次挑戰需完整觀戰（可用 4× 加速）">🔒 結算</button>'));
   }
@@ -41,6 +42,10 @@ function mythicTimerBar(b) {
 function vaultBar(b) {
   const left = Math.max(0, b.vault.dur - b.tick), f = b.vault.floor, cap = G.vaultMaxKills(f);
   return tx('<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">剩 {1}</span></div> <div class="vaultcount"><b class="num">{2}</b> 隻哥布林・<span class="num">+{3}</span> 金{4}</div>', pct(b.tick, b.vault.dur), mmss(left), b.kills, fmt(Math.min(b.kills, cap) * G.vaultGoldPerKill(f)), b.kills >= cap ? tx('（已達金幣上限）') : tx('<span class="sub" style="margin:0">　金幣算到 {0} 隻</span>', cap));
+}
+// v0.20 音效快速開關
+function muteBtn() {
+  return `<button class="mute ${prefs.sound ? '' : 'off'}" data-act="mute" aria-pressed="${prefs.sound}" aria-label="${prefs.sound ? tx('關閉音效') : tx('開啟音效')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/>${prefs.sound ? '<path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/>' : '<path d="m16 9 5 6M21 9l-5 6"/>'}</svg></button>`;
 }
 function hornBtn(b) {
   const on = b.hornActive(), left = b.horn.until - b.tick;

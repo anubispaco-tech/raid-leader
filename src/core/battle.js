@@ -15,18 +15,18 @@ import { PACKS, roleOf } from './classes/index.js';
 const BOSS_MECHS = {
   enrage(b, e, m) {
     if (b.waveTick < m.at) return 1;
-    if (b.waveTick === m.at) b.push(tx('🔥 {0} 狂暴了！傷害大增', e.name), 'warn');
+    if (b.waveTick === m.at) { b.push(tx('🔥 {0} 狂暴了！傷害大增', e.name), 'warn'); b.fx({ k: 'phase', s: e.id }); }
     return m.mult;
   },
   pulse(b, e, m) {
     if (b.waveTick % m.every) return 1;
-    b.push(tx('💥 {0} 施放範圍攻擊', e.name), 'warn');
+    b.push(tx('💥 {0} 施放範圍攻擊', e.name), 'warn'); b.fx({ k: 'pulse', s: e.id });
     for (const u of b.alive()) b.hitHero(u, e.atk * m.dmg * b.weakMult(e), 'magic');
     return 1;
   },
   buster(b, e, m, tgt) {
     if (b.waveTick % m.every) return 1;
-    b.push(tx('⚡ {0} 對 {1} 重擊', e.name, tgt.name), 'warn');
+    b.push(tx('⚡ {0} 對 {1} 重擊', e.name, tgt.name), 'warn'); b.fx({ k: 'buster', s: e.id, t: tgt.id });
     b.isBuster = true;
     return m.mult;
   },
@@ -36,37 +36,37 @@ const BOSS_MECHS = {
     if (b.waveTick % m.every) return 1;
     const pool = b.alive().filter(u => !(u.curse > b.tick)); if (!pool.length) return 1;
     const u = pick(pool); u.curse = b.tick + m.dur; u.cursePct = m.pct;
-    b.push(tx('☠ {0} 詛咒了 {1}', e.name, u.name), 'warn');
+    b.push(tx('☠ {0} 詛咒了 {1}', e.name, u.name), 'warn'); b.fx({ k: 'curse', s: e.id, t: u.id, dur: m.dur });
     return 1;
   },
   // 讀條：time 秒後全隊受到魔法傷害（攻擊 × mult）；能打斷的職業會在讀條時打斷
   cast(b, e, m) {
     if (b.waveTick % m.every || e.casting) return 1;
     e.casting = { until: b.tick + m.time, mult: m.mult };
-    b.push(tx('📖 {0} 開始讀條（{1} 秒）', e.name, m.time), 'warn');
+    b.push(tx('📖 {0} 開始讀條（{1} 秒）', e.name, m.time), 'warn'); b.fx({ k: 'cast', s: e.id, time: m.time });
     return 1;
   },
   // 護盾：獲得最大生命 pct 的護盾，window 秒內沒打破就回復 heal 的生命
   shield(b, e, m) {
     if (b.waveTick % m.every) return 1;
     e.bshield = Math.round(e.max * m.pct); e.bshieldUntil = b.tick + m.window; e.bshieldHeal = m.heal;
-    b.push(tx('🛡 {0} 張開護盾！{1} 秒內打破它', e.name, m.window), 'warn');
+    b.push(tx('🛡 {0} 張開護盾！{1} 秒內打破它', e.name, m.window), 'warn'); b.fx({ k: 'shield', s: e.id });
     return 1;
   },
   // 轉階段：生命低於 at 時攻擊永久 ×atk
   phase(b, e, m) {
-    if (!e.phased && e.hp < e.max * m.at) { e.phased = true; e.atk *= m.atk; b.push(tx('🌑 {0} 進入第二階段！攻擊大增', e.name), 'warn'); }
+    if (!e.phased && e.hp < e.max * m.at) { e.phased = true; e.atk *= m.atk; b.push(tx('🌑 {0} 進入第二階段！攻擊大增', e.name), 'warn'); b.fx({ k: 'phase', s: e.id }); }
     return 1;
   },
   // 雙首領的羈絆：另一隻先倒下，這隻攻擊 ×mult
   bond(b, e, m) {
-    if (!e.bonded && b.enemies.some(x => x.boss && x !== e && x.hp <= 0)) { e.bonded = true; e.atk *= m.mult; b.push(tx('💢 {0} 悲憤交加，攻擊大增', e.name), 'warn'); }
+    if (!e.bonded && b.enemies.some(x => x.boss && x !== e && x.hp <= 0)) { e.bonded = true; e.atk *= m.mult; b.push(tx('💢 {0} 悲憤交加，攻擊大增', e.name), 'warn'); b.fx({ k: 'phase', s: e.id }); }
     return 1;
   },
   summon(b, e, m) {
     if (b.waveTick % m.every) return 1;
     for (let k = 0; k < m.n; k++) b.enemies.push({ name: tx('召喚物'), hp: e.addHp, max: e.addHp, atk: e.addAtk, boss: false, id: uid() });
-    b.push(tx('🌀 {0} 召喚了 {1} 隻小怪', e.name, m.n), 'warn');
+    b.push(tx('🌀 {0} 召喚了 {1} 隻小怪', e.name, m.n), 'warn'); b.fx({ k: 'summon', s: e.id });
     return 1;
   },
 };
@@ -110,6 +110,8 @@ export class Battle {
   has(affix) { return !!this.mythic && this.mythic.affixes.includes(affix); }
   alive() { return this.units.filter(u => u.hp > 0); }
   foes() { return this.enemies.filter(e => e.hp > 0); }
+  // v0.20 演出事件：只有畫面層設了 fxq 才記錄（模擬不受影響），不使用亂數
+  fx(ev) { if (this.fxq) this.fxq.push(ev); }
   push(msg, cls = '') { this.log.push({ t: this.tick, msg, cls }); if (this.log.length > 80) this.log.shift(); }
   skillLog(u, name, t) { this.push(tx('{0} {1}：{2}{3}', u.icon, u.name, name, t && t.name !== u.name ? ` → ${t.name}` : ''), 'skill'); }
 
@@ -118,6 +120,7 @@ export class Battle {
   useHorn() {
     if (this.horn.used || this.over) return false;
     this.horn.used = true; this.horn.until = this.tick + RAID_HORN.dur;
+    this.fx({ k: 'horn' });
     this.push(tx('📯 英勇號角！全隊傷害與治療 +{0}%，持續 {1} 秒', Math.round(RAID_HORN.bonus * 100), RAID_HORN.dur), 'info');
     return true;
   }
@@ -126,6 +129,7 @@ export class Battle {
   startLust(src, dur, haste, proc = 0, procMult = 1) {
     if (this.lust.used || this.over) return false;
     Object.assign(this.lust, { used: true, until: this.tick + dur, haste, proc, procMult, src });
+    this.fx({ k: 'lust', s: src.id });
     this.push(tx('🥁 {0} 施放嗜血！全隊出手速度 +{1}%，持續 {2} 秒', src.name, Math.round(haste * 100), dur), 'info');
     return true;
   }
@@ -150,9 +154,10 @@ export class Battle {
     amt = Math.min(e.hp, Math.round(amt * rnd(0.92, 1.08)));
     if (e.bshield > 0) { // 首領護盾先吸收
       const ab = Math.min(e.bshield, amt); e.bshield -= ab; e.hp += ab;
-      if (e.bshield === 0) this.push(tx('💥 {0} 的護盾被打破了', e.name), 'good');
+      if (e.bshield === 0) { this.push(tx('💥 {0} 的護盾被打破了', e.name), 'good'); this.fx({ k: 'sbreak', t: e.id }); }
     }
     e.hp -= amt; u.dmgDone += amt; if (o.skill || o.dot) u.skillDmg += amt;
+    this.fx({ k: 'hit', s: u.id, t: e.id, crit, aoe: !!o.aoe, dot: !!o.dot, proc: !!o.proc, skill: !!o.skill });
     if (u.hk.afterHit) u.hk.afterHit(this, u, e, amt, o);           // 掛勾：命中後（吸血、疊毒、額外目標…）
     if (this.lust.proc && !o.dot && !o.proc && this.lustActive() && R() < this.lust.proc) { // 風暴之怒：引發閃電
       const L = this.lust, t = e.hp > amt ? e : this.foes().find(x => x !== e);
@@ -161,7 +166,7 @@ export class Battle {
     if (e.hp === 0) {
       if (e.goblin) this.kills = (this.kills || 0) + 1;
       if (u.lh.onKill) u.lh.onKill(this, u, e);                     // 傳說掛勾：擊殺後
-      this.push(tx('{0} 被擊殺', e.name), e.boss ? 'good' : '');
+      this.push(tx('{0} 被擊殺', e.name), e.boss ? 'good' : ''); this.fx({ k: 'kill', t: e.id, boss: !!e.boss });
       if (!e.boss && this.has('bolstering')) { // 繁盛：其他小怪變強
         const rest = this.foes().filter(x => !x.boss);
         for (const x of rest) { x.max = Math.round(x.max * 1.15); x.hp = Math.round(x.hp * 1.15); x.atk *= 1.15; }
@@ -189,6 +194,7 @@ export class Battle {
     amt = Math.round(amt * Math.max(0.05, red) * rnd(0.9, 1.1));
     const absorbed = Math.min(u.shield, amt); u.shield -= absorbed; amt -= absorbed;
     u.hp = Math.max(0, u.hp - amt); u.taken += amt;
+    this.fx({ k: 'hurt', s: attacker ? attacker.id : null, t: u.id, kind });
     if (u.role === 'tank' && kind !== 'magic' && this.has('necrotic')) u.necro = Math.min(40, u.necro + 1);
     if (kind !== 'magic' && m.counter && attacker && R() < m.counter) this.hitEnemy(u, attacker, u.pow);
     this.lifeSavers(u);
@@ -199,7 +205,7 @@ export class Battle {
   lifeSavers(u) {
     const save = (key, below, dur, name) => {
       if (u.used[key] || u.hp >= u.max * below) return;
-      u.used[key] = true; u.hp = Math.max(1, u.hp); u.buf.immune = this.tick + dur; this.skillLog(u, name);
+      u.used[key] = true; u.hp = Math.max(1, u.hp); u.buf.immune = this.tick + dur; this.skillLog(u, name); this.fx({ k: 'immune', t: u.id });
     };
     if (u.hk.lifeSaver) u.hk.lifeSaver(this, u, save);
     if (u.mods.iceBlock) save('ice', 0.3, u.mods.iceBlock, tx('寒冰屏障'));
@@ -207,14 +213,15 @@ export class Battle {
   }
   onDeath(u) {
     const priest = this.alive().find(x => x.mods.redemption && !x.used.redemption);
-    if (priest) { priest.used.redemption = true; u.hp = Math.round(u.max * priest.mods.redemption); this.skillLog(priest, tx('救贖'), u); return; }
-    this.push(tx('💀 {0}（{1}）陣亡', u.name, u.pack.name), 'bad');
+    if (priest) { priest.used.redemption = true; u.hp = Math.round(u.max * priest.mods.redemption); this.skillLog(priest, tx('救贖'), u); this.fx({ k: 'heal', s: priest.id, t: u.id, big: true }); return; }
+    this.push(tx('💀 {0}（{1}）陣亡', u.name, u.pack.name), 'bad'); this.fx({ k: 'die', t: u.id });
   }
   heal(src, tgt, amt, raw = false) {
     if (tgt.hp <= 0) return 0;
     const necro = tgt.necro ? Math.max(0.2, 1 - 0.02 * tgt.necro) : 1; // 壞疽
     const h = Math.min(tgt.max - tgt.hp, Math.round(amt * (raw ? 1 : this.healMult(src)) * necro));
     tgt.hp += h; src.healDone += h;
+    if (h > 0) this.fx({ k: 'heal', s: src.id, t: tgt.id });
     if (src.lh.onHeal && !raw) src.lh.onHeal(this, src, tgt, amt, h); // 傳說掛勾：治療後
     return h;
   }
@@ -222,12 +229,12 @@ export class Battle {
   utility(u, foes) {
     const caster = foes.find(e => e.casting);
     if (caster && u.pack.kick && u.pack.kick(u) && (u.cd.kick || 0) <= this.tick) {
-      caster.casting = null; u.cd.kick = this.tick + (u.mods.kickCd || 12);
+      caster.casting = null; u.cd.kick = this.tick + (u.mods.kickCd || 12); this.fx({ k: 'kick', s: u.id, t: caster.id });
       this.skillLog(u, tx('打斷'), caster); return true;
     }
     if (u.role === 'heal' && (u.cd.dispel || 0) <= this.tick) {
       const c = this.alive().find(x => x.curse > this.tick);
-      if (c) { c.curse = 0; u.cd.dispel = this.tick + (u.mods.dispelCd || 6); this.skillLog(u, tx('淨化'), c); return true; }
+      if (c) { c.curse = 0; u.cd.dispel = this.tick + (u.mods.dispelCd || 6); this.skillLog(u, tx('淨化'), c); this.fx({ k: 'dispel', s: u.id, t: c.id }); return true; }
     }
     return false;
   }
@@ -247,7 +254,7 @@ export class Battle {
     }
     for (const e of this.foes()) if (e.bshield > 0 && this.tick >= e.bshieldUntil) { // 護盾時間到：首領回血
       e.bshield = 0; const h = Math.round(e.max * e.bshieldHeal); e.hp = Math.min(e.max, e.hp + h);
-      this.push(tx('💚 護盾沒被打破，{0} 回復了 {1} 生命', e.name, h), 'bad');
+      this.push(tx('💚 護盾沒被打破，{0} 回復了 {1} 生命', e.name, h), 'bad'); this.fx({ k: 'sfail', t: e.id });
     }
     for (const u of this.alive()) if (u.curse > this.tick) this.hitHero(u, u.max * u.cursePct, 'magic');
     for (const u of this.alive()) {
@@ -280,29 +287,29 @@ export class Battle {
     }
     for (const e of this.foes()) if (e.casting && this.tick >= e.casting.until) { // 讀條完成：全隊受傷
       const c = e.casting; e.casting = null;
-      this.push(tx('💥 {0} 讀條完成，全隊受到重創', e.name), 'bad');
+      this.push(tx('💥 {0} 讀條完成，全隊受到重創', e.name), 'bad'); this.fx({ k: 'blast', s: e.id });
       for (const u of this.alive()) this.hitHero(u, e.atk * c.mult * this.weakMult(e), 'magic');
     }
     if (this.has('volcanic') && this.waveTick % 8 === 0 && this.alive().length) { // 火山
-      const u = pick(this.alive()); this.push(tx('🌋 火山爆發，{0} 受到傷害', u.name), 'warn');
+      const u = pick(this.alive()); this.push(tx('🌋 火山爆發，{0} 受到傷害', u.name), 'warn'); this.fx({ k: 'volc', t: u.id });
       this.hitHero(u, this.mythic.volcanic, 'magic');
     }
     if (this.mythic && this.tick === this.mythic.timer && !this.over) this.push(tx('⏰ 超過限時！仍可打完，但鑰石會降級'), 'bad');
     this.checkEnd();
   }
   checkEnd() {
-    if (!this.alive().length) { this.over = true; this.win = false; this.push(tx('☠️ 團滅…'), 'bad'); return; }
+    if (!this.alive().length) { this.over = true; this.win = false; this.push(tx('☠️ 團滅…'), 'bad'); this.fx({ k: 'end', win: false }); return; }
     if (!this.foes().length) {
       if (this.waveIdx < this.waves.length - 1) {
         this.waveIdx++;
         for (const u of this.alive()) u.hp = Math.min(u.max, u.hp + Math.round(u.max * DUNGEON.waveHeal));
         this.push(this.waveIdx === this.waves.length - 1 ? tx('👑 首領 {0} 現身！', this.waves[this.waveIdx][0].name) : tx('第 {0} 波敵人來襲', this.waveIdx + 1), 'info');
-        this.loadWave();
-      } else { this.over = true; this.win = true; this.push(tx('🏆 副本通關！'), 'good'); }
+        this.loadWave(); this.fx({ k: 'wave', boss: this.waveIdx === this.waves.length - 1 });
+      } else { this.over = true; this.win = true; this.push(tx('🏆 副本通關！'), 'good'); this.fx({ k: 'end', win: true }); }
     }
     if (this.tick >= this.maxTicks && !this.over) {
-      if (this.vault) { this.over = true; this.win = true; this.push(tx('⏰ 時間到！共打倒 {0} 隻寶藏哥布林', this.kills || 0), 'good'); }
-      else { this.over = true; this.win = false; this.push(tx('⌛ 時間耗盡，撤退'), 'bad'); }
+      if (this.vault) { this.over = true; this.win = true; this.push(tx('⏰ 時間到！共打倒 {0} 隻寶藏哥布林', this.kills || 0), 'good'); this.fx({ k: 'end', win: true }); }
+      else { this.over = true; this.win = false; this.push(tx('⌛ 時間耗盡，撤退'), 'bad'); this.fx({ k: 'end', win: false }); }
     }
   }
   runToEnd() { while (!this.over) this.step(); return this; }

@@ -6,6 +6,7 @@ import { app } from '../state.js';
 import { enabled } from '../telemetry.js';
 import { esc, fmt } from '../helpers.js';
 import { cloudEnabled, loggedIn, cloud, fmtTime } from '../cloud.js';
+import { prefs } from '../prefs.js';
 
 function cloudBlock() {
   if (!loggedIn()) return `<span class="label">${tx('雲端存檔')}</span>
@@ -16,6 +17,7 @@ function cloudBlock() {
     <p class="sub" style="margin:0">${cloud.busy ? tx('上傳中…') : i ? (i.updated ? tx('已登入・雲端最後備份 {0}（{1}）', fmtTime(i.updated), esc(i.summary || '—')) : tx('已登入・雲端還沒有存檔')) : tx('已登入・讀取雲端狀態中…')}<br>${tx('自動同步：開啟遊戲時載入較新的雲端進度；有新進度時每 {0} 分鐘、以及離開遊戲時自動上傳。', G.CLOUD.autoMin)}</p>
     <div class="row"><button class="btn main" data-act="cloudup" ${cloud.busy ? 'disabled' : ''}>${tx('立即上傳')}</button><button class="btn" data-act="clouddown">${tx('從雲端下載')}</button><button class="btn" data-act="cloudout">${tx('登出')}</button></div>`;
 }
+const seg = (k, opts, cur) => `<div class="seg sm">${opts.map(([v, n]) => `<button data-act="pref" data-k="${k}" data-v="${v}" class="${v === cur ? 'sel' : ''}">${n}</button>`).join('')}</div>`;
 const row = (label, value) => `<div class="set"><span>${label}</span>${value}</div>`;
 export function sheetSettings() {
   const S = app.S, p = S.player, sec = p.playSec || 0;
@@ -32,6 +34,12 @@ export function sheetSettings() {
     <span class="label">${tx('存檔')}</span>
     <p class="sub" style="margin:0">${tx('進度存在這台裝置的瀏覽器。換裝置前，先匯出存檔碼。')}</p>
     <div class="row"><button class="btn" data-act="export">${tx('匯出存檔碼')}</button><button class="btn" data-act="import">${tx('匯入')}</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">${tx('重新開始')}</button></div>
+    <span class="label">${tx('戰鬥畫面')}</span><div class="settings">
+      ${row(tx('格子特效'), seg('fx', [['full', tx('完整')], ['lite', tx('簡化')], ['off', tx('關')]], prefs.fx))}
+      ${row(tx('立體視角'), seg('iso', [['0', tx('關')], ['1', tx('開')]], prefs.iso ? '1' : '0'))}
+      ${row(tx('音效'), seg('sound', [['1', tx('開')], ['0', tx('關')]], prefs.sound ? '1' : '0'))}
+    </div>
+    <p class="sub" style="margin:0">${tx('「簡化」只保留命中與首領機制的閃爍；「關」改回文字列表。設定只存在這台裝置。')}</p>
     <span class="label">${getLang() === 'en' ? 'Language' : '語言 · Language'}</span>
     <div class="seg">${LANGS.map(l => `<button data-act="lang" data-v="${l.id}" class="${l.id === getLang() ? 'sel' : ''}">${l.name}</button>`).join('')}</div>`;
   if (enabled()) h += `<span class="label">${tx('意見回饋')}</span>

@@ -6,6 +6,7 @@ import { save } from './save.js';
 import { toast, mmss } from './helpers.js';
 import { sendEvent } from './telemetry.js';
 import { milestone } from './cloud.js';
+import { playFx } from './grid.js';
 
 export function startBattle(dIdx) {
   const p = G.partyHeroes(app.S);
@@ -49,14 +50,18 @@ export function startVault(floor) {
 }
 export function runTimer() {
   clearInterval(app.bTimer);
+  if (app.battle && !app.battle.over && !app.battle.fxq) app.battle.fxq = []; // v0.20 格子戰場的演出事件
   app.bTimer = setInterval(stepBattle, TICK_MS / app.speed);
 }
 function stepBattle() {
   if (!app.battle || app.battle.over) { clearInterval(app.bTimer); return; }
-  app.battle.step();
-  if (app.battle.over) finishBattle();
+  const b = app.battle;
+  b.step();
+  const evs = b.fxq ? b.fxq.splice(0) : [];
+  if (b.over) finishBattle();
   else if (app.tab === 'battle') app.render(true);
   else app.renderTabs();
+  if (app.tab === 'battle') playFx(b, evs, TICK_MS / app.speed);
 }
 export function finishBattle() {
   clearInterval(app.bTimer);
