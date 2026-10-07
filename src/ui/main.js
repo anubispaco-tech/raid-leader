@@ -20,7 +20,7 @@ import { esc, heroName } from './helpers.js';
 import { VERSION } from '../core/version.js';
 import { installIcons, svg, BRAND } from './icons.js';
 import * as C from './cloud.js';
-import { mountGrid } from './grid.js';
+import { mountGrid, zoomBy } from './grid.js';
 import { prefs, setPref } from './prefs.js';
 import * as SFX from './sfx.js';
 
@@ -168,6 +168,7 @@ document.addEventListener('click', e => {
       if (app.modal) renderModal(); else render(true);
       return;
     }
+    case 'gzoom': zoomBy(+t.dataset.v); return;
     case 'isotog': setPref('iso', !prefs.iso); render(true); return;
     case 'mute': setPref('sound', !prefs.sound); if (prefs.sound) { SFX.unlock(); SFX.play('heal'); } T.sendEvent(tx('音效設定'), prefs.sound ? tx('開') : tx('關')); render(true); return;
     case 'retreat': if (app.battle && !app.battle.over) { clearInterval(app.bTimer); app.battle.over = true; app.battle.win = false; app.battle.push(tx('🏳 主動撤退'), 'bad'); app.lastResult = app.battle.vault ? G.applyVaultResult(app.S, app.battle, G.partyHeroes) : app.battle.mythicIdle ? G.applyMythicIdleResult(app.S, app.battle) : app.battle.mythic ? G.applyMythicResult(app.S, app.battle) : G.applyResult(app.S, app.battle.dIdx, app.battle); if (app.S.idle === app.battle.dIdx) app.S.idle = null; if (app.battle.mythicIdle) app.S.idleMythic = null; save(); } break;

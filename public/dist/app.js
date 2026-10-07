@@ -631,6 +631,8 @@
     "\u5F9E\u96F2\u7AEF\u4E0B\u8F09": "Download from cloud",
     "\u5DF2\u81EA\u52D5\u8F09\u5165\u96F2\u7AEF\u8F03\u65B0\u7684\u9032\u5EA6\uFF08{0}\uFF09": "Loaded newer cloud progress ({0})",
     "\u5DF2\u5F9E\u96F2\u7AEF\u8F09\u5165\u9032\u5EA6": "Progress loaded from the cloud",
+    "\u7E2E\u5C0F": "Zoom out",
+    "\u653E\u5927": "Zoom in",
     "\u5A01\u529B {0}": "Power {0}",
     "\u8010\u529B {0}": "Stamina {0}",
     "\u66B4\u64CA +{0}%": "Crit +{0}%",
@@ -4817,17 +4819,19 @@
   // src/ui/prefs.js
   var KEY3 = "raid-leader-prefs";
   var FX_LEVELS = ["full", "lite", "off"];
-  var prefs = { fx: "full", iso: false, sound: true };
+  var prefs = { fx: "full", iso: false, sound: true, zoom: 1 };
   try {
     const v = JSON.parse(localStorage.getItem(KEY3) || "{}");
     if (FX_LEVELS.includes(v.fx)) prefs.fx = v.fx;
     if (typeof v.iso === "boolean") prefs.iso = v.iso;
     if (typeof v.sound === "boolean") prefs.sound = v.sound;
+    if (Number.isFinite(v.zoom) && v.zoom >= 0.5 && v.zoom <= 2.5) prefs.zoom = v.zoom;
   } catch (e) {
   }
   function setPref(k, v) {
     if (k === "fx" && !FX_LEVELS.includes(v)) return;
     if ((k === "iso" || k === "sound") && typeof v !== "boolean") return;
+    if (k === "zoom" && !(Number.isFinite(v) && v >= 0.5 && v <= 2.5)) return;
     if (!(k in prefs)) return;
     prefs[k] = v;
     try {
@@ -5673,9 +5677,12 @@
   }
 
   // src/ui/grid.js
-  var ROWS = 9;
-  var COLS = 7;
+  var K = 2;
+  var CR = 9;
+  var CC = 7;
   var MID = 4;
+  var ROWS = CR * K;
+  var COLS = CC * K;
   var COL = {
     phys: "#f4ead0",
     enemy: "#ff4d5e",
@@ -5693,13 +5700,14 @@
   var FOE_COL = "#7a3a46";
   var GOBLIN_COL = "#b8902e";
   var DEAD_COL = "#3a4150";
+  var ZOOM = { min: 0.6, max: 2, step: 1.2 };
   var HERO_SLOTS = {
     tank: [[5, 3], [5, 2], [5, 4]],
     heal: [[7, 3], [7, 2], [7, 4]],
     dps: [[6, 2], [6, 4], [6, 1], [6, 5], [7, 1], [7, 5], [8, 3]]
   };
   var ANY_HERO = [];
-  for (let r = 5; r < ROWS; r++) for (let c = 0; c < COLS; c++) ANY_HERO.push([r, c]);
+  for (let r = MID + 1; r < CR; r++) for (let c = 0; c < CC; c++) ANY_HERO.push([r, c]);
   var FOE_SLOTS = [[3, 3], [3, 2], [3, 4], [3, 1], [3, 5], [1, 0], [1, 6], [3, 0], [3, 6], [2, 0], [2, 6], [0, 0], [0, 6], [2, 1], [2, 5], [1, 1], [1, 5], [0, 3], [1, 3], [2, 3]];
   var TRASH_SLOTS = [[2, 3], [2, 2], [2, 4], [1, 3], [1, 1], [1, 5], [2, 1], [2, 5], [3, 3], [0, 3], [1, 2], [1, 4], [3, 2], [3, 4], [2, 0], [2, 6], [0, 1], [0, 5], [3, 1], [3, 5]];
   var root = null;
@@ -5708,51 +5716,60 @@
   var cur = null;
   var waveSeen = -1;
   var owners = /* @__PURE__ */ new Map();
+  var occ = /* @__PURE__ */ new Map();
   var ghosts = /* @__PURE__ */ new Map();
   var longAnims = /* @__PURE__ */ new Map();
   var shakeAt = 0;
   var at = (p) => cells[p[0]][p[1]];
   var dist = (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1]));
+  function area(r0, r1) {
+    const o = [];
+    for (let r = r0 * K; r < (r1 + 1) * K; r++) for (let c = 0; c < COLS; c++) o.push([r, c]);
+    return o;
+  }
   function build() {
     root = document.createElement("div");
     root.className = "gstage";
     board = document.createElement("div");
     board.className = "gboard";
     board.setAttribute("aria-hidden", "true");
+    board.style.setProperty("--cols", COLS);
     root.appendChild(board);
+    const z = document.createElement("div");
+    z.className = "gzoom";
+    z.innerHTML = `<button type="button" data-act="gzoom" data-v="-1" aria-label="${tx("\u7E2E\u5C0F")}">\u2212</button><button type="button" data-act="gzoom" data-v="1" aria-label="${tx("\u653E\u5927")}">\uFF0B</button>`;
+    root.appendChild(z);
     cells = [];
     for (let r = 0; r < ROWS; r++) {
       cells.push([]);
       for (let c = 0; c < COLS; c++) {
         const el = document.createElement("div");
-        el.className = "gcell" + (r === MID ? " gmid" : "");
+        el.className = "gcell" + (Math.floor(r / K) === MID ? " gmid" : "");
+        el.style.gridArea = `${r + 1} / ${c + 1}`;
         const floor = document.createElement("div");
         floor.className = "gfloor";
         const stack = document.createElement("div");
         stack.className = "gstack";
-        const hp = document.createElement("div");
-        hp.className = "ghp";
-        hp.hidden = true;
-        hp.appendChild(document.createElement("i"));
         const fx2 = document.createElement("div");
         fx2.className = "gfx";
-        el.append(floor, stack, hp, fx2);
+        el.append(floor, stack, fx2);
         board.appendChild(el);
-        cells[r].push({ el, stack, hp, fx: fx2, base: 0, bonus: 0, color: null, glyph: "", shield: false, owner: null, sig: "" });
+        cells[r].push({ el, stack, fx: fx2, base: 0, bonus: 0, color: null, shield: false, owner: null, sig: "", gen: 0 });
       }
     }
+    pinchZoom();
   }
   function clearCell(c) {
-    c.gen = (c.gen || 0) + 1;
-    Object.assign(c, { base: 0, bonus: 0, color: null, glyph: "", shield: false, owner: null });
-    c.hp.hidden = true;
+    c.gen++;
+    Object.assign(c, { base: 0, bonus: 0, color: null, shield: false, owner: null });
   }
   function shade(hex, f) {
     const n2 = parseInt(hex.slice(1), 16), ch = (s) => Math.round((n2 >> s & 255) * f);
     return `rgb(${ch(16)},${ch(8)},${ch(0)})`;
   }
+  var topOf2 = (c) => Math.max(0, c.base + c.bonus) + (c.shield ? 1 : 0);
   function paint(c) {
-    const n2 = Math.max(0, c.base + c.bonus), sig = `${n2}|${c.color}|${c.glyph}|${c.shield}`;
+    const n2 = Math.max(0, c.base + c.bonus), sig = `${n2}|${c.color}|${c.shield}`;
     if (sig === c.sig) return;
     c.sig = sig;
     c.stack.textContent = "";
@@ -5761,7 +5778,6 @@
       s.className = "gslab";
       s.style.setProperty("--i", i);
       s.style.background = shade(c.color || DEAD_COL, 0.42 + 0.58 * (i + 1) / n2);
-      if (i === n2 - 1 && c.glyph) s.innerHTML = c.glyph;
       c.stack.appendChild(s);
     }
     if (c.shield) {
@@ -5770,58 +5786,60 @@
       s.style.setProperty("--i", n2);
       c.stack.appendChild(s);
     }
-    const top = n2 + (c.shield ? 1 : 0);
-    c.fx.style.setProperty("--top", top);
-    c.hp.style.setProperty("--top", top);
+    c.fx.style.setProperty("--top", topOf2(c));
   }
-  function place(id, kind, unit, list, center) {
+  function place(id, kind, unit, cr, cc, size = 1) {
+    const list = [];
+    for (let y = 0; y < size * K; y++) for (let x = 0; x < size * K; x++) list.push([cr * K + y, cc * K + x]);
+    for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) occ.set(`${cr + y},${cc + x}`, id);
     for (const p of list) at(p).owner = id;
-    owners.set(id, { kind, unit, cells: list, center: center || list[0] });
+    const half = Math.floor(size * K / 2), center = [cr * K + half, cc * K + half];
+    const core = size === 1 ? list : list.filter((p) => dist(p, center) <= 1);
+    const lab = document.createElement("div");
+    lab.className = "glab" + (kind === "boss" ? " gboss" : "");
+    lab.style.gridArea = `${cr * K + 1} / ${cc * K + 1} / span ${size * K} / span ${size * K}`;
+    lab.innerHTML = `${svg(kind === "hero" ? CLASS_GLYPH[unit.cls] : enemyGlyph(unit))}<span class="ghp"><i></i></span>`;
+    board.appendChild(lab);
+    owners.set(id, { kind, unit, cells: list, core, center, lab, cr, cc, size });
   }
-  function freeOf(list) {
-    return list.find((p) => !at(p).owner);
-  }
+  var freeOf = (list) => list.find(([r, c]) => !occ.has(`${r},${c}`));
   function placeHeroes(b) {
     for (const u of b.units) {
       const p = freeOf(HERO_SLOTS[u.role] || []) || freeOf(ANY_HERO);
       if (!p) continue;
-      place(u.id, "hero", u, [p]);
+      place(u.id, "hero", u, p[0], p[1]);
     }
-  }
-  function bossBlocks(n2) {
-    if (n2 <= 1) return [{ r: 0, c: 2 }];
-    return [{ r: 0, c: 0 }, { r: 0, c: 4 }];
   }
   function placeFoe(e, hasBoss) {
     const p = freeOf(hasBoss ? FOE_SLOTS : TRASH_SLOTS);
     if (!p) return false;
-    place(e.id, "foe", e, [p]);
+    place(e.id, "foe", e, p[0], p[1]);
     return true;
-  }
-  function placeWave(b) {
-    for (let r = 0; r <= MID; r++) for (let c = 0; c < COLS; c++) {
-      const cl = at([r, c]);
-      if (cl.owner) drop(cl.owner);
-      clearCell(cl);
-    }
-    const bosses = b.enemies.filter((e) => e.boss), blocks = bossBlocks(bosses.length);
-    bosses.slice(0, 2).forEach((e, i) => {
-      const { r, c } = blocks[i], list = [];
-      for (let y = 0; y < 3; y++) for (let x = 0; x < 3; x++) list.push([r + y, c + x]);
-      place(e.id, "boss", e, list, [r + 1, c + 1]);
-    });
-    for (const e of b.enemies) if (!e.boss && e.hp > 0) placeFoe(e, bosses.length > 0);
-    waveSeen = b.waveIdx;
   }
   function drop(id) {
     const o = owners.get(id);
-    if (o) {
-      ghosts.set(id, o);
-      owners.delete(id);
+    if (!o) return;
+    for (const p of o.cells) {
+      const c = at(p);
+      if (c.owner === id) clearCell(c);
     }
+    for (const [k, v] of occ) if (v === id) occ.delete(k);
+    o.lab.remove();
+    ghosts.set(id, o);
+    owners.delete(id);
+  }
+  function placeWave(b) {
+    for (const [id, o] of [...owners]) if (o.kind !== "hero") drop(id);
+    const bosses = b.enemies.filter((e) => e.boss);
+    const blocks = bosses.length > 1 ? [[0, 0], [0, 4]] : [[0, 2]];
+    bosses.slice(0, 2).forEach((e, i) => place(e.id, "boss", e, blocks[i][0], blocks[i][1], 3));
+    for (const e of b.enemies) if (!e.boss && e.hp > 0) placeFoe(e, bosses.length > 0);
+    waveSeen = b.waveIdx;
   }
   function reset(b) {
-    owners = /* @__PURE__ */ new Map();
+    for (const id of [...owners.keys()]) drop(id);
+    ghosts.clear();
+    occ.clear();
     for (const k of [...longAnims.keys()]) stopLong(k);
     for (const row2 of cells) for (const c of row2) {
       clearCell(c);
@@ -5837,65 +5855,118 @@
     else if (b.waveIdx !== waveSeen) placeWave(b);
     const hasBoss = b.enemies.some((e) => e.boss);
     for (const e of b.enemies) if (!owners.has(e.id) && e.hp > 0 && placeFoe(e, hasBoss)) flashCells(owners.get(e.id).cells, COL.curse, { dur: 500, peak: 0.8 });
-    for (const [id, o] of owners) {
+    for (const [id, o] of [...owners]) {
       const u = o.unit, dead = u.hp <= 0;
-      if (o.kind === "hero") {
-        const c = at(o.center);
-        Object.assign(c, dead ? { base: 1, color: DEAD_COL, glyph: svg(CLASS_GLYPH[u.cls]) } : { base: u.role === "tank" ? 3 : 2, color: CLASS_COL[u.cls] || "#8e97a6", glyph: svg(CLASS_GLYPH[u.cls]) });
-        c.shield = !dead && u.shield > 0;
-        setHp(c, dead ? 0 : u.hp / u.max);
-      } else if (o.kind === "boss") {
+      if (o.kind === "foe" && dead) {
+        drop(id);
+        continue;
+      }
+      if (o.kind === "boss") {
+        const up = u.phased || u.bonded ? 2 : 0, mid = (o.size * K - 1) / 2;
         for (const p of o.cells) {
-          const c = at(p), d = dist(p, o.center);
-          Object.assign(c, dead ? { base: d ? 0 : 1, color: DEAD_COL, glyph: "" } : { base: (d ? p[0] !== o.center[0] && p[1] !== o.center[1] ? 3 : 4 : 6) + (u.phased || u.bonded ? 2 : 0), color: u.phased || u.bonded ? BOSS_PHASE : BOSS_COL, glyph: d ? "" : svg(enemyGlyph(u)) });
+          const c = at(p), dn = Math.hypot(p[0] - o.cr * K - mid, p[1] - o.cc * K - mid) / K;
+          Object.assign(c, dead ? { base: dn < 0.8 ? 1 : 0, color: DEAD_COL } : { base: Math.max(2, Math.round(6 - 2 * dn)) + up, color: up ? BOSS_PHASE : BOSS_COL });
           c.shield = !dead && u.bshield > 0;
         }
-        setHp(at(o.center), dead ? 0 : u.hp / u.max);
       } else {
-        const c = at(o.center);
-        if (dead) {
-          clearCell(c);
-          drop(id);
-          continue;
+        const base = dead ? 1 : o.kind === "hero" ? u.role === "tank" ? 3 : 2 : 2;
+        const color = dead ? DEAD_COL : o.kind === "hero" ? CLASS_COL[u.cls] || "#8e97a6" : u.goblin ? GOBLIN_COL : FOE_COL;
+        for (const p of o.cells) {
+          const c = at(p);
+          c.base = base;
+          c.color = color;
+          c.shield = !dead && o.kind === "hero" && u.shield > 0;
         }
-        Object.assign(c, { base: 2, color: u.goblin ? GOBLIN_COL : FOE_COL, glyph: svg(enemyGlyph(u)) });
-        setHp(c, u.hp / u.max);
       }
+      o.lab.classList.toggle("dead", dead);
     }
     for (const row2 of cells) for (const c of row2) paint(c);
+    for (const o of owners.values()) labelSync(o);
   }
-  function setHp(c, f) {
-    c.hp.hidden = false;
-    c.hp.firstChild.style.width = Math.max(0, Math.min(100, f * 100)) + "%";
-    c.hp.classList.toggle("low", f < 0.35);
+  function labelSync(o) {
+    const u = o.unit, f = u.hp <= 0 ? 0 : u.hp / u.max, bar = o.lab.lastChild;
+    o.lab.style.setProperty("--top", Math.max(...o.core.map((p) => topOf2(at(p)))));
+    bar.firstChild.style.width = Math.max(0, Math.min(100, f * 100)) + "%";
+    bar.classList.toggle("low", f > 0 && f < 0.35);
+  }
+  function applyZoom() {
+    if (root) root.style.setProperty("--zm", prefs.zoom.toFixed(3));
+  }
+  function zoomBy(dir) {
+    const z = dir === 0 ? 1 : prefs.zoom * (dir > 0 ? ZOOM.step : 1 / ZOOM.step);
+    setPref("zoom", Math.min(ZOOM.max, Math.max(ZOOM.min, z)));
+    applyZoom();
+  }
+  function pinchZoom() {
+    const pts = /* @__PURE__ */ new Map();
+    let start2 = null;
+    const d2 = () => {
+      const [a, b] = [...pts.values()];
+      return Math.hypot(a.x - b.x, a.y - b.y);
+    };
+    root.addEventListener("pointerdown", (e) => {
+      if (e.pointerType !== "touch" || !prefs.iso) return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pts.size === 2) start2 = { d: d2(), z: prefs.zoom };
+    });
+    root.addEventListener("pointermove", (e) => {
+      if (!pts.has(e.pointerId)) return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pts.size === 2 && start2) {
+        setPref("zoom", Math.min(ZOOM.max, Math.max(ZOOM.min, start2.z * d2() / Math.max(1, start2.d))));
+        applyZoom();
+      }
+    });
+    const end = (e) => {
+      pts.delete(e.pointerId);
+      if (pts.size < 2) start2 = null;
+    };
+    root.addEventListener("pointerup", end);
+    root.addEventListener("pointercancel", end);
+    root.addEventListener("wheel", (e) => {
+      if (!prefs.iso || !e.ctrlKey) return;
+      e.preventDefault();
+      setPref("zoom", Math.min(ZOOM.max, Math.max(ZOOM.min, prefs.zoom * Math.exp(-e.deltaY * 0.01))));
+      applyZoom();
+    }, { passive: false });
   }
   function mountGrid(slot, b) {
     if (!slot || !b) return;
     syncGrid(b);
     root.classList.toggle("iso", prefs.iso);
     root.classList.toggle("lite", prefs.fx === "lite");
+    applyZoom();
     slot.appendChild(root);
   }
   function flash(p, o) {
     const c = at(p), col = o.color;
-    const frames = o.outline ? [{ opacity: 0, background: "transparent", boxShadow: `inset 0 0 0 3px ${col}` }, { opacity: 1, offset: 0.4 }, { opacity: 0 }] : [{ opacity: 0, background: col, boxShadow: "none" }, { opacity: o.peak ?? 0.9, offset: 0.3 }, { opacity: 0 }];
+    const frames = o.outline ? [{ opacity: 0, background: "transparent", boxShadow: `inset 0 0 0 2px ${col}` }, { opacity: 1, offset: 0.4 }, { opacity: 0 }] : [{ opacity: 0, background: col, boxShadow: "none" }, { opacity: o.peak ?? 0.9, offset: 0.3 }, { opacity: 0 }];
     return c.fx.animate(frames, { duration: o.dur ?? 300, delay: o.delay ?? 0, iterations: o.times ?? 1, easing: "ease-out" });
   }
   function flashCells(list, color, o = {}) {
     return list.map((p) => flash(p, { color, ...o }));
   }
-  function lift(p, k, ms, delay = 0) {
-    const c = at(p), g = c.gen;
+  function lift(list, k, ms, delay = 0) {
     setTimeout(() => {
-      if (c.gen !== g) return;
-      c.bonus += k;
-      paint(c);
-      setTimeout(() => {
-        if (c.gen !== g) return;
-        c.bonus -= k;
+      const done = [];
+      for (const p of list) {
+        const c = at(p);
+        c.bonus += k;
         paint(c);
+        done.push([c, c.gen]);
+      }
+      syncLabels();
+      setTimeout(() => {
+        for (const [c, g] of done) if (c.gen === g) {
+          c.bonus -= k;
+          paint(c);
+        }
+        syncLabels();
       }, ms);
     }, delay);
+  }
+  function syncLabels() {
+    for (const o of owners.values()) labelSync(o);
   }
   function line(a, b) {
     const pts = [];
@@ -5919,24 +5990,19 @@
     return pts;
   }
   function projectile(a, b, color, step, delay) {
-    const path = line(a, b).slice(1, -1);
-    path.forEach((p, i) => flash(p, { color, delay: delay + i * step, dur: Math.max(120, step * 4), peak: 0.75 }));
-    return delay + path.length * step;
+    const path = line(a, b).slice(1, -1), s = step / K;
+    path.forEach((p, i) => flash(p, { color, delay: delay + i * s, dur: Math.max(140, s * 7), peak: 0.75 }));
+    return delay + path.length * s;
   }
   function ring(src, list, color, step, o = {}) {
-    for (const p of list) flash(p, { color, delay: (o.delay || 0) + dist(p, src) * step, dur: o.dur || 380, peak: o.peak ?? 0.5 });
-  }
-  function area(r0, r1) {
-    const o = [];
-    for (let r = r0; r <= r1; r++) for (let c = 0; c < COLS; c++) o.push([r, c]);
-    return o;
+    for (const p of list) flash(p, { color, delay: (o.delay || 0) + dist(p, src) * step / K, dur: o.dur || 380, peak: o.peak ?? 0.5 });
   }
   function shake(px) {
     if (!root || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const now2 = performance.now();
     if (now2 - shakeAt < 400) return;
     shakeAt = now2;
-    root.animate([{ transform: "translate(0,0)" }, { transform: `translate(${px}px,${-px / 2}px)` }, { transform: `translate(${-px}px,${px / 2}px)` }, { transform: "translate(0,0)" }], { duration: 240 });
+    root.animate([{ translate: "0 0" }, { translate: `${px}px ${-px / 2}px` }, { translate: `${-px}px ${px / 2}px` }, { translate: "0 0" }], { duration: 240 });
   }
   function stopLong(key) {
     const l = longAnims.get(key);
@@ -5959,8 +6025,14 @@
       const o = own(id);
       return o && o.center;
     };
-    const partyCells = () => [...owners.values()].filter((o) => o.kind === "hero").map((o) => o.center);
+    const core = (id) => {
+      const o = own(id);
+      return o ? o.core : null;
+    };
+    const partyCells = () => [...owners.values()].filter((o) => o.kind === "hero").flatMap((o) => o.cells);
     const foeCells = () => [...owners.values()].filter((o) => o.kind !== "hero").flatMap((o) => o.cells);
+    const heroCore = () => [...owners.values()].filter((o) => o.kind === "hero").flatMap((o) => o.core);
+    const ME = [6 * K + 1, 3 * K + 1];
     let shots = 0;
     const maxShots = lite ? 0 : 10;
     const seen = /* @__PURE__ */ new Set();
@@ -5968,7 +6040,7 @@
     let ni = 0;
     evs.forEach((e, idx) => {
       const d = NOISY.has(e.k) ? Math.round(span * (ni++ / Math.max(1, nNoisy))) : Math.round(span * (idx / evs.length) * 0.5);
-      const s = ctr(e.s), t = ctr(e.t);
+      const s = ctr(e.s), t = ctr(e.t), tc = core(e.t), sc = core(e.s);
       switch (e.k) {
         case "hit": {
           if (!t) break;
@@ -5977,7 +6049,7 @@
             const key = "dot" + e.t;
             if (lite || seen.has(key)) break;
             seen.add(key);
-            flash(t, { color: col, delay: d, dur: 220, peak: 0.3 });
+            flash(t, { color: col, delay: d, dur: 220, peak: 0.35 });
             play("dot");
             break;
           }
@@ -5985,8 +6057,7 @@
             const key = "aoe" + e.s;
             if (seen.has(key)) break;
             seen.add(key);
-            const list = foeCells();
-            ring(s || t, list, col, lite ? 0 : step * 1.5, { delay: d, dur: 360, peak: 0.55 });
+            ring(s || t, foeCells(), col, lite ? 0 : step * 1.5, { delay: d, dur: 360, peak: 0.55 });
             play("hit", d / 1e3);
             break;
           }
@@ -5996,11 +6067,11 @@
             hitAt = projectile(s, t, col, step, d);
           }
           if (e.crit) {
-            flash(t, { color: col, delay: hitAt, dur: 480, peak: 1 });
-            lift(t, 2, Math.max(300, tickMs * 0.6), hitAt);
+            flashCells(tc, col, { delay: hitAt, dur: 480, peak: 1 });
+            lift(tc, 2, Math.max(300, tickMs * 0.6), hitAt);
             play("crit", hitAt / 1e3);
           } else {
-            flash(t, { color: col, delay: hitAt, dur: 160, peak: 0.85 });
+            flashCells(tc, col, { delay: hitAt, dur: 160, peak: 0.85 });
             play("hit", hitAt / 1e3);
           }
           break;
@@ -6012,7 +6083,7 @@
             const key2 = "mg" + e.t;
             if (seen.has(key2)) break;
             seen.add(key2);
-            flash(t, { color: COL.curse, delay: d, dur: 260, peak: 0.35 });
+            flashCells(tc, COL.curse, { delay: d, dur: 260, peak: 0.35 });
             break;
           }
           let hitAt = d;
@@ -6023,15 +6094,15 @@
           const key = "hurt" + e.t;
           if (seen.has(key)) break;
           seen.add(key);
-          flash(t, { color: COL.enemy, delay: hitAt, dur: 200, peak: 0.55 });
+          flashCells(tc, COL.enemy, { delay: hitAt, dur: 200, peak: 0.55 });
           play("hurt", hitAt / 1e3);
           break;
         }
         case "heal": {
           if (!t) break;
           if (e.big) {
-            flash(t, { color: COL.heal, delay: d, dur: 900, peak: 1 });
-            lift(t, 2, 900, d);
+            flashCells(tc, COL.heal, { delay: d, dur: 900, peak: 1 });
+            lift(tc, 2, 900, d);
             play("heal", d / 1e3);
             break;
           }
@@ -6043,127 +6114,125 @@
             seen.add("healer" + e.s);
             hitAt = projectile(s, t, COL.heal, step * 1.8, d);
           }
-          flash(t, { color: COL.heal, delay: hitAt, dur: 600, peak: 0.55 });
-          lift(t, 1, 500, hitAt);
+          flashCells(tc, COL.heal, { delay: hitAt, dur: 600, peak: 0.55 });
+          lift(tc, 1, 500, hitAt);
           play("heal", hitAt / 1e3);
           break;
         }
         case "kick": {
           stopLong("cast" + e.t);
           const hitAt = s && t && !lite ? projectile(s, t, COL.white, step * 0.7, d) : d;
-          if (t) flash(t, { color: COL.white, delay: hitAt, dur: 140, times: 3, peak: 1 });
+          if (tc) flashCells(tc, COL.white, { delay: hitAt, dur: 140, times: 3, peak: 1 });
           play("kick", hitAt / 1e3);
           break;
         }
         case "dispel":
           stopLong("curse" + e.t);
-          if (t) flash(t, { color: COL.heal, delay: d, dur: 500, peak: 0.9 });
+          if (tc) flashCells(tc, COL.heal, { delay: d, dur: 500, peak: 0.9 });
           play("heal", d / 1e3);
           break;
         case "cast": {
-          if (!s) break;
+          if (!sc) break;
           stopLong("cast" + e.s);
-          const total = e.time * tickMs, list = partyCells(), anims = [];
+          const total = e.time * tickMs, anims = [];
           const slowN = Math.max(1, Math.floor(total * 0.6 / 700)), fastStart = slowN * 700, fastN = Math.max(2, Math.floor((total - fastStart) / 180));
-          for (const p of list) {
+          for (const p of partyCells()) {
             anims.push(flash(p, { color: COL.cast, outline: true, dur: 700, times: slowN, delay: d }));
             anims.push(flash(p, { color: COL.cast, outline: true, dur: 180, times: fastN, delay: d + fastStart }));
           }
-          anims.push(flash(s, { color: COL.cast, dur: 400, times: Math.max(2, Math.floor(total / 400)), peak: 0.6, delay: d }));
+          for (const p of sc) anims.push(flash(p, { color: COL.cast, dur: 400, times: Math.max(2, Math.floor(total / 400)), peak: 0.6, delay: d }));
           longAnims.set("cast" + e.s, anims);
           play("cast", d / 1e3);
           break;
         }
         case "blast": {
           stopLong("cast" + e.s);
-          for (const p of area(MID, ROWS - 1)) flash(p, { color: COL.cast, delay: d + (p[0] - MID) * step * 2, dur: 420, peak: 0.9 });
+          for (const p of area(MID, CR - 1)) flash(p, { color: COL.cast, delay: d + (p[0] - MID * K) * step, dur: 420, peak: 0.9 });
           setTimeout(() => shake(5), d + 120);
           play("blast", d / 1e3);
           break;
         }
         case "pulse":
           if (s) {
-            ring(s, area(0, ROWS - 1), COL.enemy, lite ? 0 : step * 2, { delay: d, dur: 380, peak: 0.45 });
+            ring(s, area(0, CR - 1), COL.enemy, lite ? 0 : step * 2, { delay: d, dur: 380, peak: 0.45 });
             setTimeout(() => shake(4), d + 150);
             play("pulse", d / 1e3);
           }
           break;
         case "buster": {
           const hitAt = s && t && !lite ? projectile(s, t, COL.enemy, step * 0.8, d) : d;
-          if (t) {
-            flash(t, { color: COL.enemy, delay: hitAt, dur: 420, peak: 1 });
-            lift(t, -1, 500, hitAt);
+          if (tc) {
+            flashCells(tc, COL.enemy, { delay: hitAt, dur: 420, peak: 1 });
+            lift(tc, -1, 500, hitAt);
           }
           setTimeout(() => shake(3), hitAt);
           play("buster", hitAt / 1e3);
           break;
         }
         case "curse": {
-          if (!t) break;
+          if (!tc) break;
           stopLong("curse" + e.t);
-          longAnims.set("curse" + e.t, [flash(t, { color: COL.curse, outline: true, dur: 900, times: Math.max(1, Math.round(e.dur * tickMs / 900)), delay: d })]);
+          longAnims.set("curse" + e.t, flashCells(tc, COL.curse, { outline: true, dur: 900, times: Math.max(1, Math.round(e.dur * tickMs / 900)), delay: d }));
           play("curse", d / 1e3);
           break;
         }
         case "shield": {
-          const o = owners.get(e.s);
+          const o = own(e.s);
           if (o) flashCells(o.cells, COL.shield, { delay: d, dur: 420, peak: 0.8 });
           play("shield", d / 1e3);
           break;
         }
         case "sbreak": {
-          const o = owners.get(e.t);
+          const o = own(e.t);
           if (o) flashCells(o.cells, COL.shield, { delay: d, dur: 140, times: 3, peak: 1 });
           play("sbreak", d / 1e3);
           break;
         }
         case "sfail": {
-          const o = owners.get(e.t);
+          const o = own(e.t);
           if (o) flashCells(o.cells, COL.heal, { delay: d, dur: 700, peak: 0.7 });
           play("heal", d / 1e3);
           break;
         }
         case "phase": {
-          const o = owners.get(e.s);
+          const o = own(e.s);
           if (o) flashCells(o.cells, COL.enemy, { delay: d, dur: 600, peak: 0.95 });
           setTimeout(() => shake(6), d);
           play("boss", d / 1e3);
           break;
         }
         case "summon": {
-          const o = owners.get(e.s);
+          const o = own(e.s);
           if (o) flashCells(o.cells, COL.curse, { delay: d, dur: 500, peak: 0.6 });
           break;
         }
         case "kill": {
-          const o = own(e.t), list = o ? o.cells : t ? [t] : [];
+          const o = own(e.t), list = o ? o.cells : [];
           flashCells(list, COL.white, { delay: d, dur: 380, peak: 1 });
           if (e.boss) {
-            const c = o && o.center || t;
-            if (c) ring(c, area(0, ROWS - 1), COL.gold, step * 2, { delay: d + 150, dur: 500, peak: 0.5 });
+            if (o) ring(o.center, area(0, CR - 1), COL.gold, step * 2, { delay: d + 150, dur: 500, peak: 0.5 });
             play("bosskill", d / 1e3);
           } else play("kill", d / 1e3);
           break;
         }
         case "die":
-          if (t) flash(t, { color: COL.enemy, delay: d, dur: 600, peak: 1 });
+          if (tc) flashCells(tc, COL.enemy, { delay: d, dur: 600, peak: 1 });
           play("die", d / 1e3);
           break;
         case "immune":
-          if (t) flash(t, { color: COL.shield, delay: d, dur: 600, peak: 0.9 });
+          if (tc) flashCells(tc, COL.shield, { delay: d, dur: 600, peak: 0.9 });
           break;
         case "volc":
-          if (t) flash(t, { color: COL.cast, delay: d, dur: 500, peak: 0.85 });
+          if (tc) flashCells(tc, COL.cast, { delay: d, dur: 500, peak: 0.85 });
           break;
         case "horn": {
-          const pc = partyCells();
-          ring([6, 3], area(MID + 1, ROWS - 1), COL.gold, step * 2, { delay: d, dur: 500, peak: 0.5 });
-          pc.forEach((p) => lift(p, 1, 700, d));
+          ring(ME, area(MID + 1, CR - 1), COL.gold, step * 2, { delay: d, dur: 500, peak: 0.5 });
+          lift(heroCore(), 1, 700, d);
           play("horn", d / 1e3);
           break;
         }
         case "lust": {
-          ring(s || [6, 3], area(MID + 1, ROWS - 1), COL.bolt, step * 2, { delay: d, dur: 450, peak: 0.45 });
+          ring(s || ME, area(MID + 1, CR - 1), COL.bolt, step * 2, { delay: d, dur: 450, peak: 0.45 });
           play("horn", d / 1e3);
           break;
         }
@@ -6172,14 +6241,13 @@
             const o = [...owners.values()].find((x) => x.kind === "boss");
             if (o) {
               flashCells(o.cells, COL.enemy, { delay: d, dur: 700, peak: 0.8 });
-              o.cells.forEach((p) => lift(p, 2, 600, d));
+              lift(o.cells, 2, 600, d);
             }
             play("boss", d / 1e3);
           }
           break;
         case "end": {
-          const list = area(0, ROWS - 1);
-          for (const p of list) flash(p, { color: e.win ? COL.gold : COL.enemy, delay: d + (e.win ? ROWS - 1 - p[0] : p[0]) * step * 2, dur: 520, peak: e.win ? 0.45 : 0.3 });
+          for (const p of area(0, CR - 1)) flash(p, { color: e.win ? COL.gold : COL.enemy, delay: d + (e.win ? ROWS - 1 - p[0] : p[0]) * step, dur: 520, peak: e.win ? 0.45 : 0.3 });
           play(e.win ? "win" : "lose", d / 1e3);
           break;
         }
@@ -6597,6 +6665,9 @@
         else render(true);
         return;
       }
+      case "gzoom":
+        zoomBy(+t.dataset.v);
+        return;
       case "isotog":
         setPref("iso", !prefs.iso);
         render(true);

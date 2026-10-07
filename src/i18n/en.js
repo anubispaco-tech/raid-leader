@@ -629,6 +629,8 @@ export default {
 "從雲端下載": "Download from cloud",
 "已自動載入雲端較新的進度（{0}）": "Loaded newer cloud progress ({0})",
 "已從雲端載入進度": "Progress loaded from the cloud",
+"縮小": "Zoom out",
+"放大": "Zoom in",
 "威力 {0}": "Power {0}",
 "耐力 {0}": "Stamina {0}",
 "暴擊 +{0}%": "Crit +{0}%",
