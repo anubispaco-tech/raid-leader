@@ -21,7 +21,7 @@ export async function unpack(code) {
 // 舊網址：顯示「搬家中」然後跳轉；回傳 true 代表不要再啟動遊戲
 export function moveAway() {
   if (!OLD_HOSTS.includes(location.hostname)) return false;
-  document.body.insertAdjacentHTML('beforeend', `<div id="boot"><div class="blogo">${tx('副本團長')}</div><div class="bbar"><i></i></div><div class="bmsg">${tx('遊戲搬家了，正在帶著你的進度前往新網址…')}</div></div>`);
+  document.body.insertAdjacentHTML('beforeend', `<div id="boot"><div class="blogo">RAID LEADER</div><div class="bbar"><i></i></div><div class="bmsg">${tx('遊戲搬家了，正在帶著你的進度前往新網址…')}</div></div>`);
   let raw = null; try { raw = localStorage.getItem(KEY); } catch (e) { /* ignore */ }
   const go = hash => location.replace(NEW_ORIGIN + '/' + hash);
   if (!raw) { go(''); return true; }

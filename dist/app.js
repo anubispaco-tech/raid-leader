@@ -1,4 +1,4 @@
-/* 副本團長 v0.18.0 */
+/* 副本團長 v0.18.1 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -663,6 +663,7 @@
     "\u5DF2\u8DF3\u904E\u6559\u5B78\uFF0C\u300C\u4E0B\u4E00\u6B65\u300D\u5361\u7247\u6703\u7E7C\u7E8C\u63D0\u793A": "Tutorial skipped. The Next step card will keep giving tips",
     "\u5DF2\u9396\u5B9A\uFF0C\u4E0D\u6703\u88AB\u5206\u89E3\u6216\u89E3\u96C7": "Locked. It won't be salvaged or dismissed",
     "\u5DF2\u89E3\u9664\u9396\u5B9A": "Unlocked",
+    "\u5F37\u5316\u6210\u529F +{0}": "Upgraded to +{0}",
     "\u5206\u89E3\u7372\u5F97 {0} \u91D1": "Salvaged for {0} gold",
     "\u639B\u6A5F\u4E2D\u4E0D\u80FD\u66F4\u63DB\u968A\u54E1\uFF0C\u8ACB\u5148\u505C\u6B62\u639B\u6A5F": "Can't change members while idling \u2014 stop idling first",
     "{0} \u96E2\u958B\u4E86\u5718\u968A\uFF0C\u9000\u9084 {1} \u91D1{2}": "{0} left the party, refunded {1} gold{2}",
@@ -717,7 +718,6 @@
     "\uFF08\u968A\u4F0D\u5DF2\u6EFF\uFF0C\u5728\u5F85\u547D\u5340\uFF09": " (party full \u2014 on the bench)",
     '<small class="c4">{0}\uFF1A{1}</small>': '<small class="c4">{0}: {1}</small>',
     '<h3>\u4F60\u7684\u66B1\u7A31</h3><p class="sub" style="margin:0">\u986F\u793A\u5728\u5929\u68AF\u4E0A\uFF0C\u4E4B\u5F8C\u96A8\u6642\u53EF\u4EE5\u4FEE\u6539\u3002\u904A\u6232\u6703\u8A18\u9304\u66B1\u7A31\u3001\u9032\u5EA6\u8207\u904A\u73A9\u6642\u9593\uFF0C\u4E0D\u6703\u6536\u96C6\u5E33\u865F\u6216\u500B\u4EBA\u8CC7\u6599\u3002</p> <input id="nickInp" class="inp" maxlength="16" placeholder="\u4F8B\u5982\uFF1AYomi" value="{0}" autocomplete="off"> <div class="row"><button class="btn main grow" data-act="savenick">\u78BA\u5B9A</button><button class="btn" data-act="skipnick">\u533F\u540D\u53C3\u52A0</button></div>': '<h3>Your nickname</h3><p class="sub" style="margin:0">Shown on the Ladder; you can change it anytime. The game records your nickname, progress and play time \u2014 no accounts or personal data.</p> <input id="nickInp" class="inp" maxlength="16" placeholder="e.g. Yomi" value="{0}" autocomplete="off"> <div class="row"><button class="btn main grow" data-act="savenick">OK</button><button class="btn" data-act="skipnick">Stay anonymous</button></div>',
-    "\u526F\u672C\u5718\u9577": "Raid Leader",
     "\u8A2D\u5B9A": "Settings",
     "\u639B\u6A5F\u4E2D": "Idling",
     "\u5B58\u6A94\u4E2D": "Saving",
@@ -929,7 +929,7 @@
     "\u639B\u6A5F\u5237": "Idle",
     "\u4E00\u9375\u5099\u6230\uFF1A\u639B\u6A5F\u4E2D\u53EA\u8ABF\u5929\u8CE6\u3001\u88DD\u5099": "One-tap prep: talents and gear only while idling",
     "\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099": "One-tap prep: lineup, talents, gear",
-    '<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u9EDE\u5DE6\u4E0A\u89D2\u300C\u526F\u672C\u5718\u9577\u300D\u958B\u555F\u8A2D\u5B9A\uFF0C\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>': `<div class="howto" style="margin-top:16px"><b>Prep</b>: sets lineup, talents and gear for this boss's weakness (while idling, only talents and gear).<br><b>Idle</b>: repeats the floor automatically, even with the page closed (up to {0}h); rewards are paid when you return.<br><b>Save data</b>: progress lives in this browser. To switch devices, tap "Raid Leader" at the top left to open Settings and export a save code.</div>`,
+    '<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u9EDE\u5DE6\u4E0A\u89D2\u300CRAID LEADER\u300D\u958B\u555F\u8A2D\u5B9A\uFF0C\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>': `<div class="howto" style="margin-top:16px"><b>Prep</b>: sets lineup, talents and gear for this boss's weakness (while idling, only talents and gear).<br><b>Idle</b>: repeats the floor automatically, even with the page closed (up to {0}h); rewards are paid when you return.<br><b>Save data</b>: progress lives in this browser. To switch devices, tap "RAID LEADER" at the top left to open Settings and export a save code.</div>`,
     "\u96F2\u7AEF\u5B58\u6A94": "Cloud save",
     "\u7528 Google \u5E33\u865F\u767B\u5165\uFF0C\u9032\u5EA6\u6703\u81EA\u52D5\u5099\u4EFD\u5230\u96F2\u7AEF\uFF1B\u63DB\u624B\u6A5F\u767B\u5165\u540C\u4E00\u500B\u5E33\u865F\u5C31\u80FD\u63A5\u7E8C\u3002\u53EA\u6703\u8A18\u4E0B Google \u5E33\u865F\u7DE8\u865F\uFF0C\u4E0D\u6703\u5132\u5B58 Email \u6216\u5176\u4ED6\u8CC7\u6599\u3002": "Sign in with Google to back up your progress automatically. Sign in with the same account on another phone to pick up where you left off. Only your Google account ID is stored, never your email or other data.",
     "\u4E0A\u50B3\u4E2D\u2026": "Uploading\u2026",
@@ -1013,11 +1013,14 @@
     "{0}\uFF08{1}\uFF09": "{0} ({1})",
     "\u7A7A": "empty",
     '\u30FB<span class="dust num">{0}</span> \u7CBE\u83EF': '\u30FB<span class="dust num">{0}</span> Essence',
+    '<button class="btn danger" data-act="salvage" data-id="{0}">\u78BA\u5B9A\u5206\u89E3{1}\uFF1F</button>': '<button class="btn danger" data-act="salvage" data-id="{0}">Salvage this {1} item?</button>',
     '<button class="btn" data-act="salvage" data-id="{0}">\u5206\u89E3 +<span class="num">{1}</span> \u91D1{2}</button>': '<button class="btn" data-act="salvage" data-id="{0}">Salvage +<span class="num">{1}</span>  gold{2}</button>',
     "\u89E3\u9664\u9396\u5B9A": "Unlock",
     "\u9396\u5B9A\uFF08\u907F\u514D\u8AA4\u5206\u89E3\uFF0F\u89E3\u96C7\uFF09": "Lock (prevents salvaging/dismissing)",
     "\u{1F512} \u5DF2\u9396\u5B9A": "\u{1F512} Locked",
     "\u{1F513} \u9396\u5B9A": "\u{1F513} Lock",
+    "\u5F37\u5316\u81F3 +{0}": "Upgrade to +{0}",
+    "\u5F37\u5316 \xD75": "Upgrade \xD75",
     '<button class="btn {0}" disabled>\u5F37\u5316 MAX</button>': '<button class="btn {0}" disabled>MAX</button>',
     '<h2>\u9152\u9928</h2><p class="sub">\u540D\u518A <b class="num">{0}/{1}</b>\u3002\u65B0\u82F1\u96C4\u7684\u7B49\u7D1A\u6703\u63A5\u8FD1\u4F60\u968A\u4F0D\u7684\u5E73\u5747\u3002</p> <div class="recruit"><div><span class="label">\u62DB\u52DF\u4EE4</span><b>\u76F4\u63A5\u62BD\u4E00\u4F4D\u82F1\u96C4\u52A0\u5165\u540D\u518A</b> <span class="sub num" style="margin:0">\u7B2C {2} \u62BD\u5167\u5FC5\u51FA\u53F2\u8A69\u4EE5\u4E0A{3}</span></div> <div class="row"><button class="btn main grow" data-act="scroll" data-n="1" {4}>\u55AE\u62BD <span class="num">{5}</span> \u91D1</button> <button class="btn main grow" data-act="scroll" data-n="10" {6}>\u5341\u9023 <span class="num">{7}</span> \u91D1</button></div> {8} <div class="rates">{9}</div></div> <h2 style="font-size:18px">\u4ECA\u65E5\u540D\u55AE</h2><div class="stack">': `<h2>Tavern</h2><p class="sub">Roster <b class="num">{0}/{1}</b>. New heroes join near your party's average level.</p> <div class="recruit"><div><span class="label">Recruit Scroll</span><b>Draw a hero straight into your roster</b> <span class="sub num" style="margin:0">Epic or better within {2} pulls{3}</span></div> <div class="row"><button class="btn main grow" data-act="scroll" data-n="1" {4}>\xD71 <span class="num">{5}</span> gold</button> <button class="btn main grow" data-act="scroll" data-n="10" {6}>\xD710 <span class="num">{7}</span> gold</button></div> {8} <div class="rates">{9}</div></div> <h2 style="font-size:18px">Today's recruits</h2><div class="stack">`,
     "\u30FB\u7B2C {0} \u62BD\u5167\u5FC5\u51FA\u50B3\u8AAA": " \xB7 Legendary within {0} pulls",
@@ -3776,6 +3779,25 @@
     bump(s, "upgrade");
     return true;
   }
+  function upgradeMany(s, itemId, n2, dry = false) {
+    const it = s.items[itemId];
+    if (!it) return null;
+    const steps = Math.min(n2, maxUpFor(s) - it.up);
+    if (steps <= 0) return { steps: 0, gold: 0, dust: 0, ok: false };
+    let gold = 0, dust = 0;
+    for (let k = 0; k < steps; k++) {
+      const t = { ...it, up: it.up + k };
+      gold += upgradeCost(t);
+      dust += dustCost(t);
+    }
+    const ok = s.gold >= gold && (s.dust || 0) >= dust, r = { steps, gold, dust, ok, to: it.up + steps };
+    if (dry || !ok) return r;
+    s.gold -= gold;
+    s.dust = (s.dust || 0) - dust;
+    it.up += steps;
+    bump(s, "upgrade", steps);
+    return r;
+  }
   function hasUpgrade(s) {
     return partyHeroes(s).some((h) => Object.keys(SLOTS).some((slot) => {
       const cur = h.gear[slot] && s.items[h.gear[slot]];
@@ -4117,7 +4139,7 @@
   }
   function moveAway() {
     if (!OLD_HOSTS.includes(location.hostname)) return false;
-    document.body.insertAdjacentHTML("beforeend", `<div id="boot"><div class="blogo">${tx("\u526F\u672C\u5718\u9577")}</div><div class="bbar"><i></i></div><div class="bmsg">${tx("\u904A\u6232\u642C\u5BB6\u4E86\uFF0C\u6B63\u5728\u5E36\u8457\u4F60\u7684\u9032\u5EA6\u524D\u5F80\u65B0\u7DB2\u5740\u2026")}</div></div>`);
+    document.body.insertAdjacentHTML("beforeend", `<div id="boot"><div class="blogo">RAID LEADER</div><div class="bbar"><i></i></div><div class="bmsg">${tx("\u904A\u6232\u642C\u5BB6\u4E86\uFF0C\u6B63\u5728\u5E36\u8457\u4F60\u7684\u9032\u5EA6\u524D\u5F80\u65B0\u7DB2\u5740\u2026")}</div></div>`);
     let raw = null;
     try {
       raw = localStorage.getItem(KEY2);
@@ -4245,7 +4267,7 @@
   var dailyOpenNow = () => app.dailyOpen != null ? app.dailyOpen : dailyPending(app.S) > 0;
 
   // src/core/version.js
-  var VERSION = "0.18.0";
+  var VERSION = "0.18.1";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -4536,7 +4558,7 @@
       const idleHere = app.S.idle === i;
       h += tx('<div class="dg {0}"> <div class="tier">{1}<small>\u7B2C {2} \u5C64</small></div> <h3>{3}<span class="boss">\u9996\u9818\u30FB{4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>\u5EFA\u8B70 <b class="num {6}">Lv{7}</b></span> <span>\u88DD\u7B49 <b class="num {8}">{9}</b></span> <span>\u6389\u843D <b class="num">{10}</b></span> <span>\u901A\u95DC <b class="num">{11}</b> \u6B21</span> </div> <div class="acts">{12} </div></div>', locked ? "locked" : "", ROMAN[i] + dungeonIcon(i), i + 1, d.name, d.boss, d.tip, lv >= d.recLevel ? "ok" : "low", d.recLevel, il >= d.recIlvl ? "ok" : "low", d.recIlvl, d.dropIlvl, clears, locked ? tx('<span class="sub" style="margin:0">\u5148\u901A\u95DC\u4E0A\u4E00\u5C64</span>') : tx('<button class="btn main grow" data-act="fight" data-d="{0}">\u6311\u6230</button> <button class="btn {1}" data-act="idle" data-d="{2}" {3}>{4}</button> <button class="btn" data-act="prepare" data-d="{5}" aria-label="{6}">\u5099\u6230</button>', i, idleHere ? "on" : "", i, clears ? "" : tx('disabled title="\u901A\u95DC\u4E00\u6B21\u5F8C\u624D\u80FD\u639B\u6A5F"'), idleHere ? tx("\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62") : tx("\u639B\u6A5F\u5237"), i, partyLocked(app.S) ? tx("\u4E00\u9375\u5099\u6230\uFF1A\u639B\u6A5F\u4E2D\u53EA\u8ABF\u5929\u8CE6\u3001\u88DD\u5099") : tx("\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099")));
     });
-    h += `</div>` + tx('<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u9EDE\u5DE6\u4E0A\u89D2\u300C\u526F\u672C\u5718\u9577\u300D\u958B\u555F\u8A2D\u5B9A\uFF0C\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>', ECONOMY.offlineCapHours);
+    h += `</div>` + tx('<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u9EDE\u5DE6\u4E0A\u89D2\u300CRAID LEADER\u300D\u958B\u555F\u8A2D\u5B9A\uFF0C\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>', ECONOMY.offlineCapHours);
     return h;
   }
 
@@ -5126,11 +5148,11 @@
         const better = !cur || heroItemScore(x, it) > heroItemScore(x, cur);
         return tx('<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">\u76EE\u524D\uFF1A{7}</div></button>', x.id, it.id, cls(x).icon, x.name, cls(x).name, better ? "in" : "", better ? tx("\u25B2 \u63D0\u5347") : tx("\u8F03\u5DEE"), cur ? tx("{0}\uFF08{1}\uFF09", cur.name, cur.ilvl) : tx("\u7A7A"));
       }).join(""),
-      upBtn(it, ""),
+      upBtn(it, "") + " " + upManyBtn(it),
       it.id,
       salvageValue(it),
       salvageDust(it) ? tx('\u30FB<span class="dust num">{0}</span> \u7CBE\u83EF', salvageDust(it)) : "",
-      lockBtn("item", it) + (it.locked ? "" : tx('<button class="btn" data-act="salvage" data-id="{0}">\u5206\u89E3 +<span class="num">{1}</span> \u91D1{2}</button>', it.id, salvageValue(it), salvageDust(it) ? tx('\u30FB<span class="dust num">{0}</span> \u7CBE\u83EF', salvageDust(it)) : ""))
+      lockBtn("item", it) + (it.locked ? "" : app.modal.confirmSalv === it.id ? tx('<button class="btn danger" data-act="salvage" data-id="{0}">\u78BA\u5B9A\u5206\u89E3{1}\uFF1F</button>', it.id, RARITY[it.rarity].name) : tx('<button class="btn" data-act="salvage" data-id="{0}">\u5206\u89E3 +<span class="num">{1}</span> \u91D1{2}</button>', it.id, salvageValue(it), salvageDust(it) ? tx('\u30FB<span class="dust num">{0}</span> \u7CBE\u83EF', salvageDust(it)) : ""))
     ));
   }
   function affixLine(it) {
@@ -5143,6 +5165,12 @@
     return `<div class="affixnote"><b>${tx(A.name)}</b>${parts.join(tx("\u3001"))}</div>`;
   }
   var lockBtn = (kind, x) => `<button class="btn" data-act="lock" data-kind="${kind}" data-id="${x.id}" title="${x.locked ? tx("\u89E3\u9664\u9396\u5B9A") : tx("\u9396\u5B9A\uFF08\u907F\u514D\u8AA4\u5206\u89E3\uFF0F\u89E3\u96C7\uFF09")}">${x.locked ? tx("\u{1F512} \u5DF2\u9396\u5B9A") : tx("\u{1F513} \u9396\u5B9A")}</button>`;
+  function upManyBtn(it) {
+    const r = upgradeMany(app.S, it.id, 5, true);
+    if (!r || r.steps < 2) return "";
+    const label = r.steps < 5 ? tx("\u5F37\u5316\u81F3 +{0}", r.to) : tx("\u5F37\u5316 \xD75");
+    return `<button class="btn" data-act="up5" data-id="${it.id}" ${r.ok ? "" : "disabled"}>${label} <span class="num">${fmt(r.gold)}</span>${r.dust ? `<span class="dust num">+${r.dust}\u2726</span>` : ""}</button>`;
+  }
   function upBtn(it, size) {
     if (it.up >= maxUpFor(app.S)) return tx('<button class="btn {0}" disabled>\u5F37\u5316 MAX</button>', size);
     const g = upgradeCost(it), d = dustCost(it), ok = app.S.gold >= g && (app.S.dust || 0) >= d;
@@ -5709,7 +5737,22 @@
         save();
         break;
       }
+      case "up5": {
+        const r = upgradeMany(app.S, id, 5);
+        if (r && r.ok) {
+          toast(tx("\u5F37\u5316\u6210\u529F +{0}", r.to));
+          save();
+        } else toast(tx("\u91D1\u5E63\u6216\u7CBE\u83EF\u4E0D\u8DB3"));
+        break;
+      }
       case "salvage":
+        {
+          const it = app.S.items[id];
+          if (it && (it.rarity >= 3 || it.set) && app.modal && app.modal.confirmSalv !== id) {
+            app.modal.confirmSalv = id;
+            break;
+          }
+        }
         toast(tx("\u5206\u89E3\u7372\u5F97 {0} \u91D1", salvage(app.S, id)));
         save();
         app.modal = null;
@@ -6050,10 +6093,10 @@
     checkAchievements(app.S);
     for (const h of [...app.S.heroes, ...app.S.tavern || []]) h.name = localName(h.name);
     for (const it of Object.values(app.S.items)) it.name = it.base || it.set ? itemLabel(it) : localName(it.name);
-    $(".brand-t").textContent = tx("\u526F\u672C\u5718\u9577");
+    $(".brand-t").textContent = "RAID LEADER";
     $(".brand").setAttribute("aria-label", tx("\u8A2D\u5B9A"));
     $("#idleChip").textContent = tx("\u639B\u6A5F\u4E2D");
-    document.title = tx("\u526F\u672C\u5718\u9577");
+    document.title = getLang() === "en" ? "Raid Leader" : "RAID LEADER \u526F\u672C\u5718\u9577";
     document.documentElement.lang = getLang();
     $("#saveChip").textContent = tx("\u5B58\u6A94\u4E2D");
     $("#newsBtn").setAttribute("aria-label", tx("\u516C\u544A"));
@@ -6083,7 +6126,7 @@
   function bootScreen() {
     const el = document.createElement("div");
     el.id = "boot";
-    el.innerHTML = `<div class="blogo">${tx("\u526F\u672C\u5718\u9577")}</div><div class="bbar"><i></i></div><div class="bmsg">${tx("\u8B80\u53D6\u5B58\u6A94\u4E2D\u2026")}</div>`;
+    el.innerHTML = `<div class="blogo">RAID LEADER</div><div class="bbar"><i></i></div><div class="bmsg">${tx("\u8B80\u53D6\u5B58\u6A94\u4E2D\u2026")}</div>`;
     document.body.appendChild(el);
     return { msg: (t) => {
       el.querySelector(".bmsg").textContent = t;
@@ -6104,7 +6147,7 @@
     }
     const el = document.createElement("div");
     el.id = "title";
-    el.innerHTML = `<div class="tbox"><div class="tlogo">${tx("\u526F\u672C\u5718\u9577")}</div>${getLang() === "en" ? "" : '<div class="tsub">RAID LEADER</div>'}
+    el.innerHTML = `<div class="tbox"><div class="tlogo">RAID LEADER</div>${getLang() === "en" ? "" : '<div class="tsub">\u526F\u672C\u5718\u9577</div>'}
     <p class="ttag">${tx("\u5E36\u9818\u4F60\u7684\u5192\u96AA\u5718\uFF0C\u653B\u4E0B\u6BCF\u4E00\u5EA7\u526F\u672C\u3002")}</p>
     <button class="btn main tgo" data-act="titlego">${fresh ? tx("\u958B\u59CB\u5192\u96AA") : tx("\u7E7C\u7E8C\u5192\u96AA")}</button>
     <div class="seg tlang">${LANGS.map((l) => `<button data-act="lang" data-v="${l.id}" class="${l.id === getLang() ? "sel" : ""}">${l.name}</button>`).join("")}</div>

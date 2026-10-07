@@ -182,7 +182,13 @@ document.addEventListener('click', e => {
     case 'tutskip': { const step = app.S.tut.step; G.tutSkip(app.S); save(); T.sendEvent(tx('教學'), `skip@${step}`); toast(tx('已跳過教學，「下一步」卡片會繼續提示')); break; }
     case 'cardok': G.markCard(app.S, t.dataset.v); save(); break;
     case 'lock': { const on = G.toggleLock(app.S, t.dataset.kind, id); if (on != null) toast(on ? tx('已鎖定，不會被分解或解雇') : tx('已解除鎖定')); save(); break; }
-    case 'salvage': toast(tx('分解獲得 {0} 金', G.salvage(app.S, id))); save(); app.modal = null; break;
+    case 'up5': { const r = G.upgradeMany(app.S, id, 5);
+      if (r && r.ok) { toast(tx('強化成功 +{0}', r.to)); save(); } else toast(tx('金幣或精華不足')); break; }
+    case 'salvage': {
+      // v0.18.1 史詩以上或套裝：要再按一次確認，避免誤觸
+      const it = app.S.items[id];
+      if (it && (it.rarity >= 3 || it.set) && app.modal && app.modal.confirmSalv !== id) { app.modal.confirmSalv = id; break; }
+    } toast(tx('分解獲得 {0} 金', G.salvage(app.S, id))); save(); app.modal = null; break;
     case 'join': if (G.partyLocked(app.S)) { toast(tx('掛機中不能更換隊員，請先停止掛機')); break; } G.joinParty(app.S, id); save(); break;
     case 'bench': if (G.partyLocked(app.S)) { toast(tx('掛機中不能更換隊員，請先停止掛機')); break; } G.benchHero(app.S, id); save(); break;
     case 'fire': {
@@ -330,7 +336,7 @@ function start(data) {
   G.checkAchievements(app.S); // 舊存檔：已達成的成就直接補登，不跳提示
   for (const h of [...app.S.heroes, ...(app.S.tavern || [])]) h.name = localName(h.name);
   for (const it of Object.values(app.S.items)) it.name = it.base || it.set ? G.itemLabel(it) : localName(it.name); // v0.16 名稱由代號組出
-  $('.brand-t').textContent = tx('副本團長'); $('.brand').setAttribute('aria-label', tx('設定')); $('#idleChip').textContent = tx('掛機中'); document.title = tx('副本團長');
+  $('.brand-t').textContent = 'RAID LEADER'; $('.brand').setAttribute('aria-label', tx('設定')); $('#idleChip').textContent = tx('掛機中'); document.title = getLang() === 'en' ? 'Raid Leader' : 'RAID LEADER 副本團長';
   document.documentElement.lang = getLang();
   $('#saveChip').textContent = tx('存檔中'); $('#newsBtn').setAttribute('aria-label', tx('公告'));
   N.updateDot(); N.refresh(true);
@@ -353,7 +359,7 @@ function start(data) {
 }
 function bootScreen() {
   const el = document.createElement('div'); el.id = 'boot';
-  el.innerHTML = `<div class="blogo">${tx('副本團長')}</div><div class="bbar"><i></i></div><div class="bmsg">${tx('讀取存檔中…')}</div>`;
+  el.innerHTML = `<div class="blogo">RAID LEADER</div><div class="bbar"><i></i></div><div class="bmsg">${tx('讀取存檔中…')}</div>`;
   document.body.appendChild(el);
   return { msg: t => { el.querySelector('.bmsg').textContent = t; }, done: () => { el.classList.add('out'); setTimeout(() => el.remove(), 260); } };
 }
@@ -362,7 +368,7 @@ function showTitle(fresh, onGo) {
   let seen = false; try { seen = sessionStorage.getItem('rl-title') === '1'; } catch (e) { /* ignore */ }
   if (seen) { onGo(); return; }
   const el = document.createElement('div'); el.id = 'title';
-  el.innerHTML = `<div class="tbox"><div class="tlogo">${tx('副本團長')}</div>${getLang() === 'en' ? '' : '<div class="tsub">RAID LEADER</div>'}
+  el.innerHTML = `<div class="tbox"><div class="tlogo">RAID LEADER</div>${getLang() === 'en' ? '' : '<div class="tsub">副本團長</div>'}
     <p class="ttag">${tx('帶領你的冒險團，攻下每一座副本。')}</p>
     <button class="btn main tgo" data-act="titlego">${fresh ? tx('開始冒險') : tx('繼續冒險')}</button>
     <div class="seg tlang">${LANGS.map(l => `<button data-act="lang" data-v="${l.id}" class="${l.id === getLang() ? 'sel' : ''}">${l.name}</button>`).join('')}</div>

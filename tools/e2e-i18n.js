@@ -24,7 +24,7 @@ const route = p => p.route('**/*', r => { const u = new URL(r.request().url()); 
   check(await page.locator('#title').isVisible() && (await page.locator('#title .tgo').innerText()) === '開始冒險', '開始畫面（中文）');
   await page.screenshot({ path: `${shots}/i18n-title-zh.png` });
   await page.click('#title [data-act="lang"][data-v="en"]'); await page.waitForTimeout(600);
-  check((await page.locator('#title .tgo').innerText()) === 'New adventure' && (await page.locator('#title .tlogo').innerText()) === 'Raid Leader', '切換英文後重新載入');
+  check((await page.locator('#title .tgo').innerText()) === 'New adventure' && (await page.locator('#title .tlogo').innerText()) === 'RAID LEADER', '切換英文後重新載入');
   await page.screenshot({ path: `${shots}/i18n-title-en.png` });
   await page.click('#title .tgo'); await page.waitForTimeout(400);
   const l1 = await page.locator('.dlg p').innerText();

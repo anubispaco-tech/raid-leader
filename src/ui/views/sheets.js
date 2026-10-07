@@ -114,8 +114,10 @@ function sheetItem(it) {
       const cur = x.gear[it.slot] && app.S.items[x.gear[it.slot]];
       const better = !cur || G.heroItemScore(x, it) > G.heroItemScore(x, cur);
       return tx('<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">目前：{7}</div></button>', x.id, it.id, cls(x).icon, x.name, cls(x).name, better ? 'in' : '', better ? tx('▲ 提升') : tx('較差'), cur ? tx('{0}（{1}）', cur.name, cur.ilvl) : tx('空'));
-    }).join(''), upBtn(it, ''), it.id, G.salvageValue(it), G.salvageDust(it) ? tx('・<span class="dust num">{0}</span> 精華', G.salvageDust(it)) : '',
-    lockBtn('item', it) + (it.locked ? '' : tx('<button class="btn" data-act="salvage" data-id="{0}">分解 +<span class="num">{1}</span> 金{2}</button>', it.id, G.salvageValue(it), G.salvageDust(it) ? tx('・<span class="dust num">{0}</span> 精華', G.salvageDust(it)) : ''))));
+    }).join(''), upBtn(it, '') + ' ' + upManyBtn(it), it.id, G.salvageValue(it), G.salvageDust(it) ? tx('・<span class="dust num">{0}</span> 精華', G.salvageDust(it)) : '',
+    lockBtn('item', it) + (it.locked ? '' : app.modal.confirmSalv === it.id
+      ? tx('<button class="btn danger" data-act="salvage" data-id="{0}">確定分解{1}？</button>', it.id, G.RARITY[it.rarity].name)
+      : tx('<button class="btn" data-act="salvage" data-id="{0}">分解 +<span class="num">{1}</span> 金{2}</button>', it.id, G.salvageValue(it), G.salvageDust(it) ? tx('・<span class="dust num">{0}</span> 精華', G.salvageDust(it)) : ''))));
 }
 // v0.16 詞綴說明（放在標題下方：withSet 會把套裝說明插在「裝備給」上方）
 function affixLine(it) {
@@ -127,6 +129,13 @@ function affixLine(it) {
 // v0.14 鎖定按鈕：鎖住後不能解雇／分解（批次與自動分解也會跳過）
 const lockBtn = (kind, x) => `<button class="btn" data-act="lock" data-kind="${kind}" data-id="${x.id}" title="${x.locked ? tx('解除鎖定') : tx('鎖定（避免誤分解／解雇）')}">${x.locked ? tx('🔒 已鎖定') : tx('🔓 鎖定')}</button>`;
 // 強化按鈕：+5 以上叫「精煉」，額外需要精華
+// v0.18.1 一次強化 5 級（剩不到 5 級時顯示「強化至 +上限」）；金幣或精華不足就鎖住
+function upManyBtn(it) {
+  const r = G.upgradeMany(app.S, it.id, 5, true);
+  if (!r || r.steps < 2) return '';
+  const label = r.steps < 5 ? tx('強化至 +{0}', r.to) : tx('強化 ×5');
+  return `<button class="btn" data-act="up5" data-id="${it.id}" ${r.ok ? '' : 'disabled'}>${label} <span class="num">${fmt(r.gold)}</span>${r.dust ? `<span class="dust num">+${r.dust}✦</span>` : ''}</button>`;
+}
 function upBtn(it, size) {
   if (it.up >= G.maxUpFor(app.S)) return tx('<button class="btn {0}" disabled>強化 MAX</button>', size);
   const g = G.upgradeCost(it), d = G.dustCost(it), ok = app.S.gold >= g && (app.S.dust || 0) >= d;

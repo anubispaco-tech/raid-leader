@@ -456,6 +456,17 @@ export function upgrade(s, itemId) {
   const c = upgradeCost(it), d = dustCost(it); if (s.gold < c || (s.dust || 0) < d) return false;
   s.gold -= c; s.dust = (s.dust || 0) - d; it.up++; bump(s, 'upgrade'); return true;
 }
+// v0.18.1 一次強化多級（例如 +5）：剩不到 n 級就強化到上限；金幣或精華不夠就整批不做（dry 只試算）
+export function upgradeMany(s, itemId, n, dry = false) {
+  const it = s.items[itemId]; if (!it) return null;
+  const steps = Math.min(n, maxUpFor(s) - it.up); if (steps <= 0) return { steps: 0, gold: 0, dust: 0, ok: false };
+  let gold = 0, dust = 0;
+  for (let k = 0; k < steps; k++) { const t = { ...it, up: it.up + k }; gold += upgradeCost(t); dust += dustCost(t); }
+  const ok = s.gold >= gold && (s.dust || 0) >= dust, r = { steps, gold, dust, ok, to: it.up + steps };
+  if (dry || !ok) return r;
+  s.gold -= gold; s.dust = (s.dust || 0) - dust; it.up += steps; bump(s, 'upgrade', steps);
+  return r;
+}
 // 背包裡是否有比出戰隊員身上更好的裝備（下一步建議用）
 export function hasUpgrade(s) {
   return partyHeroes(s).some(h => Object.keys(SLOTS).some(slot => {
