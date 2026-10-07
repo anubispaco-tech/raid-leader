@@ -32,7 +32,8 @@ check((await page.locator('#title .tsub').innerText()).includes('副本團長'),
 const box = await page.locator('#title .tlogo').boundingBox(); check(box && box.width <= 375, `主標題不超出手機寬度（${Math.round(box.width)}px）`);
 await page.screenshot({ path: '/tmp/v0181-title.png' });
 await page.click('[data-act="titlego"]'); await page.waitForTimeout(800);
-check((await page.locator('.brand-t').innerText()) === 'RAID LEADER', '左上角品牌字樣');
+check(await page.locator('.brand-t svg.gi-brand').count() === 1 && (await page.locator('.brand').getAttribute('title')) === 'RAID LEADER', '左上角改成雙劍圖示');
+const hb = await page.locator('.brand').boundingBox(); check(hb && hb.width <= 60, `左上角寬度精簡（${Math.round(hb.width)}px）`);
 check((await page.title()).startsWith('RAID LEADER'), '分頁標題');
 const openItem = async id => { await page.evaluate(id => { const b = document.createElement('button'); b.dataset.act = 'item'; b.dataset.id = id; document.body.appendChild(b); b.click(); b.remove(); }, id); await page.waitForTimeout(300); };
 const save = () => page.evaluate(() => JSON.parse(localStorage.getItem('raid-leader-save-v1')));

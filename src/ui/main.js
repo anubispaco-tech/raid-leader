@@ -18,7 +18,7 @@ import { startBattle, startMythic, startMythicIdle, startVault, runTimer, finish
 import * as T from './telemetry.js';
 import { esc, heroName } from './helpers.js';
 import { VERSION } from '../core/version.js';
-import { installIcons } from './icons.js';
+import { installIcons, svg, BRAND } from './icons.js';
 import * as C from './cloud.js';
 
 // ---------- 分頁 ----------
@@ -336,7 +336,7 @@ function start(data) {
   G.checkAchievements(app.S); // 舊存檔：已達成的成就直接補登，不跳提示
   for (const h of [...app.S.heroes, ...(app.S.tavern || [])]) h.name = localName(h.name);
   for (const it of Object.values(app.S.items)) it.name = it.base || it.set ? G.itemLabel(it) : localName(it.name); // v0.16 名稱由代號組出
-  $('.brand-t').textContent = 'RAID LEADER'; $('.brand').setAttribute('aria-label', tx('設定')); $('#idleChip').textContent = tx('掛機中'); document.title = getLang() === 'en' ? 'Raid Leader' : 'RAID LEADER 副本團長';
+  $('.brand-t').innerHTML = svg(BRAND, 'gi-brand'); $('.brand').setAttribute('aria-label', tx('設定')); $('.brand').title = 'RAID LEADER'; $('#idleChip').textContent = tx('掛機中'); document.title = getLang() === 'en' ? 'Raid Leader' : 'RAID LEADER 副本團長';
   document.documentElement.lang = getLang();
   $('#saveChip').textContent = tx('存檔中'); $('#newsBtn').setAttribute('aria-label', tx('公告'));
   N.updateDot(); N.refresh(true);

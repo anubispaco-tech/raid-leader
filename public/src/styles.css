@@ -25,9 +25,11 @@ button:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);
   margin-inline:-16px;padding:12px 16px 10px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
 .brand{font-family:var(--f-display);font-weight:900;font-size:18px;letter-spacing:.06em;color:var(--brass);white-space:nowrap;background:none;border:0;padding:4px 2px;display:flex;align-items:center;gap:6px;cursor:pointer}
+.brand-t{display:flex;align-items:center}.brand .gi-brand{width:26px;height:26px;fill:var(--brass)}
 .brand .gear{width:15px;height:15px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round}
 .brand:active{opacity:.7}
 .res{margin-left:auto;display:flex;gap:10px;align-items:center;font-size:13px}
+@media (max-width:400px){.res{gap:6px}.idlechip,.savechip{padding:2px 6px}.res .pill{padding:3px 8px}.brand{gap:3px}}
 .res .pill{display:flex;gap:6px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
 .coin{width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffe39a,var(--brass) 60%,var(--brass-d))}
 .idlechip{font-size:12px;color:var(--good);border:1px solid color-mix(in srgb,var(--good) 50%,transparent);border-radius:999px;padding:2px 8px;white-space:nowrap}
