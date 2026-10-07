@@ -23,7 +23,7 @@
 5. 跑相關 e2e：`node tools/e2e-*.js`（Playwright 在 /opt/npm-tools）。全部測試清單見 tools/。
 6. README.md 版本紀錄加一行 → commit（附 Co-Authored-By）→ push main。
 7. 用 Artifact 工具把 `dist/raid-leader.html` 發布到開發者既有的單檔預覽 artifact（同一個網址更新）。
-8. 用瀏覽器確認線上（新網址）`app.js?v=` 已是新版。
+8. 用瀏覽器確認線上（新網址）`app.js?v=` 已是新版。Cloudflare 偶爾收不到 GitHub 推送通知（部署紀錄裡沒有該 commit 的建置，不是失敗）：再推一個有實際內容的 commit 就會觸發；空 commit 曾被推送端拒絕（Internal Server Error）。
 
 ## 設計慣例
 - `src/core` 只放邏輯，不碰畫面，可在 Node 跑模擬；UI 在 `src/ui`。
