@@ -847,7 +847,7 @@
     '<div class="more">\u53E6\u5916 {0} \u96BB</div>': '<div class="more">+{0} more</div>',
     '<h2>\u6230\u9B25</h2><div class="empty">\u76EE\u524D\u6C92\u6709\u9032\u884C\u4E2D\u7684\u6230\u9B25\u3002<br>\u5230\u300C\u526F\u672C\u300D\u9078\u4E00\u5C64\u958B\u59CB\u6311\u6230\u3002<br><br><button class="btn main" data-tab="dungeon">\u524D\u5F80\u526F\u672C</button></div>': '<h2>Battle</h2><div class="empty">No battle in progress.<br>Pick a floor in Dungeons to start.<br><br><button class="btn main" data-tab="dungeon">Go to Dungeons</button></div>',
     "\u5BF6\u5EAB\u30FB\u7B2C {0} \u5C64": "Vault \xB7 Floor {0}",
-    '<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">\u6575\u65B9\u30FB{7}</span>{8}</div> <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>': '<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">Enemies \xB7 {7}</span>{8}</div> <div class="side"><span class="label">Your party</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>',
+    '<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}{13}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">\u6575\u65B9\u30FB{7}</span>{8}</div> <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>': '<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}{13}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">Enemies \xB7 {7}</span>{8}</div> <div class="side"><span class="label">Your party</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>',
     "\u9996\u9818\u6230": "Boss",
     "\u7B2C {0} \u6CE2": "Wave {0}",
     '<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">\u64A4\u9000</button></div></div>': '<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">Retreat</button></div></div>',
@@ -858,6 +858,8 @@
     '<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">\u5269 {1}</span></div> <div class="vaultcount"><b class="num">{2}</b> \u96BB\u54E5\u5E03\u6797\u30FB<span class="num">+{3}</span> \u91D1{4}</div>': '<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">{1} left</span></div> <div class="vaultcount"><b class="num">{2}</b>  goblins \xB7 <span class="num">+{3}</span>  gold{4}</div>',
     "\uFF08\u5DF2\u9054\u91D1\u5E63\u4E0A\u9650\uFF09": " (gold cap reached)",
     '<span class="sub" style="margin:0">\u3000\u91D1\u5E63\u7B97\u5230 {0} \u96BB</span>': '<span class="sub" style="margin:0"> Gold counts up to {0}</span>',
+    "\u5207\u63DB\u6210\u5E73\u9762\u8996\u89D2": "Switch to flat view",
+    "\u5207\u63DB\u6210\u7ACB\u9AD4\u8996\u89D2": "Switch to 3D view",
     "\u95DC\u9589\u97F3\u6548": "Mute sound",
     "\u958B\u555F\u97F3\u6548": "Unmute sound",
     '<button class="btn horn {0}" data-act="horn" {1} aria-label="\u82F1\u52C7\u865F\u89D2">{3}{2}</button>': '<button class="btn horn {0}" data-act="horn" {1} aria-label="Heroic Horn">{3}{2}</button>',
@@ -4854,7 +4856,7 @@
     if (!app.battle) return tx('<h2>\u6230\u9B25</h2><div class="empty">\u76EE\u524D\u6C92\u6709\u9032\u884C\u4E2D\u7684\u6230\u9B25\u3002<br>\u5230\u300C\u526F\u672C\u300D\u9078\u4E00\u5C64\u958B\u59CB\u6311\u6230\u3002<br><br><button class="btn main" data-tab="dungeon">\u524D\u5F80\u526F\u672C</button></div>');
     const d = dungeonInfo(app.battle.dIdx), b = app.battle;
     if (b.vault) d.name = tx("\u5BF6\u5EAB\u30FB\u7B2C {0} \u5C64", b.vault.floor + 1);
-    let h = tx('<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}{13}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">\u6575\u65B9\u30FB{7}</span>{8}</div> <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>', d.name, b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : "", b.tick, b.vault ? "" : `<div class="waves">`, b.vault ? "" : b.waves.map((_, i) => `<i class="${i < b.waveIdx || b.over && b.win ? "done" : i === b.waveIdx ? "cur" : ""}"></i>`).join("") + "</div>", b.mythic ? mythicTimerBar(b) : "", b.vault ? vaultBar(b) : "", b.waveIdx === b.waves.length - 1 ? tx("\u9996\u9818\u6230") : tx("\u7B2C {0} \u6CE2", b.waveIdx + 1), enemyRows(b), b.units.map((u) => unitRow(u, false)).join(""), b.log.map((l) => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, " ")}</span>${l.msg}</p>`).join(""), prefs.fx !== "off" ? '<div id="gridSlot" class="gridslot"></div>' : "", prefs.fx !== "off" ? " compact" : "", muteBtn());
+    let h = tx('<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}{13}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">\u6575\u65B9\u30FB{7}</span>{8}</div> <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>', d.name, b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : "", b.tick, b.vault ? "" : `<div class="waves">`, b.vault ? "" : b.waves.map((_, i) => `<i class="${i < b.waveIdx || b.over && b.win ? "done" : i === b.waveIdx ? "cur" : ""}"></i>`).join("") + "</div>", b.mythic ? mythicTimerBar(b) : "", b.vault ? vaultBar(b) : "", b.waveIdx === b.waves.length - 1 ? tx("\u9996\u9818\u6230") : tx("\u7B2C {0} \u6CE2", b.waveIdx + 1), enemyRows(b), b.units.map((u) => unitRow(u, false)).join(""), b.log.map((l) => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, " ")}</span>${l.msg}</p>`).join(""), prefs.fx !== "off" ? '<div id="gridSlot" class="gridslot"></div>' : "", prefs.fx !== "off" ? " compact" : "", (prefs.fx !== "off" ? isoBtn() : "") + muteBtn());
     if (!b.over) {
       h += tx('<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">\u64A4\u9000</button></div></div>', [1, 2, 4].map((x) => `<button data-act="speed" data-x="${x}" class="${app.speed === x ? "sel" : ""}">${x}\xD7</button>`).join(""), hornBtn(b), canSkip(b) ? tx('<button class="btn" data-act="skip">\u76F4\u63A5\u7D50\u7B97</button>') : tx('<button class="btn" disabled title="\u9996\u6B21\u6311\u6230\u9700\u5B8C\u6574\u89C0\u6230\uFF08\u53EF\u7528 4\xD7 \u52A0\u901F\uFF09">\u{1F512} \u7D50\u7B97</button>'));
     }
@@ -4871,8 +4873,11 @@
     const left = Math.max(0, b.vault.dur - b.tick), f = b.vault.floor, cap = vaultMaxKills(f);
     return tx('<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">\u5269 {1}</span></div> <div class="vaultcount"><b class="num">{2}</b> \u96BB\u54E5\u5E03\u6797\u30FB<span class="num">+{3}</span> \u91D1{4}</div>', pct(b.tick, b.vault.dur), mmss(left), b.kills, fmt(Math.min(b.kills, cap) * vaultGoldPerKill(f)), b.kills >= cap ? tx("\uFF08\u5DF2\u9054\u91D1\u5E63\u4E0A\u9650\uFF09") : tx('<span class="sub" style="margin:0">\u3000\u91D1\u5E63\u7B97\u5230 {0} \u96BB</span>', cap));
   }
+  function isoBtn() {
+    return `<button class="hbtn viewbtn ${prefs.iso ? "on" : ""}" data-act="isotog" aria-pressed="${prefs.iso}" aria-label="${prefs.iso ? tx("\u5207\u63DB\u6210\u5E73\u9762\u8996\u89D2") : tx("\u5207\u63DB\u6210\u7ACB\u9AD4\u8996\u89D2")}">${prefs.iso ? "3D" : "2D"}</button>`;
+  }
   function muteBtn() {
-    return `<button class="mute ${prefs.sound ? "" : "off"}" data-act="mute" aria-pressed="${prefs.sound}" aria-label="${prefs.sound ? tx("\u95DC\u9589\u97F3\u6548") : tx("\u958B\u555F\u97F3\u6548")}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/>${prefs.sound ? '<path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/>' : '<path d="m16 9 5 6M21 9l-5 6"/>'}</svg></button>`;
+    return `<button class="hbtn mute ${prefs.sound ? "" : "off"}" data-act="mute" aria-pressed="${prefs.sound}" aria-label="${prefs.sound ? tx("\u95DC\u9589\u97F3\u6548") : tx("\u958B\u555F\u97F3\u6548")}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/>${prefs.sound ? '<path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/>' : '<path d="m16 9 5 6M21 9l-5 6"/>'}</svg></button>`;
   }
   function hornBtn(b) {
     const on = b.hornActive(), left = b.horn.until - b.tick;
@@ -6592,6 +6597,10 @@
         else render(true);
         return;
       }
+      case "isotog":
+        setPref("iso", !prefs.iso);
+        render(true);
+        return;
       case "mute":
         setPref("sound", !prefs.sound);
         if (prefs.sound) {

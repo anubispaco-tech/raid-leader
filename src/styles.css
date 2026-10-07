@@ -433,8 +433,12 @@ h3 .gi{vertical-align:-.12em}
 .arena.compact .unit{grid-template-columns:22px 1fr auto}
 .arena.compact .unit .bar{height:5px}
 .arena.compact .unit .nm{font-size:12px}
-.bhead .mute{flex:0 0 auto;width:36px;height:36px;margin-left:8px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--fg)}
+.bhead .viewbtn{margin-left:8px;font-family:var(--f-num);font-size:12px;font-weight:700;letter-spacing:.04em}
+.bhead .viewbtn.on{color:var(--brass);border-color:var(--brass-d)}
+.bhead .hbtn{flex:0 0 auto;width:36px;height:36px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--fg)}
 .mute svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .mute.off{color:var(--muted)}
+.bhead .hbtn + .hbtn{margin-left:-4px}
+.bhead .mute:first-of-type{margin-left:8px}
 .seg.sm button{padding:5px 12px;font-family:var(--f-body)}
 @media (prefers-reduced-motion:reduce){.gboard,.gslab{transition:none}}

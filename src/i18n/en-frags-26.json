@@ -11,5 +11,7 @@
   "格子特效": "Grid effects",
   "立體視角": "3D view",
   "音效": "Sound",
-  "「簡化」只保留命中與首領機制的閃爍；「關」改回文字列表。設定只存在這台裝置。": "\"Simple\" keeps only hit and boss-mechanic flashes; \"Off\" goes back to the text list. Saved on this device only."
+  "「簡化」只保留命中與首領機制的閃爍；「關」改回文字列表。設定只存在這台裝置。": "\"Simple\" keeps only hit and boss-mechanic flashes; \"Off\" goes back to the text list. Saved on this device only.",
+  "切換成平面視角": "Switch to flat view",
+  "切換成立體視角": "Switch to 3D view"
 }

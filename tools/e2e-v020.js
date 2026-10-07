@@ -51,6 +51,14 @@ const over = await page.evaluate(() => { const c = document.querySelector('.ctrl
 check(over === 0, `控制列每顆按鈕在 360px 都完整顯示（${over}）`);
 const pageOver = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
 check(pageOver <= 0, `頁面沒有橫向捲動（${pageOver}）`);
+// 3b. 戰鬥中 2D／3D 快速切換
+check((await page.locator('[data-act="isotog"]').innerText()).trim() === '2D', '戰鬥標題列有 2D／3D 切換鍵（預設 2D）');
+await page.click('[data-act="isotog"]'); await page.waitForTimeout(300);
+check(await page.locator('.gstage.iso').count() === 1 && (await page.locator('[data-act="isotog"]').innerText()).trim() === '3D', '按一下切成立體');
+const hbOver = await page.evaluate(() => { const h = document.querySelector('.bhead'); return h.scrollWidth - h.clientWidth; });
+check(hbOver <= 0, `標題列在 360px 不溢出（${hbOver}）`);
+await page.click('[data-act="isotog"]'); await page.waitForTimeout(300);
+check(await page.locator('.gstage.iso').count() === 0, '再按一下切回平面');
 // 4. 音效快速開關
 await page.click('[data-act="mute"]'); await page.waitForTimeout(200);
 check(JSON.parse(await page.evaluate(() => localStorage.getItem('raid-leader-prefs'))).sound === false, '戰鬥中按喇叭可以關音效，並記在這台裝置');
