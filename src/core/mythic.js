@@ -3,7 +3,7 @@ import { tx } from './i18n.js';
 import { DUNGEONS, DUNGEON, MYTHIC, REWARD, SLOTS, RARITY, CH1_TOP } from './config.js';
 import { R, rnd, rint, pick } from './rng.js';
 import { buildWaves, dropIlvl } from './dungeons.js';
-import { makeItem, rollRarity } from './items.js';
+import { makeItem, rollLoot, rollRarity } from './items.js';
 
 // ---------- 詞綴 ----------
 // hint：對應哪種首領機制（推薦天賦用）
@@ -95,7 +95,7 @@ export function mythicBattleOpts(dIdx, level, date) {
 }
 
 // ---------- 結算 ----------
-export function mythicRewards(level, inTime, dIdx = 0) {
+export function mythicRewards(level, inTime, dIdx = 0, classes) { // classes：出戰隊員職業（v0.19 掉落加權）
   const top = mythicBase(dIdx), t2 = mythicTier(dIdx) === 2;
   const gold = Math.round((REWARD.goldBase + REWARD.goldPerTier * top) * MYTHIC.goldMult * (1 + 0.05 * level) * rnd(0.9, 1.1));
   const xp = Math.round(REWARD.xpBase * Math.pow(top + 1, REWARD.xpExp) * MYTHIC.xpMult * (1 + 0.1 * level));
@@ -104,7 +104,7 @@ export function mythicRewards(level, inTime, dIdx = 0) {
   const ilvl = t2 ? MYTHIC.ch2.dropBase + MYTHIC.ch2.dropPerLevel * level : MYTHIC.dropBase + MYTHIC.dropPerLevel * level;
   for (let k = 0; k < n; k++) {
     const rar = R() < legend ? RARITY.length - 1 : rollRarity(1); // 秘境至少精良
-    loot.push(makeItem(pick(Object.keys(SLOTS)), ilvl + rint(-1, 2), rar));
+    loot.push(rollLoot(classes, ilvl + rint(-1, 2), rar));
   }
   return { gold, xp, loot };
 }

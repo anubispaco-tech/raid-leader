@@ -20,7 +20,7 @@ import * as G from '../src/core/index.js';
   check(its.every(i => G.BASE_INFO[i.base] && G.GEAR_AFFIX[i.affix]), '新裝備都有基底與詞綴');
   check(new Set(its.map(i => i.affix)).size >= 7, '史詩可以出現多種詞綴（含完美的）：' + [...new Set(its.map(i => i.affix))].join(','));
   const st = G.makeSetItem('mage', 'head', 60); check(!st.base && !st.affix && G.codexKey(st) === 'set:mage:head', '套裝沒有詞綴，圖鑑以職業＋部位計');
-  check(G.codexAllKeys().length === 40 * 5 + 24, '圖鑑共 224 格');
+  check(G.codexAllKeys().length === 42 * 5 + 24, '圖鑑共 234 格（v0.19 +2 種基底）');
   // 舊存檔：沒有 base 的裝備由名稱回填
   const s = G.newGame(); s.player.asked = true; s.story.seen.push('pre0');
   s.items.old1 = { id: 'old1', slot: 'weapon', ilvl: 20, rarity: 2, up: 0, pow: 10, sta: 10, crit: 0, name: '灼熱的長劍' }; s.bag.push('old1');
@@ -37,7 +37,7 @@ import * as G from '../src/core/index.js';
   await page.click('[data-tab="bag"]'); await page.waitForTimeout(150);
   check((await page.locator('.item', { hasText: '長劍' }).first().innerText()).includes('灼焰長劍'), '舊裝備改用新命名顯示');
   await page.click('[data-act="bagview"][data-v="codex"]'); await page.waitForTimeout(150);
-  check(await page.locator('.cxrow').count() === 40 + 6, '圖鑑列出 40 種基底＋6 套套裝');
+  check(await page.locator('.cxrow').count() === 42 + 6, '圖鑑列出 42 種基底＋6 套套裝');
   check(await page.locator('.cxm.ready').count() === 1, '收集 26%：25% 獎勵可領');
   const g0 = await page.locator('#gold').innerText();
   await page.click('.cxm.ready'); await page.waitForTimeout(200);

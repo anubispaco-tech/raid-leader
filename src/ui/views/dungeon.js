@@ -3,7 +3,7 @@ import { tx } from '../../core/i18n.js';
 import * as G from '../../core/index.js';
 import { app, e2eMode } from '../state.js';
 import { dungeonIcon } from '../icons.js';
-import { fmt, mmss, esc, partyPower, avgPartyIlvl, avgPartyLv, dailyOpenNow } from '../helpers.js';
+import { fmt, mmss, esc, partyPower, avgPartyIlvl, avgPartyLv, dailyOpenNow, gearRuleCard } from '../helpers.js';
 import { leaderboard } from '../telemetry.js';
 
 // ---------- 下一步建議卡 ----------
@@ -98,7 +98,7 @@ function boardCard() {
 }
 export function viewDungeons() {
   const lv = avgPartyLv(), il = avgPartyIlvl();
-  let h = (G.tutActive(app.S) ? '' : dailyCard()) + nextStepCard() + tx('<h2>副本</h2><p class="sub">隊伍平均 <b class="num">Lv{0}</b>・裝等 <b class="num">{1}</b>・戰力 <b class="num">{2}</b>　｜　每隻首領都有弱點，打不過就換陣容，或回頭刷裝備。</p>', lv, il, fmt(partyPower()));
+  let h = gearRuleCard('home') + (G.tutActive(app.S) ? '' : dailyCard()) + nextStepCard() + tx('<h2>副本</h2><p class="sub">隊伍平均 <b class="num">Lv{0}</b>・裝等 <b class="num">{1}</b>・戰力 <b class="num">{2}</b>　｜　每隻首領都有弱點，打不過就換陣容，或回頭刷裝備。</p>', lv, il, fmt(partyPower()));
   // 遊玩分類：主線／秘境／寶庫／活動（之後的節慶、裝備副本放「活動」）
   const S = app.S, mode = app.mode || 'story';
   const modes = [['story', tx('主線')], ['mythic', tx('秘境')], ['vault', tx('寶庫')], ['event', tx('活動')]];

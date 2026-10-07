@@ -27,14 +27,14 @@
 
 ## 設計慣例
 - `src/core` 只放邏輯，不碰畫面，可在 Node 跑模擬；UI 在 `src/ui`。
-- 職業 = `src/core/classes/` 一個檔案 + `classes/index.js` 登記一行（像 DLC）。
+- 職業 = `src/core/classes/` 一個檔案 + `classes/index.js` 登記一行（像 DLC）。職業包要填 `armorType`（cloth／leather／plate）與 `weapons`（可用武器基底）。
 - 數值調整一定先寫或跑模擬工具（sim.js、sim-ch2.js、sim-abyss.js、probe.js、shaman-sim.js、druid-sim.js），用數據說話。
-- 物品定義在 `config.js` 的 `ITEM_BASES`（基底代號不可改名，只能新增）、`GEAR_AFFIX`、`ITEM_TIERS`；名稱一律用 `itemLabel()` 組，不要寫死到存檔。
+- 物品定義在 `config.js` 的 `ITEM_BASES`（基底代號不可改名，只能新增）；新增護甲基底要同時在 `BASE_ARMOR` 填甲類、在 `src/ui/icons.js` 的 `BASE_GLYPH` 填圖示、`GEAR_AFFIX`、`ITEM_TIERS`；名稱一律用 `itemLabel()` 組，不要寫死到存檔。
 - 存檔格式只加不改，舊檔升級寫在 `game.js` 的 `migrate()`；載入一律經過 `sanitizeSave` + `normalizeTypes`（安全）。
 - CSP 在 `tools/build.js`：新增外部來源要同步更新。
 - 圖示來自 game-icons.net（CC BY 3.0）：改 `src/ui/icons.js` 對照表後跑 `node tools/icons-build.js`。
 
-## 目前狀態（v0.18.2，GAS 對應 v0.18 版）
+## 目前狀態（v0.19.0，GAS 對應 v0.18 版）
 - 內容：6 職業（含德魯伊、薩滿）、2 章 14 層、傳奇秘境＋深淵秘境（共用體力）、寶庫、每日任務／首勝／簽到、45 個成就、T0 職業套裝、雲端存檔（Google 登入、自動同步、衝突偵測）、公告（試算表「公告」分頁 → GAS `?action=news`）。
 - 已決定：秘境體力制、套裝依職業分、樓層用羅馬數字、日文上線前再做、帳密登入不做（只用 Google）。
 - 待辦／候選：戰鬥紀錄 emoji 換圖示、技能名稱改成原創（商業化前）、日文、活動副本、T1 套裝、刷寶模式、10 人團本、主動技能。

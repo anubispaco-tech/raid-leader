@@ -4,6 +4,7 @@ import { ready, specCd, spec, baseCd, SPEC_ROW } from './shared.js';
 
 const P = {
   id: 'rogue', name: tx('暗影盜賊'), role: 'dps', icon: '🗡️', hp: 140, hpL: 24, pow: 10, powL: 2.3, armor: 0.2, crit: 0.15,
+  armorType: 'leather', weapons: ['dagger', 'scimitar', 'shortbow', 'longsword'], // v0.19 本職甲類（可向下穿）與可用武器基底
   desc: tx('單體爆發，暴擊率高。擅長打王。'),
   prefers: ['enrage', 'cast'],
   kick: () => true, // 腳踢 // 推薦陣容：遇到這些機制時優先帶

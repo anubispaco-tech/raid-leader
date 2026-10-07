@@ -2,14 +2,19 @@
 import { tx } from '../../core/i18n.js';
 import * as G from '../../core/index.js';
 import { app } from '../state.js';
-import { itemStatText, itemName, fmt } from '../helpers.js';
+import { itemStatText, itemName, fmt, gainFor, pctText, gearRuleCard } from '../helpers.js';
 
-function bestUpgradeFor(it) { // 是否比某位出戰者身上的更好
-  return G.partyHeroes(app.S).some(h => { const cur = h.gear[it.slot] && app.S.items[h.gear[it.slot]]; return !cur || G.heroItemScore(h, it) > G.heroItemScore(h, cur); });
+// v0.19 對出戰隊員的提升：「▲ 名字 +N%」；目前不比較好但強化後會更好 →「潛力」；隊上沒人能穿 → 灰字
+function gainNote(it) {
+  const g = gainFor(it);
+  if (g.best) return `<span class="better">▲ ${g.best.h.name} ${pctText(g.best.pct)}</span>`;
+  if (g.pot) return `<span class="potential" title="${tx('強化到 +{0} 時', g.pot.up)}">${tx('潛力 {0} {1}', g.pot.h.name, pctText(g.pot.pct))}</span>`;
+  if (!g.any) return `<span class="nofit">${tx('隊上沒人能穿')}</span>`;
+  return '';
 }
 const seg = (act, cur, opts) => `<div class="seg">${opts.map(([v, n]) => `<button data-act="${act}" data-v="${v}" class="${cur === v ? 'sel' : ''}">${n}</button>`).join('')}</div>`;
 const itemRow = (it, act = 'item') => `<button class="item rar${it.rarity}" data-act="${act}" data-id="${it.id}">
-    <div class="in">${itemName(it)}${bestUpgradeFor(it) ? tx('<span class="better">▲ 可提升</span>') : ''}</div>
+    <div class="in">${itemName(it)}${gainNote(it)}</div>
     <div class="il">${G.SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div>
     <div class="is num">${G.RARITY[it.rarity].name}・${itemStatText(it)}</div>${setMini(it)}</button>`;
 // v0.15 T0 套裝在列表上直接顯示簡短效果
@@ -46,7 +51,7 @@ export function viewBag() {
     .filter(it => app.invFilter === 'all' || it.slot === app.invFilter || (app.invFilter === 'armor' && G.ARMOR_SLOTS.includes(it.slot)) || (app.invFilter === 'set' && it.set))
     .sort((a, b) => G.itemScore(b) - G.itemScore(a));
   const cap = G.bagMax(S), full = S.bag.length >= cap;
-  let h = bagTabs() + tx('<h2>背包 <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">精華 <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">分解精良以上的裝備會得到精華。通關第 7 層後，可用精華把裝備精煉到 +6 ~ +{4}。</p>', full ? 'warnc' : '', S.bag.length, cap, fmt(S.dust || 0), G.GEAR.maxUp);
+  let h = gearRuleCard('bag') + bagTabs() + tx('<h2>背包 <span class="sub num {0}">{1}/{2}</span><span class="sub" style="float:right;font-size:14px;margin-top:6px">精華 <b class="dust num">{3}</b></span></h2> <p class="sub" style="margin:0 0 8px">分解精良以上的裝備會得到精華。通關第 7 層後，可用精華把裝備精煉到 +6 ~ +{4}。</p>', full ? 'warnc' : '', S.bag.length, cap, fmt(S.dust || 0), G.GEAR.maxUp);
   if (S.stash.length) {
     h += tx('<div class="stashbox"><div class="row" style="align-items:center"><b>戰利品箱</b><span class="sub num" style="margin:0">{0}/{1}</span> <span class="sub" style="margin:0 0 0 auto">背包滿時掉落的裝備</span></div> <div class="stack">{2} {3}</div> <div class="row"><button class="btn sm main grow" data-act="takestash" {4}>{5}</button> <button class="btn sm" data-act="salvagestash">全部分解</button></div></div>', S.stash.length, E.stashMax, S.stash.map(id => S.items[id]).sort((a, b) => G.itemScore(b) - G.itemScore(a)).slice(0, 5).map(it => itemRow(it)).join(''), S.stash.length > 5 ? tx('<div class="sub" style="margin:0">還有 {0} 件</div>', S.stash.length - 5) : '', full ? 'disabled' : '', full ? tx('背包已滿') : tx('取出到背包（還能放 {0} 件）', cap - S.bag.length));
   }

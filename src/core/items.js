@@ -1,15 +1,16 @@
 // ===== 裝備 =====
-import { RARITY, SLOTS, SLOT_STATS, SLOT_NAMES, PREFIX, GEAR, SETS, SET_PIECE, ARMOR_SLOTS, ITEM_BASES, BASE_INFO, ITEM_TIERS, GEAR_AFFIX, CLASSES } from './config.js';
+import { RARITY, SLOTS, SLOT_STATS, SLOT_NAMES, PREFIX, GEAR, SETS, SET_PIECE, ARMOR_SLOTS, ITEM_BASES, BASE_INFO, ITEM_TIERS, GEAR_AFFIX, CLASSES, ARMOR_TYPES, LOOT } from './config.js';
 import { tx } from './i18n.js';
 import { roleOf } from './classes/index.js';
 import { R, rnd, pick, uid } from './rng.js';
 import { getLang } from './i18n.js';
 
 // v0.16 裝備 = 基底（base）＋詞綴（affix）＋裝等＋稀有度；名稱在顯示時由 itemLabel() 組出（存檔只存代號）
-export function makeItem(slot, ilvl, rarity) {
+// cls：指定時只從這個職業的本職基底（可用武器／本職甲類／飾品）挑
+export function makeItem(slot, ilvl, rarity, cls) {
   const B = ilvl * RARITY[rarity].mult, w = SLOT_STATS[slot];
   const v = () => rnd(0.9, 1.1);
-  const base = pick(ITEM_BASES[slot])[0], affix = rollAffix(rarity), A = GEAR_AFFIX[affix];
+  const base = pick(cls ? fitBases(slot, cls) : ITEM_BASES[slot].map(b => b[0])), affix = rollAffix(rarity), A = GEAR_AFFIX[affix];
   const crit = (slot === 'trinket' && rarity >= 2 ? 0.01 * rarity + 0.01 : 0) + A.crit;
   const it = { id: uid(), slot, ilvl, rarity, up: 0, base, affix, pow: Math.round(B * w.pow * v() * A.pow), sta: Math.round(B * w.sta * v() * A.sta), crit: Math.round(crit * 1000) / 1000 };
   it.name = itemLabel(it); return it;
@@ -46,6 +47,35 @@ export const affixFit = (role, it) => {
   const A = GEAR_AFFIX[it.affix]; if (!A) return 1;
   return role === 'tank' ? 0.5 + 0.5 * A.sta : 0.5 + 0.5 * A.pow + A.crit * 5;
 };
+// ---------- v0.19 職業限制 ----------
+// 甲類：套裝 = 該職業本職甲類；一般護甲看基底；武器、飾品、找不到基底的舊裝備 = null
+export const armorOf = it => (!ARMOR_SLOTS.includes(it.slot) ? null : it.set ? (CLASSES[it.set] && CLASSES[it.set].armorType) || null : (it.base && BASE_INFO[it.base] && BASE_INFO[it.base].armor) || null);
+const clsOf = x => (typeof x === 'string' ? x : x && x.cls);
+// 能不能穿：套裝只有該職業；武器看職業包的 weapons；護甲甲類不能高於本職；飾品與沒有基底的舊裝備不限
+export function canEquip(who, it) {
+  const c = clsOf(who), P = CLASSES[c]; if (!P || !it) return false;
+  if (it.set) return it.set === c;
+  if (it.slot === 'trinket' || !it.base || !BASE_INFO[it.base]) return true;
+  if (it.slot === 'weapon') return !P.weapons || P.weapons.includes(it.base);
+  const a = armorOf(it); if (!a || !P.armorType) return true;
+  return ARMOR_TYPES[a].rank <= ARMOR_TYPES[P.armorType].rank;
+}
+// 本職護甲：屬性 +fitBonus
+export const isFitArmor = (who, it) => { const a = armorOf(it), P = CLASSES[clsOf(who)]; return !!a && !!P && a === P.armorType; };
+export const fitMult = (who, it) => (isFitArmor(who, it) ? 1 + GEAR.fitBonus : 1);
+// 本職基底：武器 = 可用武器；護甲 = 本職甲類；飾品 = 全部（掉落加權用）
+export function fitBases(slot, cls) {
+  const P = CLASSES[cls], all = ITEM_BASES[slot].map(b => b[0]);
+  const list = slot === 'weapon' ? all.filter(b => !P || !P.weapons || P.weapons.includes(b))
+    : ARMOR_SLOTS.includes(slot) ? all.filter(b => !P || !P.armorType || BASE_INFO[b].armor === P.armorType) : all;
+  return list.length ? list : all;
+}
+// 一般掉落：LOOT.smart 的比例針對出戰隊員其中一人的職業，其餘完全隨機（classes 空 = 完全隨機）
+export function rollLoot(classes, ilvl, rarity, slot) {
+  const sl = slot || pick(Object.keys(SLOTS));
+  const cls = classes && classes.length && R() < LOOT.smart ? pick(classes) : null;
+  return makeItem(sl, ilvl, rarity, cls);
+}
 // 由高到低累積機率抽稀有度
 export function rollRarity(minR = 0) {
   let x = R(), r = 0;
@@ -68,7 +98,10 @@ export function setMods(h, items) {
 }
 export const setCount = (h, items) => ARMOR_SLOTS.filter(sl => h.gear[sl] && items[h.gear[sl]] && items[h.gear[sl]].set === h.cls).length;
 // 給某位英雄看的裝備分數：同職業套裝件 +20%（讓一鍵配裝願意保留套裝）
-export const heroItemScore = (h, it) => itemScore(it) * (it.set && it.set === h.cls ? 1.2 : 1);
+// v0.19：穿不上的 = 0；本職護甲再 ×(1 + fitBonus)
+export const heroItemScore = (h, it) => (canEquip(h, it) ? itemScore(it) * (it.set && it.set === h.cls ? 1.2 : 1) * fitMult(h, it) : 0);
+// 同強化等級比較（背包「潛力」）：把 it 當成強化到 up 級
+export const heroItemScoreAt = (h, it, up) => heroItemScore(h, { ...it, up });
 export const upMult = it => 1 + GEAR.upBonus * (it.up || 0);
 export const itemPow = it => Math.round(it.pow * upMult(it));
 export const itemSta = it => Math.round(it.sta * upMult(it));

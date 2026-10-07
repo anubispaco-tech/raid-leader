@@ -4,6 +4,7 @@ import { ready, specCd, fx, spec, baseCd, SPEC_ROW } from './shared.js';
 
 const P = {
   id: 'mage', name: tx('奧術法師'), role: 'dps', icon: '🔥', hp: 115, hpL: 19, pow: 9, powL: 2.1, armor: 0.1, crit: 0.08,
+  armorType: 'cloth', weapons: ['staff', 'tome', 'dagger', 'scepter'], // v0.19 本職甲類（可向下穿）與可用武器基底
   desc: tx('範圍傷害，同時攻擊所有敵人。擅長清小怪。'),
   prefers: ['summon', 'shield'],
   kick: u => !!u.mods.canKick, // 學了「法術反制」才能打斷

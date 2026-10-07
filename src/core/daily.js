@@ -3,7 +3,7 @@
 import { tx } from './i18n.js';
 import { DAILY, REWARD, SLOTS, DUNGEONS, CH1_TOP } from './config.js';
 import { dayKey, addStamina } from './mythic.js';
-import { makeItem, makeSetItem, randomArmorSlot, rollRarity } from './items.js';
+import { makeItem, makeSetItem, randomArmorSlot, rollRarity, rollLoot } from './items.js';
 import { dungeonInfo } from './dungeons.js';
 import { vaultUnlocked } from './vault.js';
 import { partyHeroes, mythicUnlocked, grantItem } from './game.js';
@@ -56,7 +56,7 @@ export const dailyPending = s => { const d = dailyToday(s); return d.q.filter(q 
 function giveItem(s, rarity, setChance = 0) {
   const ch2 = topCleared(s) > CH1_TOP, party = partyHeroes(s);
   const it = ch2 && party.length && R() < setChance ? makeSetItem(pick(party).cls, randomArmorSlot(), topIlvl(s) + 2)
-    : makeItem(pick(Object.keys(SLOTS)), topIlvl(s) + 2, rollRarity(rarity));
+    : rollLoot(party.map(h => h.cls), topIlvl(s) + 2, rollRarity(rarity));
   return { item: it, dest: grantItem(s, it) };
 }
 export function claimQuest(s, i) {

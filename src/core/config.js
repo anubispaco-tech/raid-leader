@@ -74,13 +74,28 @@ export const ITEM_BASES = {
   weapon: [['longsword', tx('長劍')], ['staff', tx('法杖')], ['dagger', tx('匕首')], ['warhammer', tx('戰錘')], ['scepter', tx('權杖')], ['shortbow', tx('短弓')],
     ['greataxe', tx('巨斧')], ['scimitar', tx('彎刀')], ['tome', tx('法典')], ['spear', tx('長槍')]],
   head: [['helm', tx('頭盔')], ['hood', tx('兜帽')], ['circlet', tx('頭冠')], ['visor', tx('面甲')], ['hornhelm', tx('角盔')], ['bandana', tx('頭巾')]],
-  chest: [['mail', tx('鎖甲')], ['robe', tx('法袍')], ['leather', tx('皮甲')], ['plate', tx('板甲')], ['tabard', tx('戰袍')], ['scale', tx('鱗甲')]],
-  hands: [['gloves', tx('手套')], ['gauntlets', tx('護手')], ['bracers', tx('腕甲')], ['knuckles', tx('拳套')], ['grips', tx('指套')]],
-  legs: [['greaves', tx('護腿')], ['wraps', tx('綁腿')], ['legplates', tx('腿甲')], ['breeches', tx('馬褲')], ['tassets', tx('裙甲')]],
+  chest: [['mail', tx('鎖甲')], ['robe', tx('法袍')], ['leather', tx('皮革胸甲')], ['plate', tx('板甲')], ['tabard', tx('戰袍')], ['scale', tx('鱗甲')]],
+  hands: [['gloves', tx('手套')], ['gauntlets', tx('護手')], ['bracers', tx('腕甲')], ['knuckles', tx('拳套')], ['grips', tx('指套')], ['vambraces', tx('臂鎧')]],
+  legs: [['greaves', tx('護腿')], ['wraps', tx('綁腿')], ['legplates', tx('腿甲')], ['breeches', tx('馬褲')], ['tassets', tx('裙甲')], ['silks', tx('絲綢長褲')]],
   trinket: [['amulet', tx('護符')], ['ring', tx('戒指')], ['sigil', tx('徽記')], ['orb', tx('寶珠')], ['necklace', tx('項鍊')], ['earring', tx('耳環')],
     ['buckle', tx('腰扣')], ['runestone', tx('符文石')]],
 };
-export const BASE_INFO = Object.fromEntries(Object.entries(ITEM_BASES).flatMap(([slot, list]) => list.map(([key, name]) => [key, { slot, name, icon: null, tags: [] }])));
+// v0.19 甲類：鎧甲（只有本職鎧甲的職業能穿）＞皮甲＞布甲（全職業）；職業的本職甲類與可用武器寫在職業包（armorType／weapons）
+export const ARMOR_TYPES = {
+  cloth: { rank: 0, name: tx('布甲'), short: tx('布') },
+  leather: { rank: 1, name: tx('皮甲'), short: tx('皮') },
+  plate: { rank: 2, name: tx('鎧甲'), short: tx('鎧') },
+};
+export const BASE_ARMOR = {
+  helm: 'plate', visor: 'plate', hornhelm: 'leather', bandana: 'leather', hood: 'cloth', circlet: 'cloth',
+  plate: 'plate', mail: 'plate', leather: 'leather', scale: 'leather', robe: 'cloth', tabard: 'cloth',
+  gauntlets: 'plate', vambraces: 'plate', bracers: 'leather', knuckles: 'leather', gloves: 'cloth', grips: 'cloth',
+  legplates: 'plate', tassets: 'plate', greaves: 'leather', breeches: 'leather', wraps: 'cloth', silks: 'cloth',
+};
+// 物品圖示（game-icons.net 名稱，對照在 src/ui/icons.js 的 BASE_GLYPH）
+export const BASE_INFO = Object.fromEntries(Object.entries(ITEM_BASES).flatMap(([slot, list]) => list.map(([key, name]) => [key, { slot, name, icon: null, armor: BASE_ARMOR[key] || null, tags: BASE_ARMOR[key] ? [BASE_ARMOR[key]] : [] }])));
+// v0.19 掉落：smart 的比例先從出戰隊員抽一位，再從他的本職基底（可用武器／本職甲類）挑；其餘完全隨機
+export const LOOT = { smart: 0.7 };
 // 裝等階級材質（每 6 裝等一階），只影響名稱
 export const ITEM_TIERS = ['', tx('鐵製'), tx('精鋼'), tx('灼焰'), tx('寒霜'), tx('虛空'), tx('遠古'), tx('龍鱗')];
 // 詞綴：重新分配威力／耐力，或換一點暴擊；總量大致不變。w = 各稀有度的出現權重（普通→傳說）
@@ -101,6 +116,7 @@ export const CODEX_REWARDS = [
 export const PREFIX = ['', tx('堅毅的'), tx('銳利的'), tx('灼熱的'), tx('寒霜的'), tx('虛空的'), tx('遠古的'), tx('龍鱗的')];
 export const GEAR = {
   maxUp: 10, upBonus: 0.08,         // 每級強化屬性 +8%（+6 以上為精煉）
+  fitBonus: 0.1,                    // v0.19 穿本職甲類的護甲：屬性 +10%
   refineFrom: 5, dustPerStep: 5,    // 精煉：+5 → +6 要 5 精華，之後每級多 5（+6→+7 要 10…）
   salvageDust: [0, 1, 2, 4, 10],    // 分解得到的精華（依品質）
   upCostBase: 15,                   // 強化費用 = base × (等級+1) × (1 + 裝等/10)

@@ -6,6 +6,7 @@ import { ready, specCd, fx, spec, SPEC_ROW } from './shared.js';
 const ROLE = { elemental: 'dps', resto: 'heal' };
 const P = {
   id: 'shaman', name: tx('薩滿'), role: 'dps', roleText: tx('輸出／治療'), icon: '⚡',
+  armorType: 'leather', weapons: ['warhammer', 'greataxe', 'scimitar', 'staff'], // v0.19 本職甲類（可向下穿）與可用武器基底
   hp: 125, hpL: 21, pow: 8.5, powL: 1.95, armor: 0.22, crit: 0.07,
   desc: tx('元素可輸出、恢復可治療；首領戰開場自動施放嗜血，全隊加速，圖騰再強化全隊。'),
   roleOf: h => ROLE[h.spec] || 'dps',

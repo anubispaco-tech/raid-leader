@@ -181,6 +181,8 @@ document.addEventListener('click', e => {
     case 'codexclaim': { const r = G.claimCodex(app.S, +t.dataset.v); if (r) { toast(tx('圖鑑 {0}%：獲得 {1} 金、{2} 精華', r.pct, fmt(r.gold), r.dust)); save(); } break; }
     case 'tutskip': { const step = app.S.tut.step; G.tutSkip(app.S); save(); T.sendEvent(tx('教學'), `skip@${step}`); toast(tx('已跳過教學，「下一步」卡片會繼續提示')); break; }
     case 'cardok': G.markCard(app.S, t.dataset.v); save(); break;
+    case 'gearfixok': { const had = app.S.gearFix; app.S.gearFix = 0; G.markCard(app.S, 'gear19');
+      if (had) { const n = G.autoEquip(app.S); toast(tx('更換了 {0} 件裝備', n)); } save(); break; }
     case 'lock': { const on = G.toggleLock(app.S, t.dataset.kind, id); if (on != null) toast(on ? tx('已鎖定，不會被分解或解雇') : tx('已解除鎖定')); save(); break; }
     case 'up5': { const r = G.upgradeMany(app.S, id, 5);
       if (r && r.ok) { toast(tx('強化成功 +{0}', r.to)); save(); } else toast(tx('金幣或精華不足')); break; }

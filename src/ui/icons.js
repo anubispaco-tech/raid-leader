@@ -13,12 +13,24 @@ const BOSS_GLYPH = ['mushroom-gills', 'golem-head', 'trident', 'fire-shield', 'c
 const TRASH = 'imp-laugh', GOBLIN = 'goblin-head', COIN = 'two-coins';
 export const HORN = 'hunting-horn'; // 英勇號角按鈕
 export const TROPHY = 'trophy-cup';  // 成就
-export const BRAND = 'crossed-swords'; // v0.18.2 左上角遊戲圖示（點了開設定）
+export const BRAND = 'crossed-swords';
+// v0.19 物品圖示：依基底（config.js 的 ITEM_BASES）；套裝與舊裝備用部位圖示
+export const BASE_GLYPH = {
+  longsword: 'broadsword', staff: 'wizard-staff', dagger: 'sacrificial-dagger', warhammer: 'warhammer', scepter: 'lunar-wand',
+  shortbow: 'pocket-bow', greataxe: 'battle-axe', scimitar: 'crescent-blade', tome: 'spell-book', spear: 'spear-hook',
+  helm: 'visored-helm', visor: 'closed-barbute', hornhelm: 'horned-helm', bandana: 'ninja-mask', hood: 'hood', circlet: 'jewel-crown',
+  plate: 'breastplate', mail: 'chain-mail', leather: 'leather-vest', scale: 'scale-mail', robe: 'robe', tabard: 'cape-armor',
+  gauntlets: 'gauntlet', vambraces: 'mailed-fist', bracers: 'bracers', knuckles: 'brass-knuckles', gloves: 'gloves', grips: 'hand-bandage',
+  legplates: 'leg-armor', tassets: 'belt-armor', greaves: 'metal-boot', breeches: 'armored-pants', wraps: 'bandage-roll', silks: 'trousers',
+  amulet: 'gem-pendant', ring: 'diamond-ring', sigil: 'stone-tablet', orb: 'crystal-ball', necklace: 'pearl-necklace', earring: 'drop-earrings',
+  buckle: 'belt-buckles', runestone: 'rune-stone',
+}; // v0.18.2 左上角遊戲圖示（點了開設定）
 
 export const svg = (name, cls = '') => DATA[name]
   ? `<svg class="gi ${cls}" viewBox="0 0 512 512" aria-hidden="true"><path d="${DATA[name]}"/></svg>` : '';
 export const classIcon = cls => svg(CLASS_GLYPH[cls], 'gi-' + cls);
 export const slotIcon = (slot, rarity = 0) => svg(SLOT_GLYPH[slot], 'c' + rarity);
+export const itemIcon = it => svg((!it.set && BASE_GLYPH[it.base]) || SLOT_GLYPH[it.slot], 'c' + it.rarity);
 export const dungeonIcon = i => { const g = BOSS_GLYPH[i]; return svg(Array.isArray(g) ? g[0] : g, 'gi-boss'); };
 // 戰鬥中的敵人：依名字找首領圖示，其餘是小怪／寶藏哥布林
 const byName = {};

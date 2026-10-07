@@ -153,6 +153,13 @@ h2{font-family:var(--f-display);font-weight:700;font-size:22px;margin:22px 0 4px
 .c0{color:var(--r0)} .c1{color:var(--r1)} .c2{color:var(--r2)} .c3{color:var(--r3)}
 .up{color:var(--brass);font-family:var(--f-num);font-size:12px;margin-left:4px}
 .better{color:var(--good);font-size:11px;font-weight:700;margin-left:6px}
+/* v0.19 裝備職業限制：甲類標籤、潛力、沒人能穿、不能穿的英雄 */
+.atag{display:inline-block;font-size:10px;line-height:14px;padding:0 4px;margin-left:5px;border-radius:4px;border:1px solid var(--line);color:var(--muted);vertical-align:1px;font-weight:700}
+.atag.at-plate{color:#c9d1dc;border-color:#6b7686}.atag.at-leather{color:#d4a373;border-color:#8a6440}.atag.at-cloth{color:#b9a3e8;border-color:#6d5a9c}
+.potential{color:var(--warn);font-size:11px;font-weight:700;margin-left:6px}
+.nofit{color:var(--dim);font-size:11px;margin-left:6px}
+.whocan{font-size:12px;color:var(--muted);margin:6px 0 2px}.whocan b{color:var(--fg)}
+.hero.off{opacity:.45;cursor:not-allowed}
 
 /* 底部分頁 */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}

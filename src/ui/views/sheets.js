@@ -4,7 +4,7 @@ import { tx } from '../../core/i18n.js';
 import * as G from '../../core/index.js';
 import { app } from '../state.js';
 import { sheetSettings } from './settings.js';
-import { $, fmt, pct, toast, hero, cls, inParty, itemStatText, itemName, partyPower, avgPartyIlvl, avgPartyLv, heroName, rarityTag } from '../helpers.js';
+import { $, fmt, pct, toast, hero, cls, inParty, itemStatText, itemName, partyPower, avgPartyIlvl, avgPartyLv, heroName, rarityTag, whoCan, pctText } from '../helpers.js';
 
 import { sheetAchievements } from './achievements.js';
 export function openModal(m) { app.modal = m; renderModal(); }
@@ -102,22 +102,35 @@ function talentView(x) {
 }
 function sheetPick() {
   const x = hero(app.modal.id), slot = app.modal.slot, cur = x.gear[slot] && app.S.items[x.gear[slot]];
-  const list = app.S.bag.map(id => app.S.items[id]).filter(it => it.slot === slot).sort((a, b) => G.heroItemScore(x, b) - G.heroItemScore(x, a));
-  return tx('<h3>為 {0} 選擇{1}</h3><div class="sub" style="margin:0">目前：{2}</div> <div class="choices">{3}</div> <div class="row">{4}<button class="btn" data-act="hero" data-id="{5}">返回</button></div>', x.name, G.SLOTS[slot], cur ? itemName(cur) + '・' + itemStatText(cur) : tx('無'), list.map(it => `<button class="item rar${it.rarity}" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="in">${itemName(it)}${!cur || G.heroItemScore(x, it) > G.heroItemScore(x, cur) ? '<span class="better">▲</span>' : ''}</div><div class="il"><b class="num">${it.ilvl}</b></div><div class="is num">${itemStatText(it)}</div></button>`).join(''), cur ? tx('<button class="btn" data-act="unequip" data-hero="{0}" data-slot="{1}">卸下</button>', x.id, slot) : '', x.id);
+  const all = app.S.bag.map(id => app.S.items[id]).filter(it => it.slot === slot), list = all.filter(it => G.canEquip(x, it)).sort((a, b) => G.heroItemScore(x, b) - G.heroItemScore(x, a));
+  const hidden = all.length - list.length, base = cur ? G.heroItemScore(x, cur) : 0;
+  const gainTag = it => { if (!cur) return '<span class="better">▲</span>'; const g = G.heroItemScore(x, it) / base - 1;
+    if (g > 0.005) return `<span class="better">▲ ${pctText(g)}</span>`;
+    const p = (cur.up || 0) > (it.up || 0) ? G.heroItemScoreAt(x, it, cur.up) / base - 1 : 0;
+    return p > 0.005 ? `<span class="potential">${tx('潛力 {0}', pctText(p))}</span>` : ''; };
+  return tx('<h3>為 {0} 選擇{1}</h3><div class="sub" style="margin:0">目前：{2}</div> <div class="choices">{3}</div> <div class="row">{4}<button class="btn" data-act="hero" data-id="{5}">返回</button></div>', x.name, G.SLOTS[slot], cur ? itemName(cur) + '・' + itemStatText(cur) : tx('無'), list.map(it => `<button class="item rar${it.rarity}" data-act="equip" data-hero="${x.id}" data-id="${it.id}"><div class="in">${itemName(it)}${gainTag(it)}</div><div class="il"><b class="num">${it.ilvl}</b></div><div class="is num">${itemStatText(it)}</div></button>`).join('') + (hidden ? tx('<p class="sub" style="margin:0">另有 {0} 件{1}不能穿（甲類或武器不符）</p>', hidden, cls(x).name) : ''), cur ? tx('<button class="btn" data-act="unequip" data-hero="{0}" data-slot="{1}">卸下</button>', x.id, slot) : '', x.id);
 }
 // 套裝說明插在「裝備給」上方
 const withSet = (it, html) => html.replace('<span class="label">', affixLine(it) + setInfo(it) + '<span class="label">');
 function sheetItem(it) {
   if (!it) return '';
   const party = G.partyHeroes(app.S);
-  return withSet(it, tx('<h3>{0}</h3><div class="sub num" style="margin:0">{1}{2}・裝等 {3}・強化 +{4}/{5}<br>{6}</div> <span class="label">裝備給</span><div class="stack">{7}</div> <div class="row">{8} {12}</div>', itemName(it), G.RARITY[it.rarity].name, G.SLOTS[it.slot], it.ilvl, it.up, G.maxUpFor(app.S), itemStatText(it), party.map(x => {
+  return withSet(it, tx('<h3>{0}</h3><div class="sub num" style="margin:0">{1}{2}・裝等 {3}・強化 +{4}/{5}<br>{6}</div>{13} <span class="label">裝備給</span><div class="stack">{7}</div> <div class="row">{8} {12}</div>', itemName(it), G.RARITY[it.rarity].name, G.SLOTS[it.slot], it.ilvl, it.up, G.maxUpFor(app.S), itemStatText(it), party.map(x => {
       const cur = x.gear[it.slot] && app.S.items[x.gear[it.slot]];
-      const better = !cur || G.heroItemScore(x, it) > G.heroItemScore(x, cur);
-      return tx('<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">目前：{7}</div></button>', x.id, it.id, cls(x).icon, x.name, cls(x).name, better ? 'in' : '', better ? tx('▲ 提升') : tx('較差'), cur ? tx('{0}（{1}）', cur.name, cur.ilvl) : tx('空'));
+      if (!G.canEquip(x, it)) return tx('<button class="hero off" disabled><div class="ic">{0}</div><div class="nm">{1}<small>{2}</small></div><span class="tag">不能穿</span><div class="st">{3}</div></button>', cls(x).icon, x.name, cls(x).name, it.slot === 'weapon' ? tx('不會用這種武器') : it.set ? tx('其他職業的套裝') : tx('只能穿{0}以下', G.ARMOR_TYPES[cls(x).armorType].name));
+      const base = cur ? G.heroItemScore(x, cur) : 0, g = cur ? G.heroItemScore(x, it) / base - 1 : Infinity;
+      const p = cur && (cur.up || 0) > (it.up || 0) ? G.heroItemScoreAt(x, it, cur.up) / base - 1 : 0, better = g > 0.005;
+      const fit = G.isFitArmor(x, it) ? tx('・本職 +{0}%', Math.round(G.GEAR.fitBonus * 100)) : '';
+      return tx('<button class="hero" data-act="equip" data-hero="{0}" data-id="{1}"><div class="ic">{2}</div><div class="nm">{3}<small>{4}</small></div><span class="tag {5}">{6}</span><div class="st">目前：{7}{8}{9}</div></button>', x.id, it.id, cls(x).icon, x.name, cls(x).name, better ? 'in' : '', better ? tx('▲ {0}', pctText(g)) : tx('較差'), cur ? tx('{0}（{1}）', cur.name, cur.ilvl) : tx('空'), p > 0.005 && !better ? tx('・強化到 +{0} 會 {1}', cur.up, pctText(p)) : '', fit);
     }).join(''), upBtn(it, '') + ' ' + upManyBtn(it), it.id, G.salvageValue(it), G.salvageDust(it) ? tx('・<span class="dust num">{0}</span> 精華', G.salvageDust(it)) : '',
     lockBtn('item', it) + (it.locked ? '' : app.modal.confirmSalv === it.id
       ? tx('<button class="btn danger" data-act="salvage" data-id="{0}">確定分解{1}？</button>', it.id, G.RARITY[it.rarity].name)
-      : tx('<button class="btn" data-act="salvage" data-id="{0}">分解 +<span class="num">{1}</span> 金{2}</button>', it.id, G.salvageValue(it), G.salvageDust(it) ? tx('・<span class="dust num">{0}</span> 精華', G.salvageDust(it)) : ''))));
+      : tx('<button class="btn" data-act="salvage" data-id="{0}">分解 +<span class="num">{1}</span> 金{2}</button>', it.id, G.salvageValue(it), G.salvageDust(it) ? tx('・<span class="dust num">{0}</span> 精華', G.salvageDust(it)) : '')), equipLine(it)));
+}
+// v0.19 誰能穿：甲類＋可穿職業
+function equipLine(it) {
+  const a = G.armorOf(it);
+  return `<div class="whocan">${a && !it.set ? `<b>${G.ARMOR_TYPES[a].name}</b>・` : ''}${tx('可裝備：{0}', whoCan(it))}</div>`;
 }
 // v0.16 詞綴說明（放在標題下方：withSet 會把套裝說明插在「裝備給」上方）
 function affixLine(it) {

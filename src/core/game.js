@@ -2,7 +2,7 @@
 // 所有函式都接收存檔物件 s 並直接修改它；畫面層只呼叫這裡，不自己改存檔。
 import { CLASSES, HERO, SLOTS, DUNGEONS, REWARD, ECONOMY, GEAR, BAG_MILESTONES, BAG_PER_MILESTONE, HERO_RARITY, LEGENDS, RECRUIT } from './config.js';
 import { R, rnd, rint, pick } from './rng.js';
-import { makeItem, rollRarity, itemScore, heroItemScore, makeSetItem, randomArmorSlot, salvageValue, salvageDust, upgradeCost, dustCost, codexKey, codexAllKeys, guessBase } from './items.js';
+import { makeItem, rollLoot, canEquip, rollRarity, itemScore, heroItemScore, makeSetItem, randomArmorSlot, salvageValue, salvageDust, upgradeCost, dustCost, codexKey, codexAllKeys, guessBase } from './items.js';
 import { CODEX_REWARDS } from './config.js';
 import { makeHero, gainXp, heroPower, roleOf, heroIlvl } from './heroes.js';
 import { getLang } from './i18n.js';
@@ -18,7 +18,7 @@ const newPlayer = () => ({ pid: Array.from({ length: 12 }, () => 'abcdefghijklmn
 export const hireCost = h => Math.round((ECONOMY.hireBase + ECONOMY.hirePerLevel * h.level) * HERO_RARITY[h.rarity || 0].hire);
 
 // ---------- 獎勵 ----------
-export function rewards(dIdx, win, firstClear) {
+export function rewards(dIdx, win, firstClear, classes) { // classes：出戰隊員職業（v0.19 掉落加權）
   const info = dungeonInfo(dIdx), m = win ? 1 : REWARD.loseMult;
   const gold = Math.round((REWARD.goldBase + REWARD.goldPerTier * dIdx) * m * rnd(0.9, 1.1));
   const xp = Math.round(REWARD.xpBase * Math.pow(dIdx + 1, REWARD.xpExp) * m);
@@ -26,7 +26,7 @@ export function rewards(dIdx, win, firstClear) {
   if (win) {
     const n = REWARD.baseDrops + (R() < REWARD.doubleDropChance ? 1 : 0);
     for (let k = 0; k < n; k++) {
-      loot.push(makeItem(pick(Object.keys(SLOTS)), info.dropIlvl + rint(-1, 2), rollRarity(firstClear && k === 0 ? REWARD.firstClearMinRarity : 0)));
+      loot.push(rollLoot(classes, info.dropIlvl + rint(-1, 2), rollRarity(firstClear && k === 0 ? REWARD.firstClearMinRarity : 0)));
     }
   }
   return { gold, xp, loot };
@@ -94,6 +94,14 @@ export function migrate(s) {
   if (s.salvageIlvlGap == null) s.salvageIlvlGap = 0;
   s.story = s.story || { seen: [] };
   normalizeTypes(s);
+  // v0.19 職業限制：穿不上的裝備卸回背包（滿了先進戰利品箱，再滿也放背包，不會消失）；件數給畫面顯示一次說明
+  { let n = 0;
+    for (const h of s.heroes) for (const sl of Object.keys(h.gear || {})) {
+      const id = h.gear[sl], it = id && s.items[id]; if (!it || canEquip(h, it)) continue;
+      h.gear[sl] = null; n++;
+      if (s.bag.length >= bagMax(s) && s.stash.length < ECONOMY.stashMax) s.stash.push(id); else s.bag.push(id);
+    }
+    s.gearFix = int(s.gearFix, 0, 999) + n; }
   s.v = SAVE_VERSION;
   return s;
 }
@@ -256,7 +264,7 @@ export function addLoot(s, it) {
 }
 export function applyResult(s, dIdx, battle) {
   const first = battle.win && !s.clears[dIdx];
-  const rw = rewards(dIdx, battle.win, first);
+  const rw = rewards(dIdx, battle.win, first, partyHeroes(s).map(h => h.cls));
   const party = partyHeroes(s), decay = decayFor(dIdx), avgL = avgLevel(party);
   s.stats.runs++;
   rw.gold = Math.max(1, Math.round(rw.gold * decay(avgL)));
@@ -294,7 +302,7 @@ export const mythicUnlocked = s => !!s.clears[MYTHIC.unlockAfter];
 export const maxUpFor = s => mythicUnlocked(s) ? GEAR.maxUp : GEAR.refineFrom;
 export function applyMythicResult(s, battle) {
   const M = battle.mythic, kc = keyChange(M.level, battle, M.timer);
-  const rw = mythicRewards(M.level, kc.inTime, M.dIdx);
+  const rw = mythicRewards(M.level, kc.inTime, M.dIdx, partyHeroes(s).map(h => h.cls));
   // 深淵秘境限時通關：和第二章主線一樣有機會掉職業套裝
   const party = partyHeroes(s);
   if (kc.inTime && mythicTier(M.dIdx) === 2 && party.length && R() < SET_DROP.chance)
@@ -321,7 +329,7 @@ export function mythicIdleLevel(s, dIdx) {
 export const canMythicIdle = s => Object.keys(s.mythic.best || {}).length > 0;
 export function applyMythicIdleResult(s, battle) {
   const M = battle.mythic, win = battle.win;
-  const rw = mythicRewards(M.level, true, M.dIdx), m = win ? MYTHIC.idleMult : MYTHIC.idleMult * REWARD.loseMult;
+  const rw = mythicRewards(M.level, true, M.dIdx, partyHeroes(s).map(h => h.cls)), m = win ? MYTHIC.idleMult : MYTHIC.idleMult * REWARD.loseMult;
   rw.gold = Math.round(rw.gold * m); rw.xp = Math.round(rw.xp * m); rw.loot = win ? rw.loot.slice(0, 2) : [];
   s.stats.runs++; if (win) s.stats.wins++;
   s.gold += rw.gold;
@@ -335,12 +343,14 @@ export function applyMythicIdleResult(s, battle) {
 
 // ---------- 背包與裝備 ----------
 export function equip(s, heroId, itemId) {
-  const h = s.heroes.find(x => x.id === heroId), it = s.items[itemId]; if (!h || !it) return;
+  const h = s.heroes.find(x => x.id === heroId), it = s.items[itemId]; if (!h || !it) return false;
+  if (!canEquip(h, it)) return false; // v0.19 職業限制
   const prev = h.gear[it.slot];
   for (const o of s.heroes) if (o.gear[it.slot] === itemId) o.gear[it.slot] = null; // 從別人身上拿過來
   s.bag = s.bag.filter(id => id !== itemId); s.stash = (s.stash || []).filter(id => id !== itemId);
   h.gear[it.slot] = itemId;
   if (prev && prev !== itemId) s.bag.push(prev);
+  return true;
 }
 export function unequip(s, heroId, slot) {
   const h = s.heroes.find(x => x.id === heroId); if (!h || !h.gear[slot]) return;
@@ -471,7 +481,7 @@ export function upgradeMany(s, itemId, n, dry = false) {
 export function hasUpgrade(s) {
   return partyHeroes(s).some(h => Object.keys(SLOTS).some(slot => {
     const cur = h.gear[slot] && s.items[h.gear[slot]];
-    return s.bag.some(id => { const it = s.items[id]; return it.slot === slot && (!cur || heroItemScore(h, it) > heroItemScore(h, cur)); });
+    return s.bag.some(id => { const it = s.items[id]; return it.slot === slot && canEquip(h, it) && (!cur || heroItemScore(h, it) > heroItemScore(h, cur)); });
   }));
 }
 // 一鍵配裝：替出戰隊員從背包挑分數最高的
@@ -483,7 +493,7 @@ export function autoEquip(s, heroId, dry) {
     for (const slot of Object.keys(SLOTS)) {
       const cur = h.gear[slot] && s.items[h.gear[slot]];
       let best = null;
-      for (const id of s.bag) { const it = s.items[id]; if (it.slot === slot && (!best || heroItemScore(h, it) > heroItemScore(h, best))) best = it; }
+      for (const id of s.bag) { const it = s.items[id]; if (it.slot === slot && canEquip(h, it) && (!best || heroItemScore(h, it) > heroItemScore(h, best))) best = it; }
       if (best && (!cur || heroItemScore(h, best) > heroItemScore(h, cur))) { if (!dry) equip(s, h.id, best.id); changed++; }
     }
   }

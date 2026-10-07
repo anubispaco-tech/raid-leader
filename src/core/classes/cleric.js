@@ -5,6 +5,7 @@ import { ready, specCd, fx, spec, baseCd, SPEC_ROW } from './shared.js';
 
 const P = {
   id: 'cleric', name: tx('聖光牧師'), role: 'heal', icon: '✨', hp: 130, hpL: 22, pow: 9, powL: 2.0, armor: 0.15, crit: 0.05,
+  armorType: 'cloth', weapons: ['scepter', 'staff', 'tome', 'warhammer'], // v0.19 本職甲類（可向下穿）與可用武器基底
   desc: tx('治療血量最低的隊友，每 5 秒群體治療。'),
   ai: { single: 1.9, critMult: 1.5, groupEvery: 5, group: 0.75, groupBelow: 0.9, idleHit: 0.5 },
   base: { name: tx('真言術：盾'), cd: 10, mult: 4, desc: tx('冷卻 10 秒：給血量最低的隊友護盾（威力 ×4）') },

@@ -4,6 +4,7 @@ import { ready, specCd, fx, spec, baseCd, SPEC_ROW } from './shared.js';
 
 const P = {
   id: 'guardian', name: tx('守護騎士'), role: 'tank', icon: '🛡️', hp: 230, hpL: 42, pow: 6, powL: 1.5, armor: 0.45, crit: 0.05,
+  armorType: 'plate', weapons: ['longsword', 'warhammer', 'greataxe', 'spear'], // v0.19 本職甲類（可向下穿）與可用武器基底
   desc: tx('嘲諷所有敵人，承受傷害。護甲減傷 45%。'),
   kick: () => true, // 盾牌猛擊可以打斷讀條
   ai: { hit: 0.8 },

@@ -12,6 +12,7 @@ const FORM = {
 };
 const P = {
   id: 'druid', name: tx('德魯伊'), role: 'dps', roleText: tx('坦克／治療／輸出'), icon: '🌿',
+  armorType: 'leather', weapons: ['staff', 'spear', 'dagger', 'warhammer'], // v0.19 本職甲類（可向下穿）與可用武器基底
   hp: 126, hpL: 22, pow: 9, powL: 2.07, armor: 0.2, crit: 0.12,
   desc: tx('依專精化身熊、樹人或獵豹，可以當坦克、治療或輸出；單一職責比專職職業弱一些。'),
   roleOf: h => ROLE[h.spec] || 'dps',
