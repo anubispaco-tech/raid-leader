@@ -23,6 +23,9 @@ import * as C from './cloud.js';
 import { mountGrid, zoomBy } from './grid.js';
 import { prefs, setPref } from './prefs.js';
 import * as SFX from './sfx.js';
+import * as A from './acq.js';
+
+A.captureParams(); // v0.21.1 先收下 ?src= ?ref=（在搬家流程改網址之前）
 
 // ---------- 分頁 ----------
 const ICONS = {
@@ -85,7 +88,12 @@ app.showStuck = showStuck;
 app.render = render;
 app.renderModal = renderModal;
 // 設定頁畫好後放 Google 登入按鈕、讀雲端狀態
-app.afterModal = () => { if (app.modal && app.modal.type === 'settings' && C.cloudEnabled()) { C.mountButton(); C.check(); } };
+app.afterModal = () => {
+  if (!C.cloudEnabled()) return;
+  if (document.getElementById('gsiBtn')) C.mountButton(); // 設定頁、v0.21.1 登入視窗
+  if (app.modal && app.modal.type === 'settings') C.check();
+};
+app.closeModal = closeModal;
 app.openModal = openModal;
 app.renderTabs = renderTabs;
 
@@ -310,6 +318,11 @@ document.addEventListener('click', e => {
     case 'cloudpick': C.pick(t.dataset.v); return;
     case 'cloudout': C.logout(); toast(tx('已登出（這台裝置的進度保留）')); break;
     case 'nick': openNick(); return;
+    case 'share': shareInvite(); return;
+    case 'sharecopy': { const el = $('#shareTxt'); navigator.clipboard?.writeText(el.value).then(() => { toast(tx('已複製邀請連結')); T.sendEvent(tx('分享'), 'copy'); }, () => { el.select(); toast(tx('請手動複製')); }) ?? (el.select(), toast(tx('請手動複製'))); return; }
+    case 'loginskip': closeModal(); return;
+    case 'inappclose': $('#inappBar').hidden = true; try { sessionStorage.setItem('rl-inapp', '1'); } catch (err) { /* ignore */ } return;
+    case 'inappcopy': navigator.clipboard?.writeText(A.outsideUrl()).then(() => toast(tx('已複製連結，請貼到 Safari 或 Chrome 開啟')), () => toast(tx('請手動複製'))) ?? toast(tx('請手動複製')); return;
     case 'savenick': {
       const v = ($('#nickInp').value || '').trim().slice(0, 16);
       app.S.player.name = v; app.S.player.asked = true; app.modal = null; save();
@@ -369,7 +382,7 @@ document.addEventListener('visibilitychange', () => {
   } else if (app.battle && !app.battle.over) runTimer();
   else resumeIdle();
 });
-setInterval(() => { if (!document.hidden) { T.tick(5); save(); C.autoTick(); showStuck('time'); } }, 5000);
+setInterval(() => { if (!document.hidden) { T.tick(5); save(); C.autoTick(); showStuck('time'); maybeBind(); } }, 5000);
 document.addEventListener('input', e => { if (e.target.id === 'fbText') app.fbDraft = e.target.value; });
 document.addEventListener('change', e => {
   if (e.target.id === 'salvSel') { app.salvSel = +e.target.value; app.salvConfirm = false; render(); }
@@ -394,6 +407,8 @@ function start(data) {
   const saved = (data && data.S) || load();
   installIcons(); // 職業圖示換成 SVG（在建立任何戰鬥之前）
   app.S = G.migrate(saved || G.newGame()); app.fresh = !saved;
+  const newSrc = A.applyAcq(app.S, !saved), sa = A.standalone(); // v0.21.1 來源（只記第一次）、主畫面模式
+  if (sa) app.S.player.pwa = 1;
   G.checkAchievements(app.S); // 舊存檔：已達成的成就直接補登，不跳提示
   for (const h of [...app.S.heroes, ...(app.S.tavern || [])]) h.name = localName(h.name);
   for (const it of Object.values(app.S.items)) it.name = it.base || it.set ? G.itemLabel(it) : localName(it.name); // v0.16 名稱由代號組出
@@ -401,6 +416,9 @@ function start(data) {
   document.documentElement.lang = getLang();
   $('#saveChip').textContent = tx('存檔中'); $('#newsBtn').setAttribute('aria-label', tx('公告'));
   N.updateDot(); N.refresh(true);
+  if (newSrc) { save(); T.sendEvent(tx('來源'), app.S.player.src + (app.S.player.ref ? ' ref:' + app.S.player.ref : '')); }
+  if (sa && once('rl-pwa')) T.sendEvent(tx('主畫面模式'), A.platform());
+  showInApp();
   settleOffline();
   resumeIdle();
   render();
@@ -415,7 +433,15 @@ function start(data) {
   const wait = useCloud ? Promise.race([C.check(true).catch(() => {}), new Promise(ok => setTimeout(ok, 6000))]) : Promise.resolve();
   wait.then(() => setTimeout(() => {
     boot.done();
-    showTitle(!saved, () => { app.fresh = false; save(); return !saved ? playDialog(PROLOGUE, after) : after(); });
+    showTitle(!saved, login => {
+      app.fresh = false; save();
+      const go = () => (!saved ? playDialog(PROLOGUE, after) : after());
+      // v0.21.1 開始畫面按「Google 登入接續」，或 iPhone 第一次從主畫面開（存檔和 Safari 分開）→ 先問要不要登入
+      const pwaNew = !saved && sa && A.platform() === 'ios' && C.cloudEnabled() && !C.loggedIn();
+      if (login) openLogin('title', go);
+      else if (pwaNew) openLogin('pwa', go, { title: tx('從主畫面開啟'), text: tx('主畫面版的進度和 Safari 分開保存。之前在瀏覽器玩過的話，用 Google 登入就能接續；也可以到設定用存檔碼匯入。'), skip: tx('開始新冒險') });
+      else go();
+    });
   }, Math.max(0, 700 - (Date.now() - t0))));
 }
 function bootScreen() {
@@ -432,13 +458,14 @@ function showTitle(fresh, onGo) {
   el.innerHTML = `<div class="tbox"><div class="tlogo">RAID LEADER</div>${getLang() === 'en' ? '' : '<div class="tsub">副本團長</div>'}
     <p class="ttag">${tx('帶領你的冒險團，攻下每一座副本。')}</p>
     <button class="btn main tgo" data-act="titlego">${fresh ? tx('開始冒險') : tx('繼續冒險')}</button>
+    ${C.cloudEnabled() && !C.loggedIn() && !A.inApp() ? `<button class="linkbtn tlogin" data-act="titlelogin">${tx('已有進度？用 Google 登入接續')}</button>` : ''}
     <div class="seg tlang">${LANGS.map(l => `<button data-act="lang" data-v="${l.id}" class="${l.id === getLang() ? 'sel' : ''}">${l.name}</button>`).join('')}</div>
     <div class="sub num tver">v${VERSION}</div></div>`;
   document.body.appendChild(el);
   el.addEventListener('click', e => {
-    if (!e.target.closest('[data-act="titlego"]')) return;
+    const b = e.target.closest('[data-act="titlego"],[data-act="titlelogin"]'); if (!b) return;
     try { sessionStorage.setItem('rl-title', '1'); } catch (err) { /* ignore */ }
-    el.classList.add('out'); setTimeout(() => el.remove(), 260); onGo();
+    el.classList.add('out'); setTimeout(() => el.remove(), 260); onGo(b.dataset.act === 'titlelogin');
   });
 }
 window.claude?.hot?.snapshot?.(() => ({ S: app.S }));
@@ -476,4 +503,49 @@ function gearMsg(g) {
   if (!g) return '';
   const n = g.bag + g.stash + g.salvaged; if (!n) return '';
   return tx('；卸下 {0} 件裝備{1}{2}', n, g.stash ? tx('（{0} 件進戰利品箱）', g.stash) : '', g.salvaged ? tx('（{0} 件放不下已分解 +{1} 金）', g.salvaged, fmt(g.gold)) : '');
+}
+
+// ---------- v0.21.1 推廣準備：登入入口、綁定提示、分享、內建瀏覽器提示 ----------
+function once(k) { try { if (sessionStorage.getItem(k)) return false; sessionStorage.setItem(k, '1'); } catch (e) { /* ignore */ } return true; }
+// 登入視窗：from 記在事件裡（title／pwa／bind）；next = 關掉視窗或登入後（雲端沒有存檔）要接著做的事
+function openLogin(from, next, o = {}) {
+  app.loginFrom = from;
+  openModal({ type: 'text', login: true, onClose: next || null, html: `<h3>${o.title || tx('用 Google 登入')}</h3>
+    <p class="sub" style="margin:0">${o.text || tx('登入後會自動載入你在其他裝置的雲端進度。只會記下 Google 帳號編號，不會儲存 Email 或其他資料。')}</p>
+    <div id="gsiBtn" class="gsi"></div>
+    <div class="row"><button class="btn grow" data-act="loginskip">${o.skip || tx('先不用')}</button></div>` });
+}
+// 綁定提示：還沒登入的玩家通關第 2 層、或玩滿 30 分鐘時提醒一次
+function maybeBind() {
+  const S = app.S, p = S && S.player;
+  if (!p || p.bindAsked || app.fresh || app.modal || !C.cloudEnabled() || C.loggedIn() || A.inApp()) return;
+  if (document.getElementById('title') || document.getElementById('boot')) return;
+  if (app.battle && !app.battle.over && app.tab === 'battle') return;
+  const why = S.clears[1] ? 'floor2' : (p.playSec || 0) >= 1800 ? '30min' : '';
+  if (!why) return;
+  p.bindAsked = 1; save(); T.sendEvent(tx('綁定提示'), why);
+  openLogin('bind', null, { title: tx('綁定 Google，進度不怕不見'), text: tx('目前進度只存在這台裝置的瀏覽器。換手機、清除瀏覽紀錄、或改從主畫面開啟時，進度都可能不見。用 Google 登入後會自動備份，換裝置也能接續。'), skip: tx('之後再說') });
+}
+// 分享給朋友：手機用系統分享選單，不支援就複製連結
+async function shareInvite() {
+  const url = A.shareUrl(app.S.player.pid), text = tx('一起來當副本團長！手機瀏覽器就能玩的放置團本 RPG，免下載：');
+  if (navigator.share) {
+    try { await navigator.share({ title: 'RAID LEADER 副本團長', text, url }); T.sendEvent(tx('分享'), 'native'); return; }
+    catch (err) { if (err && err.name === 'AbortError') return; }
+  }
+  openModal({ type: 'text', html: `<h3>${tx('邀請朋友')}</h3><p class="sub" style="margin:0">${tx('把這個連結傳給朋友。朋友從你的連結開始玩，我們就知道是你帶來的。')}</p>
+    <textarea id="shareTxt" readonly>${esc(text + ' ' + url)}</textarea>
+    <div class="row"><button class="btn main" data-act="sharecopy">${tx('複製')}</button><button class="btn" data-act="closebtn">${tx('關閉')}</button></div>` });
+}
+// App 內建瀏覽器（IG、FB、Threads、LINE）：提示改用外部瀏覽器，進度與 Google 登入才保得住
+function showInApp() {
+  const ia = A.inApp(), el = $('#inappBar'); if (!el) return;
+  let closed = false; try { closed = sessionStorage.getItem('rl-inapp') === '1'; } catch (e) { /* ignore */ }
+  if (!ia || closed) { el.hidden = true; return; }
+  if (once('rl-inapp-ev')) T.sendEvent(tx('內建瀏覽器'), `${ia}:${A.platform()}`);
+  const href = A.outsideHref(ia);
+  const how = href ? tx('點「用瀏覽器開啟」') : A.platform() === 'ios' ? tx('點右上角 ⋯ →「在外部瀏覽器開啟」') : tx('點右上角選單 →「在瀏覽器開啟」');
+  el.innerHTML = `<div class="ia-t"><b>${tx('你正在 {0} 裡開啟遊戲', ia)}</b><span>${tx('這裡的進度可能存不住、也無法 Google 登入。請{0}。', how)}</span></div>
+    <div class="ia-b">${href ? `<a class="btn sm main" href="${esc(href)}">${tx('用瀏覽器開啟')}</a>` : ''}<button class="btn sm" data-act="inappcopy">${tx('複製連結')}</button><button class="btn sm" data-act="inappclose" aria-label="${tx('關閉')}">✕</button></div>`;
+  el.hidden = false;
 }

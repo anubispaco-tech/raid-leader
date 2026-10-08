@@ -56,8 +56,8 @@ const up = async () => { if (!(await page.locator('[data-act="cloudup"]').isVisi
 mode = 'fast'; const n0 = calls.filter(c => c.startsWith('cloudsave')).length;
 await up();
 check((await toastText()).includes('剛剛已同步過'), '限流提示：' + await toastText());
+await page.waitForTimeout(16500); // v0.21.1 事件改成排隊送（間隔 2 秒），稍後才會送到
 check(events.some(e => e.includes('save:too fast')), '手動上傳被限流有埋點');
-await page.waitForTimeout(16500);
 check(calls.filter(c => c.startsWith('cloudsave')).length >= n0 + 2, '16 秒後自動重試');
 check((await toastText()).includes('已上傳'), '重試成功提示：' + await toastText());
 // 2. 斷線 → 網路提示（同一分鐘不重複埋點）
@@ -68,7 +68,8 @@ check(!events.some(e => e.includes('save:net')), '一分鐘內只記一筆埋點
 mode = 'err';
 await up();
 check((await toastText()).includes('上傳失敗'), '其他錯誤提示：' + await toastText());
-check(events.length === 1, '一分鐘內共 1 筆埋點：' + events.length);
+const cf = events.filter(e => e.startsWith('雲端失敗|')); // v0.21.1 另有「來源」「雲端登入」事件
+check(cf.length === 1, '一分鐘內共 1 筆埋點：' + cf.length);
 mode = '';
 console.log('呼叫：' + calls.join(',')); console.log('事件：' + events.join(' / '));
 check(!errs.length, '無 JS 錯誤 ' + errs.join(';'));

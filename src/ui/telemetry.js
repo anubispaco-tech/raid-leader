@@ -25,8 +25,21 @@ export function progress() {
 }
 export const progressText = () => { const p = progress(); return tx('Lv{0}・第 {1} 層{2}', p.level, p.top, (p.best ? tx('・秘境 +{0}', p.best) : '') + (p.best2 ? tx('・深淵 +{0}', p.best2) : '')); };
 
-export const sendSnapshot = keepalive => post({ type: 'snapshot', ...progress() }, keepalive);
-export const sendEvent = (kind, detail) => post({ type: 'event', kind, detail });
+// v0.21.1 來源（first-touch）、推薦人、是否從主畫面開過
+const acq = () => { const p = app.S.player; return { src: p.src || '', ref: p.ref || '', pwa: p.pwa ? 1 : 0 }; };
+export const sendSnapshot = keepalive => post({ type: 'snapshot', ...progress(), ...acq() }, keepalive);
+// v0.21.1 事件排隊送出：GAS 同一位玩家 2 秒內只收一筆，啟動時連續幾筆事件以前會被丟掉
+const evQ = []; let evBusy = false, evLast = 0;
+const EV_GAP = 2100;
+function pump() {
+  if (evBusy || !evQ.length) return;
+  evBusy = true;
+  setTimeout(() => { evBusy = false; evLast = Date.now(); post({ type: 'event', ...evQ.shift() }); pump(); }, Math.max(0, evLast + EV_GAP - Date.now()));
+}
+export function sendEvent(kind, detail) {
+  if (!URL_ || evQ.length >= 20) return;
+  evQ.push({ kind, detail }); pump();
+}
 export const sendFeedback = text => post({ type: 'feedback', text, progress: progressText() });
 
 // 排行榜：讀過且未過期就用快取；讀完只重畫頁面（不重畫抽屜，避免打字中的內容被清掉）

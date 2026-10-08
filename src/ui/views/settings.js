@@ -7,6 +7,7 @@ import { enabled } from '../telemetry.js';
 import { esc, fmt } from '../helpers.js';
 import { cloudEnabled, loggedIn, cloud, fmtTime } from '../cloud.js';
 import { prefs } from '../prefs.js';
+import { platform, standalone, inApp } from '../acq.js';
 
 function cloudBlock() {
   if (!loggedIn()) return `<span class="label">${tx('雲端存檔')}</span>
@@ -16,6 +17,18 @@ function cloudBlock() {
   return `<span class="label">${tx('雲端存檔')}</span>
     <p class="sub" style="margin:0">${cloud.busy ? tx('上傳中…') : i ? (i.updated ? tx('已登入・雲端最後備份 {0}（{1}）', fmtTime(i.updated), esc(i.summary || '—')) : tx('已登入・雲端還沒有存檔')) : tx('已登入・讀取雲端狀態中…')}<br>${tx('自動同步：開啟遊戲時載入較新的雲端進度；有新進度時每 {0} 分鐘、以及離開遊戲時自動上傳。', G.CLOUD.autoMin)}</p>
     <div class="row"><button class="btn main" data-act="cloudup" ${cloud.busy ? 'disabled' : ''}>${tx('立即上傳')}</button><button class="btn" data-act="clouddown">${tx('從雲端下載')}</button><button class="btn" data-act="cloudout">${tx('登出')}</button></div>`;
+}
+// v0.21.1 加到主畫面：依裝置顯示步驟；已從主畫面開啟就只顯示完成
+const step = (n, html) => `<div class="a2hs-s"><b>${n}</b><span>${html}</span></div>`;
+function homeBlock() {
+  if (standalone()) return `<p class="sub" style="margin:0">${tx('✓ 已從主畫面開啟')}</p>`;
+  if (inApp()) return `<p class="sub" style="margin:0">${tx('目前在 App 的內建瀏覽器裡，請先改用 Safari 或 Chrome 開啟遊戲，才能加入主畫面。')}</p>`;
+  const pf = platform();
+  const ios = [step(1, tx('用 Safari 開啟，點下方「分享」按鈕（沒看到就先點 ⋯）')), step(2, tx('往下滑，選「加入主畫面」')), step(3, tx('點右上角「加入」'))].join('');
+  const and = [step(1, tx('用 Chrome 開啟，點右上角 ⋮')), step(2, tx('選「加到主畫面」或「安裝應用程式」')), step(3, tx('點「安裝」或「新增」'))].join('');
+  const warn = pf === 'ios' ? `<p class="sub" style="margin:0">${tx('iPhone 的主畫面版和 Safari 的進度分開保存：建議先用 Google 登入，再從主畫面開啟。')}</p>` : '';
+  return `<p class="sub" style="margin:0">${tx('像 App 一樣從主畫面一點就開、全螢幕遊玩，不用下載。')}</p>
+    ${pf === 'android' ? `<div class="a2hs">${and}</div>` : pf === 'ios' ? `<div class="a2hs">${ios}</div>` : `<div class="a2hs"><b class="a2hs-h">iPhone</b>${ios}<b class="a2hs-h">Android</b>${and}</div>`}${warn}`;
 }
 const seg = (k, opts, cur) => `<div class="seg sm">${opts.map(([v, n]) => `<button data-act="pref" data-k="${k}" data-v="${v}" class="${v === cur ? 'sel' : ''}">${n}</button>`).join('')}</div>`;
 const row = (label, value) => `<div class="set"><span>${label}</span>${value}</div>`;
@@ -29,11 +42,13 @@ export function sheetSettings() {
       ${row(tx('遊玩時間'), `<span class="num">${play}</span>`)}
       ${row(tx('成就'), `<button class="btn sm" data-act="ach">${tx('{0} 點・查看', G.achPoints(S))}</button>`)}
       ${row(tx('戰績'), `<span class="num">${tx('共挑戰 {0} 次・通關 {1} 次', fmt(S.stats.runs), fmt(S.stats.wins))}</span>`)}
+      ${row(tx('邀請朋友'), `<button class="btn sm main" data-act="share">${tx('分享連結')}</button>`)}
     </div>
     ${cloudEnabled() ? cloudBlock() : ''}
     <span class="label">${tx('存檔')}</span>
     <p class="sub" style="margin:0">${tx('進度存在這台裝置的瀏覽器。換裝置前，先匯出存檔碼。')}</p>
     <div class="row"><button class="btn" data-act="export">${tx('匯出存檔碼')}</button><button class="btn" data-act="import">${tx('匯入')}</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">${tx('重新開始')}</button></div>
+    <span class="label">${tx('加到主畫面')}</span>${homeBlock()}
     <span class="label">${tx('戰鬥畫面')}</span><div class="settings">
       ${row(tx('格子特效'), seg('fx', [['full', tx('完整')], ['lite', tx('簡化')], ['off', tx('關')]], prefs.fx))}
       ${row(tx('立體視角'), seg('iso', [['0', tx('關')], ['1', tx('開')]], prefs.iso ? '1' : '0'))}
@@ -46,7 +61,7 @@ export function sheetSettings() {
     <textarea id="fbText" class="fb" maxlength="1000" placeholder="${tx('哪裡好玩、哪裡卡住、想要什麼功能都可以寫')}">${esc(app.fbDraft || '')}</textarea>
     <div class="row" style="align-items:center"><span class="sub" style="margin:0">${tx('會附上暱稱「{0}」與目前進度', esc(p.name || tx('匿名')))}</span><button class="btn main" data-act="sendfb" style="margin-left:auto">${tx('送出')}</button></div>`;
   h += `<span class="label">${tx('隱私與數據')}</span>
-    <p class="sub" style="margin:0">${tx('遊戲不需要帳號。為了改善平衡，會匿名送出：隨機玩家 ID、暱稱、隊伍等級、最高層與秘境成績、遊玩時間與版本；以及你主動送出的意見回饋。不收集姓名、Email、位置或裝置資訊。暱稱會顯示在天梯上，請不要填真實姓名。')}</p>`;
+    <p class="sub" style="margin:0">${tx('遊戲不需要帳號。為了改善平衡，會匿名送出：隨機玩家 ID、暱稱、隊伍等級、最高層與秘境成績、遊玩時間與版本、從哪個連結進入遊戲（例如 IG 或朋友分享）、是否從主畫面開啟；以及你主動送出的意見回饋。不收集姓名、Email、位置或裝置資訊。暱稱會顯示在天梯上，請不要填真實姓名。')}</p>`;
   h += `<span class="label">${tx('關於')}</span><div class="settings">
       ${row(tx('版本'), `<span class="num">v${VERSION}</span>`)}
       ${row(tx('圖示'), `<span><a href="https://game-icons.net" target="_blank" rel="noopener noreferrer">game-icons.net</a> <small class="sub" style="margin:0">${tx('Lorc、Delapouite 等作者・CC BY 3.0')}</small></span>`)}

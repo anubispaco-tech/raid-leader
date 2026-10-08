@@ -133,6 +133,8 @@ function boardCard() {
       <span class="num">${p.best2 ? tx('深淵 +{0}', p.best2) : p.best ? tx('秘境 +{0}', p.best) : tx('第 {0} 層', p.top)}</span><span class="sub num" style="margin:0">Lv${p.level}</span></li>`).join('')}</ol>`;
   return tx('<div class="boardcard"><div class="row" style="align-items:baseline"><b>天梯</b><span class="sub" style="margin:0 0 0 auto">{0}・<button class="linkbtn" data-act="nick">{1}</button></span></div>{2} <p class="sub" style="margin:0">先比深淵秘境、再比傳奇秘境的最高限時等級。你的成績每 5 分鐘上傳一次。</p></div>', me ? tx('你是「{0}」', esc(me)) : tx('匿名'), me ? tx('改暱稱') : tx('設定暱稱'), body);
 }
+// v0.21.1 邀請朋友（新手教學結束後才出現）
+const inviteCard = () => (G.tutActive(app.S) ? '' : `<div class="invite"><span>${tx('找朋友一起爬天梯')}</span><button class="btn sm" data-act="share">${tx('邀請朋友')}</button></div>`);
 export function viewDungeons() {
   const lv = avgPartyLv(), il = avgPartyIlvl();
   let h = gearRuleCard('home') + (G.tutActive(app.S) ? '' : dailyCard()) + nextStepCard() + tx('<h2>副本</h2><p class="sub">隊伍平均 <b class="num">Lv{0}</b>・裝等 <b class="num">{1}</b>・戰力 <b class="num">{2}</b>　｜　每隻首領都有弱點，打不過就換陣容，或回頭刷裝備。</p>', lv, il, fmt(partyPower()));
@@ -140,7 +142,7 @@ export function viewDungeons() {
   const S = app.S, mode = app.mode || 'story';
   const modes = [['story', tx('主線')], ['mythic', tx('秘境')], ['vault', tx('寶庫')], ['event', tx('活動')]];
   h += `<div class="seg modes">${modes.map(([k, n]) => `<button data-act="mode" data-v="${k}" class="${mode === k ? 'sel' : ''}">${n}</button>`).join('')}</div>`;
-  if (mode === 'mythic') return h + mythicSection() + boardCard();
+  if (mode === 'mythic') return h + mythicSection() + boardCard() + inviteCard();
   if (mode === 'vault') return h + vaultSection();
   if (mode === 'event') return h + `<div class="mythic locked"><b>${tx('活動')}</b><span class="sub" style="margin:0">${tx('即將推出：節慶副本、裝備副本等限時活動會放在這裡。')}</span></div>`;
   // 主線：章節分頁
@@ -156,5 +158,5 @@ export function viewDungeons() {
         tx('<button class="btn main grow" data-act="fight" data-d="{0}">挑戰</button> <button class="btn {1}" data-act="idle" data-d="{2}" {3}>{4}</button> <button class="btn" data-act="prepare" data-d="{5}" aria-label="{6}">備戰</button>', i, idleHere ? 'on' : '', i, clears ? '' : tx('disabled title="通關一次後才能掛機"'), idleHere ? tx('掛機中・停止') : tx('掛機刷'), i, G.partyLocked(app.S) ? tx('一鍵備戰：掛機中只調天賦、裝備') : tx('一鍵備戰：陣容、天賦、裝備')), locked ? '' : storyDrops(i));
   });
   h += `</div>` + tx('<div class="howto" style="margin-top:16px"><b>備戰</b>：依這層首領的弱點，自動排好陣容、天賦與裝備（掛機中陣容鎖定，只調天賦與裝備）。<br><b>掛機刷</b>：自動重複挑戰，關掉頁面也會累積（最多 {0} 小時），回來時一次結算。<br><b>存檔</b>：進度存在這支手機的瀏覽器。要換手機玩，點左上角的雙劍圖示開啟設定，匯出存檔碼。</div>', G.ECONOMY.offlineCapHours);
-  return h;
+  return h + inviteCard();
 }

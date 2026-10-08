@@ -1,2 +1,4 @@
 node_modules/
 *.png
+!src/assets/icons/*.png
+!public/icons/*.png

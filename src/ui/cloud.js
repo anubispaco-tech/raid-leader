@@ -53,8 +53,10 @@ async function onCredential(resp) {
   const updated = toMs(r.updated);
   setSession({ token: r.token, at: Date.now(), base: 0, fp: '' });
   cloud.info = { updated, summary: r.summary };
+  sendEvent(tx('雲端登入'), `${app.loginFrom || 'settings'}:${updated ? 'has' : 'new'}`); // v0.21.1 從哪個入口登入
+  const fromLogin = app.modal && app.modal.login; app.loginFrom = '';
   if (updated) chooser(tx('雲端已有存檔'), updated, r.summary); // 雲端已有存檔：問要用哪一份
-  else { toast(tx('已登入，正在建立雲端存檔')); upload(true, true); }
+  else { toast(tx('已登入，正在建立雲端存檔')); upload(true, true); if (fromLogin) app.closeModal(); }
   rerender();
 }
 // v0.17.1 失敗原因分開提示＋埋點（同一分鐘只記一筆）

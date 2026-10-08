@@ -19,6 +19,19 @@ const CSP = ["default-src 'self'", "script-src 'self' https://accounts.google.co
   "font-src https://fonts.gstatic.com", "img-src 'self' data: https://*.googleusercontent.com", "frame-src https://accounts.google.com/gsi/",
   "connect-src https://script.google.com https://script.googleusercontent.com https://accounts.google.com/gsi/",
   "object-src 'none'", "base-uri 'none'", "form-action 'none'"].join('; ');
+// v0.21.1 加到主畫面：manifest＋圖示（只放在網站版；單檔預覽不需要）
+const APP_META = `<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<meta name="theme-color" content="#12161d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="副本團長">`;
+const MANIFEST = { name: 'RAID LEADER 副本團長', short_name: '副本團長', lang: 'zh-Hant', start_url: '/', scope: '/', display: 'standalone',
+  orientation: 'portrait', background_color: '#12161d', theme_color: '#12161d', description: '放置型團本經理 RPG：招募坦、補、輸出，攻下每一座副本。',
+  icons: [{ src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' }, { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+    { src: 'icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }] };
 fs.writeFileSync(path.join(root, 'src/core/version.js'), `// 由 tools/build.js 依 package.json 產生，請勿手動修改\nexport const VERSION = '${v}';\n`);
 const script = dev ? '<script type="module" src="src/ui/main.js"></script>' : `<script src="dist/app.js?v=${v}"></script>`;
 const pages = `<!doctype html>
@@ -28,6 +41,7 @@ const pages = `<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 ${dev ? '' : `<meta http-equiv="Content-Security-Policy" content="${CSP}">`}
 <meta name="referrer" content="no-referrer">
+${dev ? '' : APP_META}
 ${head}
 <link rel="stylesheet" href="src/styles.css?v=${v}">
 </head>
@@ -52,4 +66,7 @@ for (const f of ['index.html', 'dist/app.js', 'src/styles.css']) {
   fs.mkdirSync(path.dirname(path.join(pub, f)), { recursive: true });
   fs.copyFileSync(path.join(root, f), path.join(pub, f));
 }
+fs.mkdirSync(path.join(pub, 'icons'), { recursive: true });
+for (const f of fs.readdirSync(path.join(root, 'src/assets/icons'))) fs.copyFileSync(path.join(root, 'src/assets/icons', f), path.join(pub, 'icons', f));
+fs.writeFileSync(path.join(pub, 'manifest.json'), JSON.stringify(MANIFEST, null, 2) + '\n');
 console.log(`built index.html + dist/raid-leader.html + public/ (v${pkg.version})`);

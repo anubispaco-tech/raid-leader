@@ -512,6 +512,22 @@ h3 .gi{vertical-align:-.12em}
 .dset i{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:5px;border:1px solid var(--line);opacity:.3;filter:grayscale(1)}
 .dset i.on{opacity:1;filter:none} .dset i.t5{border-color:var(--r4)} .dset .gi{width:18px;height:18px}
 .dg .drops{grid-column:1/-1}
+
+/* v0.21.1 推廣準備：內建瀏覽器提示、開始畫面登入、邀請、加到主畫面 */
+.inapp{margin:10px 0 0;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--warn) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--warn) 55%,transparent);display:grid;gap:8px}
+.inapp .ia-t{display:grid;gap:2px;font-size:13px;line-height:1.45}
+.inapp .ia-t b{color:var(--warn);font-size:14px}
+.inapp .ia-b{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.inapp .ia-b a.btn{text-decoration:none}
+.inapp .ia-b [data-act="inappclose"]{margin-left:auto}
+#title .tlogin{font-size:14px;margin-top:-4px}
+.invite{display:flex;align-items:center;gap:10px;margin-top:8px;padding:10px 14px;border:1px dashed var(--line);border-radius:10px;font-size:13px;color:var(--muted)}
+.invite .btn{margin-left:auto}
+.a2hs{display:grid;gap:6px;margin:6px 0 4px}
+.a2hs-h{font-size:13px;color:var(--brass);margin-top:4px}
+.a2hs-s{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.45}
+.a2hs-s b{flex:none;width:22px;height:22px;border-radius:50%;border:1px solid var(--brass);color:var(--brass);font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+#shareTxt{width:100%;min-height:84px}
 </style>
 <div class="app">
   <header class="top">
@@ -523,13 +539,14 @@ h3 .gi{vertical-align:-.12em}
       <span class="pill num"><i class="coin"></i><span id="gold">0</span></span>
     </div>
   </header>
+  <div id="inappBar" class="inapp" hidden></div>
   <main id="view"></main>
 </div>
 <div class="tabs"><nav id="tabs"></nav></div>
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.21.0 */
+/* 副本團長 v0.21.1 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -1146,6 +1163,7 @@ h3 .gi{vertical-align:-.12em}
     "\u7B2C {0} \u5C64 {1}": "Floor {0} {1}",
     "Google \u767B\u5165\u66AB\u6642\u7121\u6CD5\u8F09\u5165\uFF0C\u7A0D\u5F8C\u518D\u8A66\u3002": "Google sign-in couldn't load. Try again later.",
     "\u767B\u5165\u5931\u6557\uFF0C\u8ACB\u518D\u8A66\u4E00\u6B21": "Sign-in failed. Please try again",
+    "\u96F2\u7AEF\u767B\u5165": "Cloud login",
     "\u96F2\u7AEF\u5DF2\u6709\u5B58\u6A94": "A cloud save already exists",
     "\u5DF2\u767B\u5165\uFF0C\u6B63\u5728\u5EFA\u7ACB\u96F2\u7AEF\u5B58\u6A94": "Signed in. Creating your cloud save",
     "\u9023\u4E0D\u4E0A\u4F3A\u670D\u5668\uFF0C\u8ACB\u78BA\u8A8D\u7DB2\u8DEF\u5F8C\u518D\u8A66": "Can't reach the server. Check your connection and try again",
@@ -1251,6 +1269,9 @@ h3 .gi{vertical-align:-.12em}
     "\u5B58\u6A94\u78BC\u7121\u6CD5\u8B80\u53D6\uFF0C\u8ACB\u78BA\u8A8D\u662F\u5426\u5B8C\u6574\u8907\u88FD": "Couldn't read that save code \u2014 make sure you copied all of it",
     '<h3>\u91CD\u65B0\u958B\u59CB\uFF1F</h3><p class="sub" style="margin:0">\u76EE\u524D\u7684\u82F1\u96C4\u3001\u88DD\u5099\u8207\u9032\u5EA6\u90FD\u6703\u6E05\u9664\uFF0C\u7121\u6CD5\u5FA9\u539F\u3002</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">\u6E05\u9664\u4E26\u91CD\u4F86</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>': `<h3>Start over?</h3><p class="sub" style="margin:0">All heroes, gear and progress will be erased. This can't be undone.</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">Erase and restart</button><button class="btn" data-act="closebtn">Cancel</button></div>`,
     "\u5DF2\u767B\u51FA\uFF08\u9019\u53F0\u88DD\u7F6E\u7684\u9032\u5EA6\u4FDD\u7559\uFF09": "Signed out (progress on this device is kept)",
+    "\u5DF2\u8907\u88FD\u9080\u8ACB\u9023\u7D50": "Invite link copied",
+    "\u5206\u4EAB": "Share",
+    "\u5DF2\u8907\u88FD\u9023\u7D50\uFF0C\u8ACB\u8CBC\u5230 Safari \u6216 Chrome \u958B\u555F": "Link copied. Paste it into Safari or Chrome",
     "\u66B1\u7A31\u8A2D\u70BA\u300C{0}\u300D\uFF0C\u5929\u68AF\u7D04 1 \u5206\u9418\u5167\u66F4\u65B0": 'Nickname set to "{0}" \u2014 the Ladder updates within a minute',
     "\u4EE5\u533F\u540D\u53C3\u52A0": "Joined anonymously",
     "\u8ACB\u5148\u8F38\u5165\u610F\u898B": "Please write something first",
@@ -1281,11 +1302,17 @@ h3 .gi{vertical-align:-.12em}
     "\u639B\u6A5F\u4E2D": "Idling",
     "\u5B58\u6A94\u4E2D": "Saving",
     "\u516C\u544A": "News",
+    "\u4F86\u6E90": "Source",
+    "\u4E3B\u756B\u9762\u6A21\u5F0F": "Home screen",
     "\u540C\u6B65\u96F2\u7AEF\u5B58\u6A94\u2026": "Syncing cloud save\u2026",
+    "\u5F9E\u4E3B\u756B\u9762\u958B\u555F": "Opened from home screen",
+    "\u4E3B\u756B\u9762\u7248\u7684\u9032\u5EA6\u548C Safari \u5206\u958B\u4FDD\u5B58\u3002\u4E4B\u524D\u5728\u700F\u89BD\u5668\u73A9\u904E\u7684\u8A71\uFF0C\u7528 Google \u767B\u5165\u5C31\u80FD\u63A5\u7E8C\uFF1B\u4E5F\u53EF\u4EE5\u5230\u8A2D\u5B9A\u7528\u5B58\u6A94\u78BC\u532F\u5165\u3002": "The home screen app keeps its progress separate from Safari. If you played in the browser before, sign in with Google to continue, or import a save code in Settings.",
+    "\u958B\u59CB\u65B0\u5192\u96AA": "Start a new adventure",
     "\u8B80\u53D6\u5B58\u6A94\u4E2D\u2026": "Loading save\u2026",
     "\u5E36\u9818\u4F60\u7684\u5192\u96AA\u5718\uFF0C\u653B\u4E0B\u6BCF\u4E00\u5EA7\u526F\u672C\u3002": "Lead your party through every dungeon.",
     "\u958B\u59CB\u5192\u96AA": "New adventure",
     "\u7E7C\u7E8C\u5192\u96AA": "Continue",
+    "\u5DF2\u6709\u9032\u5EA6\uFF1F\u7528 Google \u767B\u5165\u63A5\u7E8C": "Already playing? Continue with Google",
     "\u5DF2\u642C\u5230\u65B0\u7DB2\u5740\uFF0C\u9032\u5EA6\u5DF2\u5E36\u904E\u4F86": "Moved to the new address. Your progress came along",
     "\u9019\u53F0\u88DD\u7F6E\u5728\u65B0\u7DB2\u5740\u5DF2\u6709\u9032\u5EA6\uFF0C\u6C92\u6709\u8986\u84CB": "This device already has progress at the new address, so nothing was overwritten",
     "\u642C\u5BB6\u5B58\u6A94\u8B80\u53D6\u5931\u6557\uFF0C\u53EF\u7528 Google \u767B\u5165\u6216\u5B58\u6A94\u78BC\u627E\u56DE\u9032\u5EA6": "Couldn't read the moved save. Use Google sign-in or a save code to recover progress",
@@ -1296,6 +1323,26 @@ h3 .gi{vertical-align:-.12em}
     "\uFF1B\u5378\u4E0B {0} \u4EF6\u88DD\u5099{1}{2}": "; {0} item(s) unequipped{1}{2}",
     "\uFF08{0} \u4EF6\u9032\u6230\u5229\u54C1\u7BB1\uFF09": " ({0} to loot chest)",
     "\uFF08{0} \u4EF6\u653E\u4E0D\u4E0B\u5DF2\u5206\u89E3 +{1} \u91D1\uFF09": " ({0} didn't fit, salvaged +{1} gold)",
+    "\u7528 Google \u767B\u5165": "Sign in with Google",
+    "\u767B\u5165\u5F8C\u6703\u81EA\u52D5\u8F09\u5165\u4F60\u5728\u5176\u4ED6\u88DD\u7F6E\u7684\u96F2\u7AEF\u9032\u5EA6\u3002\u53EA\u6703\u8A18\u4E0B Google \u5E33\u865F\u7DE8\u865F\uFF0C\u4E0D\u6703\u5132\u5B58 Email \u6216\u5176\u4ED6\u8CC7\u6599\u3002": "After signing in, your cloud progress from other devices loads automatically. Only your Google account ID is stored \u2014 no email or other data.",
+    "\u5148\u4E0D\u7528": "Not now",
+    "\u7D81\u5B9A\u63D0\u793A": "Link prompt",
+    "\u7D81\u5B9A Google\uFF0C\u9032\u5EA6\u4E0D\u6015\u4E0D\u898B": "Link Google so you never lose progress",
+    "\u76EE\u524D\u9032\u5EA6\u53EA\u5B58\u5728\u9019\u53F0\u88DD\u7F6E\u7684\u700F\u89BD\u5668\u3002\u63DB\u624B\u6A5F\u3001\u6E05\u9664\u700F\u89BD\u7D00\u9304\u3001\u6216\u6539\u5F9E\u4E3B\u756B\u9762\u958B\u555F\u6642\uFF0C\u9032\u5EA6\u90FD\u53EF\u80FD\u4E0D\u898B\u3002\u7528 Google \u767B\u5165\u5F8C\u6703\u81EA\u52D5\u5099\u4EFD\uFF0C\u63DB\u88DD\u7F6E\u4E5F\u80FD\u63A5\u7E8C\u3002": "Your progress only lives in this device's browser. Switching phones, clearing browsing data, or opening from the home screen can lose it. Sign in with Google to back it up automatically and continue on any device.",
+    "\u4E4B\u5F8C\u518D\u8AAA": "Maybe later",
+    "\u4E00\u8D77\u4F86\u7576\u526F\u672C\u5718\u9577\uFF01\u624B\u6A5F\u700F\u89BD\u5668\u5C31\u80FD\u73A9\u7684\u653E\u7F6E\u5718\u672C RPG\uFF0C\u514D\u4E0B\u8F09\uFF1A": "Become a Raid Leader with me! An idle raid RPG that runs in your phone browser, no download:",
+    "\u9080\u8ACB\u670B\u53CB": "Invite friends",
+    "\u628A\u9019\u500B\u9023\u7D50\u50B3\u7D66\u670B\u53CB\u3002\u670B\u53CB\u5F9E\u4F60\u7684\u9023\u7D50\u958B\u59CB\u73A9\uFF0C\u6211\u5011\u5C31\u77E5\u9053\u662F\u4F60\u5E36\u4F86\u7684\u3002": "Send this link to a friend. When they start from your link, we'll know you brought them.",
+    "\u8907\u88FD": "Copy",
+    "\u95DC\u9589": "Off",
+    "\u5167\u5EFA\u700F\u89BD\u5668": "In-app browser",
+    "\u9EDE\u300C\u7528\u700F\u89BD\u5668\u958B\u555F\u300D": 'tap "Open in browser"',
+    "\u9EDE\u53F3\u4E0A\u89D2 \u22EF \u2192\u300C\u5728\u5916\u90E8\u700F\u89BD\u5668\u958B\u555F\u300D": 'tap \u22EF at the top right \u2192 "Open in external browser"',
+    "\u9EDE\u53F3\u4E0A\u89D2\u9078\u55AE \u2192\u300C\u5728\u700F\u89BD\u5668\u958B\u555F\u300D": 'tap the menu at the top right \u2192 "Open in browser"',
+    "\u4F60\u6B63\u5728 {0} \u88E1\u958B\u555F\u904A\u6232": "You're playing inside {0}",
+    "\u9019\u88E1\u7684\u9032\u5EA6\u53EF\u80FD\u5B58\u4E0D\u4F4F\u3001\u4E5F\u7121\u6CD5 Google \u767B\u5165\u3002\u8ACB{0}\u3002": "Progress may not be saved here and Google sign-in won't work. Please {0}.",
+    "\u7528\u700F\u89BD\u5668\u958B\u555F": "Open in browser",
+    "\u8907\u88FD\u9023\u7D50": "Copy link",
     "\u904A\u6232\u642C\u5BB6\u4E86\uFF0C\u6B63\u5728\u5E36\u8457\u4F60\u7684\u9032\u5EA6\u524D\u5F80\u65B0\u7DB2\u5740\u2026": "The game has moved. Taking your progress to the new address\u2026",
     "\u6D3B\u52D5": "Events",
     "\u66F4\u65B0": "Update",
@@ -1386,7 +1433,6 @@ h3 .gi{vertical-align:-.12em}
     "\u591A\u9078": "Select",
     '<div class="empty">\u80CC\u5305\u662F\u7A7A\u7684\u3002\u901A\u95DC\u526F\u672C\u6703\u6389\u843D\u88DD\u5099\u3002</div>': '<div class="empty">Your bag is empty. Clearing dungeons drops gear.</div>',
     '<h2 style="font-size:18px">\u6230\u5229\u54C1\u8A2D\u5B9A</h2><div class="settings"> <div class="set"><span>\u6389\u843D\u6642\u81EA\u52D5\u5206\u89E3</span>{0}</div> <div class="set"><span>\u80CC\u5305\u6EFF\u5F8C\u53EA\u4FDD\u7559</span>{1}</div> <div class="set"><span>\u4F9D\u88DD\u7B49\u81EA\u52D5\u5206\u89E3</span>{6}</div> <p class="sub" style="margin:0">\u80CC\u5305\u6EFF\u4E86\u4EE5\u5F8C\uFF0C\u7B26\u5408\u54C1\u8CEA\u7684\u88DD\u5099\u6703\u5148\u653E\u9032\u6230\u5229\u54C1\u7BB1\uFF08\u6700\u591A {2} \u4EF6\uFF09\uFF0C\u5176\u4ED6\u81EA\u52D5\u63DB\u6210\u91D1\u5E63\u3002</p></div> <h2 style="font-size:18px">\u80CC\u5305\u64F4\u5145 <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>': '<h2 style="font-size:18px">Loot settings</h2><div class="settings"> <div class="set"><span>Auto-salvage drops</span>{0}</div> <div class="set"><span>When bag is full, keep</span>{1}</div> <div class="set"><span>Auto-salvage by iLvl</span>{6}</div> <p class="sub" style="margin:0">Once your bag is full, gear of that quality goes to the loot chest (up to {2}); the rest is turned into gold.</p></div> <h2 style="font-size:18px">Bag expansions <span class="sub num">{3}/{4}</span></h2> <div class="settings">{5}</div>',
-    "\u95DC\u9589": "Off",
     "\u7CBE\u826F\u4EE5\u4E0B": "Uncommon & below",
     "\u7CBE\u826F\u4EE5\u4E0A": "Uncommon+",
     "\u7A00\u6709\u4EE5\u4E0A": "Rare+",
@@ -1512,6 +1558,7 @@ h3 .gi{vertical-align:-.12em}
     "\u4F60\u662F\u300C{0}\u300D": 'You are "{0}"',
     "\u6539\u66B1\u7A31": "Rename",
     "\u8A2D\u5B9A\u66B1\u7A31": "Set nickname",
+    "\u627E\u670B\u53CB\u4E00\u8D77\u722C\u5929\u68AF": "Climb the ladder with friends",
     '<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv{0}</b>\u30FB\u88DD\u7B49 <b class="num">{1}</b>\u30FB\u6230\u529B <b class="num">{2}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u90FD\u6709\u5F31\u9EDE\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\uFF0C\u6216\u56DE\u982D\u5237\u88DD\u5099\u3002</p>': `<h2>Dungeons</h2><p class="sub">Party avg <b class="num">Lv{0}</b> \xB7 iLvl <b class="num">{1}</b> \xB7 Rating <b class="num">{2}</b>  | Every boss has a weakness \u2014 if you can't win, change the lineup or farm gear.</p>`,
     "\u5373\u5C07\u63A8\u51FA\uFF1A\u7BC0\u6176\u526F\u672C\u3001\u88DD\u5099\u526F\u672C\u7B49\u9650\u6642\u6D3B\u52D5\u6703\u653E\u5728\u9019\u88E1\u3002": "Coming soon: festival dungeons, gear dungeons and other limited events will live here.",
     '<div class="dg {0}"> <div class="tier">{1}<small>\u7B2C {2} \u5C64</small></div> <h3>{3}<span class="boss">\u9996\u9818\u30FB{4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>\u5EFA\u8B70 <b class="num {6}">Lv{7}</b></span> <span>\u88DD\u7B49 <b class="num {8}">{9}</b></span> <span>\u6389\u843D <b class="num">{10}</b></span> <span>\u901A\u95DC <b class="num">{11}</b> \u6B21</span> </div> <div class="acts">{12} </div>{13}</div>': '<div class="dg {0}"> <div class="tier">{1}<small>Floor {2}</small></div> <h3>{3}<span class="boss">Boss \xB7 {4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>Rec. <b class="num {6}">Lv{7}</b></span> <span>iLvl <b class="num {8}">{9}</b></span> <span>Drops <b class="num">{10}</b></span> <span>Cleared <b class="num">{11}</b> times</span> </div> <div class="acts">{12} </div>{13}</div>',
@@ -1531,6 +1578,16 @@ h3 .gi{vertical-align:-.12em}
     "\u81EA\u52D5\u540C\u6B65\uFF1A\u958B\u555F\u904A\u6232\u6642\u8F09\u5165\u8F03\u65B0\u7684\u96F2\u7AEF\u9032\u5EA6\uFF1B\u6709\u65B0\u9032\u5EA6\u6642\u6BCF {0} \u5206\u9418\u3001\u4EE5\u53CA\u96E2\u958B\u904A\u6232\u6642\u81EA\u52D5\u4E0A\u50B3\u3002": "Auto-sync: newer cloud progress loads when you open the game; new progress uploads every {0} minutes and when you leave.",
     "\u7ACB\u5373\u4E0A\u50B3": "Upload now",
     "\u767B\u51FA": "Sign out",
+    "\u2713 \u5DF2\u5F9E\u4E3B\u756B\u9762\u958B\u555F": "\u2713 Opened from the home screen",
+    "\u76EE\u524D\u5728 App \u7684\u5167\u5EFA\u700F\u89BD\u5668\u88E1\uFF0C\u8ACB\u5148\u6539\u7528 Safari \u6216 Chrome \u958B\u555F\u904A\u6232\uFF0C\u624D\u80FD\u52A0\u5165\u4E3B\u756B\u9762\u3002": "You're in an app's built-in browser. Open the game in Safari or Chrome first to add it to your home screen.",
+    "\u7528 Safari \u958B\u555F\uFF0C\u9EDE\u4E0B\u65B9\u300C\u5206\u4EAB\u300D\u6309\u9215\uFF08\u6C92\u770B\u5230\u5C31\u5148\u9EDE \u22EF\uFF09": "In Safari, tap the Share button at the bottom (tap \u22EF first if you don't see it)",
+    "\u5F80\u4E0B\u6ED1\uFF0C\u9078\u300C\u52A0\u5165\u4E3B\u756B\u9762\u300D": 'Scroll down and choose "Add to Home Screen"',
+    "\u9EDE\u53F3\u4E0A\u89D2\u300C\u52A0\u5165\u300D": 'Tap "Add" at the top right',
+    "\u7528 Chrome \u958B\u555F\uFF0C\u9EDE\u53F3\u4E0A\u89D2 \u22EE": "In Chrome, tap \u22EE at the top right",
+    "\u9078\u300C\u52A0\u5230\u4E3B\u756B\u9762\u300D\u6216\u300C\u5B89\u88DD\u61C9\u7528\u7A0B\u5F0F\u300D": 'Choose "Add to Home screen" or "Install app"',
+    "\u9EDE\u300C\u5B89\u88DD\u300D\u6216\u300C\u65B0\u589E\u300D": 'Tap "Install" or "Add"',
+    "iPhone \u7684\u4E3B\u756B\u9762\u7248\u548C Safari \u7684\u9032\u5EA6\u5206\u958B\u4FDD\u5B58\uFF1A\u5EFA\u8B70\u5148\u7528 Google \u767B\u5165\uFF0C\u518D\u5F9E\u4E3B\u756B\u9762\u958B\u555F\u3002": "On iPhone, the home screen app and Safari keep separate progress: sign in with Google first, then open from the home screen.",
+    "\u50CF App \u4E00\u6A23\u5F9E\u4E3B\u756B\u9762\u4E00\u9EDE\u5C31\u958B\u3001\u5168\u87A2\u5E55\u904A\u73A9\uFF0C\u4E0D\u7528\u4E0B\u8F09\u3002": "Open it from your home screen like an app, full screen, no download.",
     "{0} \u5C0F\u6642 {1} \u5206": "{0}h {1}m",
     "\u5E33\u865F": "Account",
     "\u66B1\u7A31": "Nickname",
@@ -1541,11 +1598,13 @@ h3 .gi{vertical-align:-.12em}
     "{0} \u9EDE\u30FB\u67E5\u770B": "{0} pts \xB7 View",
     "\u6230\u7E3E": "Record",
     "\u5171\u6311\u6230 {0} \u6B21\u30FB\u901A\u95DC {1} \u6B21": "{0} runs \xB7 {1} clears",
+    "\u5206\u4EAB\u9023\u7D50": "Share link",
     "\u5B58\u6A94": "Save data",
     "\u9032\u5EA6\u5B58\u5728\u9019\u53F0\u88DD\u7F6E\u7684\u700F\u89BD\u5668\u3002\u63DB\u88DD\u7F6E\u524D\uFF0C\u5148\u532F\u51FA\u5B58\u6A94\u78BC\u3002": "Progress is stored in this device's browser. Export a save code before switching devices.",
     "\u532F\u51FA\u5B58\u6A94\u78BC": "Export save code",
     "\u532F\u5165": "Import",
     "\u91CD\u65B0\u958B\u59CB": "Start over",
+    "\u52A0\u5230\u4E3B\u756B\u9762": "Add to home screen",
     "\u6230\u9B25\u756B\u9762": "Battle screen",
     "\u683C\u5B50\u7279\u6548": "Grid effects",
     "\u7ACB\u9AD4\u8996\u89D2": "3D view",
@@ -1556,7 +1615,7 @@ h3 .gi{vertical-align:-.12em}
     "\u6703\u9644\u4E0A\u66B1\u7A31\u300C{0}\u300D\u8207\u76EE\u524D\u9032\u5EA6": 'Sent with your nickname "{0}" and progress',
     "\u9001\u51FA": "Send",
     "\u96B1\u79C1\u8207\u6578\u64DA": "Privacy & data",
-    "\u904A\u6232\u4E0D\u9700\u8981\u5E33\u865F\u3002\u70BA\u4E86\u6539\u5584\u5E73\u8861\uFF0C\u6703\u533F\u540D\u9001\u51FA\uFF1A\u96A8\u6A5F\u73A9\u5BB6 ID\u3001\u66B1\u7A31\u3001\u968A\u4F0D\u7B49\u7D1A\u3001\u6700\u9AD8\u5C64\u8207\u79D8\u5883\u6210\u7E3E\u3001\u904A\u73A9\u6642\u9593\u8207\u7248\u672C\uFF1B\u4EE5\u53CA\u4F60\u4E3B\u52D5\u9001\u51FA\u7684\u610F\u898B\u56DE\u994B\u3002\u4E0D\u6536\u96C6\u59D3\u540D\u3001Email\u3001\u4F4D\u7F6E\u6216\u88DD\u7F6E\u8CC7\u8A0A\u3002\u66B1\u7A31\u6703\u986F\u793A\u5728\u5929\u68AF\u4E0A\uFF0C\u8ACB\u4E0D\u8981\u586B\u771F\u5BE6\u59D3\u540D\u3002": "No account needed. To improve balance, the game anonymously sends a random player ID, your nickname, party level, highest floor and Mythic results, play time and version, plus any feedback you choose to submit. No name, email, location or device info is collected. Your nickname appears on the leaderboard, so please don't use your real name.",
+    "\u904A\u6232\u4E0D\u9700\u8981\u5E33\u865F\u3002\u70BA\u4E86\u6539\u5584\u5E73\u8861\uFF0C\u6703\u533F\u540D\u9001\u51FA\uFF1A\u96A8\u6A5F\u73A9\u5BB6 ID\u3001\u66B1\u7A31\u3001\u968A\u4F0D\u7B49\u7D1A\u3001\u6700\u9AD8\u5C64\u8207\u79D8\u5883\u6210\u7E3E\u3001\u904A\u73A9\u6642\u9593\u8207\u7248\u672C\u3001\u5F9E\u54EA\u500B\u9023\u7D50\u9032\u5165\u904A\u6232\uFF08\u4F8B\u5982 IG \u6216\u670B\u53CB\u5206\u4EAB\uFF09\u3001\u662F\u5426\u5F9E\u4E3B\u756B\u9762\u958B\u555F\uFF1B\u4EE5\u53CA\u4F60\u4E3B\u52D5\u9001\u51FA\u7684\u610F\u898B\u56DE\u994B\u3002\u4E0D\u6536\u96C6\u59D3\u540D\u3001Email\u3001\u4F4D\u7F6E\u6216\u88DD\u7F6E\u8CC7\u8A0A\u3002\u66B1\u7A31\u6703\u986F\u793A\u5728\u5929\u68AF\u4E0A\uFF0C\u8ACB\u4E0D\u8981\u586B\u771F\u5BE6\u59D3\u540D\u3002": "No account needed. To improve balance, the game anonymously sends: a random player ID, nickname, party level, highest floor and dungeon records, play time and version, which link you came from (e.g. Instagram or a friend's share), and whether you opened it from the home screen; plus any feedback you send. No names, email, location or device info are collected. Your nickname appears on the ladder, so please don't use your real name.",
     "\u95DC\u65BC": "About",
     "\u7248\u672C": "Version",
     "\u5716\u793A": "Icons",
@@ -5136,7 +5195,7 @@ h3 .gi{vertical-align:-.12em}
   }
 
   // src/core/version.js
-  var VERSION = "0.21.0";
+  var VERSION = "0.21.1";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -5170,8 +5229,30 @@ h3 .gi{vertical-align:-.12em}
     const p = progress();
     return tx("Lv{0}\u30FB\u7B2C {1} \u5C64{2}", p.level, p.top, (p.best ? tx("\u30FB\u79D8\u5883 +{0}", p.best) : "") + (p.best2 ? tx("\u30FB\u6DF1\u6DF5 +{0}", p.best2) : ""));
   };
-  var sendSnapshot = (keepalive) => post({ type: "snapshot", ...progress() }, keepalive);
-  var sendEvent = (kind, detail) => post({ type: "event", kind, detail });
+  var acq = () => {
+    const p = app.S.player;
+    return { src: p.src || "", ref: p.ref || "", pwa: p.pwa ? 1 : 0 };
+  };
+  var sendSnapshot = (keepalive) => post({ type: "snapshot", ...progress(), ...acq() }, keepalive);
+  var evQ = [];
+  var evBusy = false;
+  var evLast = 0;
+  var EV_GAP = 2100;
+  function pump() {
+    if (evBusy || !evQ.length) return;
+    evBusy = true;
+    setTimeout(() => {
+      evBusy = false;
+      evLast = Date.now();
+      post({ type: "event", ...evQ.shift() });
+      pump();
+    }, Math.max(0, evLast + EV_GAP - Date.now()));
+  }
+  function sendEvent(kind, detail) {
+    if (!URL_ || evQ.length >= 20) return;
+    evQ.push({ kind, detail });
+    pump();
+  }
   var sendFeedback = (text) => post({ type: "feedback", text, progress: progressText() });
   function leaderboard() {
     if (!URL_) return null;
@@ -5449,13 +5530,14 @@ h3 .gi{vertical-align:-.12em}
       <span class="num">${p.best2 ? tx("\u6DF1\u6DF5 +{0}", p.best2) : p.best ? tx("\u79D8\u5883 +{0}", p.best) : tx("\u7B2C {0} \u5C64", p.top)}</span><span class="sub num" style="margin:0">Lv${p.level}</span></li>`).join("")}</ol>`;
     return tx('<div class="boardcard"><div class="row" style="align-items:baseline"><b>\u5929\u68AF</b><span class="sub" style="margin:0 0 0 auto">{0}\u30FB<button class="linkbtn" data-act="nick">{1}</button></span></div>{2} <p class="sub" style="margin:0">\u5148\u6BD4\u6DF1\u6DF5\u79D8\u5883\u3001\u518D\u6BD4\u50B3\u5947\u79D8\u5883\u7684\u6700\u9AD8\u9650\u6642\u7B49\u7D1A\u3002\u4F60\u7684\u6210\u7E3E\u6BCF 5 \u5206\u9418\u4E0A\u50B3\u4E00\u6B21\u3002</p></div>', me ? tx("\u4F60\u662F\u300C{0}\u300D", esc(me)) : tx("\u533F\u540D"), me ? tx("\u6539\u66B1\u7A31") : tx("\u8A2D\u5B9A\u66B1\u7A31"), body);
   }
+  var inviteCard = () => tutActive(app.S) ? "" : `<div class="invite"><span>${tx("\u627E\u670B\u53CB\u4E00\u8D77\u722C\u5929\u68AF")}</span><button class="btn sm" data-act="share">${tx("\u9080\u8ACB\u670B\u53CB")}</button></div>`;
   function viewDungeons() {
     const lv = avgPartyLv(), il = avgPartyIlvl();
     let h = gearRuleCard("home") + (tutActive(app.S) ? "" : dailyCard()) + nextStepCard() + tx('<h2>\u526F\u672C</h2><p class="sub">\u968A\u4F0D\u5E73\u5747 <b class="num">Lv{0}</b>\u30FB\u88DD\u7B49 <b class="num">{1}</b>\u30FB\u6230\u529B <b class="num">{2}</b>\u3000\uFF5C\u3000\u6BCF\u96BB\u9996\u9818\u90FD\u6709\u5F31\u9EDE\uFF0C\u6253\u4E0D\u904E\u5C31\u63DB\u9663\u5BB9\uFF0C\u6216\u56DE\u982D\u5237\u88DD\u5099\u3002</p>', lv, il, fmt(partyPower()));
     const S = app.S, mode = app.mode || "story";
     const modes = [["story", tx("\u4E3B\u7DDA")], ["mythic", tx("\u79D8\u5883")], ["vault", tx("\u5BF6\u5EAB")], ["event", tx("\u6D3B\u52D5")]];
     h += `<div class="seg modes">${modes.map(([k, n2]) => `<button data-act="mode" data-v="${k}" class="${mode === k ? "sel" : ""}">${n2}</button>`).join("")}</div>`;
-    if (mode === "mythic") return h + mythicSection() + boardCard();
+    if (mode === "mythic") return h + mythicSection() + boardCard() + inviteCard();
     if (mode === "vault") return h + vaultSection();
     if (mode === "event") return h + `<div class="mythic locked"><b>${tx("\u6D3B\u52D5")}</b><span class="sub" style="margin:0">${tx("\u5373\u5C07\u63A8\u51FA\uFF1A\u7BC0\u6176\u526F\u672C\u3001\u88DD\u5099\u526F\u672C\u7B49\u9650\u6642\u6D3B\u52D5\u6703\u653E\u5728\u9019\u88E1\u3002")}</span></div>`;
     const chs = CHAPTERS, open = (c) => S.unlocked - 1 >= chs[c].floors[0];
@@ -5469,7 +5551,7 @@ h3 .gi{vertical-align:-.12em}
       h += tx('<div class="dg {0}"> <div class="tier">{1}<small>\u7B2C {2} \u5C64</small></div> <h3>{3}<span class="boss">\u9996\u9818\u30FB{4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>\u5EFA\u8B70 <b class="num {6}">Lv{7}</b></span> <span>\u88DD\u7B49 <b class="num {8}">{9}</b></span> <span>\u6389\u843D <b class="num">{10}</b></span> <span>\u901A\u95DC <b class="num">{11}</b> \u6B21</span> </div> <div class="acts">{12} </div>{13}</div>', locked ? "locked" : "", ROMAN[i] + dungeonIcon(i), i + 1, d.name, d.boss, d.tip, lv >= d.recLevel ? "ok" : "low", d.recLevel, il >= d.recIlvl ? "ok" : "low", d.recIlvl, d.dropIlvl, clears, locked ? tx('<span class="sub" style="margin:0">\u5148\u901A\u95DC\u4E0A\u4E00\u5C64</span>') : tx('<button class="btn main grow" data-act="fight" data-d="{0}">\u6311\u6230</button> <button class="btn {1}" data-act="idle" data-d="{2}" {3}>{4}</button> <button class="btn" data-act="prepare" data-d="{5}" aria-label="{6}">\u5099\u6230</button>', i, idleHere ? "on" : "", i, clears ? "" : tx('disabled title="\u901A\u95DC\u4E00\u6B21\u5F8C\u624D\u80FD\u639B\u6A5F"'), idleHere ? tx("\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62") : tx("\u639B\u6A5F\u5237"), i, partyLocked(app.S) ? tx("\u4E00\u9375\u5099\u6230\uFF1A\u639B\u6A5F\u4E2D\u53EA\u8ABF\u5929\u8CE6\u3001\u88DD\u5099") : tx("\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099")), locked ? "" : storyDrops(i));
     });
     h += `</div>` + tx('<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u9EDE\u5DE6\u4E0A\u89D2\u7684\u96D9\u528D\u5716\u793A\u958B\u555F\u8A2D\u5B9A\uFF0C\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>', ECONOMY.offlineCapHours);
-    return h;
+    return h + inviteCard();
   }
 
   // src/ui/prefs.js
@@ -5811,10 +5893,14 @@ h3 .gi{vertical-align:-.12em}
     const updated = toMs(r.updated);
     setSession({ token: r.token, at: Date.now(), base: 0, fp: "" });
     cloud.info = { updated, summary: r.summary };
+    sendEvent(tx("\u96F2\u7AEF\u767B\u5165"), `${app.loginFrom || "settings"}:${updated ? "has" : "new"}`);
+    const fromLogin = app.modal && app.modal.login;
+    app.loginFrom = "";
     if (updated) chooser(tx("\u96F2\u7AEF\u5DF2\u6709\u5B58\u6A94"), updated, r.summary);
     else {
       toast(tx("\u5DF2\u767B\u5165\uFF0C\u6B63\u5728\u5EFA\u7ACB\u96F2\u7AEF\u5B58\u6A94"));
       upload(true, true);
+      if (fromLogin) app.closeModal();
     }
     rerender();
   }
@@ -5950,6 +6036,84 @@ h3 .gi{vertical-align:-.12em}
     if (!cloud.busy && Date.now() - cloud.lastTry > 16e3) upload(true);
   }
 
+  // src/ui/acq.js
+  var KEY5 = "rl-acq";
+  var SRC_RE = /^[a-z0-9_]{1,24}$/;
+  var REF_RE = /^[a-z0-9]{8,24}$/;
+  function captureParams() {
+    let q;
+    try {
+      q = new URLSearchParams(location.search);
+    } catch (e) {
+      return;
+    }
+    const src = (q.get("src") || "").toLowerCase().trim(), ref = (q.get("ref") || "").toLowerCase().trim();
+    if (!src && !ref) return;
+    const v = { src: SRC_RE.test(src) ? src : src ? "other" : "", ref: REF_RE.test(ref) ? ref : "" };
+    try {
+      sessionStorage.setItem(KEY5, JSON.stringify(v));
+    } catch (e) {
+    }
+    q.delete("src");
+    q.delete("ref");
+    const rest = q.toString();
+    try {
+      history.replaceState(null, "", location.pathname + (rest ? "?" + rest : "") + location.hash);
+    } catch (e) {
+    }
+  }
+  function acqParams() {
+    try {
+      return JSON.parse(sessionStorage.getItem(KEY5) || "null") || {};
+    } catch (e) {
+      return {};
+    }
+  }
+  function applyAcq(S, fresh) {
+    const p = S.player;
+    if (p.src) return false;
+    const a = acqParams();
+    p.src = fresh ? a.src || (a.ref ? "share" : "direct") : "old";
+    if (fresh && a.ref && a.ref !== p.pid) p.ref = a.ref;
+    return true;
+  }
+  var UA = () => typeof navigator !== "undefined" ? navigator.userAgent || "" : "";
+  function platform() {
+    const ua = UA();
+    if (/iPhone|iPad|iPod/.test(ua) || /Macintosh/.test(ua) && navigator.maxTouchPoints > 1) return "ios";
+    if (/Android/.test(ua)) return "android";
+    return "other";
+  }
+  function inApp() {
+    const ua = UA();
+    if (/Instagram/i.test(ua)) return "Instagram";
+    if (/Barcelona|Threads/i.test(ua)) return "Threads";
+    if (/FBAN|FBAV|FB_IAB|FBIOS/i.test(ua)) return "Facebook";
+    if (/\bLine\//i.test(ua)) return "LINE";
+    return "";
+  }
+  function standalone() {
+    try {
+      return !!(window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+    } catch (e) {
+      return false;
+    }
+  }
+  var shareUrl = (pid) => `${NEW_ORIGIN}/?src=share&ref=${encodeURIComponent(pid)}`;
+  function outsideUrl() {
+    const a = acqParams(), q = new URLSearchParams();
+    if (a.src) q.set("src", a.src);
+    if (a.ref) q.set("ref", a.ref);
+    const s = q.toString();
+    return `${NEW_ORIGIN}/${s ? "?" + s : ""}`;
+  }
+  function outsideHref(app2) {
+    const url = outsideUrl();
+    if (app2 === "LINE") return url + (url.includes("?") ? "&" : "?") + "openExternalBrowser=1";
+    if (platform() === "android") return `intent://${url.replace(/^https:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`;
+    return "";
+  }
+
   // src/ui/views/settings.js
   function cloudBlock() {
     if (!loggedIn()) return `<span class="label">${tx("\u96F2\u7AEF\u5B58\u6A94")}</span>
@@ -5959,6 +6123,17 @@ h3 .gi{vertical-align:-.12em}
     return `<span class="label">${tx("\u96F2\u7AEF\u5B58\u6A94")}</span>
     <p class="sub" style="margin:0">${cloud.busy ? tx("\u4E0A\u50B3\u4E2D\u2026") : i ? i.updated ? tx("\u5DF2\u767B\u5165\u30FB\u96F2\u7AEF\u6700\u5F8C\u5099\u4EFD {0}\uFF08{1}\uFF09", fmtTime(i.updated), esc(i.summary || "\u2014")) : tx("\u5DF2\u767B\u5165\u30FB\u96F2\u7AEF\u9084\u6C92\u6709\u5B58\u6A94") : tx("\u5DF2\u767B\u5165\u30FB\u8B80\u53D6\u96F2\u7AEF\u72C0\u614B\u4E2D\u2026")}<br>${tx("\u81EA\u52D5\u540C\u6B65\uFF1A\u958B\u555F\u904A\u6232\u6642\u8F09\u5165\u8F03\u65B0\u7684\u96F2\u7AEF\u9032\u5EA6\uFF1B\u6709\u65B0\u9032\u5EA6\u6642\u6BCF {0} \u5206\u9418\u3001\u4EE5\u53CA\u96E2\u958B\u904A\u6232\u6642\u81EA\u52D5\u4E0A\u50B3\u3002", CLOUD.autoMin)}</p>
     <div class="row"><button class="btn main" data-act="cloudup" ${cloud.busy ? "disabled" : ""}>${tx("\u7ACB\u5373\u4E0A\u50B3")}</button><button class="btn" data-act="clouddown">${tx("\u5F9E\u96F2\u7AEF\u4E0B\u8F09")}</button><button class="btn" data-act="cloudout">${tx("\u767B\u51FA")}</button></div>`;
+  }
+  var step = (n2, html) => `<div class="a2hs-s"><b>${n2}</b><span>${html}</span></div>`;
+  function homeBlock() {
+    if (standalone()) return `<p class="sub" style="margin:0">${tx("\u2713 \u5DF2\u5F9E\u4E3B\u756B\u9762\u958B\u555F")}</p>`;
+    if (inApp()) return `<p class="sub" style="margin:0">${tx("\u76EE\u524D\u5728 App \u7684\u5167\u5EFA\u700F\u89BD\u5668\u88E1\uFF0C\u8ACB\u5148\u6539\u7528 Safari \u6216 Chrome \u958B\u555F\u904A\u6232\uFF0C\u624D\u80FD\u52A0\u5165\u4E3B\u756B\u9762\u3002")}</p>`;
+    const pf = platform();
+    const ios = [step(1, tx("\u7528 Safari \u958B\u555F\uFF0C\u9EDE\u4E0B\u65B9\u300C\u5206\u4EAB\u300D\u6309\u9215\uFF08\u6C92\u770B\u5230\u5C31\u5148\u9EDE \u22EF\uFF09")), step(2, tx("\u5F80\u4E0B\u6ED1\uFF0C\u9078\u300C\u52A0\u5165\u4E3B\u756B\u9762\u300D")), step(3, tx("\u9EDE\u53F3\u4E0A\u89D2\u300C\u52A0\u5165\u300D"))].join("");
+    const and = [step(1, tx("\u7528 Chrome \u958B\u555F\uFF0C\u9EDE\u53F3\u4E0A\u89D2 \u22EE")), step(2, tx("\u9078\u300C\u52A0\u5230\u4E3B\u756B\u9762\u300D\u6216\u300C\u5B89\u88DD\u61C9\u7528\u7A0B\u5F0F\u300D")), step(3, tx("\u9EDE\u300C\u5B89\u88DD\u300D\u6216\u300C\u65B0\u589E\u300D"))].join("");
+    const warn = pf === "ios" ? `<p class="sub" style="margin:0">${tx("iPhone \u7684\u4E3B\u756B\u9762\u7248\u548C Safari \u7684\u9032\u5EA6\u5206\u958B\u4FDD\u5B58\uFF1A\u5EFA\u8B70\u5148\u7528 Google \u767B\u5165\uFF0C\u518D\u5F9E\u4E3B\u756B\u9762\u958B\u555F\u3002")}</p>` : "";
+    return `<p class="sub" style="margin:0">${tx("\u50CF App \u4E00\u6A23\u5F9E\u4E3B\u756B\u9762\u4E00\u9EDE\u5C31\u958B\u3001\u5168\u87A2\u5E55\u904A\u73A9\uFF0C\u4E0D\u7528\u4E0B\u8F09\u3002")}</p>
+    ${pf === "android" ? `<div class="a2hs">${and}</div>` : pf === "ios" ? `<div class="a2hs">${ios}</div>` : `<div class="a2hs"><b class="a2hs-h">iPhone</b>${ios}<b class="a2hs-h">Android</b>${and}</div>`}${warn}`;
   }
   var seg2 = (k, opts, cur2) => `<div class="seg sm">${opts.map(([v, n2]) => `<button data-act="pref" data-k="${k}" data-v="${v}" class="${v === cur2 ? "sel" : ""}">${n2}</button>`).join("")}</div>`;
   var row = (label, value) => `<div class="set"><span>${label}</span>${value}</div>`;
@@ -5972,11 +6147,13 @@ h3 .gi{vertical-align:-.12em}
       ${row(tx("\u904A\u73A9\u6642\u9593"), `<span class="num">${play2}</span>`)}
       ${row(tx("\u6210\u5C31"), `<button class="btn sm" data-act="ach">${tx("{0} \u9EDE\u30FB\u67E5\u770B", achPoints(S))}</button>`)}
       ${row(tx("\u6230\u7E3E"), `<span class="num">${tx("\u5171\u6311\u6230 {0} \u6B21\u30FB\u901A\u95DC {1} \u6B21", fmt(S.stats.runs), fmt(S.stats.wins))}</span>`)}
+      ${row(tx("\u9080\u8ACB\u670B\u53CB"), `<button class="btn sm main" data-act="share">${tx("\u5206\u4EAB\u9023\u7D50")}</button>`)}
     </div>
     ${cloudEnabled() ? cloudBlock() : ""}
     <span class="label">${tx("\u5B58\u6A94")}</span>
     <p class="sub" style="margin:0">${tx("\u9032\u5EA6\u5B58\u5728\u9019\u53F0\u88DD\u7F6E\u7684\u700F\u89BD\u5668\u3002\u63DB\u88DD\u7F6E\u524D\uFF0C\u5148\u532F\u51FA\u5B58\u6A94\u78BC\u3002")}</p>
     <div class="row"><button class="btn" data-act="export">${tx("\u532F\u51FA\u5B58\u6A94\u78BC")}</button><button class="btn" data-act="import">${tx("\u532F\u5165")}</button><button class="btn" data-act="reset" style="margin-left:auto;color:var(--bad)">${tx("\u91CD\u65B0\u958B\u59CB")}</button></div>
+    <span class="label">${tx("\u52A0\u5230\u4E3B\u756B\u9762")}</span>${homeBlock()}
     <span class="label">${tx("\u6230\u9B25\u756B\u9762")}</span><div class="settings">
       ${row(tx("\u683C\u5B50\u7279\u6548"), seg2("fx", [["full", tx("\u5B8C\u6574")], ["lite", tx("\u7C21\u5316")], ["off", tx("\u95DC")]], prefs.fx))}
       ${row(tx("\u7ACB\u9AD4\u8996\u89D2"), seg2("iso", [["0", tx("\u95DC")], ["1", tx("\u958B")]], prefs.iso ? "1" : "0"))}
@@ -5989,7 +6166,7 @@ h3 .gi{vertical-align:-.12em}
     <textarea id="fbText" class="fb" maxlength="1000" placeholder="${tx("\u54EA\u88E1\u597D\u73A9\u3001\u54EA\u88E1\u5361\u4F4F\u3001\u60F3\u8981\u4EC0\u9EBC\u529F\u80FD\u90FD\u53EF\u4EE5\u5BEB")}">${esc(app.fbDraft || "")}</textarea>
     <div class="row" style="align-items:center"><span class="sub" style="margin:0">${tx("\u6703\u9644\u4E0A\u66B1\u7A31\u300C{0}\u300D\u8207\u76EE\u524D\u9032\u5EA6", esc(p.name || tx("\u533F\u540D")))}</span><button class="btn main" data-act="sendfb" style="margin-left:auto">${tx("\u9001\u51FA")}</button></div>`;
     h += `<span class="label">${tx("\u96B1\u79C1\u8207\u6578\u64DA")}</span>
-    <p class="sub" style="margin:0">${tx("\u904A\u6232\u4E0D\u9700\u8981\u5E33\u865F\u3002\u70BA\u4E86\u6539\u5584\u5E73\u8861\uFF0C\u6703\u533F\u540D\u9001\u51FA\uFF1A\u96A8\u6A5F\u73A9\u5BB6 ID\u3001\u66B1\u7A31\u3001\u968A\u4F0D\u7B49\u7D1A\u3001\u6700\u9AD8\u5C64\u8207\u79D8\u5883\u6210\u7E3E\u3001\u904A\u73A9\u6642\u9593\u8207\u7248\u672C\uFF1B\u4EE5\u53CA\u4F60\u4E3B\u52D5\u9001\u51FA\u7684\u610F\u898B\u56DE\u994B\u3002\u4E0D\u6536\u96C6\u59D3\u540D\u3001Email\u3001\u4F4D\u7F6E\u6216\u88DD\u7F6E\u8CC7\u8A0A\u3002\u66B1\u7A31\u6703\u986F\u793A\u5728\u5929\u68AF\u4E0A\uFF0C\u8ACB\u4E0D\u8981\u586B\u771F\u5BE6\u59D3\u540D\u3002")}</p>`;
+    <p class="sub" style="margin:0">${tx("\u904A\u6232\u4E0D\u9700\u8981\u5E33\u865F\u3002\u70BA\u4E86\u6539\u5584\u5E73\u8861\uFF0C\u6703\u533F\u540D\u9001\u51FA\uFF1A\u96A8\u6A5F\u73A9\u5BB6 ID\u3001\u66B1\u7A31\u3001\u968A\u4F0D\u7B49\u7D1A\u3001\u6700\u9AD8\u5C64\u8207\u79D8\u5883\u6210\u7E3E\u3001\u904A\u73A9\u6642\u9593\u8207\u7248\u672C\u3001\u5F9E\u54EA\u500B\u9023\u7D50\u9032\u5165\u904A\u6232\uFF08\u4F8B\u5982 IG \u6216\u670B\u53CB\u5206\u4EAB\uFF09\u3001\u662F\u5426\u5F9E\u4E3B\u756B\u9762\u958B\u555F\uFF1B\u4EE5\u53CA\u4F60\u4E3B\u52D5\u9001\u51FA\u7684\u610F\u898B\u56DE\u994B\u3002\u4E0D\u6536\u96C6\u59D3\u540D\u3001Email\u3001\u4F4D\u7F6E\u6216\u88DD\u7F6E\u8CC7\u8A0A\u3002\u66B1\u7A31\u6703\u986F\u793A\u5728\u5929\u68AF\u4E0A\uFF0C\u8ACB\u4E0D\u8981\u586B\u771F\u5BE6\u59D3\u540D\u3002")}</p>`;
     h += `<span class="label">${tx("\u95DC\u65BC")}</span><div class="settings">
       ${row(tx("\u7248\u672C"), `<span class="num">v${VERSION}</span>`)}
       ${row(tx("\u5716\u793A"), `<span><a href="https://game-icons.net" target="_blank" rel="noopener noreferrer">game-icons.net</a> <small class="sub" style="margin:0">${tx("Lorc\u3001Delapouite \u7B49\u4F5C\u8005\u30FBCC BY 3.0")}</small></span>`)}
@@ -6026,7 +6203,7 @@ h3 .gi{vertical-align:-.12em}
     renderModal();
   }
   function closeModal() {
-    const done = app.modal && app.modal.type === "dialog" && app.modal.done;
+    const done = app.modal && (app.modal.type === "dialog" ? app.modal.done : app.modal.onClose);
     app.modal = null;
     renderModal();
     if (done) done();
@@ -6700,13 +6877,13 @@ h3 .gi{vertical-align:-.12em}
     }
     return pts;
   }
-  function projectile(a, b, color, step, delay) {
-    const path = line(a, b).slice(1, -1), s = step / K;
+  function projectile(a, b, color, step2, delay) {
+    const path = line(a, b).slice(1, -1), s = step2 / K;
     path.forEach((p, i) => flash(p, { color, delay: delay + i * s, dur: Math.max(140, s * 7), peak: 0.75 }));
     return delay + path.length * s;
   }
-  function ring(src, list, color, step, o = {}) {
-    for (const p of list) flash(p, { color, delay: (o.delay || 0) + dist(p, src) * step / K, dur: o.dur || 380, peak: o.peak ?? 0.5 });
+  function ring(src, list, color, step2, o = {}) {
+    for (const p of list) flash(p, { color, delay: (o.delay || 0) + dist(p, src) * step2 / K, dur: o.dur || 380, peak: o.peak ?? 0.5 });
   }
   function shake(px) {
     if (!root || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -6730,7 +6907,7 @@ h3 .gi{vertical-align:-.12em}
     }
     if (evs.length > 200) evs = evs.filter((e) => e.k === "end" || e.k === "kill" && e.boss);
     const lite = prefs.fx === "lite";
-    const span = tickMs * 0.75, step = Math.max(14, Math.min(45, tickMs / 22));
+    const span = tickMs * 0.75, step2 = Math.max(14, Math.min(45, tickMs / 22));
     const own = (id) => owners.get(id) || ghosts.get(id);
     const ctr = (id) => {
       const o = own(id);
@@ -6768,14 +6945,14 @@ h3 .gi{vertical-align:-.12em}
             const key = "aoe" + e.s;
             if (seen.has(key)) break;
             seen.add(key);
-            ring(s || t, foeCells(), col, lite ? 0 : step * 1.5, { delay: d, dur: 360, peak: 0.55 });
+            ring(s || t, foeCells(), col, lite ? 0 : step2 * 1.5, { delay: d, dur: 360, peak: 0.55 });
             play("hit", d / 1e3);
             break;
           }
           let hitAt = d;
           if (s && shots < maxShots) {
             shots++;
-            hitAt = projectile(s, t, col, step, d);
+            hitAt = projectile(s, t, col, step2, d);
           }
           if (e.crit) {
             flashCells(tc, col, { delay: hitAt, dur: 480, peak: 1 });
@@ -6800,7 +6977,7 @@ h3 .gi{vertical-align:-.12em}
           let hitAt = d;
           if (so && so.kind === "boss" && !seen.has("bossatk" + e.s) && !lite) {
             seen.add("bossatk" + e.s);
-            hitAt = projectile(so.center, t, COL.enemy, step, d);
+            hitAt = projectile(so.center, t, COL.enemy, step2, d);
           }
           const key = "hurt" + e.t;
           if (seen.has(key)) break;
@@ -6823,7 +7000,7 @@ h3 .gi{vertical-align:-.12em}
           let hitAt = d;
           if (s && e.s !== e.t && !lite && !seen.has("healer" + e.s)) {
             seen.add("healer" + e.s);
-            hitAt = projectile(s, t, COL.heal, step * 1.8, d);
+            hitAt = projectile(s, t, COL.heal, step2 * 1.8, d);
           }
           flashCells(tc, COL.heal, { delay: hitAt, dur: 600, peak: 0.55 });
           lift(tc, 1, 500, hitAt);
@@ -6832,7 +7009,7 @@ h3 .gi{vertical-align:-.12em}
         }
         case "kick": {
           stopLong("cast" + e.t);
-          const hitAt = s && t && !lite ? projectile(s, t, COL.white, step * 0.7, d) : d;
+          const hitAt = s && t && !lite ? projectile(s, t, COL.white, step2 * 0.7, d) : d;
           if (tc) flashCells(tc, COL.white, { delay: hitAt, dur: 140, times: 3, peak: 1 });
           play("kick", hitAt / 1e3);
           break;
@@ -6858,20 +7035,20 @@ h3 .gi{vertical-align:-.12em}
         }
         case "blast": {
           stopLong("cast" + e.s);
-          for (const p of area(MID, CR - 1)) flash(p, { color: COL.cast, delay: d + (p[0] - MID * K) * step, dur: 420, peak: 0.9 });
+          for (const p of area(MID, CR - 1)) flash(p, { color: COL.cast, delay: d + (p[0] - MID * K) * step2, dur: 420, peak: 0.9 });
           setTimeout(() => shake(5), d + 120);
           play("blast", d / 1e3);
           break;
         }
         case "pulse":
           if (s) {
-            ring(s, area(0, CR - 1), COL.enemy, lite ? 0 : step * 2, { delay: d, dur: 380, peak: 0.45 });
+            ring(s, area(0, CR - 1), COL.enemy, lite ? 0 : step2 * 2, { delay: d, dur: 380, peak: 0.45 });
             setTimeout(() => shake(4), d + 150);
             play("pulse", d / 1e3);
           }
           break;
         case "buster": {
-          const hitAt = s && t && !lite ? projectile(s, t, COL.enemy, step * 0.8, d) : d;
+          const hitAt = s && t && !lite ? projectile(s, t, COL.enemy, step2 * 0.8, d) : d;
           if (tc) {
             flashCells(tc, COL.enemy, { delay: hitAt, dur: 420, peak: 1 });
             lift(tc, -1, 500, hitAt);
@@ -6921,7 +7098,7 @@ h3 .gi{vertical-align:-.12em}
           const o = own(e.t), list = o ? o.cells : [];
           flashCells(list, COL.white, { delay: d, dur: 380, peak: 1 });
           if (e.boss) {
-            if (o) ring(o.center, area(0, CR - 1), COL.gold, step * 2, { delay: d + 150, dur: 500, peak: 0.5 });
+            if (o) ring(o.center, area(0, CR - 1), COL.gold, step2 * 2, { delay: d + 150, dur: 500, peak: 0.5 });
             play("bosskill", d / 1e3);
           } else play("kill", d / 1e3);
           break;
@@ -6937,13 +7114,13 @@ h3 .gi{vertical-align:-.12em}
           if (tc) flashCells(tc, COL.cast, { delay: d, dur: 500, peak: 0.85 });
           break;
         case "horn": {
-          ring(ME, area(MID + 1, CR - 1), COL.gold, step * 2, { delay: d, dur: 500, peak: 0.5 });
+          ring(ME, area(MID + 1, CR - 1), COL.gold, step2 * 2, { delay: d, dur: 500, peak: 0.5 });
           lift(heroCore(), 1, 700, d);
           play("horn", d / 1e3);
           break;
         }
         case "lust": {
-          ring(s || ME, area(MID + 1, CR - 1), COL.bolt, step * 2, { delay: d, dur: 450, peak: 0.45 });
+          ring(s || ME, area(MID + 1, CR - 1), COL.bolt, step2 * 2, { delay: d, dur: 450, peak: 0.45 });
           play("horn", d / 1e3);
           break;
         }
@@ -6958,7 +7135,7 @@ h3 .gi{vertical-align:-.12em}
           }
           break;
         case "end": {
-          for (const p of area(0, CR - 1)) flash(p, { color: e.win ? COL.gold : COL.enemy, delay: d + (e.win ? ROWS - 1 - p[0] : p[0]) * step, dur: 520, peak: e.win ? 0.45 : 0.3 });
+          for (const p of area(0, CR - 1)) flash(p, { color: e.win ? COL.gold : COL.enemy, delay: d + (e.win ? ROWS - 1 - p[0] : p[0]) * step2, dur: 520, peak: e.win ? 0.45 : 0.3 });
           play(e.win ? "win" : "lose", d / 1e3);
           break;
         }
@@ -7094,6 +7271,7 @@ h3 .gi{vertical-align:-.12em}
   }
 
   // src/ui/main.js
+  captureParams();
   var ICONS = {
     dungeon: '<path d="M4 20V9l8-5 8 5v11"/><path d="M9 20v-6a3 3 0 0 1 6 0v6"/>',
     battle: '<path d="M5 19 19 5M14 5h5v5M5 14l5 5M4 20l3-3"/>',
@@ -7159,11 +7337,11 @@ h3 .gi{vertical-align:-.12em}
   app.render = render;
   app.renderModal = renderModal;
   app.afterModal = () => {
-    if (app.modal && app.modal.type === "settings" && cloudEnabled()) {
-      mountButton();
-      check();
-    }
+    if (!cloudEnabled()) return;
+    if (document.getElementById("gsiBtn")) mountButton();
+    if (app.modal && app.modal.type === "settings") check();
   };
+  app.closeModal = closeModal;
   app.openModal = openModal;
   app.renderTabs = renderTabs;
   {
@@ -7591,10 +7769,10 @@ h3 .gi{vertical-align:-.12em}
         break;
       }
       case "tutskip": {
-        const step = app.S.tut.step;
+        const step2 = app.S.tut.step;
         tutSkip(app.S);
         save();
-        sendEvent(tx("\u6559\u5B78"), `skip@${step}`);
+        sendEvent(tx("\u6559\u5B78"), `skip@${step2}`);
         toast(tx("\u5DF2\u8DF3\u904E\u6559\u5B78\uFF0C\u300C\u4E0B\u4E00\u6B65\u300D\u5361\u7247\u6703\u7E7C\u7E8C\u63D0\u793A"));
         break;
       }
@@ -7846,6 +8024,33 @@ h3 .gi{vertical-align:-.12em}
       case "nick":
         openNick();
         return;
+      case "share":
+        shareInvite();
+        return;
+      case "sharecopy": {
+        const el = $("#shareTxt");
+        navigator.clipboard?.writeText(el.value).then(() => {
+          toast(tx("\u5DF2\u8907\u88FD\u9080\u8ACB\u9023\u7D50"));
+          sendEvent(tx("\u5206\u4EAB"), "copy");
+        }, () => {
+          el.select();
+          toast(tx("\u8ACB\u624B\u52D5\u8907\u88FD"));
+        }) ?? (el.select(), toast(tx("\u8ACB\u624B\u52D5\u8907\u88FD")));
+        return;
+      }
+      case "loginskip":
+        closeModal();
+        return;
+      case "inappclose":
+        $("#inappBar").hidden = true;
+        try {
+          sessionStorage.setItem("rl-inapp", "1");
+        } catch (err) {
+        }
+        return;
+      case "inappcopy":
+        navigator.clipboard?.writeText(outsideUrl()).then(() => toast(tx("\u5DF2\u8907\u88FD\u9023\u7D50\uFF0C\u8ACB\u8CBC\u5230 Safari \u6216 Chrome \u958B\u555F")), () => toast(tx("\u8ACB\u624B\u52D5\u8907\u88FD"))) ?? toast(tx("\u8ACB\u624B\u52D5\u8907\u88FD"));
+        return;
       case "savenick": {
         const v = ($("#nickInp").value || "").trim().slice(0, 16);
         app.S.player.name = v;
@@ -7938,6 +8143,7 @@ h3 .gi{vertical-align:-.12em}
       save();
       autoTick();
       showStuck("time");
+      maybeBind();
     }
   }, 5e3);
   document.addEventListener("input", (e) => {
@@ -7972,6 +8178,8 @@ h3 .gi{vertical-align:-.12em}
     installIcons();
     app.S = migrate(saved || newGame());
     app.fresh = !saved;
+    const newSrc = applyAcq(app.S, !saved), sa = standalone();
+    if (sa) app.S.player.pwa = 1;
     checkAchievements(app.S);
     for (const h of [...app.S.heroes, ...app.S.tavern || []]) h.name = localName(h.name);
     for (const it of Object.values(app.S.items)) it.name = it.base || it.set ? itemLabel(it) : localName(it.name);
@@ -7985,6 +8193,12 @@ h3 .gi{vertical-align:-.12em}
     $("#newsBtn").setAttribute("aria-label", tx("\u516C\u544A"));
     updateDot();
     refresh(true);
+    if (newSrc) {
+      save();
+      sendEvent(tx("\u4F86\u6E90"), app.S.player.src + (app.S.player.ref ? " ref:" + app.S.player.ref : ""));
+    }
+    if (sa && once("rl-pwa")) sendEvent(tx("\u4E3B\u756B\u9762\u6A21\u5F0F"), platform());
+    showInApp();
     settleOffline();
     resumeIdle();
     render();
@@ -7999,10 +8213,14 @@ h3 .gi{vertical-align:-.12em}
     }), new Promise((ok) => setTimeout(ok, 6e3))]) : Promise.resolve();
     wait.then(() => setTimeout(() => {
       boot.done();
-      showTitle(!saved, () => {
+      showTitle(!saved, (login) => {
         app.fresh = false;
         save();
-        return !saved ? playDialog(PROLOGUE, after) : after();
+        const go = () => !saved ? playDialog(PROLOGUE, after) : after();
+        const pwaNew = !saved && sa && platform() === "ios" && cloudEnabled() && !loggedIn();
+        if (login) openLogin("title", go);
+        else if (pwaNew) openLogin("pwa", go, { title: tx("\u5F9E\u4E3B\u756B\u9762\u958B\u555F"), text: tx("\u4E3B\u756B\u9762\u7248\u7684\u9032\u5EA6\u548C Safari \u5206\u958B\u4FDD\u5B58\u3002\u4E4B\u524D\u5728\u700F\u89BD\u5668\u73A9\u904E\u7684\u8A71\uFF0C\u7528 Google \u767B\u5165\u5C31\u80FD\u63A5\u7E8C\uFF1B\u4E5F\u53EF\u4EE5\u5230\u8A2D\u5B9A\u7528\u5B58\u6A94\u78BC\u532F\u5165\u3002"), skip: tx("\u958B\u59CB\u65B0\u5192\u96AA") });
+        else go();
       });
     }, Math.max(0, 700 - (Date.now() - t0))));
   }
@@ -8033,18 +8251,20 @@ h3 .gi{vertical-align:-.12em}
     el.innerHTML = `<div class="tbox"><div class="tlogo">RAID LEADER</div>${getLang() === "en" ? "" : '<div class="tsub">\u526F\u672C\u5718\u9577</div>'}
     <p class="ttag">${tx("\u5E36\u9818\u4F60\u7684\u5192\u96AA\u5718\uFF0C\u653B\u4E0B\u6BCF\u4E00\u5EA7\u526F\u672C\u3002")}</p>
     <button class="btn main tgo" data-act="titlego">${fresh ? tx("\u958B\u59CB\u5192\u96AA") : tx("\u7E7C\u7E8C\u5192\u96AA")}</button>
+    ${cloudEnabled() && !loggedIn() && !inApp() ? `<button class="linkbtn tlogin" data-act="titlelogin">${tx("\u5DF2\u6709\u9032\u5EA6\uFF1F\u7528 Google \u767B\u5165\u63A5\u7E8C")}</button>` : ""}
     <div class="seg tlang">${LANGS.map((l) => `<button data-act="lang" data-v="${l.id}" class="${l.id === getLang() ? "sel" : ""}">${l.name}</button>`).join("")}</div>
     <div class="sub num tver">v${VERSION}</div></div>`;
     document.body.appendChild(el);
     el.addEventListener("click", (e) => {
-      if (!e.target.closest('[data-act="titlego"]')) return;
+      const b = e.target.closest('[data-act="titlego"],[data-act="titlelogin"]');
+      if (!b) return;
       try {
         sessionStorage.setItem("rl-title", "1");
       } catch (err) {
       }
       el.classList.add("out");
       setTimeout(() => el.remove(), 260);
-      onGo();
+      onGo(b.dataset.act === "titlelogin");
     });
   }
   window.claude?.hot?.snapshot?.(() => ({ S: app.S }));
@@ -8089,6 +8309,67 @@ h3 .gi{vertical-align:-.12em}
     const n2 = g.bag + g.stash + g.salvaged;
     if (!n2) return "";
     return tx("\uFF1B\u5378\u4E0B {0} \u4EF6\u88DD\u5099{1}{2}", n2, g.stash ? tx("\uFF08{0} \u4EF6\u9032\u6230\u5229\u54C1\u7BB1\uFF09", g.stash) : "", g.salvaged ? tx("\uFF08{0} \u4EF6\u653E\u4E0D\u4E0B\u5DF2\u5206\u89E3 +{1} \u91D1\uFF09", g.salvaged, fmt(g.gold)) : "");
+  }
+  function once(k) {
+    try {
+      if (sessionStorage.getItem(k)) return false;
+      sessionStorage.setItem(k, "1");
+    } catch (e) {
+    }
+    return true;
+  }
+  function openLogin(from, next, o = {}) {
+    app.loginFrom = from;
+    openModal({ type: "text", login: true, onClose: next || null, html: `<h3>${o.title || tx("\u7528 Google \u767B\u5165")}</h3>
+    <p class="sub" style="margin:0">${o.text || tx("\u767B\u5165\u5F8C\u6703\u81EA\u52D5\u8F09\u5165\u4F60\u5728\u5176\u4ED6\u88DD\u7F6E\u7684\u96F2\u7AEF\u9032\u5EA6\u3002\u53EA\u6703\u8A18\u4E0B Google \u5E33\u865F\u7DE8\u865F\uFF0C\u4E0D\u6703\u5132\u5B58 Email \u6216\u5176\u4ED6\u8CC7\u6599\u3002")}</p>
+    <div id="gsiBtn" class="gsi"></div>
+    <div class="row"><button class="btn grow" data-act="loginskip">${o.skip || tx("\u5148\u4E0D\u7528")}</button></div>` });
+  }
+  function maybeBind() {
+    const S = app.S, p = S && S.player;
+    if (!p || p.bindAsked || app.fresh || app.modal || !cloudEnabled() || loggedIn() || inApp()) return;
+    if (document.getElementById("title") || document.getElementById("boot")) return;
+    if (app.battle && !app.battle.over && app.tab === "battle") return;
+    const why = S.clears[1] ? "floor2" : (p.playSec || 0) >= 1800 ? "30min" : "";
+    if (!why) return;
+    p.bindAsked = 1;
+    save();
+    sendEvent(tx("\u7D81\u5B9A\u63D0\u793A"), why);
+    openLogin("bind", null, { title: tx("\u7D81\u5B9A Google\uFF0C\u9032\u5EA6\u4E0D\u6015\u4E0D\u898B"), text: tx("\u76EE\u524D\u9032\u5EA6\u53EA\u5B58\u5728\u9019\u53F0\u88DD\u7F6E\u7684\u700F\u89BD\u5668\u3002\u63DB\u624B\u6A5F\u3001\u6E05\u9664\u700F\u89BD\u7D00\u9304\u3001\u6216\u6539\u5F9E\u4E3B\u756B\u9762\u958B\u555F\u6642\uFF0C\u9032\u5EA6\u90FD\u53EF\u80FD\u4E0D\u898B\u3002\u7528 Google \u767B\u5165\u5F8C\u6703\u81EA\u52D5\u5099\u4EFD\uFF0C\u63DB\u88DD\u7F6E\u4E5F\u80FD\u63A5\u7E8C\u3002"), skip: tx("\u4E4B\u5F8C\u518D\u8AAA") });
+  }
+  async function shareInvite() {
+    const url = shareUrl(app.S.player.pid), text = tx("\u4E00\u8D77\u4F86\u7576\u526F\u672C\u5718\u9577\uFF01\u624B\u6A5F\u700F\u89BD\u5668\u5C31\u80FD\u73A9\u7684\u653E\u7F6E\u5718\u672C RPG\uFF0C\u514D\u4E0B\u8F09\uFF1A");
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "RAID LEADER \u526F\u672C\u5718\u9577", text, url });
+        sendEvent(tx("\u5206\u4EAB"), "native");
+        return;
+      } catch (err) {
+        if (err && err.name === "AbortError") return;
+      }
+    }
+    openModal({ type: "text", html: `<h3>${tx("\u9080\u8ACB\u670B\u53CB")}</h3><p class="sub" style="margin:0">${tx("\u628A\u9019\u500B\u9023\u7D50\u50B3\u7D66\u670B\u53CB\u3002\u670B\u53CB\u5F9E\u4F60\u7684\u9023\u7D50\u958B\u59CB\u73A9\uFF0C\u6211\u5011\u5C31\u77E5\u9053\u662F\u4F60\u5E36\u4F86\u7684\u3002")}</p>
+    <textarea id="shareTxt" readonly>${esc(text + " " + url)}</textarea>
+    <div class="row"><button class="btn main" data-act="sharecopy">${tx("\u8907\u88FD")}</button><button class="btn" data-act="closebtn">${tx("\u95DC\u9589")}</button></div>` });
+  }
+  function showInApp() {
+    const ia = inApp(), el = $("#inappBar");
+    if (!el) return;
+    let closed = false;
+    try {
+      closed = sessionStorage.getItem("rl-inapp") === "1";
+    } catch (e) {
+    }
+    if (!ia || closed) {
+      el.hidden = true;
+      return;
+    }
+    if (once("rl-inapp-ev")) sendEvent(tx("\u5167\u5EFA\u700F\u89BD\u5668"), `${ia}:${platform()}`);
+    const href = outsideHref(ia);
+    const how = href ? tx("\u9EDE\u300C\u7528\u700F\u89BD\u5668\u958B\u555F\u300D") : platform() === "ios" ? tx("\u9EDE\u53F3\u4E0A\u89D2 \u22EF \u2192\u300C\u5728\u5916\u90E8\u700F\u89BD\u5668\u958B\u555F\u300D") : tx("\u9EDE\u53F3\u4E0A\u89D2\u9078\u55AE \u2192\u300C\u5728\u700F\u89BD\u5668\u958B\u555F\u300D");
+    el.innerHTML = `<div class="ia-t"><b>${tx("\u4F60\u6B63\u5728 {0} \u88E1\u958B\u555F\u904A\u6232", ia)}</b><span>${tx("\u9019\u88E1\u7684\u9032\u5EA6\u53EF\u80FD\u5B58\u4E0D\u4F4F\u3001\u4E5F\u7121\u6CD5 Google \u767B\u5165\u3002\u8ACB{0}\u3002", how)}</span></div>
+    <div class="ia-b">${href ? `<a class="btn sm main" href="${esc(href)}">${tx("\u7528\u700F\u89BD\u5668\u958B\u555F")}</a>` : ""}<button class="btn sm" data-act="inappcopy">${tx("\u8907\u88FD\u9023\u7D50")}</button><button class="btn sm" data-act="inappclose" aria-label="${tx("\u95DC\u9589")}">\u2715</button></div>`;
+    el.hidden = false;
   }
 })();
 </script>

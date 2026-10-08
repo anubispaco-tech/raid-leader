@@ -9,7 +9,7 @@ import { $, fmt, pct, toast, hero, cls, inParty, itemStatText, itemName, partyPo
 import { sheetAchievements } from './achievements.js';
 export function openModal(m) { app.modal = m; renderModal(); }
 export function closeModal() {
-  const done = app.modal && app.modal.type === 'dialog' && app.modal.done;
+  const done = app.modal && (app.modal.type === 'dialog' ? app.modal.done : app.modal.onClose); // v0.21.1 一般視窗也可帶 onClose
   app.modal = null; renderModal(); if (done) done();
 }
 // 對話：點一下下一句，最後一句或「跳過」結束後呼叫 done

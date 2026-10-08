@@ -31,7 +31,8 @@ const waitToast = async () => { for (let i = 0; i < 30; i++) { const t = await t
 // 0. public/ 只有遊戲本體
 const pub = []; const walk = d => fs.readdirSync(d, { withFileTypes: true }).forEach(e => e.isDirectory() ? walk(path.join(d, e.name)) : pub.push(path.relative(path.join(root, 'public'), path.join(d, e.name))));
 walk(path.join(root, 'public'));
-check(pub.sort().join(',') === 'dist/app.js,index.html,src/styles.css', 'public/ 只有 3 個檔：' + pub.join(','));
+// v0.21.1 另有 manifest.json 與主畫面圖示
+check(pub.sort().join(',') === 'dist/app.js,icons/apple-touch-icon.png,icons/icon-192.png,icons/icon-512.png,icons/icon-maskable-512.png,index.html,manifest.json,src/styles.css', 'public/ 只有遊戲本體：' + pub.join(','));
 // 1. 舊網址有存檔 → 跳到新網址並帶過去
 await page.goto(SEED); await page.evaluate(v => localStorage.setItem('raid-leader-save-v1', v), JSON.stringify(s));
 await page.goto(OLD); await page.waitForURL(u => u.host === 'raid-leader.anubispaco.workers.dev', { timeout: 5000 }).catch(() => {});

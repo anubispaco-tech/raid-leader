@@ -507,3 +507,19 @@ h3 .gi{vertical-align:-.12em}
 .dset i{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:5px;border:1px solid var(--line);opacity:.3;filter:grayscale(1)}
 .dset i.on{opacity:1;filter:none} .dset i.t5{border-color:var(--r4)} .dset .gi{width:18px;height:18px}
 .dg .drops{grid-column:1/-1}
+
+/* v0.21.1 推廣準備：內建瀏覽器提示、開始畫面登入、邀請、加到主畫面 */
+.inapp{margin:10px 0 0;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--warn) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--warn) 55%,transparent);display:grid;gap:8px}
+.inapp .ia-t{display:grid;gap:2px;font-size:13px;line-height:1.45}
+.inapp .ia-t b{color:var(--warn);font-size:14px}
+.inapp .ia-b{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.inapp .ia-b a.btn{text-decoration:none}
+.inapp .ia-b [data-act="inappclose"]{margin-left:auto}
+#title .tlogin{font-size:14px;margin-top:-4px}
+.invite{display:flex;align-items:center;gap:10px;margin-top:8px;padding:10px 14px;border:1px dashed var(--line);border-radius:10px;font-size:13px;color:var(--muted)}
+.invite .btn{margin-left:auto}
+.a2hs{display:grid;gap:6px;margin:6px 0 4px}
+.a2hs-h{font-size:13px;color:var(--brass);margin-top:4px}
+.a2hs-s{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.45}
+.a2hs-s b{flex:none;width:22px;height:22px;border-radius:50%;border:1px solid var(--brass);color:var(--brass);font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+#shareTxt{width:100%;min-height:84px}

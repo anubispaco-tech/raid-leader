@@ -12,6 +12,7 @@
  * 之後改了程式：部署 → 管理部署作業 → 編輯 → 版本選「新版本」→ 部署（網址不變）
  * v0.9.3：新增「深淵最高／深淵鑰石」兩欄 → 貼上後先執行一次 setup（補表頭），再部署新版本
  * v0.10.1：新增「封鎖」欄與成績合理性檢查 → 同樣先執行 setup，再部署新版本
+ * v0.21.1：玩家表新增「來源／推薦人／主畫面」三欄，摘要加各來源回訪率 → 貼上後先執行一次 setup（補表頭、舊玩家來源填 old），再部署新版本
  * v0.14：雲端存檔覆蓋前自動備份上一份（玩家看不到，只有管理員能還原）→ 貼上後執行一次 setup（補「雲端」表頭），再部署新版本
  *        還原方式：打開試算表 → 上方選單「副本團長」→ 在「雲端」分頁選取該玩家那一列 → 「還原選取列的備份存檔」
  * v0.13.2：雲端存檔改成自動同步（衝突偵測）→ 貼上新版後直接部署新版本即可（不用再跑 setup）
@@ -20,14 +21,14 @@
  */
 
 const SHEETS = {
-  players: { name: '玩家', headers: ['玩家ID', '暱稱', '第一次遊玩', '最後上線', '回訪天數', '遊玩分鐘', '隊伍等級', '最高層', '秘境鑰石', '秘境最高', '版本', '遊玩日期', '深淵最高', '深淵鑰石', '封鎖（填任何字就不上天梯）'] },
+  players: { name: '玩家', headers: ['玩家ID', '暱稱', '第一次遊玩', '最後上線', '回訪天數', '遊玩分鐘', '隊伍等級', '最高層', '秘境鑰石', '秘境最高', '版本', '遊玩日期', '深淵最高', '深淵鑰石', '封鎖（填任何字就不上天梯）', '來源', '推薦人（玩家ID）', '主畫面'] },
   events: { name: '事件', headers: ['時間', '玩家ID', '暱稱', '類型', '內容'] },
   feedback: { name: '回饋', headers: ['時間', '玩家ID', '暱稱', '意見', '當時進度', '版本'] },
   news: { name: '公告', headers: ['ID（不可重複，例如 n001）', '類型', '標題', '內容（可換行，網址會自動變連結）', '標題EN', '內容EN', '開始時間（空白＝立即）', '結束時間（空白＝不下架）', '置頂', '開啟時彈出', '最低版本（例如 0.18.0）', '狀態'] },
 };
 // v0.18 公告：狀態「上架」且在開始～結束時間內才會出現在遊戲；遊戲端快取 10 分鐘、GAS 端快取 1 分鐘
 const NEWS = { types: ['公告', '活動', '更新', '維修'], status: ['上架', '草稿'], max: 20 };
-const COL = { pid: 1, name: 2, first: 3, last: 4, days: 5, minutes: 6, level: 7, top: 8, key: 9, best: 10, ver: 11, dates: 12, best2: 13, key2: 14, ban: 15 };
+const COL = { pid: 1, name: 2, first: 3, last: 4, days: 5, minutes: 6, level: 7, top: 8, key: 9, best: 10, ver: 11, dates: 12, best2: 13, key2: 14, ban: 15, src: 16, ref: 17, pwa: 18 };
 // 成績合理性（v0.10.1）：傳奇秘境要通關第 7 層、深淵秘境要通關第 14 層才可能有成績；每次回報最多進步 JUMP 級
 const SANE = { mythicTop: 7, abyssTop: 14, jump: 15 };
 const TZ = 'Asia/Taipei';
@@ -51,6 +52,7 @@ function setup() {
   ps.hideColumns(COL.dates); // 遊玩日期清單只給程式用
   ps.getRange(1, COL.dates, ps.getMaxRows(), 1).setNumberFormat('@'); // 純文字，避免單一日期被自動轉成日期值
   fixDates();
+  fillOldSource(); // v0.21.1 之前的玩家沒有來源 → 填 old
   const ns = ss.getSheetByName(SHEETS.news.name), nr = ns.getMaxRows() - 1;
   ns.getRange(2, 2, nr, 1).setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(NEWS.types, true).build());
   ns.getRange(2, 9, nr, 2).insertCheckboxes();
@@ -76,7 +78,21 @@ function setup() {
   ]);
   sum.getRange('A1:B1').setFontWeight('bold');
   sum.getRange('B4').setNumberFormat('0%');
-  sum.setColumnWidth(1, 300);
+  // v0.21.1 各來源回訪率：來源代號見遊戲連結 ?src=（ig_story、ig_bio、threads、fb、line、share…；direct＝直接開網址、old＝v0.21.1 以前的玩家）
+  const L = c => `${P}!${c}2:${c}`;
+  sum.getRange('A9:D9').setValues([['來源', '玩家', '回訪 ≥ 4 天', '比例']]).setFontWeight('bold');
+  sum.getRange('A10').setFormula(`=IFERROR(SORT(UNIQUE(FILTER(${L('P')},${L('P')}<>""))),"")`);
+  sum.getRange('B10').setFormula(`=ARRAYFORMULA(IF(A10:A29="","",COUNTIF(${L('P')},A10:A29)))`);
+  sum.getRange('C10').setFormula(`=ARRAYFORMULA(IF(A10:A29="","",COUNTIFS(${L('P')},A10:A29,${L('E')},">=4")))`);
+  sum.getRange('D10').setFormula(`=ARRAYFORMULA(IF(A10:A29="","",IFERROR(C10:C29/B10:B29,0)))`);
+  sum.getRange('D10:D29').setNumberFormat('0%');
+  sum.getRange('F9:G9').setValues([['推廣', '數值']]).setFontWeight('bold');
+  sum.getRange('F10:G12').setValues([
+    ['朋友分享加入（有推薦人）', `=COUNTIF(${L('Q')},"?*")`],
+    ['從主畫面開過的玩家', `=COUNTIF(${L('R')},"是")`],
+    ['登入雲端存檔的玩家', `=MAX(0,COUNTA('${CLOUD.sheet}'!A2:A))`],
+  ]);
+  sum.setColumnWidth(6, 220);
 }
 
 // ---------- 遊戲送資料（POST，body 為 JSON 字串） ----------
@@ -164,7 +180,7 @@ function upsertPlayer(pid, name, d) {
   if (top < SANE.mythicTop) { d.best = 0; d.key = 0; }
   if (top < SANE.abyssTop) { d.best2 = 0; d.key2 = 0; }
   if (idx === -1) {
-    sh.appendRow([pid, name, now(), now(), 1, num(d.playMin, 1e6), num(d.level, 100), num(d.top, 99), num(d.key, 99), Math.min(num(d.best, 99), SANE.jump), clean(d.ver, 10), "'" + today, Math.min(num(d.best2, 99), SANE.jump), num(d.key2, 99), '']);
+    sh.appendRow([pid, name, now(), now(), 1, num(d.playMin, 1e6), num(d.level, 100), num(d.top, 99), num(d.key, 99), Math.min(num(d.best, 99), SANE.jump), clean(d.ver, 10), "'" + today, Math.min(num(d.best2, 99), SANE.jump), num(d.key2, 99), '', srcOf(d.src), refOf(d.ref, pid), d.pwa ? '是' : '']);
     return;
   }
   const r = idx + 2, row = sh.getRange(r, 1, 1, SHEETS.players.headers.length).getValues()[0];
@@ -183,9 +199,26 @@ function upsertPlayer(pid, name, d) {
   row[COL.best2 - 1] = Math.max(oldBest2, capJump(oldBest2, d.best2));
   row[COL.key2 - 1] = num(d.key2, 99);
   row[COL.ver - 1] = clean(d.ver, 10);
+  // v0.21.1 來源與推薦人只記第一次；主畫面開過一次就標「是」
+  while (row.length < SHEETS.players.headers.length) row.push('');
+  if (!row[COL.src - 1] && d.src) row[COL.src - 1] = srcOf(d.src);
+  if (!row[COL.ref - 1] && d.ref) row[COL.ref - 1] = refOf(d.ref, pid);
+  if (d.pwa) row[COL.pwa - 1] = '是';
   row[COL.dates - 1] = dates.join(',');
   sh.getRange(r, COL.dates).setNumberFormat('@');
   sh.getRange(r, 1, 1, row.length).setValues([row]);
+}
+
+// v0.21.1 來源代號只收小寫英數與底線；推薦人必須是合法玩家 ID 且不是自己
+function srcOf(v) { const s = String(v || '').toLowerCase(); return /^[a-z0-9_]{1,24}$/.test(s) ? s : ''; }
+function refOf(v, pid) { const s = String(v || '').toLowerCase(); return /^[a-z0-9]{8,24}$/.test(s) && s !== pid ? s : ''; }
+function fillOldSource() {
+  const sh = SpreadsheetApp.getActive().getSheetByName(SHEETS.players.name), n = sh.getLastRow() - 1;
+  if (n < 1) return;
+  const rng = sh.getRange(2, COL.src, n, 1), vals = rng.getValues();
+  const ids = sh.getRange(2, COL.pid, n, 1).getValues();
+  vals.forEach((r, i) => { if (!r[0] && ids[i][0]) r[0] = 'old'; });
+  rng.setValues(vals);
 }
 
 // 遊玩日期清單 → 去重的 yyyy-MM-dd 陣列（相容被試算表轉成日期值的舊資料）
