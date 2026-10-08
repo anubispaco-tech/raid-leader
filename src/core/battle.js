@@ -94,6 +94,10 @@ export class Battle {
     // 怒風圖騰等：全隊暴擊光環（上限 +15%）
     const partyCrit = Math.min(0.15, this.units.reduce((a, u) => a + (u.mods.partyCrit || 0), 0));
     if (partyCrit) for (const u of this.units) u.crit += partyCrit;
+    // v0.23 團長天賦（opts.leader＝leaderMods 的結果）：全隊生命在隊伍光環之後套用
+    const L = this.L = opts.leader || {};
+    if (L.hp) for (const u of this.units) { u.max = Math.round(u.max * (1 + L.hp)); u.hp = u.max; }
+    this.leaderUsed = {};
     this.horn = { used: false, until: -1 };
     this.lust = { used: false, until: -1, haste: 0, proc: 0, src: null }; // 嗜血（薩滿）
     this.waves = opts.waves || buildWaves(dIdx);
@@ -119,9 +123,12 @@ export class Battle {
   hornActive() { return this.horn.until > this.tick; }
   useHorn() {
     if (this.horn.used || this.over) return false;
-    this.horn.used = true; this.horn.until = this.tick + RAID_HORN.dur;
+    const L = this.L, dur = RAID_HORN.dur + (L.hornDur || 0);
+    this.horn.used = true; this.horn.until = this.tick + dur;
     this.fx({ k: 'horn' });
-    this.push(tx('📯 英勇號角！全隊傷害與治療 +{0}%，持續 {1} 秒', Math.round(RAID_HORN.bonus * 100), RAID_HORN.dur), 'info');
+    this.push(tx('📯 英勇號角！全隊傷害與治療 +{0}%，持續 {1} 秒', Math.round(this.hornBonus() * 100), dur), 'info');
+    if (L.rallyHeal) for (const u of this.alive()) { const h = Math.min(u.max - u.hp, Math.round(u.max * L.rallyHeal)); u.hp += h; if (h) this.fx({ k: 'heal', s: u.id, t: u.id }); }
+    if (L.hornBreak) for (const e of this.foes()) { if (e.casting) { e.casting = null; this.fx({ k: 'kick', t: e.id }); } if (e.bshield > 0) e.bshield = Math.round(e.bshield * 0.5); }
     return true;
   }
   // 嗜血：持續期間每位隊員每秒有 haste 機率多出手一次；proc > 0 時隊員攻擊有機率引發閃電（傳說雷鳴・卡洛）
@@ -133,14 +140,16 @@ export class Battle {
     this.push(tx('🥁 {0} 施放嗜血！全隊出手速度 +{1}%，持續 {2} 秒', src.name, Math.round(haste * 100), dur), 'info');
     return true;
   }
-  healMult(u) { return (u.mods.healMult || 1) * (u.mods.setHeal ? 1 + u.mods.setHeal : 1) * (this.hornActive() ? 1 + RAID_HORN.bonus : 1); }
+  hornBonus() { return RAID_HORN.bonus + (this.L.hornBonus || 0); }
+  healMult(u) { return (u.mods.healMult || 1) * (u.mods.setHeal ? 1 + u.mods.setHeal : 1) * (this.hornActive() ? 1 + this.hornBonus() : 1) * (1 + (this.L.heal || 0)); }
   weakMult(e) { return e.weakUntil > this.tick ? 1 - e.weak : 1; }
 
   // ---------- 傷害與治療 ----------
   hitEnemy(u, e, amt, o = {}) {
     if (e.hp <= 0) return 0;
     const m = u.mods;
-    amt *= (m.dmgMult || 1) * (this.hornActive() ? 1 + RAID_HORN.bonus : 1);
+    amt *= (m.dmgMult || 1) * (this.hornActive() ? 1 + this.hornBonus() : 1) * (1 + (this.L.dmg || 0)) * (e.boss ? 1 + (this.L.bossDmg || 0) : 1);
+    if (this.L.shieldDmg && e.bshield > 0) amt *= 1 + this.L.shieldDmg;
     if (m.setDmg) amt *= 1 + m.setDmg;                                // 套裝
     if (u.hk.outMult) amt *= u.hk.outMult(this, u, e, o);           // 掛勾：輸出倍率
     if (m.execute && e.hp < e.max * 0.35) amt *= 1 + m.execute;
@@ -191,12 +200,15 @@ export class Battle {
     const aura = this.alive().find(x => x.lh.partyTaken);            // 傳說掛勾：在場時全隊減傷
     if (aura) red *= aura.lh.partyTaken;
     if (m.lowHpReduce && u.hp < u.max * 0.5) red *= 1 - m.lowHpReduce;
+    if (this.L.tankTaken && u.role === 'tank') red *= 1 - this.L.tankTaken;
+    if (this.L.lowTaken && u.hp < u.max * 0.3) red *= 1 - this.L.lowTaken;
     amt = Math.round(amt * Math.max(0.05, red) * rnd(0.9, 1.1));
     const absorbed = Math.min(u.shield, amt); u.shield -= absorbed; amt -= absorbed;
     u.hp = Math.max(0, u.hp - amt); u.taken += amt;
     this.fx({ k: 'hurt', s: attacker ? attacker.id : null, t: u.id, kind });
     if (u.role === 'tank' && kind !== 'magic' && this.has('necrotic')) u.necro = Math.min(40, u.necro + 1);
     if (kind !== 'magic' && m.counter && attacker && R() < m.counter) this.hitEnemy(u, attacker, u.pow);
+    if (u.hp === 0 && this.L.lastStand && !this.leaderUsed.hold) { this.leaderUsed.hold = true; u.hp = 1; this.push(tx('🛡 不屈：{0} 撐住了致命一擊', u.name), 'info'); }
     this.lifeSavers(u);
     if (u.hp === 0) this.onDeath(u);
     return amt;
@@ -214,6 +226,7 @@ export class Battle {
   onDeath(u) {
     const priest = this.alive().find(x => x.mods.redemption && !x.used.redemption);
     if (priest) { priest.used.redemption = true; u.hp = Math.round(u.max * priest.mods.redemption); this.skillLog(priest, tx('救贖'), u); this.fx({ k: 'heal', s: priest.id, t: u.id, big: true }); return; }
+    if (this.L.revive && !this.leaderUsed.revive) { this.leaderUsed.revive = true; u.hp = Math.round(u.max * this.L.revive); this.push(tx('✚ 戰地救援：{0} 重新站起來', u.name), 'info'); this.fx({ k: 'heal', t: u.id, big: true }); return; }
     this.push(tx('💀 {0}（{1}）陣亡', u.name, u.pack.name), 'bad'); this.fx({ k: 'die', t: u.id });
   }
   heal(src, tgt, amt, raw = false) {
@@ -229,7 +242,7 @@ export class Battle {
   utility(u, foes) {
     const caster = foes.find(e => e.casting);
     if (caster && u.pack.kick && u.pack.kick(u) && (u.cd.kick || 0) <= this.tick) {
-      caster.casting = null; u.cd.kick = this.tick + (u.mods.kickCd || 12); this.fx({ k: 'kick', s: u.id, t: caster.id });
+      caster.casting = null; u.cd.kick = this.tick + Math.round((u.mods.kickCd || 12) * (1 - (this.L.kickCd || 0))); this.fx({ k: 'kick', s: u.id, t: caster.id });
       this.skillLog(u, tx('打斷'), caster); return true;
     }
     if (u.role === 'heal' && (u.cd.dispel || 0) <= this.tick) {

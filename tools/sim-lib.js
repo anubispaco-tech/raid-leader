@@ -3,7 +3,7 @@
 // 打不過就交替刷前一層；talents=true 時每場前套用「推薦配置」。
 import * as G from '../src/core/index.js';
 
-export function playthrough({ maxRuns = 1500, talents = true, horn = false, stopAt = G.CH1_TOP, s = G.newGame() } = {}) {
+export function playthrough({ maxRuns = 1500, talents = true, horn = false, stopAt = G.CH1_TOP, s = G.newGame(), leader = null } = {}) {
   const log = [], first = {};
   for (let run = 0; run < maxRuns; run++) {
     const want = s.party.length < 5 ? (s.heroes.some(h => h.cls === 'mage') ? 'rogue' : 'mage') : null;
@@ -24,7 +24,7 @@ export function playthrough({ maxRuns = 1500, talents = true, horn = false, stop
       }
       G.prepare(s, G.mechHints(d));
     } else if (talents) for (const h of G.partyHeroes(s)) G.applyRecommend(h, G.mechHints(d));
-    const b = new G.Battle(G.partyHeroes(s), s.items, d, { autoHorn: horn }).runToEnd();
+    const b = new G.Battle(G.partyHeroes(s), s.items, d, { autoHorn: horn, leader: typeof leader === 'function' ? leader(s, run) : leader }).runToEnd();
     G.applyResult(s, d, b);
     if (d === top) s._fs = b.win ? 0 : (s._fs || 0) + 1;
     if (b.win && first[d] === undefined) {
@@ -38,7 +38,7 @@ export function playthrough({ maxRuns = 1500, talents = true, horn = false, stop
 }
 
 // 通關第 7 層後繼續打秘境：每天 perDay 場、輪流打 7 個副本、每場前套用推薦天賦（含詞綴）、首領戰吹號角
-export function mythicRun({ runs = 300, perDay = 15, start = new Date('2026-10-05T04:00:00Z') } = {}) {
+export function mythicRun({ runs = 300, perDay = 15, start = new Date('2026-10-05T04:00:00Z'), leader = null } = {}) {
   const { s } = playthrough({ talents: true });
   const keyAt = {}, hist = [];
   for (let r = 0; r < runs; r++) {
@@ -50,7 +50,7 @@ export function mythicRun({ runs = 300, perDay = 15, start = new Date('2026-10-0
     const o = G.mythicBattleOpts(d, lvl, date);
     const hints = [...G.mechHints(d), ...G.affixHints(o.mythic.affixes)];
     for (const h of G.partyHeroes(s)) G.applyRecommend(h, hints);
-    const b = new G.Battle(G.partyHeroes(s), s.items, d, { ...o, autoHorn: true }).runToEnd();
+    const b = new G.Battle(G.partyHeroes(s), s.items, d, { ...o, autoHorn: true, leader }).runToEnd();
     const res = G.applyMythicResult(s, b);
     hist.push(res.inTime);
     for (let k = 2; k <= s.mythic.key; k++) if (keyAt[k] === undefined) keyAt[k] = r + 1;
