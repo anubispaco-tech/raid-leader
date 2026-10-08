@@ -9,7 +9,7 @@ import { getLang } from './i18n.js';
 import { dungeonInfo } from './dungeons.js';
 import { SPECS, TALENT_ROWS, SPEC_LEVEL, applyRecommend } from './talents.js';
 import { MYTHIC, CH1_TOP, SET_DROP, SET_T5, RARITY, mythicBestLevel } from './config.js';
-import { leaderModsOf, leaderMods, leaderAlloc, validAlloc, leaderLevel } from './leader.js';
+import { leaderModsOf, leaderMods, leaderAlloc, validAlloc, leaderLevel, migrateLeader } from './leader.js';
 import { bump } from './daily.js';
 import { mythicRewards, keyChange, mythicBattleOpts, keyOf, setKey, mythicTier } from './mythic.js';
 import { Battle } from './battle.js';
@@ -49,7 +49,7 @@ export function newGame() {
     tavern: [], idle: null, lastSeen: Date.now(), stats: { runs: 0, wins: 0 }, autoSalvageBelow: 0, keepRarity: ECONOMY.defaultKeepRarity, stash: [], created: Date.now(),
     mythic: { key: MYTHIC.startKey, key2: MYTHIC.startKey, best: {}, runs: 0, timed: 0 }, failStreak: 0, player: newPlayer(), bagSeen: [],
     tut: { step: 0, done: false }, cards: [],
-    recruit: { sinceEpic: 0, sinceLegend: 0, total: 0 }, vault: { day: '', used: 0, runs: 0, best: {} }, dust: 0, idleMythic: null, salvageIlvlGap: 0, story: { seen: [] }, leader: { alloc: {} } };
+    recruit: { sinceEpic: 0, sinceLegend: 0, total: 0 }, vault: { day: '', used: 0, runs: 0, best: {} }, dust: 0, idleMythic: null, salvageIlvlGap: 0, story: { seen: [] }, leader: { alloc: {}, cmds: [] } };
   for (const c of HERO.starters) { const h = makeHero(c); h.name = uniqueName(s); s.heroes.push(h); s.party.push(h.id); }
   rollTavern(s);
   return s;
@@ -89,9 +89,8 @@ export function migrate(s) {
   // v0.7.4：精華（精煉材料）、秘境掛機
   if (s.dust == null) s.dust = 0;
   if (s.idleMythic === undefined) s.idleMythic = null;
-  // v0.23 團長天賦配點（團長經驗由場數推算，不用另存）
-  if (!s.leader || typeof s.leader !== 'object') s.leader = { alloc: {} };
-  if (!s.leader.alloc || typeof s.leader.alloc !== 'object') s.leader.alloc = {};
+  // v0.23 團長天賦配點（團長經驗由場數推算，不用另存）；v0.24 改成天賦樹，舊配點退回
+  migrateLeader(s);
   // v0.9.2：護甲拆成頭胸手腿 → 舊的「護甲」變成胸甲
   for (const it of Object.values(s.items)) if (it.slot === 'armor') it.slot = 'chest';
   for (const h of [...s.heroes, ...(s.tavern || [])]) {
@@ -118,7 +117,7 @@ const int = (v, lo, hi, d = lo) => { const n = Math.round(Number(v)); return Num
 function normalizeTypes(s) {
   const R = HERO_RARITY.length - 1, IR = RARITY.length - 1;
   s.gold = int(s.gold, 0, 1e12); s.dust = int(s.dust, 0, 1e9); s.unlocked = int(s.unlocked, 1, DUNGEONS.length);
-  if (s.leader) { s.leader.alloc = validAlloc(s.leader.alloc, leaderLevel(s), s) || {}; if (s.leader.seen != null) s.leader.seen = int(s.leader.seen, 0, 999); }
+  if (s.leader) { s.leader.alloc = validAlloc(s.leader.alloc, leaderLevel(s), s) || {}; if (s.leader.seen != null) s.leader.seen = int(s.leader.seen, 0, 999); s.leader.cmds = (Array.isArray(s.leader.cmds) ? s.leader.cmds : []).filter(c => typeof c === 'string').slice(0, 4); }
   const okHero = h => h && typeof h === 'object' && CLASSES[h.cls] && h.gear && typeof h.gear === 'object';
   s.heroes = s.heroes.filter(okHero); s.tavern = (s.tavern || []).filter(okHero);
   for (const h of [...s.heroes, ...s.tavern]) {
@@ -560,7 +559,7 @@ export function offlineProgress(s, now = Date.now()) {
   let t = 0, runs = 0, wins = 0, gold = 0, items = 0, stashed = 0, lv = 0;
   while (runs < 400) {
     const d = myth ? s.idleMythic : s.idle;
-    const b = new Battle(partyHeroes(s), s.items, d, { ...(myth ? mythicBattleOpts(d, myth) : {}), autoHorn: true, leader: leaderModsOf(s, d) }).runToEnd();
+    const b = new Battle(partyHeroes(s), s.items, d, { ...(myth ? mythicBattleOpts(d, myth) : {}), autoHorn: true, leader: leaderModsOf(s, d), actives: 'auto', autoCmd: true }).runToEnd();
     t += b.tick + 5; if (t > sec) break;
     const r = myth ? applyMythicIdleResult(s, b) : applyResult(s, d, b);
     runs++; if (b.win) wins++; gold += r.gold; items += r.kept.length; stashed += r.stashed.length; lv += r.lvUps.length;

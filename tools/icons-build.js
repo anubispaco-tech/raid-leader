@@ -7,7 +7,8 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const set = require('@iconify-json/game-icons/icons.json');
-const src = fs.readFileSync(path.join(root, 'src/ui/icons.js'), 'utf8');
+// v0.24 團長天賦樹與主動技能的圖示寫在 core 資料裡（icon: '…'），一起掃
+const src = ['src/ui/icons.js', 'src/core/leader.js', 'src/core/actives.js'].map(f => fs.readFileSync(path.join(root, f), 'utf8')).join('\n');
 const names = [...new Set([...src.matchAll(/'([a-z0-9]+(?:-[a-z0-9]+)*)'/g)].map(m => m[1]))].filter(n => set.icons[n]).sort();
 const out = {};
 for (const n of names) {

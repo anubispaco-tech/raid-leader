@@ -46,19 +46,19 @@ export function setKey(s, dIdx, k) { if (mythicTier(dIdx) === 2) s.mythic.key2 =
 
 // ---------- 秘境體力 ----------
 // 手動挑戰每場 1 點；每 regenMin 分鐘回 1 點，上限 max。掛機不耗體力
-const STA_MS = () => MYTHIC.stamina.regenMin * 60000;
+const STA_MS = s => MYTHIC.stamina.regenMin * 60000 / (1 + ((s && leaderMods(leaderAlloc(s)).staRegen) || 0)); // v0.24 後勤「補給 II」回復速度
 export const staminaMax = s => MYTHIC.stamina.max + (leaderMods(leaderAlloc(s)).stamina || 0); // v0.23 後勤「補給」
 export function stamina(s, now = Date.now()) {
   const max = staminaMax(s);
   const st = s.mythic.sta || (s.mythic.sta = { pts: max, at: now });
   if (st.pts >= max) { st.at = now; return st; } // 獎勵給的體力可以暫時超過上限
-  const n = Math.floor((now - st.at) / STA_MS());
-  if (n > 0) { st.pts = Math.min(max, st.pts + n); st.at = st.pts >= max ? now : st.at + n * STA_MS(); }
+  const n = Math.floor((now - st.at) / STA_MS(s));
+  if (n > 0) { st.pts = Math.min(max, st.pts + n); st.at = st.pts >= max ? now : st.at + n * STA_MS(s); }
   return st;
 }
 export function addStamina(s, n, cap, now = Date.now()) { const st = stamina(s, now); st.pts = Math.min(cap, st.pts + n); return st.pts; }
 // 距離下一點還要幾毫秒（滿了回 0）
-export const staminaNext = (s, now = Date.now()) => { const st = stamina(s, now); return st.pts >= staminaMax(s) ? 0 : Math.max(0, st.at + STA_MS() - now); };
+export const staminaNext = (s, now = Date.now()) => { const st = stamina(s, now); return st.pts >= staminaMax(s) ? 0 : Math.max(0, st.at + STA_MS(s) - now); };
 export function spendStamina(s, now = Date.now()) {
   const st = stamina(s, now);
   if (st.pts < 1) return false;

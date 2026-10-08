@@ -549,3 +549,43 @@ h3 .gi{vertical-align:-.12em}
 .lsum{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 0}.lsum span{font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);background:var(--panel2)}
 .lnb small{display:block}
 .lnodes + .label{display:block;margin-top:14px}
+
+/* v0.24 主動技能（我方卡片）、團長指令列、天賦樹 */
+.pstrip .pc.act{font:inherit;color:inherit;cursor:pointer;text-align:left;padding:4px 5px;gap:2px 4px}
+.pstrip .pc .sk{grid-column:1/-1;line-height:1.15;font-size:10.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.pstrip .pc .cd{font-size:10.5px;color:var(--dim)}
+.pstrip .pc.ready{border-color:var(--r4);box-shadow:0 0 0 2px color-mix(in srgb,var(--r4) 30%,transparent)}
+.pstrip .pc.ready .sk,.pstrip .pc.ready .cd{color:var(--r4)}
+.pstrip .pc.act:active{transform:scale(.97)}
+.cmdrow{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.cmdbtn{display:flex;align-items:center;gap:5px}.cmdbtn .gi{width:1.1em;height:1.1em}
+.cmdbtn.ready{border-color:var(--r4);color:var(--r4)}
+.skillcard.act{border:1px solid color-mix(in srgb,var(--r4) 50%,var(--line))}
+.ltreebox{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 4px;margin-top:8px}
+.ltree{display:block;width:100%;max-width:400px;height:auto;margin:0 auto}
+.lground{fill:none;stroke:#2a3240;stroke-width:3;stroke-linecap:round}
+.lbranch{fill:none;stroke:#3a3329;stroke-linecap:round;transition:stroke .25s}
+.lbranch.on{stroke:color-mix(in srgb,var(--brass) 75%,#3a3329)}
+.lnode2{cursor:pointer}
+.lnode2 .bg{fill:var(--panel2);stroke:#4a5363;stroke-width:2.5}
+.lnode2 .ic{fill:var(--dim)}
+.lnode2.can .bg{stroke:var(--brass-d);stroke-dasharray:5 4}
+.lnode2.can .ic{fill:var(--muted)}
+.lnode2.on .bg{fill:color-mix(in srgb,var(--brass) 26%,var(--panel2));stroke:var(--brass);stroke-dasharray:none;filter:drop-shadow(0 0 6px color-mix(in srgb,var(--brass) 55%,transparent))}
+.lnode2.on .ic{fill:var(--brass)}
+.lnode2.cmd.can .bg{stroke:color-mix(in srgb,var(--r4) 60%,var(--panel2))}
+.lnode2.cmd.on .bg{fill:color-mix(in srgb,var(--r4) 30%,var(--panel2));stroke:var(--r4);filter:drop-shadow(0 0 7px color-mix(in srgb,var(--r4) 60%,transparent))}
+.lnode2.cmd.on .ic{fill:var(--r4)}
+.lnode2.fork .bg{stroke-dasharray:5 4}.lnode2.fork.on .bg{stroke-dasharray:none}
+.lnode2.soon{opacity:.45}
+.lnode2.sel .bg{stroke-width:4.5;stroke:var(--fg)}
+.lnode2:focus-visible{outline:none}.lnode2:focus-visible .bg{stroke:var(--fg);stroke-width:4.5}
+.ldetail{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:6px;margin-top:8px}
+.ldetail b{font-size:15px}.ldetail p{margin:0;font-size:13.5px}
+.ltag{display:inline-block;font-size:10.5px;font-weight:700;color:var(--ink);background:var(--brass);border-radius:999px;padding:1px 7px;margin-right:6px;vertical-align:2px}
+.ltag.cmd{background:var(--r4)}
+.lwhy{font-size:12px;color:var(--warn)}
+.lcmds{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0}
+
+.pstrip:has(.pc.act) + .log.short,.pstrip:has(.pc.act) + .cmdrow + .log.short{margin-top:6px}
+.pstrip:has(.pc.act){margin-top:6px}

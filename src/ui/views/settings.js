@@ -53,8 +53,9 @@ export function sheetSettings() {
       ${row(tx('格子特效'), seg('fx', [['full', tx('完整')], ['lite', tx('簡化')], ['off', tx('關')]], prefs.fx))}
       ${row(tx('立體視角'), seg('iso', [['0', tx('關')], ['1', tx('開')]], prefs.iso ? '1' : '0'))}
       ${row(tx('音效'), seg('sound', [['1', tx('開')], ['0', tx('關')]], prefs.sound ? '1' : '0'))}
+      ${row(tx('主動技能'), seg('autoSkill', [['1', tx('自動')], ['0', tx('手動')]], prefs.autoSkill ? '1' : '0'))}
     </div>
-    <p class="sub" style="margin:0">${tx('「簡化」只保留命中與首領機制的閃爍；「關」改回文字列表。設定只存在這台裝置。')}</p>
+    <p class="sub" style="margin:0">${tx('「簡化」只保留命中與首領機制的閃爍；「關」改回文字列表。主動技能「自動」：英雄技能與團長指令依時機自動施放，你點了就立刻放；「手動」：只有你點才放（掛機一律自動）。設定只存在這台裝置。')}</p>
     <span class="label">${getLang() === 'en' ? 'Language' : '語言 · Language'}</span>
     <div class="seg">${LANGS.map(l => `<button data-act="lang" data-v="${l.id}" class="${l.id === getLang() ? 'sel' : ''}">${l.name}</button>`).join('')}</div>`;
   if (enabled()) h += `<span class="label">${tx('意見回饋')}</span>

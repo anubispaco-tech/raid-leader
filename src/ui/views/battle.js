@@ -27,7 +27,7 @@ export function viewBattle() {
   const d = G.dungeonInfo(app.battle.dIdx), b = app.battle;
   if (b.vault) d.name = tx('寶庫・第 {0} 層', G.ROMAN[b.vault.floor]);
   if (prefs.fx !== 'off') return viewBattleGrid(b, d) + ctrlBar(b);
-  let h = tx('<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}{13}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">敵方・{7}</span>{8}</div> <div class="side"><span class="label">我方隊伍</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>', d.name, b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : '', b.tick, b.vault ? '' : `<div class="waves">`, b.vault ? '' : b.waves.map((_, i) => `<i class="${i < b.waveIdx || (b.over && b.win) ? 'done' : i === b.waveIdx ? 'cur' : ''}"></i>`).join('') + '</div>', b.mythic ? mythicTimerBar(b) : '', b.vault ? vaultBar(b) : '', b.waveIdx === b.waves.length - 1 ? tx('首領戰') : tx('第 {0} 波', b.waveIdx + 1), enemyRows(b), b.units.map(u => unitRow(u, false)).join(''), b.log.map(l => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, ' ')}</span>${l.msg}</p>`).join(''), prefs.fx !== 'off' ? '<div id="gridSlot" class="gridslot"></div>' : '', prefs.fx !== 'off' ? ' compact' : '', (prefs.fx !== 'off' ? isoBtn() : '') + muteBtn());
+  let h = tx('<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}{13}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">敵方・{7}</span>{8}</div> <div class="side"><span class="label">我方隊伍</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>', d.name, b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : '', b.tick, b.vault ? '' : `<div class="waves">`, b.vault ? '' : b.waves.map((_, i) => `<i class="${i < b.waveIdx || (b.over && b.win) ? 'done' : i === b.waveIdx ? 'cur' : ''}"></i>`).join('') + '</div>', b.mythic ? mythicTimerBar(b) : '', b.vault ? vaultBar(b) : '', b.waveIdx === b.waves.length - 1 ? tx('首領戰') : tx('第 {0} 波', b.waveIdx + 1), enemyRows(b), b.units.map(u => unitRow(u, false)).join(''), b.log.map(l => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, ' ')}</span>${l.msg}</p>`).join(''), prefs.fx !== 'off' ? '<div id="gridSlot" class="gridslot"></div>' : ((b.actMode || (b.cmds && b.cmds.length)) ? partyStrip(b) : ''), prefs.fx !== 'off' ? ' compact' : '', (prefs.fx !== 'off' ? isoBtn() : '') + muteBtn());
   h += ctrlBar(b);
   if (b.over && app.lastResult) h += viewResult();
   return h;
@@ -59,8 +59,23 @@ function foeBar(b) {
   return `<div class="foebar"><div class="fb"><span class="nm">${b.waveIdx === b.waves.length - 1 ? tx('首領戰') : tx('第 {0} 波', b.waveIdx + 1)}・${tx('剩 {0} 隻', alive.length)}</span><span class="num">${Math.ceil(pct(hp, max))}%</span><span class="bar"><i class="enemy-bar" style="width:${pct(hp, max)}%"></i></span></div></div>`;
 }
 // 我方 5 人一排：職業圖示＋血條＋百分比（名字放在 title／aria-label）
+// v0.24 有主動技能時卡片變成按鈕：點了施放，冷卻中顯示秒數，可以施放時發亮
 function partyStrip(b) {
-  return `<div class="pstrip">${b.units.map(u => `<div class="pc ${u.hp <= 0 ? 'dead' : ''}" title="${u.name}" aria-label="${u.name} ${Math.ceil(pct(u.hp, u.max))}%"><span class="ic">${u.icon}</span><span class="num">${u.hp <= 0 ? '✕' : Math.ceil(pct(u.hp, u.max)) + '%'}</span><span class="bar"><i class="role-${u.role}" style="width:${pct(u.hp, u.max)}%"></i></span></div>`).join('')}</div>`;
+  return `<div class="pstrip">${b.units.map(u => {
+    const A = u.act && G.ACTIVES[u.act.key], ready = A && b.activeReady(u), left = A ? Math.max(0, u.act.ready - b.tick) : 0;
+    const inner = `<span class="ic">${u.icon}</span><span class="num">${u.hp <= 0 ? '✕' : Math.ceil(pct(u.hp, u.max)) + '%'}</span><span class="bar"><i class="role-${u.role}" style="width:${pct(u.hp, u.max)}%"></i></span>`
+      + (A ? `<span class="sk">${ready ? A.name : `<span class="cd num">${u.hp <= 0 ? '—' : `${left}s`}</span>`}</span>` : ''); // 一行：可施放時顯示技能名、冷卻中顯示秒數
+    const label = `${u.name} ${Math.ceil(pct(u.hp, u.max))}%` + (A ? `・${A.name}` : '');
+    return A && !b.over
+      ? `<button class="pc act ${u.hp <= 0 ? 'dead' : ''} ${ready ? 'ready' : ''}" data-act="active" data-id="${u.id}" ${ready ? '' : 'aria-disabled="true"'} title="${A.name}：${A.desc}" aria-label="${label}">${inner}</button>`
+      : `<div class="pc ${u.hp <= 0 ? 'dead' : ''}" title="${u.name}" aria-label="${label}">${inner}</div>`;
+  }).join('')}</div>` + cmdRow(b);
+}
+// v0.24 團長指令列（號角在下方控制列，這裡放天賦樹點出來的指令，最多兩個）
+function cmdRow(b) {
+  if (!b.cmds || !b.cmds.length || b.over) return '';
+  return `<div class="cmdrow">${b.cmds.map(c => { const C = G.COMMANDS[c], used = b.cmdUsed[c];
+    return `<button class="btn sm cmdbtn ${used ? '' : 'ready'}" data-act="cmd" data-v="${c}" ${used ? 'disabled' : ''} title="${C.desc}">${svg(C.icon)}${C.name}${used ? tx('・已用') : ''}</button>`; }).join('')}</div>`;
 }
 function ctrlBar(b) {
   return b.over ? '' : tx('<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">撤退</button></div></div>', [1, 2, 4].map(x => `<button data-act="speed" data-x="${x}" class="${app.speed === x ? 'sel' : ''}">${x}×</button>`).join(''), hornBtn(b), canSkip(b) ? tx('<button class="btn" data-act="skip">直接結算</button>') : tx('<button class="btn" disabled title="首次挑戰需完整觀戰（可用 4× 加速）">🔒 結算</button>'));

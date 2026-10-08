@@ -40,6 +40,9 @@ export function sendEvent(kind, detail) {
   if (!URL_ || evQ.length >= 20) return;
   evQ.push({ kind, detail }); pump();
 }
+// v0.24 手動施放次數（主動技能／團長指令）：每 10 次彙總一筆事件，觀察有沒有人在點
+const uses = { active: 0, cmd: 0 };
+export function countUse(k) { uses[k]++; if (uses.active + uses.cmd >= 10) { sendEvent(tx('手動施放'), `active:${uses.active} cmd:${uses.cmd}`); uses.active = 0; uses.cmd = 0; } }
 export const sendFeedback = text => post({ type: 'feedback', text, progress: progressText() });
 
 // 排行榜：讀過且未過期就用快取；讀完只重畫頁面（不重畫抽屜，避免打字中的內容被清掉）

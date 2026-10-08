@@ -186,9 +186,17 @@ document.addEventListener('click', e => {
       if (app.fresh) { try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ } } else save();
       setLang(t.dataset.v); location.reload(); } return;
     case 'speed': app.speed = +t.dataset.x; runTimer(); break;
+    case 'active': if (app.battle && app.battle.useActive(t.dataset.id)) { T.countUse('active'); app.render(true); } return; // v0.24 點隊員卡片施放主動技能
+    case 'cmd': if (app.battle && app.battle.useCommand(t.dataset.v)) { T.countUse('cmd'); app.render(true); } return;  // v0.24 團長指令
+    case 'lnode': { // v0.24 點節點：選取並顯示說明；可以點亮就直接點亮（草稿）
+      const id = t.dataset.v, a = { ...(app.leaderDraft || G.leaderAlloc(app.S)) };
+      if (app.leaderSel === id && G.canAdd(a, id, G.leaderLevel(app.S), app.S)) { a[id] = 1; app.leaderDraft = a; }
+      app.leaderSel = id; break; }
+    case 'lcmd': if (G.toggleCmd(app.S, t.dataset.v)) save(); break;
     case 'skip': if (app.battle && !app.battle.over) {
       if (!canSkip(app.battle)) { toast(tx('首次挑戰需完整觀戰（可用 4× 加速）')); break; }
       const b = app.battle; b.opts.autoHorn = true; // 直接結算視同掛機：首領戰自動吹號角
+      if (b.actMode) b.actMode = 'auto'; b.autoCmd = true; // v0.24 主動技能與團長指令也自動
       if (b.waveIdx === b.waves.length - 1) b.useHorn();
       b.fxq = null; b.runToEnd(); finishBattle(); } break;
     case 'pref': { // v0.20 戰鬥畫面偏好（特效、立體視角、音效），存在這台裝置
@@ -323,8 +331,9 @@ document.addEventListener('click', e => {
     // v0.23 團長
     case 'teamview': app.teamView = t.dataset.v; app.leaderDraft = null; window.scrollTo(0, 0); break;
     case 'lbranch': app.leaderBranch = t.dataset.v; break;
-    case 'ladd': { const a = { ...(app.leaderDraft || G.leaderAlloc(app.S)) }; if (G.canAdd(a, t.dataset.v, G.leaderLevel(app.S), app.S)) { a[t.dataset.v] = (a[t.dataset.v] || 0) + 1; app.leaderDraft = a; } break; }
-    case 'lsub': { const a = { ...(app.leaderDraft || G.leaderAlloc(app.S)) }, id = t.dataset.v; if ((a[id] || 0) > (G.leaderAlloc(app.S)[id] || 0) && G.canRemove(a, id)) { a[id]--; if (!a[id]) delete a[id]; app.leaderDraft = a; } break; }
+    case 'ladd': { const a = { ...(app.leaderDraft || G.leaderAlloc(app.S)) }; if (G.canAdd(a, t.dataset.v, G.leaderLevel(app.S), app.S)) { a[t.dataset.v] = 1; app.leaderDraft = a; } break; }
+    case 'lsub': { const a = { ...(app.leaderDraft || G.leaderAlloc(app.S)) }, id = t.dataset.v; if (a[id] && !G.leaderAlloc(app.S)[id] && G.canRemove(a, id)) { delete a[id]; app.leaderDraft = a; } break; }
+    case 'lrefundok': if (app.S.leader) { delete app.S.leader.refunded; save(); } break;
     case 'lcancel': app.leaderDraft = null; break;
     case 'lcommit': if (app.leaderDraft && G.commitAlloc(app.S, app.leaderDraft)) { app.leaderDraft = null; save(); toast(tx('團長天賦已更新')); T.sendEvent(tx('團長配點'), leaderSummary()); } else toast(tx('配點不合法，請重新調整')); break;
     case 'lreset': openModal({ type: 'text', html: tx('<h3>重置團長天賦？</h3><p class="sub" style="margin:0">收回全部 {0} 點，花費 {1} 金。重置後可以重新分配。</p><div class="row"><button class="btn main" data-act="ldoreset" data-closemodal="1">重置</button><button class="btn" data-act="closebtn">取消</button></div>', G.spentPts(G.leaderAlloc(app.S)), fmt(G.resetCost(app.S))) }); return;
@@ -353,7 +362,10 @@ document.addEventListener('click', e => {
   }
   render();
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && app.modal) closeModal(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && app.modal) closeModal();
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.closest && e.target.closest('g[data-act]')) { e.preventDefault(); e.target.closest('g[data-act]').dispatchEvent(new MouseEvent('click', { bubbles: true })); } // v0.24 天賦樹節點
+});
 
 // ---------- 成就 ----------
 // 每次重畫時檢查；新達成的跳提示（背包里程碑另有自己的提示）。啟動時先靜默補登舊進度
@@ -562,6 +574,6 @@ function showInApp() {
 
 // v0.23 團長配點摘要（事件用）：Lv12 戰術4・士氣6・後勤2・終極 rally
 function leaderSummary() {
-  const a = G.leaderAlloc(app.S), ult = Object.keys(a).filter(id => G.NODE[id] && G.NODE[id].ult);
-  return `Lv${G.leaderLevel(app.S)} ` + Object.keys(G.LEADER_TREE).map(b => `${b[0]}${G.branchPts(a, b)}`).join('/') + (ult.length ? ' ' + ult.join(',') : '');
+  const a = G.leaderAlloc(app.S);
+  return `Lv${G.leaderLevel(app.S)} ` + Object.keys(G.LEADER_TREE).map(b => `${b[0]}${G.branchPts(a, b)}`).join('/') + ' ' + G.equippedCmds(app.S).join(',');
 }

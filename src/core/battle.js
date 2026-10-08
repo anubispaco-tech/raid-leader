@@ -10,6 +10,8 @@ import { setMods } from './items.js';
 import { buildWaves } from './dungeons.js';
 import { heroMods } from './talents.js';
 import { PACKS, roleOf } from './classes/index.js';
+import { ACTIVES, ACTIVE, activeKey } from './actives.js';
+import { COMMANDS } from './leader.js';
 
 // ---------- 首領機制：回傳本 tick 對坦克的攻擊倍率 ----------
 const BOSS_MECHS = {
@@ -98,6 +100,12 @@ export class Battle {
     const L = this.L = opts.leader || {};
     if (L.hp) for (const u of this.units) { u.max = Math.round(u.max * (1 + L.hp)); u.hp = u.max; }
     this.leaderUsed = {};
+    // v0.24 英雄主動技能（opts.actives：'auto' 依時機自動施放、'manual' 只有玩家點才放、沒給＝關閉，模擬與回歸測試預設關閉）
+    this.actMode = opts.actives || null;
+    if (this.actMode) for (const u of this.units) { const k = activeKey(u.cls, u.role); if (k) u.act = { key: k, ready: ACTIVE.first }; }
+    // v0.24 團長指令（opts.leader.cmds）；autoCmd 時依時機自動下達
+    this.cmds = (L.cmds || []).filter(c => COMMANDS[c] && ['rally', 'shatter', 'assault', 'inspire', 'bulwark'].includes(c));
+    this.cmdUsed = {}; this.autoCmd = !!opts.autoCmd;
     this.horn = { used: false, until: -1 };
     this.lust = { used: false, until: -1, haste: 0, proc: 0, src: null }; // 嗜血（薩滿）
     this.waves = opts.waves || buildWaves(dIdx);
@@ -141,6 +149,45 @@ export class Battle {
     return true;
   }
   hornBonus() { return RAID_HORN.bonus + (this.L.hornBonus || 0); }
+  // ---------- v0.24 英雄主動技能 ----------
+  activeReady(u) { return !!u.act && u.hp > 0 && u.act.ready <= this.tick && !this.over && this.foes().length > 0; }
+  useActive(id) {
+    const u = this.units.find(x => x.id === id); if (!u || !this.activeReady(u)) return false;
+    const A = ACTIVES[u.act.key]; u.act.ready = this.tick + ACTIVE.cd; u.act.used = (u.act.used || 0) + 1;
+    this.fx({ k: 'lust', s: u.id });
+    this.push(tx('✨ {0} {1}：{2}', u.icon, u.name, A.name), 'skill');
+    A.use(this, u);
+    return true;
+  }
+  // ---------- v0.24 團長指令 ----------
+  cmdReady(c) { return this.cmds.includes(c) && !this.cmdUsed[c] && !this.over && this.foes().length > 0; }
+  useCommand(c) {
+    if (!this.cmdReady(c)) return false;
+    this.cmdUsed[c] = true;
+    const ext = this.L.cmdDur || 0;
+    this.fx({ k: 'horn' });
+    this.push(tx('📣 團長指令：{0}', COMMANDS[c].name), 'info');
+    if (c === 'rally' || c === 'inspire') { const p = c === 'rally' ? 0.15 : 0.2; for (const u of this.alive()) { const h = Math.min(u.max - u.hp, Math.round(u.max * p)); u.hp += h; if (h) this.fx({ k: 'heal', t: u.id }); } }
+    if (c === 'shatter') {
+      for (const e of this.foes()) { if (e.casting) { e.casting = null; this.fx({ k: 'kick', t: e.id }); } if (e.bshield > 0) e.bshield = Math.round(e.bshield * 0.5); }
+      if (this.L.shatterVuln) this.vuln = { until: this.tick + 5 + ext, v: this.L.shatterVuln };
+    }
+    if (c === 'assault') this.assault = { until: this.tick + 10 + ext, v: 0.15 };
+    if (c === 'bulwark') this.bulwark = { until: this.tick + 6 + ext, v: 0.3 };
+    return true;
+  }
+  // 自動時機（掛機、直接結算、模擬；手動戰鬥則等玩家按）
+  autoCommands() {
+    const boss = this.waveIdx === this.waves.length - 1 && !this.vault, foes = this.foes(), a = this.alive();
+    if (!a.length || !foes.length) return;
+    const avg = a.reduce((t, u) => t + u.hp / u.max, 0) / a.length, low = avg < 0.5 || a.some(u => u.hp < u.max * 0.3);
+    const cast = foes.some(e => e.casting), shield = foes.some(e => e.bshield > 0);
+    if (low && this.cmdReady('inspire')) this.useCommand('inspire');
+    else if (low && this.cmdReady('rally')) this.useCommand('rally');
+    if ((cast || shield) && this.cmdReady('shatter')) this.useCommand('shatter');
+    if (boss && this.cmdReady('assault')) this.useCommand('assault');
+    if ((cast || (boss && avg < 0.6)) && this.cmdReady('bulwark')) this.useCommand('bulwark');
+  }
   healMult(u) { return (u.mods.healMult || 1) * (u.mods.setHeal ? 1 + u.mods.setHeal : 1) * (this.hornActive() ? 1 + this.hornBonus() : 1) * (1 + (this.L.heal || 0)); }
   weakMult(e) { return e.weakUntil > this.tick ? 1 - e.weak : 1; }
 
@@ -149,6 +196,8 @@ export class Battle {
     if (e.hp <= 0) return 0;
     const m = u.mods;
     amt *= (m.dmgMult || 1) * (this.hornActive() ? 1 + this.hornBonus() : 1) * (1 + (this.L.dmg || 0)) * (e.boss ? 1 + (this.L.bossDmg || 0) : 1);
+    if (this.assault && this.assault.until > this.tick) amt *= 1 + this.assault.v;            // 總攻號令
+    if (e.boss && this.vuln && this.vuln.until > this.tick) amt *= 1 + this.vuln.v;          // 震懾
     if (this.L.shieldDmg && e.bshield > 0) amt *= 1 + this.L.shieldDmg;
     if (m.setDmg) amt *= 1 + m.setDmg;                                // 套裝
     if (u.hk.outMult) amt *= u.hk.outMult(this, u, e, o);           // 掛勾：輸出倍率
@@ -202,6 +251,9 @@ export class Battle {
     if (m.lowHpReduce && u.hp < u.max * 0.5) red *= 1 - m.lowHpReduce;
     if (this.L.tankTaken && u.role === 'tank') red *= 1 - this.L.tankTaken;
     if (this.L.lowTaken && u.hp < u.max * 0.3) red *= 1 - this.L.lowTaken;
+    if (u.buf.wall > this.tick) red *= 0.75;                                                    // 不動壁壘
+    if (this.guard && this.guard.until > this.tick) red *= 1 - this.guard.v;                   // 咆哮守護
+    if (this.bulwark && this.bulwark.until > this.tick) red *= 1 - this.bulwark.v;             // 堅守號令
     amt = Math.round(amt * Math.max(0.05, red) * rnd(0.9, 1.1));
     const absorbed = Math.min(u.shield, amt); u.shield -= absorbed; amt -= absorbed;
     u.hp = Math.max(0, u.hp - amt); u.taken += amt;
@@ -282,6 +334,8 @@ export class Battle {
     if (this.over) return;
     this.tick++; this.waveTick++;
     this.tickEffects();
+    if (this.autoCmd && this.cmds.length) this.autoCommands();
+    if (this.actMode === 'auto') for (const u of this.alive()) if (this.activeReady(u) && ACTIVES[u.act.key].auto(this, u)) this.useActive(u.id);
     for (const u of this.alive()) {
       const foes = this.foes(); if (!foes.length) break;
       if (this.utility(u, foes)) continue; // 打斷讀條、淨化詛咒（用掉這一秒的行動）

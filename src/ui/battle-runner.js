@@ -5,14 +5,17 @@ import { app, TICK_MS } from './state.js';
 import { save } from './save.js';
 import { toast, mmss } from './helpers.js';
 import { sendEvent } from './telemetry.js';
+import { prefs } from './prefs.js';
 import { milestone } from './cloud.js';
 import { playFx } from './grid.js';
 
+// v0.24 主動技能與團長指令：掛機一律自動；手動戰鬥照設定「自動施放」（預設開，玩家點了就立刻放）
+const actOpts = idle => ({ actives: idle || prefs.autoSkill ? 'auto' : 'manual', autoCmd: idle || prefs.autoSkill });
 export function startBattle(dIdx) {
   const p = G.partyHeroes(app.S);
   if (!p.length) { toast(tx('隊伍沒有成員')); app.tab = 'team'; app.render(); return; }
   clearTimeout(app.pendingRepeat); app.pendingRepeat = null;
-  app.battle = new G.Battle(p, app.S.items, dIdx, { autoHorn: app.S.idle === dIdx, leader: G.leaderModsOf(app.S, dIdx) }); app.lastResult = null;
+  app.battle = new G.Battle(p, app.S.items, dIdx, { autoHorn: app.S.idle === dIdx, leader: G.leaderModsOf(app.S, dIdx), ...actOpts(app.S.idle === dIdx) }); app.lastResult = null;
   app.battle.push(tx('進入 {0}，第 1 波敵人出現', G.DUNGEONS[dIdx].name), 'info');
   runTimer();
 }
@@ -22,7 +25,7 @@ export function startMythic(dIdx) {
   if (!p.length) { toast(tx('隊伍沒有成員')); app.tab = 'team'; app.render(); return; }
   clearTimeout(app.pendingRepeat); app.pendingRepeat = null;
   const o = G.mythicBattleOpts(dIdx, G.keyOf(app.S, dIdx));
-  app.battle = new G.Battle(p, app.S.items, dIdx, { ...o, leader: G.leaderModsOf(app.S, dIdx) }); app.lastResult = null;
+  app.battle = new G.Battle(p, app.S.items, dIdx, { ...o, leader: G.leaderModsOf(app.S, dIdx), ...actOpts(false) }); app.lastResult = null;
   app.battle.push(tx('進入{3}：{0} +{1}｜詞綴：{2}', G.DUNGEONS[dIdx].name, o.mythic.level, o.mythic.affixes.map(a => G.AFFIXES[a].name).join(tx('、')), o.mythic.tier === 2 ? tx('深淵秘境') : tx('傳奇秘境')), 'info');
   runTimer();
 }
@@ -32,7 +35,7 @@ export function startMythicIdle(dIdx) {
   if (!p.length || !lv) return;
   clearTimeout(app.pendingRepeat); app.pendingRepeat = null;
   const o = G.mythicBattleOpts(dIdx, lv);
-  app.battle = new G.Battle(p, app.S.items, dIdx, { ...o, autoHorn: true, leader: G.leaderModsOf(app.S, dIdx) }); app.battle.mythicIdle = true; app.lastResult = null;
+  app.battle = new G.Battle(p, app.S.items, dIdx, { ...o, autoHorn: true, leader: G.leaderModsOf(app.S, dIdx), ...actOpts(true) }); app.battle.mythicIdle = true; app.lastResult = null;
   app.battle.push(tx('秘境掛機：{0} +{1}（鑰石不變，獎勵 {2}%）', G.DUNGEONS[dIdx].name, lv, Math.round(G.MYTHIC.idleMult * 100)), 'info');
   runTimer();
 }
@@ -44,7 +47,7 @@ export function startVault(floor) {
   if (!p.length) { toast(tx('隊伍沒有成員')); app.tab = 'team'; app.render(); return false; }
   if (!G.vaultLeft(app.S)) { toast(tx('今天的寶庫次數用完了，明天 00:00 重置')); return false; }
   clearTimeout(app.pendingRepeat); app.pendingRepeat = null;
-  app.battle = new G.Battle(p, app.S.items, floor, { ...G.vaultBattleOpts(floor), leader: G.leaderModsOf(app.S, floor) }); app.lastResult = null;
+  app.battle = new G.Battle(p, app.S.items, floor, { ...G.vaultBattleOpts(floor), leader: G.leaderModsOf(app.S, floor), ...actOpts(false) }); app.lastResult = null;
   app.battle.push(tx('進入寶庫第 {0} 層：60 秒內打倒越多寶藏哥布林，金幣越多！', G.ROMAN[floor]), 'info');
   runTimer(); return true;
 }

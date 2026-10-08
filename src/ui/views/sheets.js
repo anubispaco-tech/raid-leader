@@ -98,6 +98,8 @@ function talentView(x) {
   const specRow = `<div class="trow ${Object.keys(specs).length > 2 ? 'n3' : ''} ${x.level < G.SPEC_LEVEL ? 'locked' : ''}"><span class="tlv num">Lv${G.SPEC_LEVEL}<small>${x.level < G.SPEC_LEVEL ? tx('未解鎖') : tx('專精')}</small></span>
       ${Object.entries(specs).map(([k, sp]) => opt('spec', k, x.spec === k, x.level < G.SPEC_LEVEL, `${sp.name}・${sp.skill}`, sp.desc)).join('')}</div>`;
   let h = tx('<div class="skillcard"><span class="label">基礎技能</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>', B.name, B.desc);
+  { const k = G.activeKey(x.cls, G.roleOf(x)), A = k && G.ACTIVES[k]; // v0.24 主動技能
+    if (A) h += tx('<div class="skillcard act"><span class="label">主動技能・戰鬥中點隊員卡片</span><b>{0}</b><span class="sub" style="margin:0">{1}（冷卻 {2} 秒）</span></div>', A.name, A.desc, G.ACTIVE.cd); }
   G.TALENTS[x.cls].forEach((row, i) => {
     const lv = G.TALENT_ROWS[i], locked = x.level < lv;
     if (lv > G.SPEC_LEVEL && !h.includes('data-act="spec"')) h += specRow; // 專精插在 Lv5 與 Lv15 之間
