@@ -43,7 +43,7 @@ const route = p => p.route('**/*', r => { const u = new URL(r.request().url()); 
 // B) 後期存檔（英文）：各分頁截圖、找殘留中文
 {
   const { s } = playthrough({ talents: true });
-  s.lastSeen = Date.now(); s.idle = null; s.player = { pid: 'abcdefgh1234', name: 'Tester', asked: true, playSec: 0 };
+  s.lastSeen = Date.now(); s.idle = null; s.player = { pid: 'abcdefgh1234', name: 'Tester', asked: true, playSec: 0, bindAsked: 1 };
   s.mythic.best = { 0: { level: 5, time: 120 } }; s.dust = 40;
   const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); const errs = []; page.on('pageerror', e => errs.push(e.message));
   await page.addInitScript(v => { (sessionStorage.setItem('rl-title', '1'), sessionStorage.setItem('rl-e2e', '1')); localStorage.setItem('raid-leader-lang', 'en'); if (!sessionStorage.getItem('seeded')) { localStorage.setItem('raid-leader-save-v1', v); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(s));

@@ -42,7 +42,7 @@ h.gear.head = null; h.gear.chest = null;
 // ---------- 畫面 ----------
 s.dust = 350; s.items[pid].locked = false;
 // 第二件給畫面測升級：再放一件胸甲以外的、讓第一件已是 T0.5
-s.lastSeen = Date.now(); s.idle = null; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0 };
+s.lastSeen = Date.now(); s.idle = null; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0, bindAsked: 1 };
 s.story = s.story || { seen: [] }; for (let i = 0; i < 14; i++) s.story.seen.push('pre' + i, 'post' + i);
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 360, height: 780 } });

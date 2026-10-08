@@ -10,7 +10,7 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OLD = 'https://anubispaco-tech.github.io/raid-leader/', SEED = OLD + '__seed', NEW = 'https://raid-leader.anubispaco.workers.dev/';
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
 const { s } = playthrough({ talents: true, stopAt: 2 });
-s.lastSeen = Date.now(); s.idle = null; s.gold = 4321; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0 };
+s.lastSeen = Date.now(); s.idle = null; s.gold = 4321; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0, bindAsked: 1 };
 const fails = [], check = (ok, msg) => { console.log((ok ? '✅ ' : '❌ ') + msg); if (!ok) fails.push(msg); };
 const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: { width: 375, height: 760 } });

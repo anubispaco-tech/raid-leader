@@ -12,7 +12,7 @@ const entry = process.argv[2] || 'index.html';
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
 const G = await import('../src/core/index.js');
 const { s } = playthrough({ talents: true });
-s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0 };
+s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0, bindAsked: 1 };
 for (let i = 0; i <= 13; i++) s.clears[i] = true; s.unlocked = 14;
 for (const h of G.partyHeroes(s)) { h.level = 60; for (const sl of Object.keys(G.SLOTS)) { const it = G.makeItem(sl, 160, 3); it.up = 10; s.items[it.id] = it; h.gear[sl] = it.id; } }
 s.mythic.key2 = 4; s.mythic.best[7] = { level: 5, time: 100 };

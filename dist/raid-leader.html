@@ -289,7 +289,7 @@ textarea.fb{min-height:96px;font-family:var(--f-body);font-size:16px!important;l
 .vault.locked{background:var(--panel);border-color:var(--line);opacity:.7;gap:4px}
 .vleft{font-size:13px;color:var(--brass)}
 .vfloors{display:grid;grid-template-columns:repeat(7,1fr)}
-.vfloors button{padding:6px 0}
+.vfloors button{padding:6px 0;font-family:var(--f-display);font-size:13px}
 .vaultcount{margin-top:6px;font-size:14px}
 
 .mrow2 .mname{flex:1 1 100%}
@@ -547,7 +547,7 @@ h3 .gi{vertical-align:-.12em}
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.21.2 */
+/* 副本團長 v0.22.0 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -1450,6 +1450,7 @@ h3 .gi{vertical-align:-.12em}
     "\u8D85\u6642 {0}": "Over {0}",
     "\u5269 {0}": "{0} left",
     '<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">\u5269 {1}</span></div> <div class="vaultcount"><b class="num">{2}</b> \u96BB\u54E5\u5E03\u6797\u30FB<span class="num">+{3}</span> \u91D1{4}</div>': '<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">{1} left</span></div> <div class="vaultcount"><b class="num">{2}</b>  goblins \xB7 <span class="num">+{3}</span>  gold{4}</div>',
+    "\u30FB+{0} \u7CBE\u83EF": " \xB7 +{0} essence",
     "\uFF08\u5DF2\u9054\u91D1\u5E63\u4E0A\u9650\uFF09": " (gold cap reached)",
     '<span class="sub" style="margin:0">\u3000\u91D1\u5E63\u7B97\u5230 {0} \u96BB</span>': '<span class="sub" style="margin:0"> Gold counts up to {0}</span>',
     "\u8B77\u76FE": "Shield",
@@ -1527,9 +1528,11 @@ h3 .gi{vertical-align:-.12em}
     "\u6BCF\u5929 00:00\uFF08\u53F0\u7063\u6642\u9593\uFF09\u63DB\u65B0\u4EFB\u52D9\u3002": "New quests every day at 00:00 (Taiwan time).",
     '<div class="nextstep"><div><span class="label">\u4E0B\u4E00\u6B65</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>{2}</div>': '<div class="nextstep"><div><span class="label">Next step</span><b>{0}</b><span class="sub" style="margin:0">{1}</span></div>{2}</div>',
     '<div class="vault locked"><b>\u5BF6\u5EAB</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 3 \u5C64\u300C\u6C89\u6C92\u795E\u6BBF\u300D\u5F8C\u958B\u653E\uFF1A\u6BCF\u5929 3 \u6B21\uFF0C\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\u8CFA\u5927\u91CF\u91D1\u5E63\u3002</span></div>': '<div class="vault locked"><b>Vault</b><span class="sub" style="margin:0">Unlocks after clearing Floor 3, Sunken Temple: 3 runs a day hunting treasure goblins for lots of gold.</span></div>',
+    '\u53E6\u5F97\u7CBE\u83EF\uFF0C\u6700\u591A <b class="num">{0}</b>\u3002': 'Also drops essence, up to <b class="num">{0}</b>. ',
+    "\u7B2C\u4E8C\u7AE0\u7684\u6A13\u5C64\u901A\u95DC\u5F8C\u4E5F\u6703\u958B\u653E\uFF0C\u9084\u6703\u984D\u5916\u6389\u7CBE\u83EF\u3002": "Chapter 2 floors open once cleared and also drop essence.",
     "\u5BF6\u5EAB\u662F\u4EC0\u9EBC": "What is the Vault?",
-    "\u6BCF\u5929 {0} \u6B21\u3001\u6BCF\u6B21 60 \u79D2\uFF0C\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\u63DB\u91D1\u5E63\u3002\u91D1\u5E63\u7528\u4F86\u62DB\u52DF\u82F1\u96C4\u3001\u5F37\u5316\u88DD\u5099\u3002\u5C64\u6578\u8D8A\u9AD8\u6BCF\u96BB\u8D8A\u503C\u9322\uFF0C\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002": "{0} runs a day, 60 seconds each: defeat treasure goblins for gold to recruit heroes and upgrade gear. Higher floors pay more per goblin, so your highest floor usually earns the most.",
-    '<div class="vault"><div class="mhead"><div><span class="label">\u5BF6\u5EAB</span><b>60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797</b></div><span class="vleft num">\u4ECA\u5929\u5269 {0}/{1}</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">\u7B2C {3} \u5C64\uFF1A\u6BCF\u96BB <b class="num">{4}</b> \u91D1\uFF0C\u6700\u591A\u7B97 {5} \u96BB\u30FB\u6700\u4F73 {6} \u96BB\u3002\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">\u5099\u6230</button></div></div>': '<div class="vault"><div class="mhead"><div><span class="label">Vault</span><b>60s of treasure goblins</b></div><span class="vleft num">{0}/{1} left today</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">Floor {3}:  <b class="num">{4}</b>  gold each, up to {5} \xB7 best {6}. Your highest floor usually pays most.</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">Prep</button></div></div>',
+    "\u5CF6\u4E0A\u5230\u8655\u90FD\u6709\u8C50\u9952\u54E5\u5E03\u6797\u7684\u5DE2\u7A74\uFF0C\u5BF6\u5EAB\u5C31\u662F\u5176\u4E2D\u6700\u80A5\u7684\u4E00\u7AA9\uFF1A\u6BCF\u5929 {0} \u6B21\u3001\u6BCF\u6B21 60 \u79D2\uFF0C\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\u63DB\u91D1\u5E63\u3002\u5C64\u6578\u8D8A\u9AD8\u6BCF\u96BB\u8D8A\u503C\u9322\uFF0C\u7B2C\u4E8C\u7AE0\u7684\u6A13\u5C64\u9084\u6703\u6389\u7CBE\u83EF\u3002\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002": "Bountiful goblin nests are all over the island, and the Vault is the fattest of them: {0} runs a day, 60 seconds each, trading treasure goblins for gold. Higher floors pay more per goblin, and Chapter 2 floors also drop essence. Your highest floor is usually the best deal.",
+    '<div class="vault"><div class="mhead"><div><span class="label">\u5BF6\u5EAB</span><b>60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797</b></div><span class="vleft num">\u4ECA\u5929\u5269 {0}/{1}</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">\u7B2C {3} \u5C64\uFF1A\u6BCF\u96BB <b class="num">{4}</b> \u91D1\uFF0C\u6700\u591A\u7B97 {5} \u96BB\u30FB\u6700\u4F73 {6} \u96BB\u3002{10}\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">\u5099\u6230</button></div></div>': '<div class="vault"><div class="mhead"><div><span class="label">Vault</span><b>60s of treasure goblins</b></div><span class="vleft num">{0}/{1} left today</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">Floor {3}:  <b class="num">{4}</b>  gold each, up to {5} \xB7 best {6}. {10}Your highest floor usually pays most.</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">Prep</button></div></div>',
     "\u660E\u5929 00:00 \u518D\u4F86": "Come back at 00:00",
     '<div class="mythic locked"><b>\u50B3\u5947\u79D8\u5883</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 7 \u5C64\u300C\u9F8D\u7720\u9AD8\u5854\u300D\u5F8C\u89E3\u9396\uFF1A\u7121\u9650\u5C64\u6578\u3001\u9650\u6642\u6311\u6230\u3001\u6BCF\u65E5\u8A5E\u7DB4\u3002</span></div>': '<div class="mythic locked"><b>Mythic+</b><span class="sub" style="margin:0">Unlocks after clearing Floor 7, Dragonsleep Spire: endless levels, timed runs, daily affixes.</span></div>',
     '<div class="stamina"><span class="label">\u79D8\u5883\u9AD4\u529B</span><b class="num">{0}/{1}</b><span class="sub num" style="margin:0">{2}</span></div>': '<div class="stamina"><span class="label">Mythic stamina</span><b class="num">{0}/{1}</b><span class="sub num" style="margin:0">{2}</span></div>',
@@ -2875,14 +2878,32 @@ h3 .gi{vertical-align:-.12em}
     // 每一波哥布林生命 +12%
     goblinAtk: 0.25,
     // 哥布林攻擊 = 一般小怪 × 0.25
-    par: [20, 14, 19, 12, 22, 15, 15],
-    // 各層「剛通關的隊伍」60 秒擊殺數（模擬實測）
+    par: [
+      20,
+      14,
+      19,
+      12,
+      22,
+      15,
+      15,
+      // 各層「剛通關的隊伍」60 秒擊殺數（模擬實測）
+      9,
+      13,
+      12,
+      12,
+      11,
+      9,
+      12
+    ],
+    // v0.22 第二章樓層（tools/sim-vault.js，6 種子平均）
     parRuns: 10,
     // 打到 par 隻 ≈ 該層一般掛機 10 場的金幣
     capMult: 1.2,
     // 金幣最多算到 par × 1.2 隻（讓「打自己最高層」最划算）
-    xpMult: 0.2
+    xpMult: 0.2,
     // 經驗 = 該層一般一場 × 0.2
+    dust: { from: 7, base: 12, step: 3 }
+    // v0.22 第二章樓層額外產精華：打到 par 隻 = base + step ×（層 − 第 VIII 層），同樣最多算到 par × capMult
   };
   var BAG_MILESTONES = [
     { id: "clear3", name: tx("\u9996\u6B21\u901A\u95DC\u7B2C 3 \u5C64"), test: (s) => !!s.clears[2] },
@@ -3803,13 +3824,16 @@ h3 .gi{vertical-align:-.12em}
     return v;
   }
   var vaultLeft = (s) => Math.max(0, VAULT.daily - vaultToday(s).used);
-  var vaultFloors = (s) => Object.keys(s.clears).filter((k) => s.clears[k]).map(Number).filter((f) => f <= CH1_TOP).sort((a, b) => a - b);
+  var VAULT_TOP = VAULT.par.length - 1;
+  var vaultFloors = (s) => Object.keys(s.clears).filter((k) => s.clears[k]).map(Number).filter((f) => f <= VAULT_TOP).sort((a, b) => a - b);
   var floorGold = (f) => REWARD.goldBase + REWARD.goldPerTier * f;
   var vaultGoldPerKill = (f) => Math.round(floorGold(f) * VAULT.parRuns / VAULT.par[f]);
   var vaultMaxKills = (f) => Math.round(VAULT.par[f] * VAULT.capMult);
-  var vaultFloorOk = (f) => Number.isInteger(f) && f >= 0 && f <= CH1_TOP && VAULT.par[f] != null;
-  function vaultBattleOpts(floor) {
-    if (!vaultFloorOk(floor)) floor = CH1_TOP;
+  var vaultDustPar = (f) => f >= VAULT.dust.from ? VAULT.dust.base + VAULT.dust.step * (f - VAULT.dust.from) : 0;
+  var vaultDust = (f, kills) => Math.round(vaultDustPar(f) * Math.min(kills, vaultMaxKills(f)) / VAULT.par[f]);
+  var vaultFloorOk = (f) => Number.isInteger(f) && f >= 0 && f <= VAULT_TOP && VAULT.par[f] != null;
+  function vaultBattleOpts(floor, any = false) {
+    if (!any && !vaultFloorOk(floor)) floor = VAULT_TOP;
     const base = buildWaves(floor)[0][0];
     const waves = Array.from({ length: 40 }, (_, k) => Array.from({ length: 3 }, () => ({
       name: tx("\u5BF6\u85CF\u54E5\u5E03\u6797"),
@@ -3821,18 +3845,20 @@ h3 .gi{vertical-align:-.12em}
     return { vault: { floor, dur: VAULT.dur }, waves, maxTicks: VAULT.dur };
   }
   function applyVaultResult(s, battle, partyHeroes2) {
-    const f = vaultFloorOk(battle.vault.floor) ? battle.vault.floor : CH1_TOP, kills = battle.kills || 0, v = vaultToday(s);
+    const f = vaultFloorOk(battle.vault.floor) ? battle.vault.floor : VAULT_TOP, kills = battle.kills || 0, v = vaultToday(s);
     const gold = Math.min(kills, vaultMaxKills(f)) * vaultGoldPerKill(f);
     const xp = Math.round(REWARD.xpBase * Math.pow(f + 1, REWARD.xpExp) * VAULT.xpMult);
     v.used++;
     v.runs++;
     const record = kills > (v.best[f] || 0);
     if (record) v.best[f] = kills;
+    const dust = vaultDust(f, kills);
     s.gold += gold;
+    s.dust = (s.dust || 0) + dust;
     s.stats.runs++;
     const lvUps = [];
     for (const h of partyHeroes2(s)) if (gainXp(h, xp)) lvUps.push({ name: h.name, level: h.level, para: h.para || 0 });
-    return { vault: true, kills, gold, xp, record, lvUps, loot: [], kept: [], stashed: [], salvaged: 0, first: false, decayed: false };
+    return { vault: true, kills, gold, dust, xp, record, lvUps, loot: [], kept: [], stashed: [], salvaged: 0, first: false, decayed: false };
   }
 
   // src/core/daily.js
@@ -5199,7 +5225,7 @@ h3 .gi{vertical-align:-.12em}
   }
 
   // src/core/version.js
-  var VERSION = "0.21.2";
+  var VERSION = "0.22.0";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -5482,7 +5508,8 @@ h3 .gi{vertical-align:-.12em}
     const floors = vaultFloors(S), left = vaultLeft(S);
     const f = floors.includes(app.vaultFloor) ? app.vaultFloor : floors[floors.length - 1];
     const best = S.vault.best[f] || 0;
-    return (vaultUnlocked(S) ? infoCard("vault", tx("\u5BF6\u5EAB\u662F\u4EC0\u9EBC"), tx("\u6BCF\u5929 {0} \u6B21\u3001\u6BCF\u6B21 60 \u79D2\uFF0C\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\u63DB\u91D1\u5E63\u3002\u91D1\u5E63\u7528\u4F86\u62DB\u52DF\u82F1\u96C4\u3001\u5F37\u5316\u88DD\u5099\u3002\u5C64\u6578\u8D8A\u9AD8\u6BCF\u96BB\u8D8A\u503C\u9322\uFF0C\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002", VAULT.daily)) : "") + tx('<div class="vault"><div class="mhead"><div><span class="label">\u5BF6\u5EAB</span><b>60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797</b></div><span class="vleft num">\u4ECA\u5929\u5269 {0}/{1}</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">\u7B2C {3} \u5C64\uFF1A\u6BCF\u96BB <b class="num">{4}</b> \u91D1\uFF0C\u6700\u591A\u7B97 {5} \u96BB\u30FB\u6700\u4F73 {6} \u96BB\u3002\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">\u5099\u6230</button></div></div>', left, VAULT.daily, floors.map((i) => `<button data-act="vaultfloor" data-d="${i}" class="${i === f ? "sel" : ""}">${i + 1}</button>`).join(""), f + 1, fmt(vaultGoldPerKill(f)), vaultMaxKills(f), best, f, left ? "" : "disabled", left ? tx("\u9032\u5165\u5BF6\u5EAB") : tx("\u660E\u5929 00:00 \u518D\u4F86"));
+    const dustMax = vaultDust(f, vaultMaxKills(f)), ch2Hint = vaultDustPar(f) ? tx('\u53E6\u5F97\u7CBE\u83EF\uFF0C\u6700\u591A <b class="num">{0}</b>\u3002', dustMax) : S.clears[VAULT.dust.from] ? "" : tx("\u7B2C\u4E8C\u7AE0\u7684\u6A13\u5C64\u901A\u95DC\u5F8C\u4E5F\u6703\u958B\u653E\uFF0C\u9084\u6703\u984D\u5916\u6389\u7CBE\u83EF\u3002");
+    return (vaultUnlocked(S) ? infoCard("vault", tx("\u5BF6\u5EAB\u662F\u4EC0\u9EBC"), tx("\u5CF6\u4E0A\u5230\u8655\u90FD\u6709\u8C50\u9952\u54E5\u5E03\u6797\u7684\u5DE2\u7A74\uFF0C\u5BF6\u5EAB\u5C31\u662F\u5176\u4E2D\u6700\u80A5\u7684\u4E00\u7AA9\uFF1A\u6BCF\u5929 {0} \u6B21\u3001\u6BCF\u6B21 60 \u79D2\uFF0C\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\u63DB\u91D1\u5E63\u3002\u5C64\u6578\u8D8A\u9AD8\u6BCF\u96BB\u8D8A\u503C\u9322\uFF0C\u7B2C\u4E8C\u7AE0\u7684\u6A13\u5C64\u9084\u6703\u6389\u7CBE\u83EF\u3002\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002", VAULT.daily)) : "") + tx('<div class="vault"><div class="mhead"><div><span class="label">\u5BF6\u5EAB</span><b>60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797</b></div><span class="vleft num">\u4ECA\u5929\u5269 {0}/{1}</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">\u7B2C {3} \u5C64\uFF1A\u6BCF\u96BB <b class="num">{4}</b> \u91D1\uFF0C\u6700\u591A\u7B97 {5} \u96BB\u30FB\u6700\u4F73 {6} \u96BB\u3002{10}\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">\u5099\u6230</button></div></div>', left, VAULT.daily, floors.map((i) => `<button data-act="vaultfloor" data-d="${i}" class="${i === f ? "sel" : ""}">${ROMAN[i]}</button>`).join(""), ROMAN[f], fmt(vaultGoldPerKill(f)), vaultMaxKills(f), best, f, left ? "" : "disabled", left ? tx("\u9032\u5165\u5BF6\u5EAB") : tx("\u660E\u5929 00:00 \u518D\u4F86"), ch2Hint);
   }
   function mythicSection() {
     const S = app.S;
@@ -5601,7 +5628,7 @@ h3 .gi{vertical-align:-.12em}
   function viewBattle() {
     if (!app.battle) return tx('<h2>\u6230\u9B25</h2><div class="empty">\u76EE\u524D\u6C92\u6709\u9032\u884C\u4E2D\u7684\u6230\u9B25\u3002<br>\u5230\u300C\u526F\u672C\u300D\u9078\u4E00\u5C64\u958B\u59CB\u6311\u6230\u3002<br><br><button class="btn main" data-tab="dungeon">\u524D\u5F80\u526F\u672C</button></div>');
     const d = dungeonInfo(app.battle.dIdx), b = app.battle;
-    if (b.vault) d.name = tx("\u5BF6\u5EAB\u30FB\u7B2C {0} \u5C64", b.vault.floor + 1);
+    if (b.vault) d.name = tx("\u5BF6\u5EAB\u30FB\u7B2C {0} \u5C64", ROMAN[b.vault.floor]);
     if (prefs.fx !== "off") return viewBattleGrid(b, d) + ctrlBar(b);
     let h = tx('<div class="bhead"><h2>{0}{1}</h2><span class="sub num" style="margin:0">{2}s</span> {3}{4}{13}</div> {5}{6} {11}<div class="arena{12}"> <div class="side foes"><span class="label">\u6575\u65B9\u30FB{7}</span>{8}</div> <div class="side"><span class="label">\u6211\u65B9\u968A\u4F0D</span>{9}</div> </div> <div class="log" aria-live="polite">{10}</div>', d.name, b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : "", b.tick, b.vault ? "" : `<div class="waves">`, b.vault ? "" : b.waves.map((_, i) => `<i class="${i < b.waveIdx || b.over && b.win ? "done" : i === b.waveIdx ? "cur" : ""}"></i>`).join("") + "</div>", b.mythic ? mythicTimerBar(b) : "", b.vault ? vaultBar(b) : "", b.waveIdx === b.waves.length - 1 ? tx("\u9996\u9818\u6230") : tx("\u7B2C {0} \u6CE2", b.waveIdx + 1), enemyRows(b), b.units.map((u) => unitRow(u, false)).join(""), b.log.map((l) => `<p class="${l.cls}"><span class="t">${String(l.t).padStart(3, " ")}</span>${l.msg}</p>`).join(""), prefs.fx !== "off" ? '<div id="gridSlot" class="gridslot"></div>' : "", prefs.fx !== "off" ? " compact" : "", (prefs.fx !== "off" ? isoBtn() : "") + muteBtn());
     h += ctrlBar(b);
@@ -5616,7 +5643,7 @@ h3 .gi{vertical-align:-.12em}
   }
   function vaultBar(b) {
     const left = Math.max(0, b.vault.dur - b.tick), f = b.vault.floor, cap = vaultMaxKills(f);
-    return tx('<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">\u5269 {1}</span></div> <div class="vaultcount"><b class="num">{2}</b> \u96BB\u54E5\u5E03\u6797\u30FB<span class="num">+{3}</span> \u91D1{4}</div>', pct(b.tick, b.vault.dur), mmss(left), b.kills, fmt(Math.min(b.kills, cap) * vaultGoldPerKill(f)), b.kills >= cap ? tx("\uFF08\u5DF2\u9054\u91D1\u5E63\u4E0A\u9650\uFF09") : tx('<span class="sub" style="margin:0">\u3000\u91D1\u5E63\u7B97\u5230 {0} \u96BB</span>', cap));
+    return tx('<div class="mtimer"><div class="mtrack"><i style="width:{0}%"></i></div><span class="num">\u5269 {1}</span></div> <div class="vaultcount"><b class="num">{2}</b> \u96BB\u54E5\u5E03\u6797\u30FB<span class="num">+{3}</span> \u91D1{4}</div>', pct(b.tick, b.vault.dur), mmss(left), b.kills, fmt(Math.min(b.kills, cap) * vaultGoldPerKill(f)), (vaultDustPar(f) ? tx("\u30FB+{0} \u7CBE\u83EF", vaultDust(f, b.kills)) : "") + (b.kills >= cap ? tx("\uFF08\u5DF2\u9054\u91D1\u5E63\u4E0A\u9650\uFF09") : tx('<span class="sub" style="margin:0">\u3000\u91D1\u5E63\u7B97\u5230 {0} \u96BB</span>', cap)));
   }
   function viewBattleGrid(b, d) {
     let h = `<div class="bhead"><h2>${d.name}${b.mythic ? ` <span class="keystone sm num">+${b.mythic.level}</span>` : ""}</h2><span class="sub num" style="margin:0">${b.tick}s</span> ${b.vault ? "" : `<div class="waves">${b.waves.map((_, i) => `<i class="${i < b.waveIdx || b.over && b.win ? "done" : i === b.waveIdx ? "cur" : ""}"></i>`).join("")}</div>`}${isoBtn()}${muteBtn()}</div>`;
@@ -5653,7 +5680,7 @@ h3 .gi{vertical-align:-.12em}
     const dmgMax = Math.max(1, ...b.units.map((u) => Math.max(u.dmgDone, u.healDone)));
     const sec = Math.max(1, b.tick);
     const title = r.vault ? tx("\u6253\u5012 {0} \u96BB\u54E5\u5E03\u6797", r.kills) : r.mythicIdle ? b.win ? tx("\u79D8\u5883\u639B\u6A5F\u30FB\u901A\u95DC") : tx("\u79D8\u5883\u639B\u6A5F\u30FB\u5931\u6557") : r.mythic ? r.inTime ? tx("\u9650\u6642\u901A\u95DC") : b.win ? tx("\u8D85\u6642\u901A\u95DC") : tx("\u5931\u6557") : b.win ? tx("\u901A\u95DC") : tx("\u5931\u6557");
-    let h = tx('<div class="result {0}"><h3>{1}</h3>{2} {3} <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+{4}</b> \u91D1\u5E63</span><span><b class="num">+{5}</b> \u7D93\u9A57</span>{6}{7}</div>', r.vault || (r.mythic ? r.inTime : b.win) ? "win" : "lose", title, r.vault && r.record ? tx('<span class="newrec" style="justify-self:start">\u672C\u5C64\u65B0\u7D00\u9304</span>') : "", r.mythicIdle ? tx('<div class="sub" style="margin:0">\u639B\u6A5F\u7B49\u7D1A +{0}\u30FB\u9470\u77F3\u4E0D\u8B8A\uFF08\u76EE\u524D +{1}\uFF09\u30FB\u734E\u52F5 {2}%</div>', b.mythic.level, keyOf(app.S, b.dIdx), Math.round(MYTHIC.idleMult * 100)) : r.mythic ? tx('<div class="keychange"><span class="keystone num">+{0}</span><span class="arrow">\u2192</span><span class="keystone num {1}">+{2}</span> <span class="sub" style="margin:0">\u7528\u6642 <b class="num">{3}</b> / \u9650\u6642 {4}</span>{5}</div>', r.prevKey, r.nextKey > r.prevKey ? "up" : r.nextKey < r.prevKey ? "down" : "", r.nextKey, mmss(b.tick), mmss(b.mythic.timer), r.record ? tx('<span class="newrec">\u65B0\u7D00\u9304</span>') : "") : "", fmt(r.gold), fmt(r.xp), r.first ? tx('<span style="color:var(--brass)">\u9996\u6B21\u901A\u95DC\uFF1A\u5FC5\u6389\u7A00\u6709\u4EE5\u4E0A</span>') : "", r.decayed ? `<span style="color:var(--warn)">${b.dIdx === DUNGEONS.length - 1 ? tx("\u7B49\u7D1A\u58D3\u5236\uFF1A\u734E\u52F5\u6700\u4F4E\u4FDD\u7559 {0}%\uFF0C\u60F3\u8981\u66F4\u591A\u53EF\u4EE5\u6539\u7528\u79D8\u5883\u639B\u6A5F", Math.round(REWARD.decayFloorTop * 100)) : tx("\u9019\u5C64\u5C0D\u4F60\u592A\u7C21\u55AE\u4E86\uFF0C\u7D93\u9A57\u8207\u91D1\u5E63\u8B8A\u5C11\uFF0C\u5F80\u4E0B\u4E00\u5C64\u5427")}</span>` : "");
+    let h = tx('<div class="result {0}"><h3>{1}</h3>{2} {3} <div class="rew"><span><i class="coin" style="display:inline-block"></i> <b class="num">+{4}</b> \u91D1\u5E63</span><span><b class="num">+{5}</b> \u7D93\u9A57</span>{6}{7}</div>', r.vault || (r.mythic ? r.inTime : b.win) ? "win" : "lose", title, r.vault && r.record ? tx('<span class="newrec" style="justify-self:start">\u672C\u5C64\u65B0\u7D00\u9304</span>') : "", r.mythicIdle ? tx('<div class="sub" style="margin:0">\u639B\u6A5F\u7B49\u7D1A +{0}\u30FB\u9470\u77F3\u4E0D\u8B8A\uFF08\u76EE\u524D +{1}\uFF09\u30FB\u734E\u52F5 {2}%</div>', b.mythic.level, keyOf(app.S, b.dIdx), Math.round(MYTHIC.idleMult * 100)) : r.mythic ? tx('<div class="keychange"><span class="keystone num">+{0}</span><span class="arrow">\u2192</span><span class="keystone num {1}">+{2}</span> <span class="sub" style="margin:0">\u7528\u6642 <b class="num">{3}</b> / \u9650\u6642 {4}</span>{5}</div>', r.prevKey, r.nextKey > r.prevKey ? "up" : r.nextKey < r.prevKey ? "down" : "", r.nextKey, mmss(b.tick), mmss(b.mythic.timer), r.record ? tx('<span class="newrec">\u65B0\u7D00\u9304</span>') : "") : "", fmt(r.gold), fmt(r.xp), (r.dust ? `<span class="dust"><b class="num">+${r.dust}</b> ${tx("\u7CBE\u83EF")}</span>` : "") + (r.first ? tx('<span style="color:var(--brass)">\u9996\u6B21\u901A\u95DC\uFF1A\u5FC5\u6389\u7A00\u6709\u4EE5\u4E0A</span>') : ""), r.decayed ? `<span style="color:var(--warn)">${b.dIdx === DUNGEONS.length - 1 ? tx("\u7B49\u7D1A\u58D3\u5236\uFF1A\u734E\u52F5\u6700\u4F4E\u4FDD\u7559 {0}%\uFF0C\u60F3\u8981\u66F4\u591A\u53EF\u4EE5\u6539\u7528\u79D8\u5883\u639B\u6A5F", Math.round(REWARD.decayFloorTop * 100)) : tx("\u9019\u5C64\u5C0D\u4F60\u592A\u7C21\u55AE\u4E86\uFF0C\u7D93\u9A57\u8207\u91D1\u5E63\u8B8A\u5C11\uFF0C\u5F80\u4E0B\u4E00\u5C64\u5427")}</span>` : "");
     h += firstWinLine(r.firstWin);
     if (r.lvUps.length) h += `<div style="color:var(--good);font-size:14px">\u2B06 ${r.lvUps.map((x) => tx("{0} \u5347\u5230 {1}", x.name, x.para ? tx("\u5DD4\u5CF0 {0}", x.para) : `Lv${x.level}`)).join(tx("\u3001"))}</div>`;
     if (r.kept.length || r.stashed.length || r.salvaged) h += `<div class="stack">${r.kept.map((it) => `<div class="item rar${it.rarity}"><div class="in">${itemName(it)}</div><div class="il">${SLOTS[it.slot]}<b class="num">${it.ilvl}</b></div><div class="is">${itemStatText(it)}</div></div>`).join("")}${r.stashed.length ? tx('<div style="color:var(--brass);font-size:13px">\u80CC\u5305\u5DF2\u6EFF\uFF0C{0} \u4EF6\u653E\u9032\u6230\u5229\u54C1\u7BB1</div>', r.stashed.length) : ""}${r.salvaged ? tx('<div class="sub" style="margin:0">{0} \u4EF6\u81EA\u52D5\u5206\u89E3\u70BA\u91D1\u5E63\u8207\u7CBE\u83EF</div>', r.salvaged) : ""}</div>`;
@@ -7210,7 +7237,7 @@ h3 .gi{vertical-align:-.12em}
     app.pendingRepeat = null;
     app.battle = new Battle(p, app.S.items, floor, vaultBattleOpts(floor));
     app.lastResult = null;
-    app.battle.push(tx("\u9032\u5165\u5BF6\u5EAB\u7B2C {0} \u5C64\uFF1A60 \u79D2\u5167\u6253\u5012\u8D8A\u591A\u5BF6\u85CF\u54E5\u5E03\u6797\uFF0C\u91D1\u5E63\u8D8A\u591A\uFF01", floor + 1), "info");
+    app.battle.push(tx("\u9032\u5165\u5BF6\u5EAB\u7B2C {0} \u5C64\uFF1A60 \u79D2\u5167\u6253\u5012\u8D8A\u591A\u5BF6\u85CF\u54E5\u5E03\u6797\uFF0C\u91D1\u5E63\u8D8A\u591A\uFF01", ROMAN[floor]), "info");
     runTimer();
     return true;
   }

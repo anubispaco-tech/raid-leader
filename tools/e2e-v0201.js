@@ -9,7 +9,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || '/opt/npm-tools/node
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
 const { s } = playthrough({ talents: true, stopAt: 6 });
-s.lastSeen = Date.now(); s.idle = null; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0 };
+s.lastSeen = Date.now(); s.idle = null; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0, bindAsked: 1 };
 s.story = s.story || { seen: [] }; for (let i = 0; i < 14; i++) s.story.seen.push('pre' + i, 'post' + i);
 // 背包塞 6 件可分解的裝備（含 1 件鎖定、1 件史詩）
 const mk = (id, rarity, extra = {}) => ({ id, slot: 'head', ilvl: 20, rarity, up: 0, pow: 5, sta: 5, crit: 0, ...extra });

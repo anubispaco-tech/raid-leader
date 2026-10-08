@@ -12,7 +12,7 @@ const entry = process.argv[2] || 'index.html';
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
 const G = await import('../src/core/index.js');
 const { s } = playthrough({ talents: true, stopAt: 2 });
-s.lastSeen = Date.now(); s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0 };
+s.lastSeen = Date.now(); s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0, bindAsked: 1 };
 const evil = JSON.parse(JSON.stringify(s));
 evil.heroes[0].name = '<img src=x onerror="window.__pwned=1">壞人';
 evil.heroes[1].rarity = '"><img src=x onerror="window.__pwned=2">';

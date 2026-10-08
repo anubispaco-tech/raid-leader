@@ -11,7 +11,7 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const entry = process.argv[2] || 'index.html', shots = process.env.SHOTS || '/tmp/claude-0';
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
 const { s } = playthrough({ talents: true });
-s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0 };
+s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0, bindAsked: 1 };
 s.heroes = s.heroes.slice(0, 5); s.party = s.party.filter(id => s.heroes.some(h => h.id === id));
 s.recruit = { sinceEpic: 0, sinceLegend: 95, total: 95 }; // 再 5 抽保底傳說
 

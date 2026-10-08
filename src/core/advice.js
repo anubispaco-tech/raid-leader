@@ -20,7 +20,7 @@ export function nextStep(s) {
   if (party.some(h => pendingPicks(h))) return { text: tx('有天賦還沒選'), sub: s.idle != null ? tx('掛機中陣容不變，一鍵依「{0}」配好天賦與裝備。', DUNGEONS[top].name) : tx('一鍵依「{0}」配好陣容、天賦與裝備。', DUNGEONS[top].name), btn: { label: tx('一鍵備戰'), act: 'prepare', d: top } };
   if ((s.failStreak || 0) >= 2 && top > 0) return { text: tx('「{0}」連輸 {1} 場', DUNGEONS[top].name, s.failStreak), sub: tx('回前一層掛機刷裝備與等級，或調整陣容。'), btn: { label: tx('掛機刷「{0}」', DUNGEONS[top - 1].name), act: 'idle', d: top - 1 } };
   if (s.stash && s.stash.length) return { text: tx('戰利品箱有 {0} 件裝備', s.stash.length), sub: tx('背包滿了以後掉的裝備放在這裡，記得取出。'), btn: { label: tx('前往背包'), tab: 'bag' } };
-  if (vaultUnlocked(s) && vaultLeft(s) && s.stats.runs >= 5) return { text: tx('今天寶庫還有 {0} 次', vaultLeft(s)), sub: tx('60 秒打寶藏哥布林，大量金幣可以拿去招募英雄。'), btn: { label: tx('進入寶庫'), act: 'vault', d: vaultFloors(s).at(-1) } }; // 寶庫只開第一章：取可進入的最高層（v0.13.3 修正第二章玩家會被帶到第 14 層 → 金幣 NaN）
+  if (vaultUnlocked(s) && vaultLeft(s) && s.stats.runs >= 5) return { text: tx('今天寶庫還有 {0} 次', vaultLeft(s)), sub: tx('60 秒打寶藏哥布林，大量金幣可以拿去招募英雄。'), btn: { label: tx('進入寶庫'), act: 'vault', d: vaultFloors(s).at(-1) } }; // 取可進入的最高層（v0.22 起含第二章）
   if (mythicUnlocked(s) && !s.mythic.runs) return { text: tx('傳奇秘境已解鎖'), sub: tx('就在下方：層數無上限，每天詞綴不同。'), btn: null };
   return null;
 }

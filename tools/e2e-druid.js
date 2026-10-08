@@ -11,7 +11,7 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const entry = process.argv[2] || 'index.html';
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
 const { s } = playthrough({ talents: true });
-s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0 };
+s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0, bindAsked: 1 };
 s.party = s.heroes.slice(0, 5).map(h => h.id);
 const G = await import('../src/core/index.js');
 const dr = G.makeHero('druid', 20, 0); dr.name = '德魯測'; s.heroes.push(dr); s.idle = null;

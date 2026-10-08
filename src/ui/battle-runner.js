@@ -45,7 +45,7 @@ export function startVault(floor) {
   if (!G.vaultLeft(app.S)) { toast(tx('今天的寶庫次數用完了，明天 00:00 重置')); return false; }
   clearTimeout(app.pendingRepeat); app.pendingRepeat = null;
   app.battle = new G.Battle(p, app.S.items, floor, G.vaultBattleOpts(floor)); app.lastResult = null;
-  app.battle.push(tx('進入寶庫第 {0} 層：60 秒內打倒越多寶藏哥布林，金幣越多！', floor + 1), 'info');
+  app.battle.push(tx('進入寶庫第 {0} 層：60 秒內打倒越多寶藏哥布林，金幣越多！', G.ROMAN[floor]), 'info');
   runTimer(); return true;
 }
 export function runTimer() {

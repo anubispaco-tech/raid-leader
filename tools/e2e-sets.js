@@ -26,7 +26,7 @@ const fails = [], check = (ok, msg) => { console.log((ok ? '✅ ' : '❌ ') + ms
   G.setSeed(null);
 }
 const { s } = playthrough({ talents: true });
-s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0 };
+s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0, bindAsked: 1 };
 const g = G.partyHeroes(s).find(h => h.cls === 'guardian');
 for (const sl of G.ARMOR_SLOTS) { const it = G.makeSetItem('guardian', sl, 60); s.items[it.id] = it; s.bag.push(it.id); }
 const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 } }); await page.addInitScript(() => (sessionStorage.setItem('rl-title', '1'), sessionStorage.setItem('rl-e2e', '1')));

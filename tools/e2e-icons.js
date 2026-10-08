@@ -12,7 +12,7 @@ const entry = process.argv[2] || 'index.html';
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8' };
 const G = await import('../src/core/index.js');
 const { s } = playthrough({ talents: true });
-s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0 };
+s.lastSeen = Date.now(); s.idle = null; s.gold = 60000; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0, bindAsked: 1 };
 const sh = G.makeHero('shaman', 20, 4); sh.name = '卡洛'; sh.spec = 'elemental'; s.heroes.push(sh);
 const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 375, height: 760 }, deviceScaleFactor: 2 }); await page.addInitScript(() => (sessionStorage.setItem('rl-title', '1'), sessionStorage.setItem('rl-e2e', '1')));
 const errs = []; page.on('pageerror', e => errs.push(e.message));

@@ -28,14 +28,15 @@
 ## 設計慣例
 - `src/core` 只放邏輯，不碰畫面，可在 Node 跑模擬；UI 在 `src/ui`。
 - 職業 = `src/core/classes/` 一個檔案 + `classes/index.js` 登記一行（像 DLC）。職業包要填 `armorType`（cloth／leather／plate）與 `weapons`（可用武器基底）。
-- 數值調整一定先寫或跑模擬工具（sim.js、sim-ch2.js、sim-abyss.js、probe.js、shaman-sim.js、druid-sim.js），用數據說話。
+- 數值調整一定先寫或跑模擬工具（sim.js、sim-ch2.js、sim-abyss.js、sim-vault.js、sim-t05.js、probe.js、shaman-sim.js、druid-sim.js），用數據說話。
+- e2e 塞存檔時 `player` 要帶 `asked: true, bindAsked: 1`，否則暱稱視窗或綁定提示會擋住點擊。
 - 物品定義在 `config.js` 的 `ITEM_BASES`（基底代號不可改名，只能新增）；新增護甲基底要同時在 `BASE_ARMOR` 填甲類、在 `src/ui/icons.js` 的 `BASE_GLYPH` 填圖示、`GEAR_AFFIX`、`ITEM_TIERS`；名稱一律用 `itemLabel()` 組，不要寫死到存檔。
 - 存檔格式只加不改，舊檔升級寫在 `game.js` 的 `migrate()`；載入一律經過 `sanitizeSave` + `normalizeTypes`（安全）。
 - CSP 在 `tools/build.js`：新增外部來源要同步更新。
 - 格子戰場只能用 `Math.random`，不能呼叫 core 的 `R()`（會改變戰鬥結果）；演出事件只在畫面層設了 `b.fxq` 才記錄。
 - 圖示來自 game-icons.net（CC BY 3.0）：改 `src/ui/icons.js` 對照表後跑 `node tools/icons-build.js`。
 
-## 目前狀態（v0.21.2，GAS 對應 v0.21.1 版）
-- 內容：格子戰場（`src/ui/grid.js`，14×18，戰鬥核心 `Battle.fx()` 演出事件不耗亂數）＋合成音效（`src/ui/sfx.js`）＋裝置偏好（`src/ui/prefs.js`）、6 職業（含德魯伊、薩滿）、2 章 14 層、傳奇秘境＋深淵秘境（共用體力）、寶庫、每日任務／首勝／簽到、45 個成就、T0 職業套裝＋T0.5 升級（防重複掉落、套裝圖鑑、可能掉落面板）、雲端存檔（Google 登入、自動同步、衝突偵測）、公告（試算表「公告」分頁 → GAS `?action=news`）、推廣準備（`src/ui/acq.js`：連結 `?src=`／`?ref=` 來源追蹤、邀請朋友、App 內建瀏覽器提示、加到主畫面 manifest、開始畫面登入入口與綁定提示）。
+## 目前狀態（v0.22.0，GAS 對應 v0.21.1 版）
+- 內容：格子戰場（`src/ui/grid.js`，14×18，戰鬥核心 `Battle.fx()` 演出事件不耗亂數）＋合成音效（`src/ui/sfx.js`）＋裝置偏好（`src/ui/prefs.js`）、6 職業（含德魯伊、薩滿）、2 章 14 層、傳奇秘境＋深淵秘境（共用體力）、寶庫（14 層，第二章樓層另產精華；新樓層的 par 用 `tools/sim-vault.js` 量）、每日任務／首勝／簽到、45 個成就、T0 職業套裝＋T0.5 升級（防重複掉落、套裝圖鑑、可能掉落面板）、雲端存檔（Google 登入、自動同步、衝突偵測）、公告（試算表「公告」分頁 → GAS `?action=news`）、推廣準備（`src/ui/acq.js`：連結 `?src=`／`?ref=` 來源追蹤、邀請朋友、App 內建瀏覽器提示、加到主畫面 manifest、開始畫面登入入口與綁定提示）。
 - 已決定：秘境體力制、套裝依職業分、樓層用羅馬數字、日文上線前再做、帳密登入不做（只用 Google）。
 - 待辦／候選：戰前陣型＋首領方向性技能＋團長指令「散開」、職業主動技能、戰鬥紀錄 emoji 換圖示、技能名稱改成原創（商業化前）、日文、活動副本、T1 套裝、刷寶模式、10 人團本、主動技能。

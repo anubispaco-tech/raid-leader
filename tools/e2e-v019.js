@@ -35,7 +35,7 @@ check(Object.values(G.CLASSES).every(c => c.weapons.length === 4 && c.weapons.ev
 
 // ---------- 舊存檔：違規裝備卸下 ----------
 const { s } = playthrough({ talents: true, stopAt: 2 });
-s.lastSeen = Date.now(); s.idle = null; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0 };
+s.lastSeen = Date.now(); s.idle = null; s.player = { pid: 'abcdefgh1234', name: '測試', asked: true, playSec: 0, bindAsked: 1 };
 const H = c => s.heroes.find(h => h.cls === c);
 const mage = H('mage'), rogue = H('rogue'), guard = H('guardian');
 s.items.x_helm = mk('x_helm', 'head', 'helm', { ilvl: 40 }); mage.gear.head = 'x_helm';
