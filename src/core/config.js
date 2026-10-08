@@ -67,7 +67,7 @@ export const SETS = {
     d2: tx('傷害、治療 +6%'), d4: tx('傷害、治療再 +6%，嗜血持續 +4 秒') },
 };
 export const SET_PIECE = { head: tx('頭冠'), chest: tx('胸甲'), hands: tx('護手'), legs: tx('腿甲') };
-export const SET_DROP = { chance: 0.15, rarity: 3 };
+export const SET_DROP = { chance: 0.15, idle: 0.10, rarity: 3 }; // v0.21.2 idle：深淵秘境掛機勝利的機率（比手動限時低一點）
 // v0.21 T0.5：T0 史詩件花精華升成傳說（稀有度倍率 1.75→2.1），需要傳奇秘境最佳限時 +key；套裝效果與 T0 共用、混穿照算件數
 export const SET_T5 = { dust: 200, key: 18, rarity: 4 }; // 第二章每場勝利 15% 掉一件（出戰隊員其中一人的職業）
 // ---------- v0.16 物品定義表 ----------

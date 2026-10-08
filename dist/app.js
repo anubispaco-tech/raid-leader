@@ -1,4 +1,4 @@
-/* 副本團長 v0.21.1 */
+/* 副本團長 v0.21.2 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -959,7 +959,7 @@
     "\u52DD\u5229 {0}% \u6389\u4E00\u4EF6\uFF08\u51FA\u6230\u8077\u696D\u3001\u7F3A\u7684\u90E8\u4F4D\u512A\u5148\uFF09": "{0}% per win (party classes, missing slots first)",
     "\u9650\u6642 3 \u4EF6\u3001\u8D85\u6642 2 \u4EF6\u30FB\u88DD\u7B49\u7D04 {0}": "3 items timed, 2 over time \xB7 ilvl ~{0}",
     "+{0} \u8D77\u6709\u6A5F\u6703\u6389\u843D": "Can drop from +{0}",
-    "\u9650\u6642\u901A\u95DC {0}% \u6389\u4E00\u4EF6\uFF08\u51FA\u6230\u8077\u696D\u3001\u7F3A\u7684\u90E8\u4F4D\u512A\u5148\uFF09": "{0}% per timed run (party classes, missing slots first)",
+    "\u9650\u6642\u901A\u95DC {0}%\u3001\u639B\u6A5F\u52DD\u5229 {1}% \u6389\u4E00\u4EF6\uFF08\u51FA\u6230\u8077\u696D\u3001\u7F3A\u7684\u90E8\u4F4D\u512A\u5148\uFF09": "{0}% per timed run, {1}% per idle win (your party's classes, missing slots first)",
     "T0.5 \u5347\u7D1A": "T0.5 upgrade",
     "\u5DF2\u89E3\u9396\uFF08\u6700\u4F73 +{0}\uFF09": "Unlocked (best +{0})",
     "\u50B3\u5947\u79D8\u5883\u9650\u6642 +{0} \u89E3\u9396\uFF08\u76EE\u524D\u6700\u4F73 +{1}\uFF09": "Unlocks at timed Mythic+ {0} (best so far +{1})",
@@ -2083,7 +2083,7 @@
     }
   };
   var SET_PIECE = { head: tx("\u982D\u51A0"), chest: tx("\u80F8\u7532"), hands: tx("\u8B77\u624B"), legs: tx("\u817F\u7532") };
-  var SET_DROP = { chance: 0.15, rarity: 3 };
+  var SET_DROP = { chance: 0.15, idle: 0.1, rarity: 3 };
   var SET_T5 = { dust: 200, key: 18, rarity: 4 };
   var ITEM_BASES = {
     weapon: [
@@ -3845,6 +3845,9 @@
     rw.gold = Math.round(rw.gold * m);
     rw.xp = Math.round(rw.xp * m);
     rw.loot = win ? rw.loot.slice(0, 2) : [];
+    const party = partyHeroes(s);
+    if (win && mythicTier(M.dIdx) === 2 && party.length && rw.loot.length && R() < SET_DROP.idle)
+      rw.loot.push(makeSetDrop(s, pick(party).cls, rw.loot[0].ilvl));
     s.stats.runs++;
     if (win) s.stats.wins++;
     s.gold += rw.gold;
@@ -4647,7 +4650,7 @@
   }
 
   // src/core/version.js
-  var VERSION = "0.21.1";
+  var VERSION = "0.21.2";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -4875,7 +4878,7 @@
     const legend = key >= M.legendFrom ? Math.min(M.legendMax, M.legendBase + M.legendPerLevel * (key - M.legendFrom)) : 0;
     const rows = [[tx("\u88DD\u5099"), tx("\u9650\u6642 3 \u4EF6\u3001\u8D85\u6642 2 \u4EF6\u30FB\u88DD\u7B49\u7D04 {0}", il)], [tx("\u7A00\u6709\u5EA6"), rarityOdds(1, legend)]];
     if (!legend) rows.push([tx("\u50B3\u8AAA"), tx("+{0} \u8D77\u6709\u6A5F\u6703\u6389\u843D", M.legendFrom)]);
-    if (tier === 2) rows.push([tx("T0 \u5957\u88DD"), tx("\u9650\u6642\u901A\u95DC {0}% \u6389\u4E00\u4EF6\uFF08\u51FA\u6230\u8077\u696D\u3001\u7F3A\u7684\u90E8\u4F4D\u512A\u5148\uFF09", Math.round(SET_DROP.chance * 100))]);
+    if (tier === 2) rows.push([tx("T0 \u5957\u88DD"), tx("\u9650\u6642\u901A\u95DC {0}%\u3001\u639B\u6A5F\u52DD\u5229 {1}% \u6389\u4E00\u4EF6\uFF08\u51FA\u6230\u8077\u696D\u3001\u7F3A\u7684\u90E8\u4F4D\u512A\u5148\uFF09", Math.round(SET_DROP.chance * 100), Math.round(SET_DROP.idle * 100))]);
     else rows.push([tx("T0.5 \u5347\u7D1A"), mythicBestLevel(app.S, 1) >= SET_T5.key ? tx("\u5DF2\u89E3\u9396\uFF08\u6700\u4F73 +{0}\uFF09", mythicBestLevel(app.S, 1)) : tx("\u50B3\u5947\u79D8\u5883\u9650\u6642 +{0} \u89E3\u9396\uFF08\u76EE\u524D\u6700\u4F73 +{1}\uFF09", SET_T5.key, mythicBestLevel(app.S, 1))]);
     return dropsBox("m" + tier, rows, tier === 2);
   }

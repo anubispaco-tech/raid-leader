@@ -27,8 +27,8 @@ const APP_META = `<link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="副本團長">`;
-const MANIFEST = { name: 'RAID LEADER 副本團長', short_name: '副本團長', lang: 'zh-Hant', start_url: '/', scope: '/', display: 'standalone',
+<meta name="apple-mobile-web-app-title" content="RAID LEADER">`;
+const MANIFEST = { name: 'RAID LEADER', short_name: 'RAID LEADER', lang: 'zh-Hant', start_url: '/', scope: '/', display: 'standalone',
   orientation: 'portrait', background_color: '#12161d', theme_color: '#12161d', description: '放置型團本經理 RPG：招募坦、補、輸出，攻下每一座副本。',
   icons: [{ src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' }, { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
     { src: 'icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }] };

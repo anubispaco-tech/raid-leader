@@ -332,6 +332,10 @@ export function applyMythicIdleResult(s, battle) {
   const M = battle.mythic, win = battle.win;
   const rw = mythicRewards(M.level, true, M.dIdx, partyHeroes(s).map(h => h.cls)), m = win ? MYTHIC.idleMult : MYTHIC.idleMult * REWARD.loseMult;
   rw.gold = Math.round(rw.gold * m); rw.xp = Math.round(rw.xp * m); rw.loot = win ? rw.loot.slice(0, 2) : [];
+  // v0.21.2 深淵秘境掛機勝利也能掉職業套裝（機率比手動限時低），裝等跟著秘境掉落
+  const party = partyHeroes(s);
+  if (win && mythicTier(M.dIdx) === 2 && party.length && rw.loot.length && R() < SET_DROP.idle)
+    rw.loot.push(makeSetDrop(s, pick(party).cls, rw.loot[0].ilvl));
   s.stats.runs++; if (win) s.stats.wins++;
   s.gold += rw.gold;
   const lvUps = [];

@@ -39,7 +39,7 @@ function mythicDrops(tier, key) {
   const legend = key >= M.legendFrom ? Math.min(M.legendMax, M.legendBase + M.legendPerLevel * (key - M.legendFrom)) : 0;
   const rows = [[tx('裝備'), tx('限時 3 件、超時 2 件・裝等約 {0}', il)], [tx('稀有度'), rarityOdds(1, legend)]];
   if (!legend) rows.push([tx('傳說'), tx('+{0} 起有機會掉落', M.legendFrom)]);
-  if (tier === 2) rows.push([tx('T0 套裝'), tx('限時通關 {0}% 掉一件（出戰職業、缺的部位優先）', Math.round(G.SET_DROP.chance * 100))]);
+  if (tier === 2) rows.push([tx('T0 套裝'), tx('限時通關 {0}%、掛機勝利 {1}% 掉一件（出戰職業、缺的部位優先）', Math.round(G.SET_DROP.chance * 100), Math.round(G.SET_DROP.idle * 100))]);
   else rows.push([tx('T0.5 升級'), G.mythicBestLevel(app.S, 1) >= G.SET_T5.key ? tx('已解鎖（最佳 +{0}）', G.mythicBestLevel(app.S, 1)) : tx('傳奇秘境限時 +{0} 解鎖（目前最佳 +{1}）', G.SET_T5.key, G.mythicBestLevel(app.S, 1))]);
   return dropsBox('m' + tier, rows, tier === 2);
 }

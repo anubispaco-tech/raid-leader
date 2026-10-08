@@ -957,7 +957,7 @@ export default {
 "勝利 {0}% 掉一件（出戰職業、缺的部位優先）": "{0}% per win (party classes, missing slots first)",
 "限時 3 件、超時 2 件・裝等約 {0}": "3 items timed, 2 over time · ilvl ~{0}",
 "+{0} 起有機會掉落": "Can drop from +{0}",
-"限時通關 {0}% 掉一件（出戰職業、缺的部位優先）": "{0}% per timed run (party classes, missing slots first)",
+"限時通關 {0}%、掛機勝利 {1}% 掉一件（出戰職業、缺的部位優先）": "{0}% per timed run, {1}% per idle win (your party's classes, missing slots first)",
 "T0.5 升級": "T0.5 upgrade",
 "已解鎖（最佳 +{0}）": "Unlocked (best +{0})",
 "傳奇秘境限時 +{0} 解鎖（目前最佳 +{1}）": "Unlocks at timed Mythic+ {0} (best so far +{1})",
