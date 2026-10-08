@@ -67,6 +67,8 @@ tools/
 | `node tools/specs.js` | 選對 / 選錯專精的勝率差 |
 | `node tools/sim-mythic.js 4 300` | 秘境節奏 |
 | `node tools/sim-abyss.js 2 300` | 深淵秘境節奏 |
+| `node tools/sim-vault.js 6 15` | 寶庫各層「剛首通的隊伍」60 秒擊殺數（`VAULT.par` 的來源） |
+| `node tools/sim-t05.js 3 10 300` | 第二章通關後每天的精華收支與套裝收集速度 |
 | `node tools/regress.js` | 回歸測試（改戰鬥程式後必跑；刻意改平衡時用 `--save` 更新基準） |
 | `node tools/e2e.js`、`e2e-actions.js`、`e2e-talents.js`、`e2e-mythic.js`、`e2e-telemetry.js`、`e2e-v07.js`、`e2e-idlelock.js`、`e2e-fire.js`、`e2e-v074.js` | 瀏覽器測試 |
 
