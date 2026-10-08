@@ -4,6 +4,7 @@ import { REWARD, VAULT } from './config.js';
 import { buildWaves } from './dungeons.js';
 import { dayKey } from './mythic.js';
 import { gainXp } from './heroes.js';
+import { leaderMods, leaderAlloc } from './leader.js';
 
 export const vaultUnlocked = s => !!s.clears[VAULT.unlockAfter];
 // 換日就重置今天的次數（台灣時間）
@@ -12,7 +13,8 @@ export function vaultToday(s) {
   if (v.day !== today) { v.day = today; v.used = 0; }
   return v;
 }
-export const vaultLeft = s => Math.max(0, VAULT.daily - vaultToday(s).used);
+export const vaultDaily = s => VAULT.daily + (leaderMods(leaderAlloc(s)).vaultRuns || 0); // v0.23 後勤終極「巢穴熟客」
+export const vaultLeft = s => Math.max(0, vaultDaily(s) - vaultToday(s).used);
 // v0.22 寶庫延伸到第二章：可進入的樓層＝有 par 數值的已通關樓層
 export const VAULT_TOP = VAULT.par.length - 1;
 export const vaultFloors = s => Object.keys(s.clears).filter(k => s.clears[k]).map(Number).filter(f => f <= VAULT_TOP).sort((a, b) => a - b);
@@ -36,8 +38,9 @@ export function vaultBattleOpts(floor, any = false) {
 }
 export function applyVaultResult(s, battle, partyHeroes) {
   const f = vaultFloorOk(battle.vault.floor) ? battle.vault.floor : VAULT_TOP, kills = battle.kills || 0, v = vaultToday(s);
-  const gold = Math.min(kills, vaultMaxKills(f)) * vaultGoldPerKill(f);
-  const xp = Math.round(REWARD.xpBase * Math.pow(f + 1, REWARD.xpExp) * VAULT.xpMult);
+  const L = leaderMods(leaderAlloc(s));
+  const gold = Math.round(Math.min(kills, vaultMaxKills(f)) * vaultGoldPerKill(f) * (1 + (L.gold || 0)));
+  const xp = Math.round(REWARD.xpBase * Math.pow(f + 1, REWARD.xpExp) * VAULT.xpMult * (1 + (L.xp || 0)));
   v.used++; v.runs++;
   const record = kills > (v.best[f] || 0); if (record) v.best[f] = kills;
   const dust = vaultDust(f, kills);

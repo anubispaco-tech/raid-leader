@@ -9,12 +9,17 @@ import { getLang } from './i18n.js';
 import { dungeonInfo } from './dungeons.js';
 import { SPECS, TALENT_ROWS, SPEC_LEVEL, applyRecommend } from './talents.js';
 import { MYTHIC, CH1_TOP, SET_DROP, SET_T5, RARITY, mythicBestLevel } from './config.js';
+import { leaderModsOf, leaderMods, leaderAlloc, validAlloc, leaderLevel } from './leader.js';
 import { bump } from './daily.js';
 import { mythicRewards, keyChange, mythicBattleOpts, keyOf, setKey, mythicTier } from './mythic.js';
 import { Battle } from './battle.js';
 
 export const SAVE_VERSION = 6;
 const newPlayer = () => ({ pid: Array.from({ length: 12 }, () => 'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)]).join(''), name: '', asked: false, playSec: 0 });
+// v0.23 團長後勤：經濟加成（不分地區）
+const LM = s => leaderMods(leaderAlloc(s));
+export const salvDust = (s, it) => { const d = LM(s).dust; return d ? Math.round(salvageDust(it) * (1 + d)) : salvageDust(it); };
+export const offlineCap = s => ECONOMY.offlineCapHours + (LM(s).offlineH || 0);
 export const hireCost = h => Math.round((ECONOMY.hireBase + ECONOMY.hirePerLevel * h.level) * HERO_RARITY[h.rarity || 0].hire);
 
 // ---------- 獎勵 ----------
@@ -44,7 +49,7 @@ export function newGame() {
     tavern: [], idle: null, lastSeen: Date.now(), stats: { runs: 0, wins: 0 }, autoSalvageBelow: 0, keepRarity: ECONOMY.defaultKeepRarity, stash: [], created: Date.now(),
     mythic: { key: MYTHIC.startKey, key2: MYTHIC.startKey, best: {}, runs: 0, timed: 0 }, failStreak: 0, player: newPlayer(), bagSeen: [],
     tut: { step: 0, done: false }, cards: [],
-    recruit: { sinceEpic: 0, sinceLegend: 0, total: 0 }, vault: { day: '', used: 0, runs: 0, best: {} }, dust: 0, idleMythic: null, salvageIlvlGap: 0, story: { seen: [] } };
+    recruit: { sinceEpic: 0, sinceLegend: 0, total: 0 }, vault: { day: '', used: 0, runs: 0, best: {} }, dust: 0, idleMythic: null, salvageIlvlGap: 0, story: { seen: [] }, leader: { alloc: {} } };
   for (const c of HERO.starters) { const h = makeHero(c); h.name = uniqueName(s); s.heroes.push(h); s.party.push(h.id); }
   rollTavern(s);
   return s;
@@ -84,6 +89,9 @@ export function migrate(s) {
   // v0.7.4：精華（精煉材料）、秘境掛機
   if (s.dust == null) s.dust = 0;
   if (s.idleMythic === undefined) s.idleMythic = null;
+  // v0.23 團長天賦配點（團長經驗由場數推算，不用另存）
+  if (!s.leader || typeof s.leader !== 'object') s.leader = { alloc: {} };
+  if (!s.leader.alloc || typeof s.leader.alloc !== 'object') s.leader.alloc = {};
   // v0.9.2：護甲拆成頭胸手腿 → 舊的「護甲」變成胸甲
   for (const it of Object.values(s.items)) if (it.slot === 'armor') it.slot = 'chest';
   for (const h of [...s.heroes, ...(s.tavern || [])]) {
@@ -110,6 +118,7 @@ const int = (v, lo, hi, d = lo) => { const n = Math.round(Number(v)); return Num
 function normalizeTypes(s) {
   const R = HERO_RARITY.length - 1, IR = RARITY.length - 1;
   s.gold = int(s.gold, 0, 1e12); s.dust = int(s.dust, 0, 1e9); s.unlocked = int(s.unlocked, 1, DUNGEONS.length);
+  if (s.leader) { s.leader.alloc = validAlloc(s.leader.alloc, leaderLevel(s), s) || {}; if (s.leader.seen != null) s.leader.seen = int(s.leader.seen, 0, 999); }
   const okHero = h => h && typeof h === 'object' && CLASSES[h.cls] && h.gear && typeof h.gear === 'object';
   s.heroes = s.heroes.filter(okHero); s.tavern = (s.tavern || []).filter(okHero);
   for (const h of [...s.heroes, ...s.tavern]) {
@@ -256,22 +265,22 @@ export function salvageLowIlvl(s, gap, dry = false) {
 }
 export function addLoot(s, it) {
   codexAdd(s, it); // 自動分解的也算「獲得過」
-  const auto = () => { s.gold += salvageValue(it); s.dust = (s.dust || 0) + salvageDust(it); s.stats.salvaged = (s.stats.salvaged || 0) + 1; return 'salvaged'; };
+  const auto = () => { s.gold += salvageValue(it); s.dust = (s.dust || 0) + salvDust(s, it); s.stats.salvaged = (s.stats.salvaged || 0) + 1; return 'salvaged'; };
   if (s.salvageIlvlGap && it.rarity < 4 && it.ilvl < partyIlvl(s) - s.salvageIlvlGap) return auto();
   if (it.rarity < s.autoSalvageBelow) return auto();
   if (s.bag.length < bagMax(s)) { s.items[it.id] = it; s.bag.push(it.id); return 'bag'; }
   if (it.rarity >= s.keepRarity && s.stash.length < ECONOMY.stashMax) { s.items[it.id] = it; s.stash.push(it.id); return 'stash'; }
-  s.gold += salvageValue(it); s.dust = (s.dust || 0) + salvageDust(it); return 'salvaged';
+  s.gold += salvageValue(it); s.dust = (s.dust || 0) + salvDust(s, it); return 'salvaged';
 }
 export function applyResult(s, dIdx, battle) {
   const first = battle.win && !s.clears[dIdx];
   const rw = rewards(dIdx, battle.win, first, partyHeroes(s).map(h => h.cls));
-  const party = partyHeroes(s), decay = decayFor(dIdx), avgL = avgLevel(party);
+  const party = partyHeroes(s), decay = decayFor(dIdx), avgL = avgLevel(party), L = LM(s);
   s.stats.runs++;
-  rw.gold = Math.max(1, Math.round(rw.gold * decay(avgL)));
+  rw.gold = Math.max(1, Math.round(rw.gold * decay(avgL) * (1 + (L.gold || 0))));
   s.gold += rw.gold;
   rw.decayed = decay(avgL) < 1;
-  const baseXp = rw.xp; rw.xp = Math.round(baseXp * decay(avgL));
+  const baseXp = L.xp ? Math.round(rw.xp * (1 + L.xp)) : rw.xp; rw.xp = Math.round(baseXp * decay(avgL));
   const lvUps = [];
   for (const h of party) { if (gainXp(h, Math.round(baseXp * decay(h.level)))) lvUps.push({ name: h.name, level: h.level, para: h.para || 0 }); }
   if (dIdx === s.unlocked - 1) s.failStreak = battle.win ? 0 : (s.failStreak || 0) + 1;
@@ -282,6 +291,8 @@ export function applyResult(s, dIdx, battle) {
   }
   // 第二章：T0 套裝部件（出戰隊員其中一人的職業）
   if (battle.win && dIdx > CH1_TOP && party.length && R() < SET_DROP.chance) rw.loot.push(makeSetDrop(s, pick(party).cls, dungeonInfo(dIdx).dropIlvl + 2));
+  // v0.23 後勤終極「滿載而歸」：掛機勝利有機率多掉 1 件（沒點就不抽亂數）
+  if (L.extraLoot && battle.win && s.idle === dIdx && R() < L.extraLoot) { rw.loot.push(rewards(dIdx, true, false, party.map(h => h.cls)).loot[0]); rw.extra = 1; }
   const dest = rw.loot.map(it => (it.set ? addSetLoot(s, it) : addLoot(s, it)));
   const kept = rw.loot.filter((_, i) => dest[i] === 'bag'), stashed = rw.loot.filter((_, i) => dest[i] === 'stash');
   return { ...rw, first, lvUps, kept, stashed, salvaged: dest.filter(d => d === 'salvaged').length };
@@ -294,7 +305,7 @@ export function addSetLoot(s, it) {
   s.items[it.id] = it;
   if (s.bag.length < bagMax(s)) { s.bag.push(it.id); return 'bag'; }
   if (s.stash.length < ECONOMY.stashMax) { s.stash.push(it.id); return 'stash'; }
-  delete s.items[it.id]; s.gold += salvageValue(it); s.dust = (s.dust || 0) + salvageDust(it); return 'salvaged';
+  delete s.items[it.id]; s.gold += salvageValue(it); s.dust = (s.dust || 0) + salvDust(s, it); return 'salvaged';
 }
 
 // ---------- 傳奇秘境 ----------
@@ -303,7 +314,8 @@ export const mythicUnlocked = s => !!s.clears[MYTHIC.unlockAfter];
 export const maxUpFor = s => mythicUnlocked(s) ? GEAR.maxUp : GEAR.refineFrom;
 export function applyMythicResult(s, battle) {
   const M = battle.mythic, kc = keyChange(M.level, battle, M.timer);
-  const rw = mythicRewards(M.level, kc.inTime, M.dIdx, partyHeroes(s).map(h => h.cls));
+  const rw = mythicRewards(M.level, kc.inTime, M.dIdx, partyHeroes(s).map(h => h.cls)), L = LM(s);
+  if (L.gold) rw.gold = Math.round(rw.gold * (1 + L.gold)); if (L.xp) rw.xp = Math.round(rw.xp * (1 + L.xp));
   // 深淵秘境限時通關：和第二章主線一樣有機會掉職業套裝
   const party = partyHeroes(s);
   if (kc.inTime && mythicTier(M.dIdx) === 2 && party.length && R() < SET_DROP.chance)
@@ -331,7 +343,9 @@ export const canMythicIdle = s => Object.keys(s.mythic.best || {}).length > 0;
 export function applyMythicIdleResult(s, battle) {
   const M = battle.mythic, win = battle.win;
   const rw = mythicRewards(M.level, true, M.dIdx, partyHeroes(s).map(h => h.cls)), m = win ? MYTHIC.idleMult : MYTHIC.idleMult * REWARD.loseMult;
-  rw.gold = Math.round(rw.gold * m); rw.xp = Math.round(rw.xp * m); rw.loot = win ? rw.loot.slice(0, 2) : [];
+  const L = LM(s);
+  rw.gold = Math.round(rw.gold * m * (1 + (L.gold || 0))); rw.xp = Math.round(rw.xp * m * (1 + (L.xp || 0))); rw.loot = win ? rw.loot.slice(0, 2) : [];
+  if (L.extraLoot && win && R() < L.extraLoot) { rw.loot.push(mythicRewards(M.level, true, M.dIdx, partyHeroes(s).map(h => h.cls)).loot[0]); rw.extra = 1; }
   // v0.21.2 深淵秘境掛機勝利也能掉職業套裝（機率比手動限時低），裝等跟著秘境掉落
   const party = partyHeroes(s);
   if (win && mythicTier(M.dIdx) === 2 && party.length && rw.loot.length && R() < SET_DROP.idle)
@@ -394,13 +408,13 @@ export function upgradeAll(s, heroId, dry = false) {
 export function salvage(s, itemId) {
   const it = s.items[itemId]; if (!it || it.locked) return 0;
   s.bag = s.bag.filter(id => id !== itemId); s.stash = (s.stash || []).filter(id => id !== itemId); delete s.items[itemId];
-  const v = salvageValue(it); s.gold += v; s.dust = (s.dust || 0) + salvageDust(it); s.stats.salvaged = (s.stats.salvaged || 0) + 1; bump(s, 'salvage'); return v;
+  const v = salvageValue(it); s.gold += v; s.dust = (s.dust || 0) + salvDust(s, it); s.stats.salvaged = (s.stats.salvaged || 0) + 1; bump(s, 'salvage'); return v;
 }
 // v0.20.1 多選分解：只處理背包裡、沒鎖定的；dry=true 只試算（金幣、精華、是否含史詩以上或套裝）
 export function salvageMany(s, ids, dry = false) {
   const list = [...new Set(ids)].filter(id => s.bag.includes(id) && s.items[id] && !s.items[id].locked);
   const r = { count: list.length, gold: 0, dust: 0, precious: list.some(id => s.items[id].rarity >= 3 || s.items[id].set) };
-  for (const id of list) { r.dust += salvageDust(s.items[id]); r.gold += dry ? salvageValue(s.items[id]) : salvage(s, id); }
+  for (const id of list) { r.dust += salvDust(s, s.items[id]); r.gold += dry ? salvageValue(s.items[id]) : salvage(s, id); }
   return r;
 }
 // 分解背包中品質 ≤ maxRarity 的裝備（0 = 普通，1 = 精良以下）
@@ -440,7 +454,7 @@ export function takeFromStash(s) {
 }
 export function salvageStash(s) {
   const ids = s.stash.filter(id => !s.items[id].locked); // 鎖定的留在戰利品箱
-  const gold = ids.reduce((g, id) => { const v = salvageValue(s.items[id]); s.dust = (s.dust || 0) + salvageDust(s.items[id]); delete s.items[id]; return g + v; }, 0);
+  const gold = ids.reduce((g, id) => { const v = salvageValue(s.items[id]); s.dust = (s.dust || 0) + salvDust(s, s.items[id]); delete s.items[id]; return g + v; }, 0);
   s.stash = s.stash.filter(id => !ids.includes(id)); s.gold += gold;
   return { count: ids.length, gold };
 }
@@ -540,13 +554,13 @@ export function autoEquip(s, heroId, dry) {
 export function offlineProgress(s, now = Date.now()) {
   const myth = s.idleMythic != null && mythicIdleLevel(s, s.idleMythic);
   if (!myth && (s.idle == null || !s.clears[s.idle])) { s.lastSeen = now; return null; }
-  const sec = Math.min(ECONOMY.offlineCapHours * 3600, Math.max(0, (now - s.lastSeen) / 1000));
+  const sec = Math.min(offlineCap(s) * 3600, Math.max(0, (now - s.lastSeen) / 1000));
   s.lastSeen = now;
   if (sec < 60 || !partyHeroes(s).length) return null;
   let t = 0, runs = 0, wins = 0, gold = 0, items = 0, stashed = 0, lv = 0;
   while (runs < 400) {
     const d = myth ? s.idleMythic : s.idle;
-    const b = new Battle(partyHeroes(s), s.items, d, { ...(myth ? mythicBattleOpts(d, myth) : {}), autoHorn: true }).runToEnd();
+    const b = new Battle(partyHeroes(s), s.items, d, { ...(myth ? mythicBattleOpts(d, myth) : {}), autoHorn: true, leader: leaderModsOf(s, d) }).runToEnd();
     t += b.tick + 5; if (t > sec) break;
     const r = myth ? applyMythicIdleResult(s, b) : applyResult(s, d, b);
     runs++; if (b.win) wins++; gold += r.gold; items += r.kept.length; stashed += r.stashed.length; lv += r.lvUps.length;

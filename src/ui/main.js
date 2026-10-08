@@ -38,7 +38,7 @@ const ICONS = {
 const TABS = [['dungeon', tx('副本')], ['battle', tx('戰鬥')], ['team', tx('團隊')], ['bag', tx('背包')], ['tavern', tx('酒館')]];
 function renderTabs() {
   $('#tabs').innerHTML = TABS.map(([k, n]) =>
-    `<button data-tab="${k}" class="${app.tab === k ? 'sel' : ''}" aria-label="${n}"><svg viewBox="0 0 24 24">${ICONS[k]}</svg>${n}${(k === 'battle' && app.battle && !app.battle.over && app.tab !== 'battle') || (k === 'bag' && app.S.stash.length) || (k === 'team' && app.S.heroes.some(h => G.pendingPicks(h))) ? '<span class="dot"></span>' : ''}</button>`).join('');
+    `<button data-tab="${k}" class="${app.tab === k ? 'sel' : ''}" aria-label="${n}"><svg viewBox="0 0 24 24">${ICONS[k]}</svg>${n}${(k === 'battle' && app.battle && !app.battle.over && app.tab !== 'battle') || (k === 'bag' && app.S.stash.length) || (k === 'team' && (app.S.heroes.some(h => G.pendingPicks(h)) || G.leaderPoints(app.S) > 0)) ? '<span class="dot"></span>' : ''}</button>`).join('');
 }
 function render(skipModal) {
   achToasts();
@@ -46,6 +46,7 @@ function render(skipModal) {
   $('#idleChip').hidden = !G.partyLocked(app.S);
   renderTabs();
   tutTick();
+  { const up = G.leaderLevelUp(app.S); if (up && !G.tutActive(app.S)) { save(); setTimeout(() => toast(tx('團長升到 Lv{0}！得到 1 點天賦點（團隊 › 團長）', up)), 300); } } // v0.23
   const v = $('#view');
   if (app.tab === 'dungeon') v.innerHTML = viewDungeons();
   if (app.tab === 'battle') v.innerHTML = viewBattle();
@@ -319,6 +320,15 @@ document.addEventListener('click', e => {
     case 'cloudout': C.logout(); toast(tx('已登出（這台裝置的進度保留）')); break;
     case 'nick': openNick(); return;
     case 'share': shareInvite(); return;
+    // v0.23 團長
+    case 'teamview': app.teamView = t.dataset.v; app.leaderDraft = null; window.scrollTo(0, 0); break;
+    case 'lbranch': app.leaderBranch = t.dataset.v; break;
+    case 'ladd': { const a = { ...(app.leaderDraft || G.leaderAlloc(app.S)) }; if (G.canAdd(a, t.dataset.v, G.leaderLevel(app.S), app.S)) { a[t.dataset.v] = (a[t.dataset.v] || 0) + 1; app.leaderDraft = a; } break; }
+    case 'lsub': { const a = { ...(app.leaderDraft || G.leaderAlloc(app.S)) }, id = t.dataset.v; if ((a[id] || 0) > (G.leaderAlloc(app.S)[id] || 0) && G.canRemove(a, id)) { a[id]--; if (!a[id]) delete a[id]; app.leaderDraft = a; } break; }
+    case 'lcancel': app.leaderDraft = null; break;
+    case 'lcommit': if (app.leaderDraft && G.commitAlloc(app.S, app.leaderDraft)) { app.leaderDraft = null; save(); toast(tx('團長天賦已更新')); T.sendEvent(tx('團長配點'), leaderSummary()); } else toast(tx('配點不合法，請重新調整')); break;
+    case 'lreset': openModal({ type: 'text', html: tx('<h3>重置團長天賦？</h3><p class="sub" style="margin:0">收回全部 {0} 點，花費 {1} 金。重置後可以重新分配。</p><div class="row"><button class="btn main" data-act="ldoreset" data-closemodal="1">重置</button><button class="btn" data-act="closebtn">取消</button></div>', G.spentPts(G.leaderAlloc(app.S)), fmt(G.resetCost(app.S))) }); return;
+    case 'ldoreset': if (G.resetLeader(app.S)) { app.leaderDraft = null; save(); toast(tx('已重置團長天賦')); T.sendEvent(tx('團長重置'), `Lv${G.leaderLevel(app.S)}`); } else toast(tx('金幣不夠')); break;
     case 'sharecopy': { const el = $('#shareTxt'); navigator.clipboard?.writeText(el.value).then(() => { toast(tx('已複製邀請連結')); T.sendEvent(tx('分享'), 'copy'); }, () => { el.select(); toast(tx('請手動複製')); }) ?? (el.select(), toast(tx('請手動複製'))); return; }
     case 'loginskip': closeModal(); return;
     case 'inappclose': $('#inappBar').hidden = true; try { sessionStorage.setItem('rl-inapp', '1'); } catch (err) { /* ignore */ } return;
@@ -548,4 +558,10 @@ function showInApp() {
   el.innerHTML = `<div class="ia-t"><b>${tx('你正在 {0} 裡開啟遊戲', ia)}</b><span>${tx('這裡的進度可能存不住、也無法 Google 登入。請{0}。', how)}</span></div>
     <div class="ia-b">${href ? `<a class="btn sm main" href="${esc(href)}">${tx('用瀏覽器開啟')}</a>` : ''}<button class="btn sm" data-act="inappcopy">${tx('複製連結')}</button><button class="btn sm" data-act="inappclose" aria-label="${tx('關閉')}">✕</button></div>`;
   el.hidden = false;
+}
+
+// v0.23 團長配點摘要（事件用）：Lv12 戰術4・士氣6・後勤2・終極 rally
+function leaderSummary() {
+  const a = G.leaderAlloc(app.S), ult = Object.keys(a).filter(id => G.NODE[id] && G.NODE[id].ult);
+  return `Lv${G.leaderLevel(app.S)} ` + Object.keys(G.LEADER_TREE).map(b => `${b[0]}${G.branchPts(a, b)}`).join('/') + (ult.length ? ' ' + ult.join(',') : '');
 }

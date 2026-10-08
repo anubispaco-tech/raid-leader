@@ -4,14 +4,21 @@ import * as G from '../../core/index.js';
 import { app } from '../state.js';
 import { svg, TROPHY } from '../icons.js';
 import { enabled } from '../telemetry.js';
+import { viewLeader } from './leader.js';
 import { $, fmt, pct, toast, hero, cls, inParty, itemStatText, itemName, partyPower, avgPartyIlvl, avgPartyLv , esc, heroName, rarityTag } from '../helpers.js';
 
 function roleCount() {
   const c = { tank: 0, heal: 0, dps: 0 }; G.partyHeroes(app.S).forEach(h => c[G.roleOf(h)]++); return c;
 }
+// v0.23 團隊頁上方分頁：英雄｜團長（有可用點數時亮綠點）
+function teamSeg() {
+  const v = app.teamView === 'leader' ? 'leader' : 'heroes', pts = G.leaderPoints(app.S);
+  return `<div class="seg modes teamseg"><button data-act="teamview" data-v="heroes" class="${v === 'heroes' ? 'sel' : ''}">${tx('英雄')}</button><button data-act="teamview" data-v="leader" class="${v === 'leader' ? 'sel' : ''}">${tx('團長')}${pts ? `<span class="tpip">${pts}</span>` : ''}</button></div>`;
+}
 export function viewTeam() {
+  if (app.teamView === 'leader') return teamSeg() + viewLeader();
   const party = G.partyHeroes(app.S), c = roleCount();
-  let h = `<button class="btn sm achbtn" data-act="ach">${svg(TROPHY, 'gi-boss')}${tx('成就 {0} 點', G.achPoints(app.S))}</button>` + tx('<h2>團隊</h2><p class="sub">出戰最多 {0} 人。{1}</p> <div class="party">{2}</div> <div class="comp"><span><b style="color:var(--tank)">坦克</b> {3}</span><span><b style="color:var(--heal)">治療</b> {4}</span><span><b style="color:var(--dps)">輸出</b> {5}</span><span>戰力 <b class="num" style="color:var(--fg)">{6}</b></span> {7}{8}</div> <h2 style="font-size:18px">名冊 <span class="sub num">{9}/{10}</span></h2>{11}<div class="stack">', G.ECONOMY.partyMax, G.partyLocked(app.S) ? tx('<b style="color:var(--warn)">掛機中，陣容已鎖定</b>，停止掛機後才能換人。') : tx('點英雄查看裝備與調整陣容。'), Array.from({ length: G.ECONOMY.partyMax }, (_, i) => {
+  let h = teamSeg() + `<button class="btn sm achbtn" data-act="ach">${svg(TROPHY, 'gi-boss')}${tx('成就 {0} 點', G.achPoints(app.S))}</button>` + tx('<h2>團隊</h2><p class="sub">出戰最多 {0} 人。{1}</p> <div class="party">{2}</div> <div class="comp"><span><b style="color:var(--tank)">坦克</b> {3}</span><span><b style="color:var(--heal)">治療</b> {4}</span><span><b style="color:var(--dps)">輸出</b> {5}</span><span>戰力 <b class="num" style="color:var(--fg)">{6}</b></span> {7}{8}</div> <h2 style="font-size:18px">名冊 <span class="sub num">{9}/{10}</span></h2>{11}<div class="stack">', G.ECONOMY.partyMax, G.partyLocked(app.S) ? tx('<b style="color:var(--warn)">掛機中，陣容已鎖定</b>，停止掛機後才能換人。') : tx('點英雄查看裝備與調整陣容。'), Array.from({ length: G.ECONOMY.partyMax }, (_, i) => {
       const x = party[i];
       if (!x) return tx('<div class="slot emptyslot">空位</div>');
       return `<button class="slot r-${x.rarity || 0}" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div><div class="n c${x.rarity || 0}">${x.name}</div><div class="lv num">Lv${x.level}</div><div class="rl role-${G.roleOf(x)}"></div></button>`;

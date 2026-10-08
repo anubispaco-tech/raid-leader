@@ -529,6 +529,31 @@ h3 .gi{vertical-align:-.12em}
 .a2hs-s{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.45}
 .a2hs-s b{flex:none;width:22px;height:22px;border-radius:50%;border:1px solid var(--brass);color:var(--brass);font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:1px}
 #shareTxt{width:100%;min-height:84px}
+
+/* v0.23 團長分頁 */
+.teamseg{margin:14px 0 6px}.teamseg button{flex:1;display:flex;align-items:center;justify-content:center;gap:4px}
+.teamseg .tpip{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:9px;background:var(--good);color:var(--ink);font-size:11px;margin-left:4px;font-family:var(--f-num)}
+.lhead{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;background:linear-gradient(160deg,color-mix(in srgb,var(--brass) 14%,var(--panel)),var(--panel) 60%);border:1px solid color-mix(in srgb,var(--brass) 45%,var(--line));border-radius:12px;padding:14px;margin-top:8px}
+.lhead>div:first-child{display:grid}.lhead>div:first-child b{font-family:var(--f-display);font-size:26px;color:var(--brass)}
+.lhead .lpts{display:grid;justify-items:center;padding:6px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2)}
+.lhead .lpts b{font-size:22px}.lhead .lpts small{font-size:11px;color:var(--muted)}
+.lhead .lpts.has{border-color:var(--good)}.lhead .lpts.has b{color:var(--good)}
+.lbranch{margin:12px 0 8px}.lbranch button{flex:1;font-family:var(--f-body)}
+.lnodes{display:grid;gap:8px}
+.lnode{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.lnode.on{border-color:var(--brass-d)}
+.lnode.ult{background:linear-gradient(160deg,color-mix(in srgb,var(--r4) 9%,var(--panel)),var(--panel) 70%)}
+.lnode.ult.on{border-color:var(--r4)}
+.lnode.soon{opacity:.55}
+.lnb{display:grid;gap:3px;min-width:0}.lnb b{font-size:15px}
+.ltext{font-size:13px;line-height:1.4}
+.lwhy{font-size:11.5px;color:var(--warn)}
+.ulttag{font-size:10.5px;font-weight:700;color:var(--ink);background:var(--r4);border-radius:999px;padding:1px 7px;margin-right:6px;vertical-align:2px}
+.lpips{display:flex;gap:4px}.lpips i{width:14px;height:5px;border-radius:3px;background:var(--line)}.lpips i.on{background:var(--brass)}
+.lbtns{display:flex;gap:6px}.lbtns .btn{min-width:38px;font-size:16px;padding:6px 0}
+.lsum{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 0}.lsum span{font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);background:var(--panel2)}
+.lnb small{display:block}
+.lnodes + .label{display:block;margin-top:14px}
 </style>
 <div class="app">
   <header class="top">
@@ -547,7 +572,7 @@ h3 .gi{vertical-align:-.12em}
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
-/* 副本團長 v0.22.0 */
+/* 副本團長 v0.23.0 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -665,8 +690,10 @@ h3 .gi{vertical-align:-.12em}
     "\u{1F4A5} {0} \u7684\u8B77\u76FE\u88AB\u6253\u7834\u4E86": "\u{1F4A5} {0}'s shield is broken",
     "{0} \u88AB\u64CA\u6BBA": "{0} slain",
     "\u{1F33F} \u7E41\u76DB\uFF1A\u5176\u9918 {0} \u96BB\u5C0F\u602A\u8B8A\u5F37": "\u{1F33F} Bolstering: {0} remaining adds grow stronger",
+    "\u{1F6E1} \u4E0D\u5C48\uFF1A{0} \u6490\u4F4F\u4E86\u81F4\u547D\u4E00\u64CA": "\u{1F6E1} Unyielding: {0} survives a killing blow",
     "\u5BD2\u51B0\u5C4F\u969C": "Ice Block",
     "\u6551\u8D16": "Redemption",
+    "\u271A \u6230\u5730\u6551\u63F4\uFF1A{0} \u91CD\u65B0\u7AD9\u8D77\u4F86": "\u271A Field Rescue: {0} is back on their feet",
     "\u{1F480} {0}\uFF08{1}\uFF09\u9663\u4EA1": "\u{1F480} {0} ({1}) has fallen",
     "\u6253\u65B7": "Interrupt",
     "\u6DE8\u5316": "Dispel",
@@ -1112,6 +1139,51 @@ h3 .gi{vertical-align:-.12em}
     "\u62DB\u52DF {0} \u540D\u82F1\u96C4": "Recruit {0} hero",
     "\u79D8\u5883\u9650\u6642\u901A\u95DC {0} \u6B21": "Time {0} Mythic run",
     "\u6311\u6230\u5BF6\u5EAB {0} \u6B21": "Run the Vault {0} times",
+    "\u9F8D\u7720\u5CF6": "Dragonrest Isle",
+    "\u6230\u8853": "Tactics",
+    "\u9577\u9CF4": "Long Call",
+    "\u865F\u89D2\u6301\u7E8C +{0} \u79D2": "Horn lasts +{0}s",
+    "\u6FC0\u6602": "Fervor",
+    "\u865F\u89D2\u6548\u679C +{0}%": "Horn effect +{0}%",
+    "\u679C\u65B7": "Decisive",
+    "\u6253\u65B7\u51B7\u537B \u2212{0}%": "Interrupt cooldown \u2212{0}%",
+    "\u653B\u5805": "Siegebreaker",
+    "\u6253\u9996\u9818\u8B77\u76FE\u6642\u50B7\u5BB3 +{0}%": "+{0}% damage against boss shields",
+    "\u9996\u9818\u524B\u661F": "Bossbane",
+    "\u5C0D\u9996\u9818\u50B7\u5BB3 +{0}%": "+{0}% damage to bosses",
+    "\u6563\u958B": "Spread Out",
+    "\u5718\u9577\u6307\u4EE4\uFF1A\u8B80\u689D\u9810\u8B66\u6642\u8B93\u968A\u54E1\u6563\u958B\uFF08\u7AD9\u4F4D\u73A9\u6CD5\u958B\u653E\u5F8C\u555F\u7528\uFF09": "Leader command: spread out when a cast is telegraphed (enabled once positioning arrives)",
+    "\u96C6\u7D50\u865F\u89D2": "Rallying Horn",
+    "\u5439\u865F\u89D2\u6642\u5168\u968A\u56DE\u5FA9 {0}% \u751F\u547D": "The horn heals the party for {0}% of max health",
+    "\u7834\u9663\u865F\u89D2": "Shattering Horn",
+    "\u5439\u865F\u89D2\u6642\u6253\u65B7\u9996\u9818\u8B80\u689D\u3001\u8B77\u76FE\u6E1B\u534A": "The horn interrupts boss casts and halves boss shields",
+    "\u58EB\u6C23": "Morale",
+    "\u5805\u6BC5": "Fortitude",
+    "\u5168\u968A\u751F\u547D +{0}%": "Party health +{0}%",
+    "\u5766\u514B\u53D7\u5230\u50B7\u5BB3 \u2212{0}%": "Tank damage taken \u2212{0}%",
+    "\u6CBB\u7642\u91CF +{0}%": "Healing +{0}%",
+    "\u9F4A\u5FC3": "Solidarity",
+    "\u5168\u968A\u50B7\u5BB3 +{0}%": "Party damage +{0}%",
+    "\u6BCF\u5834\u7B2C\u4E00\u6B21\u81F4\u547D\u50B7\u4FDD\u7559 1 \u9EDE\u751F\u547D": "The first killing blow each fight leaves the hero at 1 health",
+    "\u6230\u5730\u6551\u63F4": "Field Rescue",
+    "\u6BCF\u5834\u4E00\u6B21\uFF0C\u7B2C\u4E00\u4F4D\u9663\u4EA1\u968A\u54E1\u4EE5 {0}% \u751F\u547D\u5FA9\u6D3B": "Once per fight, the first fallen hero returns with {0}% health",
+    "\u5805\u5B88\u9663\u7DDA": "Hold the Line",
+    "\u751F\u547D\u4F4E\u65BC 30% \u7684\u968A\u54E1\u53D7\u5230\u50B7\u5BB3 \u2212{0}%": "Heroes below 30% health take {0}% less damage",
+    "\u5F8C\u52E4": "Logistics",
+    "\u6230\u5229\u54C1": "Spoils",
+    "\u91D1\u5E63 +{0}%": "Gold +{0}%",
+    "\u6B77\u7DF4": "Seasoning",
+    "\u82F1\u96C4\u7D93\u9A57 +{0}%": "Hero XP +{0}%",
+    "\u9577\u5F81": "Long March",
+    "\u96E2\u7DDA\u6536\u76CA\u4E0A\u9650 +{0} \u5C0F\u6642": "Offline earnings cap +{0}h",
+    "\u88DC\u7D66": "Supplies",
+    "\u79D8\u5883\u9AD4\u529B\u4E0A\u9650 +{0}": "Mythic stamina cap +{0}",
+    "\u7CBE\u7149": "Refine",
+    "\u5206\u89E3\u5F97\u5230\u7684\u7CBE\u83EF +{0}%": "Essence from salvage +{0}%",
+    "\u6EFF\u8F09\u800C\u6B78": "Full Haul",
+    "\u639B\u6A5F\u52DD\u5229\u6642 {0}% \u591A\u6389 1 \u4EF6\u88DD\u5099": "{0}% chance of 1 extra item on idle wins",
+    "\u5DE2\u7A74\u719F\u5BA2": "Nest Regular",
+    "\u5BF6\u5EAB\u6BCF\u5929 +{0} \u6B21": "+{0} Vault run per day",
     "\u5F37\u97CC": "Fortified",
     "\u5C0F\u602A\u751F\u547D +30%\u3001\u653B\u64CA +20%": "Trash HP +30%, attack +20%",
     "\u7BC4\u570D\u8F38\u51FA": "AoE damage",
@@ -1198,6 +1270,7 @@ h3 .gi{vertical-align:-.12em}
     "\u5718\u968A": "Party",
     "\u80CC\u5305": "Bag",
     "\u9152\u9928": "Tavern",
+    "\u5718\u9577\u5347\u5230 Lv{0}\uFF01\u5F97\u5230 1 \u9EDE\u5929\u8CE6\u9EDE\uFF08\u5718\u968A \u203A \u5718\u9577\uFF09": "Leader reached Lv{0}! +1 talent point (Party \u203A Leader)",
     "\u6559\u5B78": "Tutorial",
     "\u{1F389} \u65B0\u624B\u6559\u5B78\u5B8C\u6210\uFF01\u7372\u5F97 {0} \u91D1": "\u{1F389} Tutorial complete! You got {0} gold",
     '<div class="coach"><div class="cstep num">{0}/{1}</div><div class="cbody"><b>{2}</b><span>{3}</span></div><button class="linkbtn cskip" data-act="tutskip">\u8DF3\u904E\u6559\u5B78</button></div>': '<div class="coach"><div class="cstep num">{0}/{1}</div><div class="cbody"><b>{2}</b><span>{3}</span></div><button class="linkbtn cskip" data-act="tutskip">Skip tutorial</button></div>',
@@ -1230,7 +1303,6 @@ h3 .gi{vertical-align:-.12em}
     "\u300C{0}\u300D": "{0}",
     "\u5DF2\u88DD\u5099": "Equipped",
     "{0}\u6210\u529F +{1}": "{0} succeeded: +{1}",
-    "\u7CBE\u7149": "Refine",
     "\u5F37\u5316": "Upgrade",
     "\u91D1\u5E63\u6216\u7CBE\u83EF\u4E0D\u8DB3": "Not enough gold or essence",
     "\u91D1\u5E63\u4E0D\u8DB3": "Not enough gold",
@@ -1270,6 +1342,12 @@ h3 .gi{vertical-align:-.12em}
     "\u5B58\u6A94\u78BC\u7121\u6CD5\u8B80\u53D6\uFF0C\u8ACB\u78BA\u8A8D\u662F\u5426\u5B8C\u6574\u8907\u88FD": "Couldn't read that save code \u2014 make sure you copied all of it",
     '<h3>\u91CD\u65B0\u958B\u59CB\uFF1F</h3><p class="sub" style="margin:0">\u76EE\u524D\u7684\u82F1\u96C4\u3001\u88DD\u5099\u8207\u9032\u5EA6\u90FD\u6703\u6E05\u9664\uFF0C\u7121\u6CD5\u5FA9\u539F\u3002</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">\u6E05\u9664\u4E26\u91CD\u4F86</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>': `<h3>Start over?</h3><p class="sub" style="margin:0">All heroes, gear and progress will be erased. This can't be undone.</p><div class="row"><button class="btn" data-act="doreset" style="color:var(--bad);border-color:var(--bad)">Erase and restart</button><button class="btn" data-act="closebtn">Cancel</button></div>`,
     "\u5DF2\u767B\u51FA\uFF08\u9019\u53F0\u88DD\u7F6E\u7684\u9032\u5EA6\u4FDD\u7559\uFF09": "Signed out (progress on this device is kept)",
+    "\u5718\u9577\u5929\u8CE6\u5DF2\u66F4\u65B0": "Leader talents updated",
+    "\u5718\u9577\u914D\u9EDE": "Leader talents",
+    "\u914D\u9EDE\u4E0D\u5408\u6CD5\uFF0C\u8ACB\u91CD\u65B0\u8ABF\u6574": "Invalid allocation, please adjust",
+    '<h3>\u91CD\u7F6E\u5718\u9577\u5929\u8CE6\uFF1F</h3><p class="sub" style="margin:0">\u6536\u56DE\u5168\u90E8 {0} \u9EDE\uFF0C\u82B1\u8CBB {1} \u91D1\u3002\u91CD\u7F6E\u5F8C\u53EF\u4EE5\u91CD\u65B0\u5206\u914D\u3002</p><div class="row"><button class="btn main" data-act="ldoreset" data-closemodal="1">\u91CD\u7F6E</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>': '<h3>Reset leader talents?</h3><p class="sub" style="margin:0">Refund all {0} points for {1} gold. You can reassign them afterwards.</p><div class="row"><button class="btn main" data-act="ldoreset" data-closemodal="1">Reset</button><button class="btn" data-act="closebtn">Cancel</button></div>',
+    "\u5DF2\u91CD\u7F6E\u5718\u9577\u5929\u8CE6": "Leader talents reset",
+    "\u5718\u9577\u91CD\u7F6E": "Leader reset",
     "\u5DF2\u8907\u88FD\u9080\u8ACB\u9023\u7D50": "Invite link copied",
     "\u5206\u4EAB": "Share",
     "\u5DF2\u8907\u88FD\u9023\u7D50\uFF0C\u8ACB\u8CBC\u5230 Safari \u6216 Chrome \u958B\u555F": "Link copied. Paste it into Safari or Chrome",
@@ -1573,6 +1651,35 @@ h3 .gi{vertical-align:-.12em}
     "\u4E00\u9375\u5099\u6230\uFF1A\u639B\u6A5F\u4E2D\u53EA\u8ABF\u5929\u8CE6\u3001\u88DD\u5099": "One-tap prep: talents and gear only while idling",
     "\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099": "One-tap prep: lineup, talents, gear",
     '<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u9EDE\u5DE6\u4E0A\u89D2\u7684\u96D9\u528D\u5716\u793A\u958B\u555F\u8A2D\u5B9A\uFF0C\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>': `<div class="howto" style="margin-top:16px"><b>Prep</b>: sets lineup, talents and gear for this boss's weakness (while idling, only talents and gear).<br><b>Idle</b>: repeats the floor automatically, even with the page closed (up to {0}h); rewards are paid when you return.<br><b>Save data</b>: progress lives in this browser. To switch devices, tap the crossed-swords icon at the top left to open Settings and export a save code.</div>`,
+    "\u5373\u5C07\u958B\u653E": "Coming soon",
+    "\u540C\u7CFB\u6295\u5165 {0} \u9EDE\u5F8C\u53EF\u9078\uFF08\u76EE\u524D {1}\uFF09": "Unlocks after {0} points in this tree (now {1})",
+    "\u5DF2\u9078\u53E6\u4E00\u500B\u7D42\u6975": "The other capstone is chosen",
+    "\u6EFF {0} \u683C\uFF1A{1}": "At {0} ranks: {1}",
+    "\u7D42\u6975": "Capstone",
+    "\u6E1B\u4E00\u683C": "Remove a rank",
+    "\u52A0\u4E00\u683C": "Add a rank",
+    "\u865F\u89D2 {0} \u79D2\u30FB+{1}": "Horn {0}s \xB7 +{1}",
+    "\u5168\u968A\u50B7\u5BB3 +{0}": "Party damage +{0}",
+    "\u5C0D\u9996\u9818 +{0}": "Vs bosses +{0}",
+    "\u5168\u968A\u751F\u547D +{0}": "Party health +{0}",
+    "\u6CBB\u7642 +{0}": "Healing +{0}",
+    "\u5766\u514B\u6E1B\u50B7 {0}": "Tank mitigation {0}",
+    "\u91D1\u5E63 +{0}": "Gold +{0}",
+    "\u7D93\u9A57 +{0}": "XP +{0}",
+    "\u5206\u89E3\u7CBE\u83EF +{0}": "Salvage essence +{0}",
+    "\u96E2\u7DDA\u4E0A\u9650 {0} \u5C0F\u6642": "Offline cap {0}h",
+    "\u9AD4\u529B\u4E0A\u9650 {0}": "Stamina cap {0}",
+    "\u9084\u6C92\u6709\u9EDE\u4EFB\u4F55\u5929\u8CE6\u3002": "No talents chosen yet.",
+    "\u5718\u9577": "Leader",
+    "\u53EF\u7528\u9EDE\u6578": "Points",
+    "\u5DF2\u9054\u76EE\u524D\u4E0A\u9650\uFF08\u51FA\u6D77\u5F8C\u6BCF\u6253\u901A\u4E00\u500B\u5730\u5340 +{0} \u7D1A\uFF09": "At the current cap (each region cleared overseas adds +{0} levels)",
+    "\u5718\u9577\u7D93\u9A57 {0} / {1}\u30FB\u6BCF\u5834\u6230\u9B25 +1\u3001\u9996\u6B21\u901A\u95DC +{2}": "Leader XP {0} / {1} \xB7 +1 per fight, +{2} per first clear",
+    "\u76EE\u524D\u6548\u679C": "Active effects",
+    "\u65B0\u589E {0} \u9EDE": "{0} new point(s)",
+    "\u78BA\u8A8D\u5F8C\u8981\u91CD\u7F6E\u624D\u80FD\u6536\u56DE": "Only a reset can undo this",
+    "\u78BA\u8A8D\u914D\u9EDE": "Confirm",
+    "<b>\u5718\u9577\u5929\u8CE6</b>\u662F\u516C\u6703\u50B3\u6388\u7684\u6307\u63EE\u5B78\uFF1A\u6230\u8853\u3001\u58EB\u6C23\u3001\u5F8C\u52E4\u4E09\u7CFB\uFF0C\u9EDE\u6578\u4E0D\u5920\u5168\u90E8\u9EDE\u6EFF\uFF0C\u8981\u81EA\u5DF1\u53D6\u6368\u3002\u6BCF\u7CFB\u6295\u5165 {0} \u9EDE\u5F8C\uFF0C\u53EF\u4EE5\u5728\u5169\u500B\u7D42\u6975\u4E2D\u9078\u4E00\u500B\u3002\u51FA\u6D77\u4E4B\u5F8C\uFF0C\u5404\u5730\u7684\u52E2\u529B\u6703\u518D\u50B3\u6388\u7576\u5730\u7684\u6230\u6CD5\u3002": "<b>Leader talents</b> are the guild's art of command: Tactics, Morale and Logistics. You can't max them all, so choose. After {0} points in a tree, pick one of its two capstones. Once you sail overseas, local factions will teach their own regional doctrines.",
+    "\u91CD\u7F6E\u5929\u8CE6\uFF08{0} \u91D1\uFF09": "Reset talents ({0} gold)",
     "\u96F2\u7AEF\u5B58\u6A94": "Cloud save",
     "\u7528 Google \u5E33\u865F\u767B\u5165\uFF0C\u9032\u5EA6\u6703\u81EA\u52D5\u5099\u4EFD\u5230\u96F2\u7AEF\uFF1B\u63DB\u624B\u6A5F\u767B\u5165\u540C\u4E00\u500B\u5E33\u865F\u5C31\u80FD\u63A5\u7E8C\u3002\u53EA\u6703\u8A18\u4E0B Google \u5E33\u865F\u7DE8\u865F\uFF0C\u4E0D\u6703\u5132\u5B58 Email \u6216\u5176\u4ED6\u8CC7\u6599\u3002": "Sign in with Google to back up your progress automatically. Sign in with the same account on another phone to pick up where you left off. Only your Google account ID is stored, never your email or other data.",
     "\u4E0A\u50B3\u4E2D\u2026": "Uploading\u2026",
@@ -3372,6 +3479,12 @@ h3 .gi{vertical-align:-.12em}
       this.partyAoe = Math.min(0.3, this.units.reduce((a, u) => a + (u.mods.partyAoe || 0), 0));
       const partyCrit = Math.min(0.15, this.units.reduce((a, u) => a + (u.mods.partyCrit || 0), 0));
       if (partyCrit) for (const u of this.units) u.crit += partyCrit;
+      const L2 = this.L = opts.leader || {};
+      if (L2.hp) for (const u of this.units) {
+        u.max = Math.round(u.max * (1 + L2.hp));
+        u.hp = u.max;
+      }
+      this.leaderUsed = {};
       this.horn = { used: false, until: -1 };
       this.lust = { used: false, until: -1, haste: 0, proc: 0, src: null };
       this.waves = opts.waves || buildWaves(dIdx);
@@ -3418,10 +3531,23 @@ h3 .gi{vertical-align:-.12em}
     }
     useHorn() {
       if (this.horn.used || this.over) return false;
+      const L2 = this.L, dur = RAID_HORN.dur + (L2.hornDur || 0);
       this.horn.used = true;
-      this.horn.until = this.tick + RAID_HORN.dur;
+      this.horn.until = this.tick + dur;
       this.fx({ k: "horn" });
-      this.push(tx("\u{1F4EF} \u82F1\u52C7\u865F\u89D2\uFF01\u5168\u968A\u50B7\u5BB3\u8207\u6CBB\u7642 +{0}%\uFF0C\u6301\u7E8C {1} \u79D2", Math.round(RAID_HORN.bonus * 100), RAID_HORN.dur), "info");
+      this.push(tx("\u{1F4EF} \u82F1\u52C7\u865F\u89D2\uFF01\u5168\u968A\u50B7\u5BB3\u8207\u6CBB\u7642 +{0}%\uFF0C\u6301\u7E8C {1} \u79D2", Math.round(this.hornBonus() * 100), dur), "info");
+      if (L2.rallyHeal) for (const u of this.alive()) {
+        const h = Math.min(u.max - u.hp, Math.round(u.max * L2.rallyHeal));
+        u.hp += h;
+        if (h) this.fx({ k: "heal", s: u.id, t: u.id });
+      }
+      if (L2.hornBreak) for (const e of this.foes()) {
+        if (e.casting) {
+          e.casting = null;
+          this.fx({ k: "kick", t: e.id });
+        }
+        if (e.bshield > 0) e.bshield = Math.round(e.bshield * 0.5);
+      }
       return true;
     }
     // 嗜血：持續期間每位隊員每秒有 haste 機率多出手一次；proc > 0 時隊員攻擊有機率引發閃電（傳說雷鳴・卡洛）
@@ -3435,8 +3561,11 @@ h3 .gi{vertical-align:-.12em}
       this.push(tx("\u{1F941} {0} \u65BD\u653E\u55DC\u8840\uFF01\u5168\u968A\u51FA\u624B\u901F\u5EA6 +{1}%\uFF0C\u6301\u7E8C {2} \u79D2", src.name, Math.round(haste * 100), dur), "info");
       return true;
     }
+    hornBonus() {
+      return RAID_HORN.bonus + (this.L.hornBonus || 0);
+    }
     healMult(u) {
-      return (u.mods.healMult || 1) * (u.mods.setHeal ? 1 + u.mods.setHeal : 1) * (this.hornActive() ? 1 + RAID_HORN.bonus : 1);
+      return (u.mods.healMult || 1) * (u.mods.setHeal ? 1 + u.mods.setHeal : 1) * (this.hornActive() ? 1 + this.hornBonus() : 1) * (1 + (this.L.heal || 0));
     }
     weakMult(e) {
       return e.weakUntil > this.tick ? 1 - e.weak : 1;
@@ -3445,7 +3574,8 @@ h3 .gi{vertical-align:-.12em}
     hitEnemy(u, e, amt, o = {}) {
       if (e.hp <= 0) return 0;
       const m = u.mods;
-      amt *= (m.dmgMult || 1) * (this.hornActive() ? 1 + RAID_HORN.bonus : 1);
+      amt *= (m.dmgMult || 1) * (this.hornActive() ? 1 + this.hornBonus() : 1) * (1 + (this.L.dmg || 0)) * (e.boss ? 1 + (this.L.bossDmg || 0) : 1);
+      if (this.L.shieldDmg && e.bshield > 0) amt *= 1 + this.L.shieldDmg;
       if (m.setDmg) amt *= 1 + m.setDmg;
       if (u.hk.outMult) amt *= u.hk.outMult(this, u, e, o);
       if (m.execute && e.hp < e.max * 0.35) amt *= 1 + m.execute;
@@ -3516,6 +3646,8 @@ h3 .gi{vertical-align:-.12em}
       const aura = this.alive().find((x) => x.lh.partyTaken);
       if (aura) red *= aura.lh.partyTaken;
       if (m.lowHpReduce && u.hp < u.max * 0.5) red *= 1 - m.lowHpReduce;
+      if (this.L.tankTaken && u.role === "tank") red *= 1 - this.L.tankTaken;
+      if (this.L.lowTaken && u.hp < u.max * 0.3) red *= 1 - this.L.lowTaken;
       amt = Math.round(amt * Math.max(0.05, red) * rnd(0.9, 1.1));
       const absorbed = Math.min(u.shield, amt);
       u.shield -= absorbed;
@@ -3525,6 +3657,11 @@ h3 .gi{vertical-align:-.12em}
       this.fx({ k: "hurt", s: attacker ? attacker.id : null, t: u.id, kind });
       if (u.role === "tank" && kind !== "magic" && this.has("necrotic")) u.necro = Math.min(40, u.necro + 1);
       if (kind !== "magic" && m.counter && attacker && R() < m.counter) this.hitEnemy(u, attacker, u.pow);
+      if (u.hp === 0 && this.L.lastStand && !this.leaderUsed.hold) {
+        this.leaderUsed.hold = true;
+        u.hp = 1;
+        this.push(tx("\u{1F6E1} \u4E0D\u5C48\uFF1A{0} \u6490\u4F4F\u4E86\u81F4\u547D\u4E00\u64CA", u.name), "info");
+      }
       this.lifeSavers(u);
       if (u.hp === 0) this.onDeath(u);
       return amt;
@@ -3552,6 +3689,13 @@ h3 .gi{vertical-align:-.12em}
         this.fx({ k: "heal", s: priest.id, t: u.id, big: true });
         return;
       }
+      if (this.L.revive && !this.leaderUsed.revive) {
+        this.leaderUsed.revive = true;
+        u.hp = Math.round(u.max * this.L.revive);
+        this.push(tx("\u271A \u6230\u5730\u6551\u63F4\uFF1A{0} \u91CD\u65B0\u7AD9\u8D77\u4F86", u.name), "info");
+        this.fx({ k: "heal", t: u.id, big: true });
+        return;
+      }
       this.push(tx("\u{1F480} {0}\uFF08{1}\uFF09\u9663\u4EA1", u.name, u.pack.name), "bad");
       this.fx({ k: "die", t: u.id });
     }
@@ -3570,7 +3714,7 @@ h3 .gi{vertical-align:-.12em}
       const caster = foes.find((e) => e.casting);
       if (caster && u.pack.kick && u.pack.kick(u) && (u.cd.kick || 0) <= this.tick) {
         caster.casting = null;
-        u.cd.kick = this.tick + (u.mods.kickCd || 12);
+        u.cd.kick = this.tick + Math.round((u.mods.kickCd || 12) * (1 - (this.L.kickCd || 0)));
         this.fx({ k: "kick", s: u.id, t: caster.id });
         this.skillLog(u, tx("\u6253\u65B7"), caster);
         return true;
@@ -3701,6 +3845,153 @@ h3 .gi{vertical-align:-.12em}
     }
   };
 
+  // src/core/leader.js
+  var LEADER = {
+    xpFirst: 20,
+    curve: { a: 1.99, p: 2.4 },
+    // 累積經驗 = a × 等級^p：Lv10 ≈ 500、Lv14 ≈ 1,100（約打完第二章）、Lv20 ≈ 2,600、Lv30 ≈ 7,000
+    baseMax: 30,
+    perRegion: 5,
+    ultNeed: 8,
+    // 同一系投入 8 點後才能點終極（兩個終極選一個）
+    resetGold: 500,
+    // 重置費用 = 500 × 團長等級
+    caps: { dmg: 0.08, hp: 0.08 }
+    // 全隊被動加成上限（不含號角）
+  };
+  var REGIONS = { island: { name: tx("\u9F8D\u7720\u5CF6") } };
+  var dungeonRegion = () => "island";
+  var regionsCleared = () => [];
+  var leaderXpFor = (lv) => lv <= 0 ? 0 : Math.round(LEADER.curve.a * Math.pow(lv, LEADER.curve.p));
+  var leaderMax = (s) => LEADER.baseMax + LEADER.perRegion * regionsCleared(s).length;
+  var leaderXp = (s) => (s.stats && s.stats.runs || 0) + LEADER.xpFirst * Object.keys(s.clears || {}).filter((k) => s.clears[k]).length;
+  function leaderLevel(s) {
+    const xp = typeof s === "number" ? s : leaderXp(s), max = typeof s === "number" ? LEADER.baseMax : leaderMax(s);
+    let lv = 0;
+    while (lv < max && xp >= leaderXpFor(lv + 1)) lv++;
+    return lv;
+  }
+  var LEADER_TREE = {
+    tactics: { name: tx("\u6230\u8853"), region: "global", icon: "horn", nodes: [
+      { id: "hornDur", name: tx("\u9577\u9CF4"), ranks: 2, per: { hornDur: 2 }, desc: tx("\u865F\u89D2\u6301\u7E8C +{0} \u79D2") },
+      { id: "hornPow", name: tx("\u6FC0\u6602"), ranks: 2, per: { hornBonus: 0.04 }, desc: tx("\u865F\u89D2\u6548\u679C +{0}%") },
+      { id: "kick", name: tx("\u679C\u65B7"), ranks: 1, per: { kickCd: 0.2 }, desc: tx("\u6253\u65B7\u51B7\u537B \u2212{0}%") },
+      { id: "breaker", name: tx("\u653B\u5805"), ranks: 1, per: { shieldDmg: 0.15 }, desc: tx("\u6253\u9996\u9818\u8B77\u76FE\u6642\u50B7\u5BB3 +{0}%") },
+      { id: "bossDmg", name: tx("\u9996\u9818\u524B\u661F"), ranks: 2, per: { bossDmg: 0.02 }, desc: tx("\u5C0D\u9996\u9818\u50B7\u5BB3 +{0}%") },
+      { id: "scatter", name: tx("\u6563\u958B"), ranks: 1, per: {}, desc: tx("\u5718\u9577\u6307\u4EE4\uFF1A\u8B80\u689D\u9810\u8B66\u6642\u8B93\u968A\u54E1\u6563\u958B\uFF08\u7AD9\u4F4D\u73A9\u6CD5\u958B\u653E\u5F8C\u555F\u7528\uFF09"), soon: true },
+      { id: "rally", name: tx("\u96C6\u7D50\u865F\u89D2"), ult: true, ranks: 1, per: { rallyHeal: 0.15 }, desc: tx("\u5439\u865F\u89D2\u6642\u5168\u968A\u56DE\u5FA9 {0}% \u751F\u547D") },
+      { id: "shatter", name: tx("\u7834\u9663\u865F\u89D2"), ult: true, ranks: 1, per: { hornBreak: 1 }, desc: tx("\u5439\u865F\u89D2\u6642\u6253\u65B7\u9996\u9818\u8B80\u689D\u3001\u8B77\u76FE\u6E1B\u534A") }
+    ] },
+    morale: { name: tx("\u58EB\u6C23"), region: "global", icon: "banner", nodes: [
+      { id: "grit", name: tx("\u5805\u6BC5"), ranks: 3, per: { hp: 0.015 }, desc: tx("\u5168\u968A\u751F\u547D +{0}%") },
+      { id: "wall", name: tx("\u9435\u58C1"), ranks: 2, per: { tankTaken: 0.02 }, desc: tx("\u5766\u514B\u53D7\u5230\u50B7\u5BB3 \u2212{0}%") },
+      { id: "mend", name: tx("\u9F13\u821E"), ranks: 2, per: { heal: 0.02 }, desc: tx("\u6CBB\u7642\u91CF +{0}%") },
+      { id: "unity", name: tx("\u9F4A\u5FC3"), ranks: 2, per: { dmg: 0.015 }, desc: tx("\u5168\u968A\u50B7\u5BB3 +{0}%") },
+      { id: "hold", name: tx("\u4E0D\u5C48"), ranks: 1, per: { lastStand: 1 }, desc: tx("\u6BCF\u5834\u7B2C\u4E00\u6B21\u81F4\u547D\u50B7\u4FDD\u7559 1 \u9EDE\u751F\u547D") },
+      { id: "revive", name: tx("\u6230\u5730\u6551\u63F4"), ult: true, ranks: 1, per: { revive: 0.3 }, desc: tx("\u6BCF\u5834\u4E00\u6B21\uFF0C\u7B2C\u4E00\u4F4D\u9663\u4EA1\u968A\u54E1\u4EE5 {0}% \u751F\u547D\u5FA9\u6D3B") },
+      { id: "aegis", name: tx("\u5805\u5B88\u9663\u7DDA"), ult: true, ranks: 1, per: { lowTaken: 0.1 }, desc: tx("\u751F\u547D\u4F4E\u65BC 30% \u7684\u968A\u54E1\u53D7\u5230\u50B7\u5BB3 \u2212{0}%") }
+    ] },
+    logistics: { name: tx("\u5F8C\u52E4"), region: "global", icon: "chest", nodes: [
+      { id: "gold", name: tx("\u6230\u5229\u54C1"), ranks: 3, per: { gold: 0.05 }, desc: tx("\u91D1\u5E63 +{0}%") },
+      { id: "xp", name: tx("\u6B77\u7DF4"), ranks: 2, per: { xp: 0.05 }, desc: tx("\u82F1\u96C4\u7D93\u9A57 +{0}%") },
+      { id: "march", name: tx("\u9577\u5F81"), ranks: 2, per: { offlineH: 1 }, desc: tx("\u96E2\u7DDA\u6536\u76CA\u4E0A\u9650 +{0} \u5C0F\u6642") },
+      { id: "stamina", name: tx("\u88DC\u7D66"), ranks: 1, per: { stamina: 1 }, desc: tx("\u79D8\u5883\u9AD4\u529B\u4E0A\u9650 +{0}") },
+      { id: "dust", name: tx("\u7CBE\u7149"), ranks: 2, per: { dust: 0.1 }, desc: tx("\u5206\u89E3\u5F97\u5230\u7684\u7CBE\u83EF +{0}%") },
+      { id: "haul", name: tx("\u6EFF\u8F09\u800C\u6B78"), ult: true, ranks: 1, per: { extraLoot: 0.15 }, desc: tx("\u639B\u6A5F\u52DD\u5229\u6642 {0}% \u591A\u6389 1 \u4EF6\u88DD\u5099") },
+      { id: "vaultx", name: tx("\u5DE2\u7A74\u719F\u5BA2"), ult: true, ranks: 1, per: { vaultRuns: 1 }, desc: tx("\u5BF6\u5EAB\u6BCF\u5929 +{0} \u6B21") }
+    ] }
+  };
+  var PCT = /* @__PURE__ */ new Set(["hornBonus", "kickCd", "shieldDmg", "bossDmg", "rallyHeal", "hp", "tankTaken", "heal", "dmg", "revive", "lowTaken", "gold", "xp", "dust", "extraLoot"]);
+  function nodeText(n2, r = n2.ranks) {
+    const [k, v] = Object.entries(n2.per)[0] || [];
+    if (k == null) return n2.desc;
+    const x = v * Math.max(1, r);
+    return n2.desc.replace("{0}", PCT.has(k) ? +(x * 100).toFixed(1) : x);
+  }
+  var NODE = {};
+  for (const [b, br] of Object.entries(LEADER_TREE)) for (const n2 of br.nodes) NODE[n2.id] = { ...n2, branch: b };
+  var leaderAlloc = (s) => s.leader && s.leader.alloc || {};
+  var spentPts = (a) => Object.entries(a).reduce((t, [id, r]) => t + (NODE[id] ? r : 0), 0);
+  var leaderPoints = (s) => Math.max(0, leaderLevel(s) - spentPts(leaderAlloc(s)));
+  var branchPts = (a, b) => LEADER_TREE[b].nodes.filter((n2) => !n2.ult).reduce((t, n2) => t + (a[n2.id] || 0), 0);
+  var branchOpen = (s, b) => {
+    const r = LEADER_TREE[b].region;
+    return r === "global" || regionsCleared(s).includes(r);
+  };
+  function canAdd(a, id, level, s) {
+    const n2 = NODE[id];
+    if (!n2 || n2.soon) return false;
+    if (s && !branchOpen(s, n2.branch)) return false;
+    if ((a[id] || 0) >= n2.ranks || spentPts(a) >= level) return false;
+    if (n2.ult) {
+      if (branchPts(a, n2.branch) < LEADER.ultNeed) return false;
+      if (LEADER_TREE[n2.branch].nodes.some((o) => o.ult && o.id !== id && a[o.id])) return false;
+    }
+    return true;
+  }
+  function canRemove(a, id) {
+    const n2 = NODE[id];
+    if (!n2 || !(a[id] > 0)) return false;
+    if (n2.ult) return true;
+    const b = { ...a, [id]: a[id] - 1 };
+    return !LEADER_TREE[n2.branch].nodes.some((o) => o.ult && b[o.id]) || branchPts(b, n2.branch) >= LEADER.ultNeed;
+  }
+  function validAlloc(a, level, s) {
+    const clean = {};
+    for (const [id, r] of Object.entries(a || {})) if (NODE[id] && !NODE[id].soon && Number.isInteger(r) && r > 0) clean[id] = Math.min(r, NODE[id].ranks);
+    if (spentPts(clean) > level) return false;
+    for (const [b, br] of Object.entries(LEADER_TREE)) {
+      const ults = br.nodes.filter((n2) => n2.ult && clean[n2.id]);
+      if (ults.length > 1 || ults.length && branchPts(clean, b) < LEADER.ultNeed) return false;
+      if (s && !branchOpen(s, b) && br.nodes.some((n2) => clean[n2.id])) return false;
+    }
+    return clean;
+  }
+  function commitAlloc(s, a) {
+    if (!s.leader) s.leader = { alloc: {} };
+    const cur2 = leaderAlloc(s), v = validAlloc(a, leaderLevel(s), s);
+    if (!v) return false;
+    for (const [id, r] of Object.entries(cur2)) if ((v[id] || 0) < r) return false;
+    s.leader.alloc = v;
+    return true;
+  }
+  var resetCost = (s) => LEADER.resetGold * leaderLevel(s);
+  function resetLeader(s) {
+    const c = resetCost(s);
+    if (!spentPts(leaderAlloc(s)) || s.gold < c) return false;
+    s.gold -= c;
+    s.leader.alloc = {};
+    s.leader.resets = (s.leader.resets || 0) + 1;
+    return true;
+  }
+  function leaderMods(alloc = {}, region = null) {
+    const m = {};
+    for (const br of Object.values(LEADER_TREE)) {
+      if (region && br.region !== "global" && br.region !== region) continue;
+      for (const n2 of br.nodes) {
+        const r = Math.min(n2.ranks, alloc[n2.id] || 0);
+        if (!r || n2.soon) continue;
+        for (const [k, v] of Object.entries(n2.per)) m[k] = (m[k] || 0) + v * r;
+      }
+    }
+    if (m.dmg) m.dmg = Math.min(m.dmg, LEADER.caps.dmg);
+    if (m.hp) m.hp = Math.min(m.hp, LEADER.caps.hp);
+    return m;
+  }
+  var leaderModsOf = (s, dIdx = 0) => leaderMods(leaderAlloc(s), dungeonRegion(dIdx));
+  function leaderLevelUp(s) {
+    const lv = leaderLevel(s), L2 = s.leader || (s.leader = { alloc: {} });
+    if (L2.seen == null) {
+      L2.seen = lv;
+      return 0;
+    }
+    if (lv > L2.seen) {
+      L2.seen = lv;
+      return lv;
+    }
+    return 0;
+  }
+
   // src/core/mythic.js
   var AFFIXES = {
     fortified: { name: tx("\u5F37\u97CC"), desc: tx("\u5C0F\u602A\u751F\u547D +30%\u3001\u653B\u64CA +20%"), test: tx("\u7BC4\u570D\u8F38\u51FA"), hint: "summon" },
@@ -3736,8 +4027,9 @@ h3 .gi{vertical-align:-.12em}
     else s.mythic.key = k;
   }
   var STA_MS = () => MYTHIC.stamina.regenMin * 6e4;
+  var staminaMax = (s) => MYTHIC.stamina.max + (leaderMods(leaderAlloc(s)).stamina || 0);
   function stamina(s, now2 = Date.now()) {
-    const max = MYTHIC.stamina.max;
+    const max = staminaMax(s);
     const st = s.mythic.sta || (s.mythic.sta = { pts: max, at: now2 });
     if (st.pts >= max) {
       st.at = now2;
@@ -3757,7 +4049,7 @@ h3 .gi{vertical-align:-.12em}
   }
   var staminaNext = (s, now2 = Date.now()) => {
     const st = stamina(s, now2);
-    return st.pts >= MYTHIC.stamina.max ? 0 : Math.max(0, st.at + STA_MS() - now2);
+    return st.pts >= staminaMax(s) ? 0 : Math.max(0, st.at + STA_MS() - now2);
   };
   function spendStamina(s, now2 = Date.now()) {
     const st = stamina(s, now2);
@@ -3823,7 +4115,8 @@ h3 .gi{vertical-align:-.12em}
     }
     return v;
   }
-  var vaultLeft = (s) => Math.max(0, VAULT.daily - vaultToday(s).used);
+  var vaultDaily = (s) => VAULT.daily + (leaderMods(leaderAlloc(s)).vaultRuns || 0);
+  var vaultLeft = (s) => Math.max(0, vaultDaily(s) - vaultToday(s).used);
   var VAULT_TOP = VAULT.par.length - 1;
   var vaultFloors = (s) => Object.keys(s.clears).filter((k) => s.clears[k]).map(Number).filter((f) => f <= VAULT_TOP).sort((a, b) => a - b);
   var floorGold = (f) => REWARD.goldBase + REWARD.goldPerTier * f;
@@ -3846,8 +4139,9 @@ h3 .gi{vertical-align:-.12em}
   }
   function applyVaultResult(s, battle, partyHeroes2) {
     const f = vaultFloorOk(battle.vault.floor) ? battle.vault.floor : VAULT_TOP, kills = battle.kills || 0, v = vaultToday(s);
-    const gold = Math.min(kills, vaultMaxKills(f)) * vaultGoldPerKill(f);
-    const xp = Math.round(REWARD.xpBase * Math.pow(f + 1, REWARD.xpExp) * VAULT.xpMult);
+    const L2 = leaderMods(leaderAlloc(s));
+    const gold = Math.round(Math.min(kills, vaultMaxKills(f)) * vaultGoldPerKill(f) * (1 + (L2.gold || 0)));
+    const xp = Math.round(REWARD.xpBase * Math.pow(f + 1, REWARD.xpExp) * VAULT.xpMult * (1 + (L2.xp || 0)));
     v.used++;
     v.runs++;
     const record = kills > (v.best[f] || 0);
@@ -3992,6 +4286,12 @@ h3 .gi{vertical-align:-.12em}
   // src/core/game.js
   var SAVE_VERSION = 6;
   var newPlayer = () => ({ pid: Array.from({ length: 12 }, () => "abcdefghijklmnopqrstuvwxyz0123456789"[Math.floor(Math.random() * 36)]).join(""), name: "", asked: false, playSec: 0 });
+  var LM = (s) => leaderMods(leaderAlloc(s));
+  var salvDust = (s, it) => {
+    const d = LM(s).dust;
+    return d ? Math.round(salvageDust(it) * (1 + d)) : salvageDust(it);
+  };
+  var offlineCap = (s) => ECONOMY.offlineCapHours + (LM(s).offlineH || 0);
   var hireCost = (h) => Math.round((ECONOMY.hireBase + ECONOMY.hirePerLevel * h.level) * HERO_RARITY[h.rarity || 0].hire);
   function rewards(dIdx, win, firstClear, classes) {
     const info = dungeonInfo(dIdx), m = win ? 1 : REWARD.loseMult;
@@ -4040,7 +4340,8 @@ h3 .gi{vertical-align:-.12em}
       dust: 0,
       idleMythic: null,
       salvageIlvlGap: 0,
-      story: { seen: [] }
+      story: { seen: [] },
+      leader: { alloc: {} }
     };
     for (const c of HERO.starters) {
       const h = makeHero(c);
@@ -4091,6 +4392,8 @@ h3 .gi{vertical-align:-.12em}
     s.vault = s.vault || { day: "", used: 0, runs: 0, best: {} };
     if (s.dust == null) s.dust = 0;
     if (s.idleMythic === void 0) s.idleMythic = null;
+    if (!s.leader || typeof s.leader !== "object") s.leader = { alloc: {} };
+    if (!s.leader.alloc || typeof s.leader.alloc !== "object") s.leader.alloc = {};
     for (const it of Object.values(s.items)) if (it.slot === "armor") it.slot = "chest";
     for (const h of [...s.heroes, ...s.tavern || []]) {
       if ("armor" in h.gear) {
@@ -4126,6 +4429,10 @@ h3 .gi{vertical-align:-.12em}
     s.gold = int(s.gold, 0, 1e12);
     s.dust = int(s.dust, 0, 1e9);
     s.unlocked = int(s.unlocked, 1, DUNGEONS.length);
+    if (s.leader) {
+      s.leader.alloc = validAlloc(s.leader.alloc, leaderLevel(s), s) || {};
+      if (s.leader.seen != null) s.leader.seen = int(s.leader.seen, 0, 999);
+    }
     const okHero = (h) => h && typeof h === "object" && CLASSES[h.cls] && h.gear && typeof h.gear === "object";
     s.heroes = s.heroes.filter(okHero);
     s.tavern = (s.tavern || []).filter(okHero);
@@ -4311,7 +4618,7 @@ h3 .gi{vertical-align:-.12em}
     codexAdd(s, it);
     const auto = () => {
       s.gold += salvageValue(it);
-      s.dust = (s.dust || 0) + salvageDust(it);
+      s.dust = (s.dust || 0) + salvDust(s, it);
       s.stats.salvaged = (s.stats.salvaged || 0) + 1;
       return "salvaged";
     };
@@ -4328,18 +4635,18 @@ h3 .gi{vertical-align:-.12em}
       return "stash";
     }
     s.gold += salvageValue(it);
-    s.dust = (s.dust || 0) + salvageDust(it);
+    s.dust = (s.dust || 0) + salvDust(s, it);
     return "salvaged";
   }
   function applyResult(s, dIdx, battle) {
     const first = battle.win && !s.clears[dIdx];
     const rw = rewards(dIdx, battle.win, first, partyHeroes(s).map((h) => h.cls));
-    const party = partyHeroes(s), decay = decayFor(dIdx), avgL = avgLevel(party);
+    const party = partyHeroes(s), decay = decayFor(dIdx), avgL = avgLevel(party), L2 = LM(s);
     s.stats.runs++;
-    rw.gold = Math.max(1, Math.round(rw.gold * decay(avgL)));
+    rw.gold = Math.max(1, Math.round(rw.gold * decay(avgL) * (1 + (L2.gold || 0))));
     s.gold += rw.gold;
     rw.decayed = decay(avgL) < 1;
-    const baseXp = rw.xp;
+    const baseXp = L2.xp ? Math.round(rw.xp * (1 + L2.xp)) : rw.xp;
     rw.xp = Math.round(baseXp * decay(avgL));
     const lvUps = [];
     for (const h of party) {
@@ -4352,6 +4659,10 @@ h3 .gi{vertical-align:-.12em}
       if (dIdx + 1 >= s.unlocked && dIdx + 1 < DUNGEONS.length) s.unlocked = dIdx + 2;
     }
     if (battle.win && dIdx > CH1_TOP && party.length && R() < SET_DROP.chance) rw.loot.push(makeSetDrop(s, pick(party).cls, dungeonInfo(dIdx).dropIlvl + 2));
+    if (L2.extraLoot && battle.win && s.idle === dIdx && R() < L2.extraLoot) {
+      rw.loot.push(rewards(dIdx, true, false, party.map((h) => h.cls)).loot[0]);
+      rw.extra = 1;
+    }
     const dest = rw.loot.map((it) => it.set ? addSetLoot(s, it) : addLoot(s, it));
     const kept = rw.loot.filter((_, i) => dest[i] === "bag"), stashed = rw.loot.filter((_, i) => dest[i] === "stash");
     return { ...rw, first, lvUps, kept, stashed, salvaged: dest.filter((d) => d === "salvaged").length };
@@ -4370,14 +4681,16 @@ h3 .gi{vertical-align:-.12em}
     }
     delete s.items[it.id];
     s.gold += salvageValue(it);
-    s.dust = (s.dust || 0) + salvageDust(it);
+    s.dust = (s.dust || 0) + salvDust(s, it);
     return "salvaged";
   }
   var mythicUnlocked = (s) => !!s.clears[MYTHIC.unlockAfter];
   var maxUpFor = (s) => mythicUnlocked(s) ? GEAR.maxUp : GEAR.refineFrom;
   function applyMythicResult(s, battle) {
     const M = battle.mythic, kc = keyChange(M.level, battle, M.timer);
-    const rw = mythicRewards(M.level, kc.inTime, M.dIdx, partyHeroes(s).map((h) => h.cls));
+    const rw = mythicRewards(M.level, kc.inTime, M.dIdx, partyHeroes(s).map((h) => h.cls)), L2 = LM(s);
+    if (L2.gold) rw.gold = Math.round(rw.gold * (1 + L2.gold));
+    if (L2.xp) rw.xp = Math.round(rw.xp * (1 + L2.xp));
     const party = partyHeroes(s);
     if (kc.inTime && mythicTier(M.dIdx) === 2 && party.length && R() < SET_DROP.chance)
       rw.loot.push(makeSetDrop(s, pick(party).cls, rw.loot[0].ilvl));
@@ -4417,9 +4730,14 @@ h3 .gi{vertical-align:-.12em}
   function applyMythicIdleResult(s, battle) {
     const M = battle.mythic, win = battle.win;
     const rw = mythicRewards(M.level, true, M.dIdx, partyHeroes(s).map((h) => h.cls)), m = win ? MYTHIC.idleMult : MYTHIC.idleMult * REWARD.loseMult;
-    rw.gold = Math.round(rw.gold * m);
-    rw.xp = Math.round(rw.xp * m);
+    const L2 = LM(s);
+    rw.gold = Math.round(rw.gold * m * (1 + (L2.gold || 0)));
+    rw.xp = Math.round(rw.xp * m * (1 + (L2.xp || 0)));
     rw.loot = win ? rw.loot.slice(0, 2) : [];
+    if (L2.extraLoot && win && R() < L2.extraLoot) {
+      rw.loot.push(mythicRewards(M.level, true, M.dIdx, partyHeroes(s).map((h) => h.cls)).loot[0]);
+      rw.extra = 1;
+    }
     const party = partyHeroes(s);
     if (win && mythicTier(M.dIdx) === 2 && party.length && rw.loot.length && R() < SET_DROP.idle)
       rw.loot.push(makeSetDrop(s, pick(party).cls, rw.loot[0].ilvl));
@@ -4517,7 +4835,7 @@ h3 .gi{vertical-align:-.12em}
     delete s.items[itemId];
     const v = salvageValue(it);
     s.gold += v;
-    s.dust = (s.dust || 0) + salvageDust(it);
+    s.dust = (s.dust || 0) + salvDust(s, it);
     s.stats.salvaged = (s.stats.salvaged || 0) + 1;
     bump(s, "salvage");
     return v;
@@ -4526,7 +4844,7 @@ h3 .gi{vertical-align:-.12em}
     const list = [...new Set(ids)].filter((id) => s.bag.includes(id) && s.items[id] && !s.items[id].locked);
     const r = { count: list.length, gold: 0, dust: 0, precious: list.some((id) => s.items[id].rarity >= 3 || s.items[id].set) };
     for (const id of list) {
-      r.dust += salvageDust(s.items[id]);
+      r.dust += salvDust(s, s.items[id]);
       r.gold += dry ? salvageValue(s.items[id]) : salvage(s, id);
     }
     return r;
@@ -4564,7 +4882,7 @@ h3 .gi{vertical-align:-.12em}
     const ids = s.stash.filter((id) => !s.items[id].locked);
     const gold = ids.reduce((g, id) => {
       const v = salvageValue(s.items[id]);
-      s.dust = (s.dust || 0) + salvageDust(s.items[id]);
+      s.dust = (s.dust || 0) + salvDust(s, s.items[id]);
       delete s.items[id];
       return g + v;
     }, 0);
@@ -4700,13 +5018,13 @@ h3 .gi{vertical-align:-.12em}
       s.lastSeen = now2;
       return null;
     }
-    const sec = Math.min(ECONOMY.offlineCapHours * 3600, Math.max(0, (now2 - s.lastSeen) / 1e3));
+    const sec = Math.min(offlineCap(s) * 3600, Math.max(0, (now2 - s.lastSeen) / 1e3));
     s.lastSeen = now2;
     if (sec < 60 || !partyHeroes(s).length) return null;
     let t = 0, runs = 0, wins = 0, gold = 0, items2 = 0, stashed = 0, lv = 0;
     while (runs < 400) {
       const d = myth ? s.idleMythic : s.idle;
-      const b = new Battle(partyHeroes(s), s.items, d, { ...myth ? mythicBattleOpts(d, myth) : {}, autoHorn: true }).runToEnd();
+      const b = new Battle(partyHeroes(s), s.items, d, { ...myth ? mythicBattleOpts(d, myth) : {}, autoHorn: true, leader: leaderModsOf(s, d) }).runToEnd();
       t += b.tick + 5;
       if (t > sec) break;
       const r = myth ? applyMythicIdleResult(s, b) : applyResult(s, d, b);
@@ -5225,7 +5543,7 @@ h3 .gi{vertical-align:-.12em}
   }
 
   // src/core/version.js
-  var VERSION = "0.22.0";
+  var VERSION = "0.23.0";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -5509,14 +5827,14 @@ h3 .gi{vertical-align:-.12em}
     const f = floors.includes(app.vaultFloor) ? app.vaultFloor : floors[floors.length - 1];
     const best = S.vault.best[f] || 0;
     const dustMax = vaultDust(f, vaultMaxKills(f)), ch2Hint = vaultDustPar(f) ? tx('\u53E6\u5F97\u7CBE\u83EF\uFF0C\u6700\u591A <b class="num">{0}</b>\u3002', dustMax) : S.clears[VAULT.dust.from] ? "" : tx("\u7B2C\u4E8C\u7AE0\u7684\u6A13\u5C64\u901A\u95DC\u5F8C\u4E5F\u6703\u958B\u653E\uFF0C\u9084\u6703\u984D\u5916\u6389\u7CBE\u83EF\u3002");
-    return (vaultUnlocked(S) ? infoCard("vault", tx("\u5BF6\u5EAB\u662F\u4EC0\u9EBC"), tx("\u5CF6\u4E0A\u5230\u8655\u90FD\u6709\u8C50\u9952\u54E5\u5E03\u6797\u7684\u5DE2\u7A74\uFF0C\u5BF6\u5EAB\u5C31\u662F\u5176\u4E2D\u6700\u80A5\u7684\u4E00\u7AA9\uFF1A\u6BCF\u5929 {0} \u6B21\u3001\u6BCF\u6B21 60 \u79D2\uFF0C\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\u63DB\u91D1\u5E63\u3002\u5C64\u6578\u8D8A\u9AD8\u6BCF\u96BB\u8D8A\u503C\u9322\uFF0C\u7B2C\u4E8C\u7AE0\u7684\u6A13\u5C64\u9084\u6703\u6389\u7CBE\u83EF\u3002\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002", VAULT.daily)) : "") + tx('<div class="vault"><div class="mhead"><div><span class="label">\u5BF6\u5EAB</span><b>60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797</b></div><span class="vleft num">\u4ECA\u5929\u5269 {0}/{1}</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">\u7B2C {3} \u5C64\uFF1A\u6BCF\u96BB <b class="num">{4}</b> \u91D1\uFF0C\u6700\u591A\u7B97 {5} \u96BB\u30FB\u6700\u4F73 {6} \u96BB\u3002{10}\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">\u5099\u6230</button></div></div>', left, VAULT.daily, floors.map((i) => `<button data-act="vaultfloor" data-d="${i}" class="${i === f ? "sel" : ""}">${ROMAN[i]}</button>`).join(""), ROMAN[f], fmt(vaultGoldPerKill(f)), vaultMaxKills(f), best, f, left ? "" : "disabled", left ? tx("\u9032\u5165\u5BF6\u5EAB") : tx("\u660E\u5929 00:00 \u518D\u4F86"), ch2Hint);
+    return (vaultUnlocked(S) ? infoCard("vault", tx("\u5BF6\u5EAB\u662F\u4EC0\u9EBC"), tx("\u5CF6\u4E0A\u5230\u8655\u90FD\u6709\u8C50\u9952\u54E5\u5E03\u6797\u7684\u5DE2\u7A74\uFF0C\u5BF6\u5EAB\u5C31\u662F\u5176\u4E2D\u6700\u80A5\u7684\u4E00\u7AA9\uFF1A\u6BCF\u5929 {0} \u6B21\u3001\u6BCF\u6B21 60 \u79D2\uFF0C\u6253\u5BF6\u85CF\u54E5\u5E03\u6797\u63DB\u91D1\u5E63\u3002\u5C64\u6578\u8D8A\u9AD8\u6BCF\u96BB\u8D8A\u503C\u9322\uFF0C\u7B2C\u4E8C\u7AE0\u7684\u6A13\u5C64\u9084\u6703\u6389\u7CBE\u83EF\u3002\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002", vaultDaily(S))) : "") + tx('<div class="vault"><div class="mhead"><div><span class="label">\u5BF6\u5EAB</span><b>60 \u79D2\u6253\u5BF6\u85CF\u54E5\u5E03\u6797</b></div><span class="vleft num">\u4ECA\u5929\u5269 {0}/{1}</span></div> <div class="seg vfloors">{2}</div> <p class="sub" style="margin:0">\u7B2C {3} \u5C64\uFF1A\u6BCF\u96BB <b class="num">{4}</b> \u91D1\uFF0C\u6700\u591A\u7B97 {5} \u96BB\u30FB\u6700\u4F73 {6} \u96BB\u3002{10}\u6253\u4F60\u76EE\u524D\u6700\u9AD8\u7684\u90A3\u5C64\u901A\u5E38\u6700\u8CFA\u3002</p> <div class="row"><button class="btn main grow" data-act="vault" data-d="{7}" {8}>{9}</button><button class="btn" data-act="prepare-vault">\u5099\u6230</button></div></div>', left, vaultDaily(S), floors.map((i) => `<button data-act="vaultfloor" data-d="${i}" class="${i === f ? "sel" : ""}">${ROMAN[i]}</button>`).join(""), ROMAN[f], fmt(vaultGoldPerKill(f)), vaultMaxKills(f), best, f, left ? "" : "disabled", left ? tx("\u9032\u5165\u5BF6\u5EAB") : tx("\u660E\u5929 00:00 \u518D\u4F86"), ch2Hint);
   }
   function mythicSection() {
     const S = app.S;
     if (!mythicUnlocked(S)) return tx('<div class="mythic locked"><b>\u50B3\u5947\u79D8\u5883</b><span class="sub" style="margin:0">\u901A\u95DC\u7B2C 7 \u5C64\u300C\u9F8D\u7720\u9AD8\u5854\u300D\u5F8C\u89E3\u9396\uFF1A\u7121\u9650\u5C64\u6578\u3001\u9650\u6642\u6311\u6230\u3001\u6BCF\u65E5\u8A5E\u7DB4\u3002</span></div>');
     const open2 = tierUnlocked(S, 2), tier = open2 && app.mtier !== 1 ? 2 : 1;
     const tabs = `<div class="seg mtiers"><button data-act="mtier" data-v="1" class="${tier === 1 ? "sel" : ""}">${tx("\u50B3\u5947\u79D8\u5883")}</button><button data-act="mtier" data-v="2" class="${tier === 2 ? "sel" : ""}" ${open2 ? "" : "disabled"}>${tx("\u6DF1\u6DF5\u79D8\u5883")}${open2 ? "" : " \u{1F512}"}</button></div>`;
-    const st = stamina(S), nx = staminaNext(S), max = MYTHIC.stamina.max;
+    const st = stamina(S), nx = staminaNext(S), max = staminaMax(S);
     const sta = tx('<div class="stamina"><span class="label">\u79D8\u5883\u9AD4\u529B</span><b class="num">{0}/{1}</b><span class="sub num" style="margin:0">{2}</span></div>', st.pts, max, nx ? tx("{0} \u5F8C +1", mmss(Math.ceil(nx / 1e3))) : tx("\u5DF2\u6EFF"));
     const key = tierKey(S, tier), today = dailyAffixes(), active = activeAffixes(key);
     let h = tabs + (tier === 2 ? infoCard("abyss", tx("\u6DF1\u6DF5\u79D8\u5883"), tx("\u898F\u5247\u548C\u50B3\u5947\u79D8\u5883\u4E00\u6A23\uFF0C\u4F46\u526F\u672C\u63DB\u6210\u7B2C\u4E8C\u7AE0\u3001\u5F37\u5EA6\u4EE5\u7B2C 14 \u5C64\u70BA\u57FA\u6E96\uFF0C\u6709\u81EA\u5DF1\u7684\u4E00\u9846\u9470\u77F3\uFF08\u9AD4\u529B\u5171\u7528\uFF09\u3002\u6389\u843D\u88DD\u7B49\u66F4\u9AD8\uFF0C\u9650\u6642\u901A\u95DC\u6709\u6A5F\u6703\u6389 T0 \u8077\u696D\u5957\u88DD\u3002")) : "") + mythicGuide() + tx(
@@ -5581,7 +5899,7 @@ h3 .gi{vertical-align:-.12em}
       const idleHere = app.S.idle === i;
       h += tx('<div class="dg {0}"> <div class="tier">{1}<small>\u7B2C {2} \u5C64</small></div> <h3>{3}<span class="boss">\u9996\u9818\u30FB{4}</span></h3> <div class="tip">{5}</div> <div class="meta"> <span>\u5EFA\u8B70 <b class="num {6}">Lv{7}</b></span> <span>\u88DD\u7B49 <b class="num {8}">{9}</b></span> <span>\u6389\u843D <b class="num">{10}</b></span> <span>\u901A\u95DC <b class="num">{11}</b> \u6B21</span> </div> <div class="acts">{12} </div>{13}</div>', locked ? "locked" : "", ROMAN[i] + dungeonIcon(i), i + 1, d.name, d.boss, d.tip, lv >= d.recLevel ? "ok" : "low", d.recLevel, il >= d.recIlvl ? "ok" : "low", d.recIlvl, d.dropIlvl, clears, locked ? tx('<span class="sub" style="margin:0">\u5148\u901A\u95DC\u4E0A\u4E00\u5C64</span>') : tx('<button class="btn main grow" data-act="fight" data-d="{0}">\u6311\u6230</button> <button class="btn {1}" data-act="idle" data-d="{2}" {3}>{4}</button> <button class="btn" data-act="prepare" data-d="{5}" aria-label="{6}">\u5099\u6230</button>', i, idleHere ? "on" : "", i, clears ? "" : tx('disabled title="\u901A\u95DC\u4E00\u6B21\u5F8C\u624D\u80FD\u639B\u6A5F"'), idleHere ? tx("\u639B\u6A5F\u4E2D\u30FB\u505C\u6B62") : tx("\u639B\u6A5F\u5237"), i, partyLocked(app.S) ? tx("\u4E00\u9375\u5099\u6230\uFF1A\u639B\u6A5F\u4E2D\u53EA\u8ABF\u5929\u8CE6\u3001\u88DD\u5099") : tx("\u4E00\u9375\u5099\u6230\uFF1A\u9663\u5BB9\u3001\u5929\u8CE6\u3001\u88DD\u5099")), locked ? "" : storyDrops(i));
     });
-    h += `</div>` + tx('<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u9EDE\u5DE6\u4E0A\u89D2\u7684\u96D9\u528D\u5716\u793A\u958B\u555F\u8A2D\u5B9A\uFF0C\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>', ECONOMY.offlineCapHours);
+    h += `</div>` + tx('<div class="howto" style="margin-top:16px"><b>\u5099\u6230</b>\uFF1A\u4F9D\u9019\u5C64\u9996\u9818\u7684\u5F31\u9EDE\uFF0C\u81EA\u52D5\u6392\u597D\u9663\u5BB9\u3001\u5929\u8CE6\u8207\u88DD\u5099\uFF08\u639B\u6A5F\u4E2D\u9663\u5BB9\u9396\u5B9A\uFF0C\u53EA\u8ABF\u5929\u8CE6\u8207\u88DD\u5099\uFF09\u3002<br><b>\u639B\u6A5F\u5237</b>\uFF1A\u81EA\u52D5\u91CD\u8907\u6311\u6230\uFF0C\u95DC\u6389\u9801\u9762\u4E5F\u6703\u7D2F\u7A4D\uFF08\u6700\u591A {0} \u5C0F\u6642\uFF09\uFF0C\u56DE\u4F86\u6642\u4E00\u6B21\u7D50\u7B97\u3002<br><b>\u5B58\u6A94</b>\uFF1A\u9032\u5EA6\u5B58\u5728\u9019\u652F\u624B\u6A5F\u7684\u700F\u89BD\u5668\u3002\u8981\u63DB\u624B\u6A5F\u73A9\uFF0C\u9EDE\u5DE6\u4E0A\u89D2\u7684\u96D9\u528D\u5716\u793A\u958B\u555F\u8A2D\u5B9A\uFF0C\u532F\u51FA\u5B58\u6A94\u78BC\u3002</div>', offlineCap(app.S));
     return h + inviteCard();
   }
 
@@ -5702,15 +6020,70 @@ h3 .gi{vertical-align:-.12em}
     return tx("\u63D0\u793A\uFF1A\u56DE\u524D\u4E00\u5C64\u5237\u88DD\u5099\u8207\u7B49\u7D1A\uFF0C\u6216\u6309\u300C\u5099\u6230\u300D\u63DB\u500B\u9663\u5BB9\u3002");
   }
 
+  // src/ui/views/leader.js
+  var draft = () => app.leaderDraft || leaderAlloc(app.S);
+  var dirty = () => !!app.leaderDraft && spentPts(app.leaderDraft) !== spentPts(leaderAlloc(app.S));
+  var pips = (r, max) => `<span class="lpips">${Array.from({ length: max }, (_, i) => `<i class="${i < r ? "on" : ""}"></i>`).join("")}</span>`;
+  function nodeCard(n2, a, level) {
+    const r = a[n2.id] || 0, saved = leaderAlloc(app.S)[n2.id] || 0, b = n2.branch;
+    const add = canAdd(a, n2.id, level, app.S), sub = r > saved && canRemove(a, n2.id);
+    let why = "";
+    if (n2.soon) why = tx("\u5373\u5C07\u958B\u653E");
+    else if (n2.ult && branchPts(a, b) < LEADER.ultNeed) why = tx("\u540C\u7CFB\u6295\u5165 {0} \u9EDE\u5F8C\u53EF\u9078\uFF08\u76EE\u524D {1}\uFF09", LEADER.ultNeed, branchPts(a, b));
+    else if (n2.ult && !r && LEADER_TREE[b].nodes.some((o) => o.ult && a[o.id])) why = tx("\u5DF2\u9078\u53E6\u4E00\u500B\u7D42\u6975");
+    const text = nodeText(n2, Math.max(1, r)) + (n2.ranks > 1 ? `<small class="sub" style="margin:0">${tx("\u6EFF {0} \u683C\uFF1A{1}", n2.ranks, nodeText(n2))}</small>` : "");
+    return `<div class="lnode ${r ? "on" : ""} ${n2.ult ? "ult" : ""} ${n2.soon ? "soon" : ""}">
+    <div class="lnb"><b>${n2.ult ? `<span class="ulttag">${tx("\u7D42\u6975")}</span>` : ""}${n2.name}</b>${pips(r, n2.ranks)}<span class="ltext">${text}</span>${why ? `<small class="lwhy">${why}</small>` : ""}</div>
+    <div class="lbtns"><button class="btn sm" data-act="lsub" data-v="${n2.id}" ${sub ? "" : "disabled"} aria-label="${tx("\u6E1B\u4E00\u683C")}">\u2212</button><button class="btn sm main" data-act="ladd" data-v="${n2.id}" ${add ? "" : "disabled"} aria-label="${tx("\u52A0\u4E00\u683C")}">\uFF0B</button></div></div>`;
+  }
+  function summary(a) {
+    const m = leaderMods(a), p = (v) => `${+(v * 100).toFixed(1)}%`, out = [];
+    if (m.hornDur || m.hornBonus) out.push(tx("\u865F\u89D2 {0} \u79D2\u30FB+{1}", 15 + (m.hornDur || 0), p(0.3 + (m.hornBonus || 0))));
+    if (m.dmg) out.push(tx("\u5168\u968A\u50B7\u5BB3 +{0}", p(m.dmg)));
+    if (m.bossDmg) out.push(tx("\u5C0D\u9996\u9818 +{0}", p(m.bossDmg)));
+    if (m.hp) out.push(tx("\u5168\u968A\u751F\u547D +{0}", p(m.hp)));
+    if (m.heal) out.push(tx("\u6CBB\u7642 +{0}", p(m.heal)));
+    if (m.tankTaken) out.push(tx("\u5766\u514B\u6E1B\u50B7 {0}", p(m.tankTaken)));
+    if (m.gold) out.push(tx("\u91D1\u5E63 +{0}", p(m.gold)));
+    if (m.xp) out.push(tx("\u7D93\u9A57 +{0}", p(m.xp)));
+    if (m.dust) out.push(tx("\u5206\u89E3\u7CBE\u83EF +{0}", p(m.dust)));
+    if (m.offlineH) out.push(tx("\u96E2\u7DDA\u4E0A\u9650 {0} \u5C0F\u6642", ECONOMY.offlineCapHours + m.offlineH));
+    if (m.stamina) out.push(tx("\u9AD4\u529B\u4E0A\u9650 {0}", MYTHIC.stamina.max + m.stamina));
+    for (const n2 of Object.values(NODE)) if ((n2.ult || n2.id === "kick" || n2.id === "breaker" || n2.id === "hold") && a[n2.id]) out.push(n2.name);
+    return out.length ? `<div class="lsum">${out.map((x) => `<span>${x}</span>`).join("")}</div>` : `<p class="sub" style="margin:0">${tx("\u9084\u6C92\u6709\u9EDE\u4EFB\u4F55\u5929\u8CE6\u3002")}</p>`;
+  }
+  function viewLeader() {
+    const S = app.S, lv = leaderLevel(S), max = leaderMax(S), xp = leaderXp(S), a = draft();
+    const lo = leaderXpFor(lv), hi = leaderXpFor(lv + 1), left = lv - spentPts(a);
+    const br = LEADER_TREE[app.leaderBranch] ? app.leaderBranch : "tactics";
+    let h = `<div class="lhead"><div><span class="label">${tx("\u5718\u9577")}</span><b class="num">Lv${lv}<small class="sub"> / ${max}</small></b></div>
+    <div class="lpts ${left ? "has" : ""}"><b class="num">${left}</b><small>${tx("\u53EF\u7528\u9EDE\u6578")}</small></div>
+    <div class="xpbar" style="grid-column:1/-1"><i style="width:${lv >= max ? 100 : pct(xp - lo, hi - lo)}%"></i></div>
+    <small class="sub" style="grid-column:1/-1;margin:0">${lv >= max ? tx("\u5DF2\u9054\u76EE\u524D\u4E0A\u9650\uFF08\u51FA\u6D77\u5F8C\u6BCF\u6253\u901A\u4E00\u500B\u5730\u5340 +{0} \u7D1A\uFF09", LEADER.perRegion) : tx("\u5718\u9577\u7D93\u9A57 {0} / {1}\u30FB\u6BCF\u5834\u6230\u9B25 +1\u3001\u9996\u6B21\u901A\u95DC +{2}", fmt(xp), fmt(hi), LEADER.xpFirst)}</small></div>`;
+    h += `<div class="seg modes lbranch">${Object.entries(LEADER_TREE).map(([k, b]) => `<button data-act="lbranch" data-v="${k}" class="${k === br ? "sel" : ""}" ${branchOpen(S, k) ? "" : "disabled"}>${b.name}<small class="num"> ${branchPts(a, k)}</small></button>`).join("")}</div>`;
+    h += `<div class="lnodes">${LEADER_TREE[br].nodes.map((n2) => nodeCard({ ...n2, branch: br }, a, lv)).join("")}</div>`;
+    h += `<span class="label">${tx("\u76EE\u524D\u6548\u679C")}</span>${summary(a)}`;
+    if (dirty()) h += `<div class="ctrlbar mselbar"><div class="ctrl"><span class="mcount">${tx("\u65B0\u589E {0} \u9EDE", spentPts(a) - spentPts(leaderAlloc(S)))}<small>${tx("\u78BA\u8A8D\u5F8C\u8981\u91CD\u7F6E\u624D\u80FD\u6536\u56DE")}</small></span><button class="btn" data-act="lcancel">${tx("\u53D6\u6D88")}</button><button class="btn main" data-act="lcommit">${tx("\u78BA\u8A8D\u914D\u9EDE")}</button></div></div>`;
+    const spent = spentPts(leaderAlloc(S));
+    h += `<div class="howto" style="margin-top:14px">${tx("<b>\u5718\u9577\u5929\u8CE6</b>\u662F\u516C\u6703\u50B3\u6388\u7684\u6307\u63EE\u5B78\uFF1A\u6230\u8853\u3001\u58EB\u6C23\u3001\u5F8C\u52E4\u4E09\u7CFB\uFF0C\u9EDE\u6578\u4E0D\u5920\u5168\u90E8\u9EDE\u6EFF\uFF0C\u8981\u81EA\u5DF1\u53D6\u6368\u3002\u6BCF\u7CFB\u6295\u5165 {0} \u9EDE\u5F8C\uFF0C\u53EF\u4EE5\u5728\u5169\u500B\u7D42\u6975\u4E2D\u9078\u4E00\u500B\u3002\u51FA\u6D77\u4E4B\u5F8C\uFF0C\u5404\u5730\u7684\u52E2\u529B\u6703\u518D\u50B3\u6388\u7576\u5730\u7684\u6230\u6CD5\u3002", LEADER.ultNeed)}</div>`;
+    h += `<div class="row" style="margin-top:10px"><button class="btn sm" data-act="lreset" ${spent ? "" : "disabled"}>${tx("\u91CD\u7F6E\u5929\u8CE6\uFF08{0} \u91D1\uFF09", fmt(resetCost(S)))}</button></div>`;
+    return h;
+  }
+
   // src/ui/views/team.js
   function roleCount() {
     const c = { tank: 0, heal: 0, dps: 0 };
     partyHeroes(app.S).forEach((h) => c[roleOf(h)]++);
     return c;
   }
+  function teamSeg() {
+    const v = app.teamView === "leader" ? "leader" : "heroes", pts = leaderPoints(app.S);
+    return `<div class="seg modes teamseg"><button data-act="teamview" data-v="heroes" class="${v === "heroes" ? "sel" : ""}">${tx("\u82F1\u96C4")}</button><button data-act="teamview" data-v="leader" class="${v === "leader" ? "sel" : ""}">${tx("\u5718\u9577")}${pts ? `<span class="tpip">${pts}</span>` : ""}</button></div>`;
+  }
   function viewTeam() {
+    if (app.teamView === "leader") return teamSeg() + viewLeader();
     const party = partyHeroes(app.S), c = roleCount();
-    let h = `<button class="btn sm achbtn" data-act="ach">${svg(TROPHY, "gi-boss")}${tx("\u6210\u5C31 {0} \u9EDE", achPoints(app.S))}</button>` + tx('<h2>\u5718\u968A</h2><p class="sub">\u51FA\u6230\u6700\u591A {0} \u4EBA\u3002{1}</p> <div class="party">{2}</div> <div class="comp"><span><b style="color:var(--tank)">\u5766\u514B</b> {3}</span><span><b style="color:var(--heal)">\u6CBB\u7642</b> {4}</span><span><b style="color:var(--dps)">\u8F38\u51FA</b> {5}</span><span>\u6230\u529B <b class="num" style="color:var(--fg)">{6}</b></span> {7}{8}</div> <h2 style="font-size:18px">\u540D\u518A <span class="sub num">{9}/{10}</span></h2>{11}<div class="stack">', ECONOMY.partyMax, partyLocked(app.S) ? tx('<b style="color:var(--warn)">\u639B\u6A5F\u4E2D\uFF0C\u9663\u5BB9\u5DF2\u9396\u5B9A</b>\uFF0C\u505C\u6B62\u639B\u6A5F\u5F8C\u624D\u80FD\u63DB\u4EBA\u3002') : tx("\u9EDE\u82F1\u96C4\u67E5\u770B\u88DD\u5099\u8207\u8ABF\u6574\u9663\u5BB9\u3002"), Array.from({ length: ECONOMY.partyMax }, (_, i) => {
+    let h = teamSeg() + `<button class="btn sm achbtn" data-act="ach">${svg(TROPHY, "gi-boss")}${tx("\u6210\u5C31 {0} \u9EDE", achPoints(app.S))}</button>` + tx('<h2>\u5718\u968A</h2><p class="sub">\u51FA\u6230\u6700\u591A {0} \u4EBA\u3002{1}</p> <div class="party">{2}</div> <div class="comp"><span><b style="color:var(--tank)">\u5766\u514B</b> {3}</span><span><b style="color:var(--heal)">\u6CBB\u7642</b> {4}</span><span><b style="color:var(--dps)">\u8F38\u51FA</b> {5}</span><span>\u6230\u529B <b class="num" style="color:var(--fg)">{6}</b></span> {7}{8}</div> <h2 style="font-size:18px">\u540D\u518A <span class="sub num">{9}/{10}</span></h2>{11}<div class="stack">', ECONOMY.partyMax, partyLocked(app.S) ? tx('<b style="color:var(--warn)">\u639B\u6A5F\u4E2D\uFF0C\u9663\u5BB9\u5DF2\u9396\u5B9A</b>\uFF0C\u505C\u6B62\u639B\u6A5F\u5F8C\u624D\u80FD\u63DB\u4EBA\u3002') : tx("\u9EDE\u82F1\u96C4\u67E5\u770B\u88DD\u5099\u8207\u8ABF\u6574\u9663\u5BB9\u3002"), Array.from({ length: ECONOMY.partyMax }, (_, i) => {
       const x = party[i];
       if (!x) return tx('<div class="slot emptyslot">\u7A7A\u4F4D</div>');
       return `<button class="slot r-${x.rarity || 0}" data-act="hero" data-id="${x.id}"><div class="ic">${cls(x).icon}</div><div class="n c${x.rarity || 0}">${x.name}</div><div class="lv num">Lv${x.level}</div><div class="rl role-${roleOf(x)}"></div></button>`;
@@ -5883,7 +6256,7 @@ h3 .gi{vertical-align:-.12em}
     return `${d.getMonth() + 1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`;
   };
   var fp = () => app.S ? `${app.S.stats.runs}:${JSON.stringify(app.S).length}` : "";
-  var dirty = () => {
+  var dirty2 = () => {
     const s = session();
     return !!s && s.fp !== fp();
   };
@@ -5953,9 +6326,9 @@ h3 .gi{vertical-align:-.12em}
     }
     return false;
   };
-  function chooser(title, updated, summary) {
+  function chooser(title, updated, summary2) {
     cloud.choosing = Date.now();
-    app.openModal({ type: "text", html: tx('<h3>{0}</h3><p class="sub" style="margin:0">\u96F2\u7AEF\uFF1A{1}\uFF08{2} \u4E0A\u50B3\uFF09<br>\u9019\u53F0\u88DD\u7F6E\uFF1A{3}</p><div class="row"><button class="btn main grow" data-act="cloudpick" data-v="cloud">\u8F09\u5165\u96F2\u7AEF</button><button class="btn grow" data-act="cloudpick" data-v="local">\u4FDD\u7559\u9019\u53F0\u4E26\u4E0A\u50B3</button></div>', title, summary || "\u2014", fmtTime(updated), progressText()) });
+    app.openModal({ type: "text", html: tx('<h3>{0}</h3><p class="sub" style="margin:0">\u96F2\u7AEF\uFF1A{1}\uFF08{2} \u4E0A\u50B3\uFF09<br>\u9019\u53F0\u88DD\u7F6E\uFF1A{3}</p><div class="row"><button class="btn main grow" data-act="cloudpick" data-v="cloud">\u8F09\u5165\u96F2\u7AEF</button><button class="btn grow" data-act="cloudpick" data-v="local">\u4FDD\u7559\u9019\u53F0\u4E26\u4E0A\u50B3</button></div>', title, summary2 || "\u2014", fmtTime(updated), progressText()) });
   }
   async function pick2(which) {
     app.modal = null;
@@ -5978,7 +6351,7 @@ h3 .gi{vertical-align:-.12em}
     cloud.info = { updated, summary: r.summary };
     if (updated && updated !== base) {
       if (!base) chooser(tx("\u96F2\u7AEF\u5DF2\u6709\u5B58\u6A94"), updated, r.summary);
-      else if (!dirty()) await download(true, true);
+      else if (!dirty2()) await download(true, true);
       else chooser(tx("\u5169\u908A\u90FD\u6709\u65B0\u9032\u5EA6"), updated, r.summary);
     }
     rerender();
@@ -6015,7 +6388,7 @@ h3 .gi{vertical-align:-.12em}
     rerender();
   }
   function uploadOnHide() {
-    if (!cloudEnabled() || !loggedIn() || !dirty() || app.fresh) return;
+    if (!cloudEnabled() || !loggedIn() || !dirty2() || app.fresh) return;
     cloud.lastTry = Date.now();
     const s = session(), body = { type: "cloudsave", token: s.token, save: JSON.stringify(app.S), summary: progressText(), ver: VERSION, base: s.base || 0 };
     post(body, true).then((r) => {
@@ -6057,7 +6430,7 @@ h3 .gi{vertical-align:-.12em}
     }
   }
   function autoTick() {
-    if (!cloudEnabled() || !loggedIn() || !dirty()) return;
+    if (!cloudEnabled() || !loggedIn() || !dirty2()) return;
     if (cloud.pending && Date.now() - cloud.lastTry > 16e3) upload(true);
     else if (Date.now() - cloud.lastAuto > CLOUD.autoMin * 6e4) upload(true);
   }
@@ -7186,7 +7559,7 @@ h3 .gi{vertical-align:-.12em}
     }
     clearTimeout(app.pendingRepeat);
     app.pendingRepeat = null;
-    app.battle = new Battle(p, app.S.items, dIdx, { autoHorn: app.S.idle === dIdx });
+    app.battle = new Battle(p, app.S.items, dIdx, { autoHorn: app.S.idle === dIdx, leader: leaderModsOf(app.S, dIdx) });
     app.lastResult = null;
     app.battle.push(tx("\u9032\u5165 {0}\uFF0C\u7B2C 1 \u6CE2\u6575\u4EBA\u51FA\u73FE", DUNGEONS[dIdx].name), "info");
     runTimer();
@@ -7202,7 +7575,7 @@ h3 .gi{vertical-align:-.12em}
     clearTimeout(app.pendingRepeat);
     app.pendingRepeat = null;
     const o = mythicBattleOpts(dIdx, keyOf(app.S, dIdx));
-    app.battle = new Battle(p, app.S.items, dIdx, o);
+    app.battle = new Battle(p, app.S.items, dIdx, { ...o, leader: leaderModsOf(app.S, dIdx) });
     app.lastResult = null;
     app.battle.push(tx("\u9032\u5165{3}\uFF1A{0} +{1}\uFF5C\u8A5E\u7DB4\uFF1A{2}", DUNGEONS[dIdx].name, o.mythic.level, o.mythic.affixes.map((a) => AFFIXES[a].name).join(tx("\u3001")), o.mythic.tier === 2 ? tx("\u6DF1\u6DF5\u79D8\u5883") : tx("\u50B3\u5947\u79D8\u5883")), "info");
     runTimer();
@@ -7213,7 +7586,7 @@ h3 .gi{vertical-align:-.12em}
     clearTimeout(app.pendingRepeat);
     app.pendingRepeat = null;
     const o = mythicBattleOpts(dIdx, lv);
-    app.battle = new Battle(p, app.S.items, dIdx, { ...o, autoHorn: true });
+    app.battle = new Battle(p, app.S.items, dIdx, { ...o, autoHorn: true, leader: leaderModsOf(app.S, dIdx) });
     app.battle.mythicIdle = true;
     app.lastResult = null;
     app.battle.push(tx("\u79D8\u5883\u639B\u6A5F\uFF1A{0} +{1}\uFF08\u9470\u77F3\u4E0D\u8B8A\uFF0C\u734E\u52F5 {2}%\uFF09", DUNGEONS[dIdx].name, lv, Math.round(MYTHIC.idleMult * 100)), "info");
@@ -7235,7 +7608,7 @@ h3 .gi{vertical-align:-.12em}
     }
     clearTimeout(app.pendingRepeat);
     app.pendingRepeat = null;
-    app.battle = new Battle(p, app.S.items, floor, vaultBattleOpts(floor));
+    app.battle = new Battle(p, app.S.items, floor, { ...vaultBattleOpts(floor), leader: leaderModsOf(app.S, floor) });
     app.lastResult = null;
     app.battle.push(tx("\u9032\u5165\u5BF6\u5EAB\u7B2C {0} \u5C64\uFF1A60 \u79D2\u5167\u6253\u5012\u8D8A\u591A\u5BF6\u85CF\u54E5\u5E03\u6797\uFF0C\u91D1\u5E63\u8D8A\u591A\uFF01", ROMAN[floor]), "info");
     runTimer();
@@ -7312,7 +7685,7 @@ h3 .gi{vertical-align:-.12em}
   };
   var TABS = [["dungeon", tx("\u526F\u672C")], ["battle", tx("\u6230\u9B25")], ["team", tx("\u5718\u968A")], ["bag", tx("\u80CC\u5305")], ["tavern", tx("\u9152\u9928")]];
   function renderTabs() {
-    $("#tabs").innerHTML = TABS.map(([k, n2]) => `<button data-tab="${k}" class="${app.tab === k ? "sel" : ""}" aria-label="${n2}"><svg viewBox="0 0 24 24">${ICONS[k]}</svg>${n2}${k === "battle" && app.battle && !app.battle.over && app.tab !== "battle" || k === "bag" && app.S.stash.length || k === "team" && app.S.heroes.some((h) => pendingPicks(h)) ? '<span class="dot"></span>' : ""}</button>`).join("");
+    $("#tabs").innerHTML = TABS.map(([k, n2]) => `<button data-tab="${k}" class="${app.tab === k ? "sel" : ""}" aria-label="${n2}"><svg viewBox="0 0 24 24">${ICONS[k]}</svg>${n2}${k === "battle" && app.battle && !app.battle.over && app.tab !== "battle" || k === "bag" && app.S.stash.length || k === "team" && (app.S.heroes.some((h) => pendingPicks(h)) || leaderPoints(app.S) > 0) ? '<span class="dot"></span>' : ""}</button>`).join("");
   }
   function render(skipModal) {
     achToasts();
@@ -7320,6 +7693,13 @@ h3 .gi{vertical-align:-.12em}
     $("#idleChip").hidden = !partyLocked(app.S);
     renderTabs();
     tutTick();
+    {
+      const up = leaderLevelUp(app.S);
+      if (up && !tutActive(app.S)) {
+        save();
+        setTimeout(() => toast(tx("\u5718\u9577\u5347\u5230 Lv{0}\uFF01\u5F97\u5230 1 \u9EDE\u5929\u8CE6\u9EDE\uFF08\u5718\u968A \u203A \u5718\u9577\uFF09", up)), 300);
+      }
+    }
     const v = $("#view");
     if (app.tab === "dungeon") v.innerHTML = viewDungeons();
     if (app.tab === "battle") v.innerHTML = viewBattle();
@@ -8058,6 +8438,54 @@ h3 .gi{vertical-align:-.12em}
       case "share":
         shareInvite();
         return;
+      // v0.23 團長
+      case "teamview":
+        app.teamView = t.dataset.v;
+        app.leaderDraft = null;
+        window.scrollTo(0, 0);
+        break;
+      case "lbranch":
+        app.leaderBranch = t.dataset.v;
+        break;
+      case "ladd": {
+        const a2 = { ...app.leaderDraft || leaderAlloc(app.S) };
+        if (canAdd(a2, t.dataset.v, leaderLevel(app.S), app.S)) {
+          a2[t.dataset.v] = (a2[t.dataset.v] || 0) + 1;
+          app.leaderDraft = a2;
+        }
+        break;
+      }
+      case "lsub": {
+        const a2 = { ...app.leaderDraft || leaderAlloc(app.S) }, id2 = t.dataset.v;
+        if ((a2[id2] || 0) > (leaderAlloc(app.S)[id2] || 0) && canRemove(a2, id2)) {
+          a2[id2]--;
+          if (!a2[id2]) delete a2[id2];
+          app.leaderDraft = a2;
+        }
+        break;
+      }
+      case "lcancel":
+        app.leaderDraft = null;
+        break;
+      case "lcommit":
+        if (app.leaderDraft && commitAlloc(app.S, app.leaderDraft)) {
+          app.leaderDraft = null;
+          save();
+          toast(tx("\u5718\u9577\u5929\u8CE6\u5DF2\u66F4\u65B0"));
+          sendEvent(tx("\u5718\u9577\u914D\u9EDE"), leaderSummary());
+        } else toast(tx("\u914D\u9EDE\u4E0D\u5408\u6CD5\uFF0C\u8ACB\u91CD\u65B0\u8ABF\u6574"));
+        break;
+      case "lreset":
+        openModal({ type: "text", html: tx('<h3>\u91CD\u7F6E\u5718\u9577\u5929\u8CE6\uFF1F</h3><p class="sub" style="margin:0">\u6536\u56DE\u5168\u90E8 {0} \u9EDE\uFF0C\u82B1\u8CBB {1} \u91D1\u3002\u91CD\u7F6E\u5F8C\u53EF\u4EE5\u91CD\u65B0\u5206\u914D\u3002</p><div class="row"><button class="btn main" data-act="ldoreset" data-closemodal="1">\u91CD\u7F6E</button><button class="btn" data-act="closebtn">\u53D6\u6D88</button></div>', spentPts(leaderAlloc(app.S)), fmt(resetCost(app.S))) });
+        return;
+      case "ldoreset":
+        if (resetLeader(app.S)) {
+          app.leaderDraft = null;
+          save();
+          toast(tx("\u5DF2\u91CD\u7F6E\u5718\u9577\u5929\u8CE6"));
+          sendEvent(tx("\u5718\u9577\u91CD\u7F6E"), `Lv${leaderLevel(app.S)}`);
+        } else toast(tx("\u91D1\u5E63\u4E0D\u5920"));
+        break;
       case "sharecopy": {
         const el = $("#shareTxt");
         navigator.clipboard?.writeText(el.value).then(() => {
@@ -8401,6 +8829,10 @@ h3 .gi{vertical-align:-.12em}
     el.innerHTML = `<div class="ia-t"><b>${tx("\u4F60\u6B63\u5728 {0} \u88E1\u958B\u555F\u904A\u6232", ia)}</b><span>${tx("\u9019\u88E1\u7684\u9032\u5EA6\u53EF\u80FD\u5B58\u4E0D\u4F4F\u3001\u4E5F\u7121\u6CD5 Google \u767B\u5165\u3002\u8ACB{0}\u3002", how)}</span></div>
     <div class="ia-b">${href ? `<a class="btn sm main" href="${esc(href)}">${tx("\u7528\u700F\u89BD\u5668\u958B\u555F")}</a>` : ""}<button class="btn sm" data-act="inappcopy">${tx("\u8907\u88FD\u9023\u7D50")}</button><button class="btn sm" data-act="inappclose" aria-label="${tx("\u95DC\u9589")}">\u2715</button></div>`;
     el.hidden = false;
+  }
+  function leaderSummary() {
+    const a = leaderAlloc(app.S), ult = Object.keys(a).filter((id) => NODE[id] && NODE[id].ult);
+    return `Lv${leaderLevel(app.S)} ` + Object.keys(LEADER_TREE).map((b) => `${b[0]}${branchPts(a, b)}`).join("/") + (ult.length ? " " + ult.join(",") : "");
   }
 })();
 </script>

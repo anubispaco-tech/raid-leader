@@ -1,5 +1,6 @@
 // ===== 傳奇秘境：鑰石、每日詞綴、敵人成長、結算 =====
 import { tx } from './i18n.js';
+import { leaderMods, leaderAlloc } from './leader.js';
 import { DUNGEONS, DUNGEON, MYTHIC, REWARD, SLOTS, RARITY, CH1_TOP } from './config.js';
 import { R, rnd, rint, pick } from './rng.js';
 import { buildWaves, dropIlvl } from './dungeons.js';
@@ -46,8 +47,9 @@ export function setKey(s, dIdx, k) { if (mythicTier(dIdx) === 2) s.mythic.key2 =
 // ---------- 秘境體力 ----------
 // 手動挑戰每場 1 點；每 regenMin 分鐘回 1 點，上限 max。掛機不耗體力
 const STA_MS = () => MYTHIC.stamina.regenMin * 60000;
+export const staminaMax = s => MYTHIC.stamina.max + (leaderMods(leaderAlloc(s)).stamina || 0); // v0.23 後勤「補給」
 export function stamina(s, now = Date.now()) {
-  const max = MYTHIC.stamina.max;
+  const max = staminaMax(s);
   const st = s.mythic.sta || (s.mythic.sta = { pts: max, at: now });
   if (st.pts >= max) { st.at = now; return st; } // 獎勵給的體力可以暫時超過上限
   const n = Math.floor((now - st.at) / STA_MS());
@@ -56,7 +58,7 @@ export function stamina(s, now = Date.now()) {
 }
 export function addStamina(s, n, cap, now = Date.now()) { const st = stamina(s, now); st.pts = Math.min(cap, st.pts + n); return st.pts; }
 // 距離下一點還要幾毫秒（滿了回 0）
-export const staminaNext = (s, now = Date.now()) => { const st = stamina(s, now); return st.pts >= MYTHIC.stamina.max ? 0 : Math.max(0, st.at + STA_MS() - now); };
+export const staminaNext = (s, now = Date.now()) => { const st = stamina(s, now); return st.pts >= staminaMax(s) ? 0 : Math.max(0, st.at + STA_MS() - now); };
 export function spendStamina(s, now = Date.now()) {
   const st = stamina(s, now);
   if (st.pts < 1) return false;
