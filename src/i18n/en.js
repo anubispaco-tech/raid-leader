@@ -975,7 +975,7 @@ export default {
 "蘑菇領主解決了？不錯。酒館在傳，礦坑最近挖出了奇怪的聲音。": "The Mushroom Lord's done? Not bad. Word at the tavern is the mine's been digging up strange noises.",
 "礦坑巨像會重擊站在最前面的人。讓坦克頂住，治療盯好他。": "The Mine Colossus smashes whoever stands in front. Let the tank take it and keep the healer on him.",
 "礦工說巨像是自己醒的。這一帶的東西，好像都比以前躁動。": "The miners say the colossus woke on its own. Everything around here seems more restless than it used to be.",
-"潮汐祭司一直在叫魚人出來。範圍傷害夠不夠，打了就知道。": "The Tide Priest keeps calling up murlocs. You'll find out soon enough if your AoE is up to it.",
+"潮汐祭司一直在叫魚人出來。範圍傷害夠不夠，打了就知道。": "The Tide Priest keeps calling up fishfolk. You'll find out soon enough if your AoE is up to it.",
 "海……在叫我……": "The sea… is calling me…",
 "海？這座島四周可是千年不散的霧。": "The sea? This island has been wrapped in fog for a thousand years.",
 "熔火督軍撐太久會狂暴。輸出不夠，就換人或換裝。": "The Molten Warlord enrages if the fight drags. Short on damage? Swap heroes or gear.",
