@@ -1,4 +1,5 @@
 // ===== 底部抽屜：英雄、裝備、選裝、文字 =====
+import { STORY_LOG, storyLines } from '../story.js';
 import { newsHtml } from '../news.js';
 import { tx } from '../../core/i18n.js';
 import * as G from '../../core/index.js';
@@ -26,6 +27,7 @@ export function renderModal() {
   if (app.modal.type === 'settings') body = sheetSettings();
   if (app.modal.type === 'ach') body = sheetAchievements();
   if (app.modal.type === 'news') body = newsHtml(app.modal.only);
+  if (app.modal.type === 'storylog') body = sheetStoryLog(app.modal.ch);
   if (!body) { app.modal = null; el.innerHTML = ''; return; }
   // 只有新開抽屜時播放滑入動畫；在抽屜內操作（選天賦、換頁）不重播，並保留捲動位置
   const key = app.modal.type + ':' + (app.modal.id || ''), old = el.querySelector('.sheet');
@@ -162,4 +164,15 @@ function upBtn(it, size) {
   if (it.up >= G.maxUpFor(app.S)) return tx('<button class="btn {0}" disabled>強化 MAX</button>', size);
   const g = G.upgradeCost(it), d = G.dustCost(it), ok = app.S.gold >= g && (app.S.dust || 0) >= d;
   return `<button class="btn ${size}" data-act="up" data-id="${it.id}" ${ok ? '' : 'disabled'}>${d ? tx('精煉') : tx('強化')} <span class="num">${fmt(g)}</span>${d ? `<span class="dust num">+${d}✦</span>` : ''}</button>`;
+}
+// v0.25 劇情回顧：依章節列出每段對話；沒解鎖的顯示條件
+function sheetStoryLog(ch) {
+  const c = G.CHAPTERS[ch] || G.CHAPTERS[0], segs = STORY_LOG[ch] || [];
+  const label = l => (l[0] === 'prologue' ? tx('序章') : l[0] === 'sail' ? tx('渡海') : tx('第 {0} 層・{1}', G.ROMAN[l[0]], l[1] === 'pre' ? tx('戰前') : tx('通關後')));
+  const rows = segs.filter(x => storyLines(x.key).length).map(x => {
+    const ok = x.avail(app.S), first = storyLines(x.key)[0];
+    const peek = ok ? `<small class="sub" style="margin:0">${first.who ? first.who + '：' : ''}${first.text}</small>` : `<small class="sub" style="margin:0">${typeof x.label[0] === 'number' ? (x.label[1] === 'pre' ? tx('到達第 {0} 層後解鎖', G.ROMAN[x.label[0]]) : tx('通關第 {0} 層後解鎖', G.ROMAN[x.label[0]])) : tx('通關上一章後解鎖')}</small>`;
+    return `<div class="slog ${ok ? '' : 'locked'}"><div><b>${label(x.label)}</b>${peek}</div>${ok ? `<button class="btn sm" data-act="storyplay" data-v="${x.key}">${tx('播放')}</button>` : '🔒'}</div>`;
+  }).join('');
+  return `<h3>${tx('劇情回顧')}・${c.name}「${c.sub}」</h3><div class="slogs">${rows}</div><button class="btn grow" data-act="close">${tx('關閉')}</button>`;
 }

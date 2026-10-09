@@ -57,6 +57,10 @@ const SOUNDS = {
   bosskill: () => { [523, 659, 784, 1047].forEach((f, i) => tone(f, f, 0.16, 'square', 0.2, i * 0.09)); noise(0.4, 0.3, 600, 'lowpass'); },
   die: () => tone(330, 70, 0.45, 'sawtooth', 0.22),
   boss: () => { tone(110, 110, 0.22, 'square', 0.25); tone(98, 98, 0.35, 'square', 0.25, 0.24); },
+  tide: () => { noise(0.6, 0.35, 420, 'lowpass'); tone(196, 147, 0.5, 'sine', 0.18); },          // v0.25 漲潮
+  ebb: () => { tone(392, 523, 0.22, 'sine', 0.16); tone(523, 659, 0.22, 'sine', 0.12, 0.12); },  // v0.25 退潮
+  charm: () => { tone(880, 660, 0.25, 'sine', 0.18); tone(1047, 784, 0.3, 'sine', 0.12, 0.12); }, // v0.25 魅惑
+  board: () => { tone(147, 147, 0.12, 'square', 0.22); noise(0.25, 0.35, 900, 'lowpass'); },        // v0.25 登船
   horn: () => { tone(392, 392, 0.18, 'sawtooth', 0.2); tone(523, 523, 0.32, 'sawtooth', 0.22, 0.18); },
   win: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, f, 0.2, 'square', 0.2, i * 0.11)),
   lose: () => [392, 330, 262, 196].forEach((f, i) => tone(f, f * 0.98, 0.24, 'triangle', 0.24, i * 0.14)),

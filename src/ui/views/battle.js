@@ -54,10 +54,12 @@ function viewBattleGrid(b, d) {
 // 敵方只留一行：首領戰顯示首領血條（雙首領兩條），小怪波顯示剩幾隻＋合計血量
 function foeBar(b) {
   const bosses = b.enemies.filter(e => e.boss);
-  if (bosses.length) return `<div class="foebar">${bosses.map(e => `<div class="fb ${e.hp <= 0 ? 'dead' : ''}"><span class="ic">${enemyIcon(e)}</span><span class="nm">${e.name}${e.bshield > 0 ? ` <small class="shield">${tx('護盾')}</small>` : ''}${e.casting ? ` <small class="casting">${tx('讀條中')}</small>` : ''}</span><span class="num">${Math.ceil(pct(e.hp, e.max))}%</span><span class="bar"><i class="enemy-bar" style="width:${pct(e.hp, e.max)}%"></i></span></div>`).join('')}</div>`;
+  if (bosses.length) return `<div class="foebar">${bosses.map(e => `<div class="fb ${e.hp <= 0 ? 'dead' : ''}"><span class="ic">${enemyIcon(e)}</span><span class="nm">${e.name}${e.bshield > 0 ? ` <small class="shield">${tx('護盾')}</small>` : ''}${e.casting ? ` <small class="casting">${e.casting.charm ? tx('魅惑之歌') : tx('讀條中')}</small>` : ''}${tideTag(b, e)}</span><span class="num">${Math.ceil(pct(e.hp, e.max))}%</span><span class="bar"><i class="enemy-bar" style="width:${pct(e.hp, e.max)}%"></i></span></div>`).join('')}</div>`;
   const alive = b.enemies.filter(e => e.hp > 0), hp = alive.reduce((a, e) => a + e.hp, 0), max = b.enemies.reduce((a, e) => a + e.max, 0) || 1;
   return `<div class="foebar"><div class="fb"><span class="nm">${b.waveIdx === b.waves.length - 1 ? tx('首領戰') : tx('第 {0} 波', b.waveIdx + 1)}・${tx('剩 {0} 隻', alive.length)}</span><span class="num">${Math.ceil(pct(hp, max))}%</span><span class="bar"><i class="enemy-bar" style="width:${pct(hp, max)}%"></i></span></div></div>`;
 }
+// v0.25 潮汐狀態標籤（只標在帶潮汐機制的首領旁）
+const tideTag = (b, e) => !b.tide || b.tide.src !== e.id ? '' : b.tideHigh() ? ` <small class="tide">${tx('漲潮')} ${b.tide.high - b.tick}s</small>` : b.tideLow() ? ` <small class="ebb">${tx('退潮')} ${b.tide.low - b.tick}s</small>` : '';
 // 我方 5 人一排：第一行職業圖示＋名字、血條、第三行主動技能圖示（冷卻環）＋血量%
 // v0.24.1：技能名不再蓋在卡片上（名字照常顯示），可以施放時圖示發亮；施放時格子上的隊員頭上會跳出技能名
 const shortName = n => String(n).split('・')[0];
@@ -70,8 +72,8 @@ function partyStrip(b) {
     const inner = `<span class="ic">${u.icon}</span><span class="pn">${shortName(u.name)}</span><span class="bar"><i class="role-${u.role}" style="width:${pct(u.hp, u.max)}%"></i></span>${sk}<span class="num hp">${hp}</span>`;
     const label = `${u.name} ${hp}` + (A ? `・${A.name}${ready ? tx('（可施放）') : ''}` : '');
     return A && !b.over
-      ? `<button class="pc act ${dead ? 'dead' : ''} ${ready ? 'ready' : ''}" data-act="active" data-id="${u.id}" ${ready ? '' : 'aria-disabled="true"'} title="${A.name}：${A.desc}" aria-label="${label}">${inner}</button>`
-      : `<div class="pc ${dead ? 'dead' : ''}" title="${u.name}" aria-label="${label}">${inner}</div>`;
+      ? `<button class="pc act ${dead ? 'dead' : ''} ${ready ? 'ready' : ''} ${u.charmed > b.tick ? 'charmed' : ''}" data-act="active" data-id="${u.id}" ${ready ? '' : 'aria-disabled="true"'} title="${A.name}：${A.desc}" aria-label="${label}">${inner}</button>`
+      : `<div class="pc ${dead ? 'dead' : ''} ${u.charmed > b.tick ? 'charmed' : ''}" title="${u.name}" aria-label="${label}">${inner}</div>`;
   }).join('')}</div>` + cmdRow(b);
 }
 // v0.24 團長指令列（號角在下方控制列，這裡放天賦樹點出來的指令，最多兩個）

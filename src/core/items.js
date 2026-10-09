@@ -1,5 +1,5 @@
 // ===== 裝備 =====
-import { RARITY, SLOTS, SLOT_STATS, SLOT_NAMES, PREFIX, GEAR, SETS, SET_PIECE, ARMOR_SLOTS, ITEM_BASES, BASE_INFO, ITEM_TIERS, GEAR_AFFIX, CLASSES, ARMOR_TYPES, LOOT, SET_T5 } from './config.js';
+import { RARITY, SLOTS, SLOT_STATS, SLOT_NAMES, PREFIX, GEAR, SETS, SET_PIECE, ARMOR_SLOTS, ITEM_BASES, BASE_INFO, ITEM_TIERS, TIDE_TIER_ILVL, GEAR_AFFIX, CLASSES, ARMOR_TYPES, LOOT, SET_T5 } from './config.js';
 import { tx } from './i18n.js';
 import { roleOf } from './classes/index.js';
 import { R, rnd, pick, uid } from './rng.js';
@@ -20,7 +20,7 @@ export function rollAffix(rarity) {
   let x = R() * tot; for (const k of ks) { x -= GEAR_AFFIX[k].w[rarity]; if (x < 0) return k; }
   return 'balanced';
 }
-export const itemTier = it => Math.min(ITEM_TIERS.length - 1, Math.floor(it.ilvl / 6));
+export const itemTier = it => (it.ilvl >= TIDE_TIER_ILVL ? ITEM_TIERS.length - 1 : Math.min(ITEM_TIERS.length - 2, Math.floor(it.ilvl / 6)));
 // 顯示名稱：套裝 =「套裝名＋部位」；一般 =「詞綴＋材質＋基底」（英文加空格）；沒有基底的舊資料用存的名字
 export function itemLabel(it) {
   const en = getLang() === 'en', sp = en ? ' ' : '';

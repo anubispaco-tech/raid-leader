@@ -24,6 +24,11 @@ const LIST = [
   { id: 'clear8', cat: 'story', pts: 10, name: tx('深入裂谷'), desc: tx('通關第 VIII 層「{0}」', DUNGEONS[7].name), prog: clear(7) },
   { id: 'clear11', cat: 'story', pts: 25, name: tx('日月同輝'), desc: tx('擊敗雙子先知（第 XI 層）'), prog: clear(10) },
   { id: 'clear14', cat: 'story', pts: 50, name: tx('深淵終結者'), desc: tx('擊敗裂谷之主・莫瑞斯（第 XIV 層）'), prog: clear(13) },
+  // v0.25 第三章・潮痕海岸
+  { id: 'clear15', cat: 'story', pts: 10, name: tx('登陸維爾達'), desc: tx('通關第 XV 層「{0}」', DUNGEONS[14].name), prog: clear(14) },
+  { id: 'clear18', cat: 'story', pts: 25, name: tx('穿越黑帆'), desc: tx('擊敗黑帆雙雄（第 XVIII 層）'), prog: clear(17) },
+  { id: 'clear21', cat: 'story', pts: 50, name: tx('淨潮者'), desc: tx('淨化被侵蝕的守護者・艾瓦拉（第 XXI 層）'), prog: clear(20) },
+  { id: 'nocharm', cat: 'story', pts: 25, name: tx('不為歌聲所動'), desc: tx('通關第 XVII 層，全程沒有隊員被魅惑'), prog: s => [n(s.stats.nocharm), 1] },
   { id: 'wins100', cat: 'story', pts: 10, name: tx('百戰'), desc: tx('累計勝利 {0} 場', 100), prog: s => [n(s.stats.wins), 100] },
   { id: 'wins1000', cat: 'story', pts: 25, name: tx('千錘百鍊'), desc: tx('累計勝利 {0} 場', 1000), prog: s => [n(s.stats.wins), 1000] },
   { id: 'wins5000', cat: 'story', pts: 50, name: tx('身經萬戰'), desc: tx('累計勝利 {0} 場', 5000), prog: s => [n(s.stats.wins), 5000] },
@@ -66,6 +71,7 @@ const LIST = [
   { id: 'chest10', cat: 'misc', pts: 10, name: tx('勤勞的團長'), desc: tx('開啟 {0} 次每日寶箱', 10), prog: s => [n(s.stats.chests), 10] },
   { id: 'gold1m', cat: 'misc', pts: 10, name: tx('富甲一方'), desc: tx('同時持有 {0} 金幣', '1,000,000'), prog: s => [Math.min(n(s.gold), 1e6), 1e6] },
   { id: 'story', cat: 'misc', pts: 5, name: tx('說書人'), desc: tx('看完第二章的完結劇情'), prog: s => [(s.story && s.story.seen || []).includes('post13') ? 1 : 0, 1] },
+  { id: 'story3', cat: 'misc', pts: 5, name: tx('海岸的傳說'), desc: tx('看完第三章的完結劇情'), prog: s => [(s.story && s.story.seen || []).includes('post20') ? 1 : 0, 1] },
 ];
 // 背包里程碑：名稱沿用，說明附上獎勵
 export const ACHIEVEMENTS = LIST.map(a => {

@@ -13,6 +13,7 @@ import { PACKS, roleOf } from './classes/index.js';
 import { ACTIVES, ACTIVE, activeKey } from './actives.js';
 import { COMMANDS } from './leader.js';
 
+const CHARM_HIT = 0.07; // v0.25 被魅惑的隊員每秒打隊友：目標最大生命的 7%
 // ---------- 首領機制：回傳本 tick 對坦克的攻擊倍率 ----------
 const BOSS_MECHS = {
   enrage(b, e, m) {
@@ -63,6 +64,30 @@ const BOSS_MECHS = {
   // 雙首領的羈絆：另一隻先倒下，這隻攻擊 ×mult
   bond(b, e, m) {
     if (!e.bonded && b.enemies.some(x => x.boss && x !== e && x.hp <= 0)) { e.bonded = true; e.atk *= m.mult; b.push(tx('💢 {0} 悲憤交加，攻擊大增', e.name), 'warn'); b.fx({ k: 'phase', s: e.id }); }
+    return 1;
+  },
+  // ---- 第三章（v0.25）：潮汐、魅惑、登船 ----
+  // 潮汐：每 every 秒漲潮 dur 秒（坦克受到傷害 +tank、治療量 −heal），接著退潮 ebb 秒（全隊傷害 +dmg）
+  tide(b, e, m) {
+    if (b.waveTick % m.every) return 1;
+    b.tide = { high: b.tick + m.dur, low: b.tick + m.dur + m.ebb, tank: m.tank, heal: m.heal, dmg: m.dmg, src: e.id, ebbSaid: false };
+    b.push(tx('🌊 漲潮了！坦克受到的傷害大增、治療變弱，撐過去就會退潮'), 'warn'); b.fx({ k: 'tide', s: e.id, high: true, dur: m.dur });
+    return 1;
+  },
+  // 魅惑：讀條 time 秒（可打斷）；沒打斷 → 輸出最高的非坦克隊員被魅惑 dur 秒，停止行動並攻擊隊友
+  charm(b, e, m) {
+    if (b.waveTick % m.every || e.casting) return 1;
+    e.casting = { until: b.tick + m.time, charm: m.dur };
+    b.push(tx('🎵 {0} 開始吟唱魅惑之歌（{1} 秒）——打斷它！', e.name, m.time), 'warn'); b.fx({ k: 'cast', s: e.id, time: m.time, charm: true });
+    return 1;
+  },
+  // 登船：首領生命跌破 at[i] 時，一次增援 n 隻海盜（生命 = 召喚物 × hp）
+  board(b, e, m) {
+    const i = e.boarded || 0;
+    if (i >= m.at.length || e.hp >= e.max * m.at[i]) return 1;
+    e.boarded = i + 1;
+    for (let k = 0; k < m.n; k++) b.enemies.push({ name: m.name || tx('登船海盜'), hp: Math.round(e.addHp * m.hp), max: Math.round(e.addHp * m.hp), atk: e.addAtk, boss: false, id: uid() });
+    b.push(tx('⚓ {0} 的增援登船了！{1} 隻海盜加入戰鬥', e.name, m.n), 'warn'); b.fx({ k: 'board', s: e.id });
     return 1;
   },
   summon(b, e, m) {
@@ -116,7 +141,8 @@ export class Battle {
   loadWave() {
     this.enemies = this.waves[this.waveIdx].map(e => ({ ...e, max: e.hp, id: uid(), weak: 0, weakUntil: -1, poison: 0 }));
     this.waveTick = 0;
-    for (const u of this.units) { u.cold = !!u.mods.coldBlood; u.necro = 0; }
+    for (const u of this.units) { u.cold = !!u.mods.coldBlood; u.necro = 0; u.charmed = 0; }
+    this.tide = null;
     if (this.opts.autoHorn && (this.waveIdx === this.waves.length - 1 || (this.vault && this.waveIdx === 0))) this.useHorn();
   }
   has(affix) { return !!this.mythic && this.mythic.affixes.includes(affix); }
@@ -150,7 +176,7 @@ export class Battle {
   }
   hornBonus() { return RAID_HORN.bonus + (this.L.hornBonus || 0); }
   // ---------- v0.24 英雄主動技能 ----------
-  activeReady(u) { return !!u.act && u.hp > 0 && u.act.ready <= this.tick && !this.over && this.foes().length > 0; }
+  activeReady(u) { return !!u.act && u.hp > 0 && !(u.charmed > this.tick) && u.act.ready <= this.tick && !this.over && this.foes().length > 0; }
   useActive(id) {
     const u = this.units.find(x => x.id === id); if (!u || !this.activeReady(u)) return false;
     const A = ACTIVES[u.act.key]; u.act.ready = this.tick + ACTIVE.cd; u.act.used = (u.act.used || 0) + 1;
@@ -190,6 +216,9 @@ export class Battle {
   }
   healMult(u) { return (u.mods.healMult || 1) * (u.mods.setHeal ? 1 + u.mods.setHeal : 1) * (this.hornActive() ? 1 + this.hornBonus() : 1) * (1 + (this.L.heal || 0)); }
   weakMult(e) { return e.weakUntil > this.tick ? 1 - e.weak : 1; }
+  // v0.25 潮汐狀態
+  tideHigh() { return !!this.tide && this.tide.high > this.tick; }
+  tideLow() { return !!this.tide && this.tide.high <= this.tick && this.tide.low > this.tick; }
 
   // ---------- 傷害與治療 ----------
   hitEnemy(u, e, amt, o = {}) {
@@ -197,6 +226,7 @@ export class Battle {
     const m = u.mods;
     amt *= (m.dmgMult || 1) * (this.hornActive() ? 1 + this.hornBonus() : 1) * (1 + (this.L.dmg || 0)) * (e.boss ? 1 + (this.L.bossDmg || 0) : 1);
     if (this.assault && this.assault.until > this.tick) amt *= 1 + this.assault.v;            // 總攻號令
+    if (this.tide && this.tideLow()) amt *= 1 + this.tide.dmg;                                // 退潮
     if (e.boss && this.vuln && this.vuln.until > this.tick) amt *= 1 + this.vuln.v;          // 震懾
     if (this.L.shieldDmg && e.bshield > 0) amt *= 1 + this.L.shieldDmg;
     if (m.setDmg) amt *= 1 + m.setDmg;                                // 套裝
@@ -250,6 +280,7 @@ export class Battle {
     if (aura) red *= aura.lh.partyTaken;
     if (m.lowHpReduce && u.hp < u.max * 0.5) red *= 1 - m.lowHpReduce;
     if (this.L.tankTaken && u.role === 'tank') red *= 1 - this.L.tankTaken;
+    if (this.tide && u.role === 'tank' && this.tideHigh()) red *= 1 + this.tide.tank;         // 漲潮
     if (this.L.lowTaken && u.hp < u.max * 0.3) red *= 1 - this.L.lowTaken;
     if (u.buf.wall > this.tick) red *= 0.75;                                                    // 不動壁壘
     if (this.guard && this.guard.until > this.tick) red *= 1 - this.guard.v;                   // 咆哮守護
@@ -284,7 +315,8 @@ export class Battle {
   heal(src, tgt, amt, raw = false) {
     if (tgt.hp <= 0) return 0;
     const necro = tgt.necro ? Math.max(0.2, 1 - 0.02 * tgt.necro) : 1; // 壞疽
-    const h = Math.min(tgt.max - tgt.hp, Math.round(amt * (raw ? 1 : this.healMult(src)) * necro));
+    const tide = this.tide && this.tideHigh() ? 1 - this.tide.heal : 1; // 漲潮：治療量下降
+    const h = Math.min(tgt.max - tgt.hp, Math.round(amt * (raw ? 1 : this.healMult(src)) * necro * tide));
     tgt.hp += h; src.healDone += h;
     if (h > 0) this.fx({ k: 'heal', s: src.id, t: tgt.id });
     if (src.lh.onHeal && !raw) src.lh.onHeal(this, src, tgt, amt, h); // 傳說掛勾：治療後
@@ -298,8 +330,8 @@ export class Battle {
       this.skillLog(u, tx('打斷'), caster); return true;
     }
     if (u.role === 'heal' && (u.cd.dispel || 0) <= this.tick) {
-      const c = this.alive().find(x => x.curse > this.tick);
-      if (c) { c.curse = 0; u.cd.dispel = this.tick + (u.mods.dispelCd || 6); this.skillLog(u, tx('淨化'), c); this.fx({ k: 'dispel', s: u.id, t: c.id }); return true; }
+      const c = this.alive().find(x => x.curse > this.tick || x.charmed > this.tick);
+      if (c) { c.curse = 0; c.charmed = 0; u.cd.dispel = this.tick + (u.mods.dispelCd || 6); this.skillLog(u, tx('淨化'), c); this.fx({ k: 'dispel', s: u.id, t: c.id }); return true; }
     }
     return false;
   }
@@ -313,6 +345,9 @@ export class Battle {
 
   // ---------- 每 tick 的持續效果 ----------
   tickEffects() {
+    if (this.tide && !this.tide.ebbSaid && this.tick >= this.tide.high && this.tide.low > this.tick) { // 漲潮結束 → 退潮
+      this.tide.ebbSaid = true; this.push(tx('🏖 退潮了！全隊傷害提高，趁現在輸出'), 'good'); this.fx({ k: 'tide', s: this.tide.src, high: false, dur: this.tide.low - this.tick });
+    }
     for (const e of this.foes()) {
       if (e.poison && e.poisonSrc) this.hitEnemy(e.poisonSrc, e, e.poison * e.poisonPer * e.poisonSrc.pow, { dot: true });
       if (e.bleed && e.bleed.until >= this.tick && e.hp > 0) this.hitEnemy(e.bleed.src, e, e.bleed.amt, { dot: true });
@@ -338,6 +373,11 @@ export class Battle {
     if (this.actMode === 'auto') for (const u of this.alive()) if (this.activeReady(u) && ACTIVES[u.act.key].auto(this, u)) this.useActive(u.id);
     for (const u of this.alive()) {
       const foes = this.foes(); if (!foes.length) break;
+      if (u.charmed > this.tick) { // 被魅惑：攻擊隨機一名隊友
+        const mates = this.alive().filter(x => x !== u);
+        if (mates.length) { const t = pick(mates); this.fx({ k: 'hit', s: u.id, t: t.id, charm: true }); this.hitHero(t, t.max * CHARM_HIT, 'magic'); } // 以目標最大生命計，跨章節一致
+        continue;
+      }
       if (this.utility(u, foes)) continue; // 打斷讀條、淨化詛咒（用掉這一秒的行動）
       u.pack.act(this, u, foes, foes.find(e => !e.boss) || foes[0]);
       if (this.lustActive() && R() < this.lust.haste) { // 嗜血：多出手一次
@@ -354,6 +394,12 @@ export class Battle {
     }
     for (const e of this.foes()) if (e.casting && this.tick >= e.casting.until) { // 讀條完成：全隊受傷
       const c = e.casting; e.casting = null;
+      if (c.charm) { // 魅惑：點名一名非坦克隊員
+        const pool = this.alive().filter(u => u.role !== 'tank' && !(u.charmed > this.tick));
+        const u = pool.length ? pool.reduce((m, x) => (x.dmgDone > m.dmgDone ? x : m), pool[0]) : null; // 歌聲找上輸出最高的人
+        if (u) { u.charmed = this.tick + c.charm; this.charms = (this.charms || 0) + 1; this.push(tx('💜 {0} 被魅惑了，轉頭攻擊隊友 {1} 秒', u.name, c.charm), 'bad'); this.fx({ k: 'charm', s: e.id, t: u.id, dur: c.charm }); }
+        continue;
+      }
       this.push(tx('💥 {0} 讀條完成，全隊受到重創', e.name), 'bad'); this.fx({ k: 'blast', s: e.id });
       for (const u of this.alive()) this.hitHero(u, e.atk * c.mult * this.weakMult(e), 'magic');
     }

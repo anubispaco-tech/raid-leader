@@ -128,7 +128,7 @@ check(await page.locator('.pstrip button.pc.act').count() === 5 && await page.lo
 await page.evaluate(() => { const b = document.createElement('button'); b.dataset.act = 'speed'; b.dataset.x = '4'; document.body.appendChild(b); b.click(); b.remove(); });
 for (let k = 0; k < 20 && !(await page.locator('.pstrip .pc.ready').count()); k++) await page.waitForTimeout(500);
 const ready = page.locator('.pstrip .pc.ready').first();
-if (await ready.count()) { await ready.click(); await page.waitForTimeout(300); }
+if (await ready.count()) { await page.evaluate(() => document.querySelector('.pstrip .pc.ready')?.click()); await page.waitForTimeout(300); } // 4 倍速每 0.25 秒重畫，用 DOM 直接點避免元素被換掉
 check(/✨/.test(await page.locator('.log').textContent()), '點亮著的卡片會施放主動技能（紀錄出現 ✨）');
 check(await page.locator('.gcast').count() >= 1 && /\S/.test(await page.locator('.gcast').first().textContent()), 'v0.24.1 施放時格子上跳出技能名標籤（4 倍速）');
 await page.waitForTimeout(700);

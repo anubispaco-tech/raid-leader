@@ -137,6 +137,26 @@ function boardCard() {
 }
 // v0.21.1 邀請朋友（新手教學結束後才出現）
 const inviteCard = () => (G.tutActive(app.S) ? '' : `<div class="invite"><span>${tx('找朋友一起爬天梯')}</span><button class="btn sm" data-act="share">${tx('邀請朋友')}</button></div>`);
+// ---------- v0.25 世界地圖：龍眠島 → 霧帆海 → 維爾達（目前只開放潮痕海岸）----------
+const REGIONS = [ // [名稱, x, y, 章節 index（沒有＝即將開放）]
+  [tx('潮痕海岸'), 236, 92, 2], [tx('灰燼高原'), 292, 98], [tx('霜牙山脈'), 296, 38], [tx('低語密林'), 248, 52], [tx('沉沒王都'), 338, 72], [tx('蝕之門'), 344, 30],
+];
+function worldMap(ch, open) {
+  const sea = open(2), isle = open(1) ? 1 : 0;
+  let g = `<path class="wm-land" d="M18 70 C 16 44, 44 28, 70 36 C 96 44, 112 60, 104 84 C 96 104, 58 112, 36 102 C 22 96, 19 84, 18 70 Z"/>`;
+  g += `<g class="wm-hit ${ch < 2 ? 'sel' : ''}" data-act="chapter" data-v="${isle}" role="button" aria-label="${tx('龍眠島')}"><circle cx="62" cy="70" r="40" fill="transparent"/><circle class="wm-dot on" cx="62" cy="66" r="5"/><text x="62" y="88">${tx('龍眠島')}</text></g>`;
+  g += `<path class="wm-route ${sea ? 'on' : ''}" d="M100 72 C 140 50, 180 104, 226 92"/>`;
+  g += `<text class="wm-sea" x="160" y="58">${tx('霧帆海')}</text>`;
+  g += `<path class="wm-land" d="M222 108 C 214 76, 226 38, 252 22 C 280 6, 330 4, 352 18 C 368 30, 366 70, 358 94 C 350 114, 300 118, 262 116 C 244 115, 226 116, 222 108 Z"/>`;
+  g += `<text class="wm-cont" x="300" y="121">${tx('維爾達')}</text>`;
+  for (const [n, x, y, c] of REGIONS) {
+    const on = c != null && open(c);
+    g += c != null && on
+      ? `<g class="wm-hit ${ch === c ? 'sel' : ''}" data-act="chapter" data-v="${c}" role="button" aria-label="${n}"><circle cx="${x}" cy="${y}" r="16" fill="transparent"/><circle class="wm-dot on" cx="${x}" cy="${y}" r="5"/><text x="${x}" y="${y - 9}">${n}</text></g>`
+      : `<g class="wm-off"><circle class="wm-dot" cx="${x}" cy="${y}" r="3.5"/><text x="${x}" y="${y - 7}">${n}</text></g>`;
+  }
+  return `<div class="worldmap"><svg viewBox="0 0 372 126" role="group" aria-label="${tx('世界地圖')}">${g}</svg>${sea ? '' : `<small class="sub">${tx('通關第二章後，霧帆海的航線會打開')}</small>`}</div>`;
+}
 export function viewDungeons() {
   const lv = avgPartyLv(), il = avgPartyIlvl();
   let h = gearRuleCard('home') + (G.tutActive(app.S) ? '' : dailyCard()) + nextStepCard() + tx('<h2>副本</h2><p class="sub">隊伍平均 <b class="num">Lv{0}</b>・裝等 <b class="num">{1}</b>・戰力 <b class="num">{2}</b>　｜　每隻首領都有弱點，打不過就換陣容，或回頭刷裝備。</p>', lv, il, fmt(partyPower()));
@@ -150,7 +170,8 @@ export function viewDungeons() {
   // 主線：章節分頁
   const chs = G.CHAPTERS, open = c => S.unlocked - 1 >= chs[c].floors[0];
   const ch = app.chapter != null && open(app.chapter) ? app.chapter : chs.reduce((a, c, i) => (open(i) ? i : a), 0);
-  h += `<div class="seg chapters">${chs.map((c, i) => `<button data-act="chapter" data-v="${i}" class="${ch === i ? 'sel' : ''}" ${open(i) ? '' : 'disabled'}>${c.name}・${c.sub}${open(i) ? '' : ' 🔒'}</button>`).join('')}</div>`;
+  h += worldMap(ch, open);
+  h += `<div class="chaprow"><div class="seg chapters">${chs.map((c, i) => `<button data-act="chapter" data-v="${i}" class="${ch === i ? 'sel' : ''}" ${open(i) ? '' : 'disabled'}><small>${c.name}${open(i) ? '' : ' 🔒'}</small>${c.sub}</button>`).join('')}</div><button class="btn sm storybtn" data-act="storylog" data-v="${ch}" aria-label="${tx('劇情回顧')}">${svg('open-book')}${tx('劇情')}</button></div>`;
   h += `<div class="dlist">`;
   G.DUNGEONS.forEach((_, i) => {
     if (i < chs[ch].floors[0] || i > chs[ch].floors[1]) return;

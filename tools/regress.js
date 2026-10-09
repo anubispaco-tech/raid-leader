@@ -50,9 +50,19 @@ for (const [slot, sp] of [[0, 'bear'], [1, 'resto'], [2, 'feral']]) for (const r
 // 4) 第二章（v0.9.0）：詛咒、讀條、護盾、打斷、淨化
 for (let combo = 0; combo < 4; combo++) {
   party.slice(0, 4).forEach((h, i) => G.setSpec(h, specs[h.cls][(combo >> (i % 2)) & 1]));
-  for (let dd = G.CH1_TOP + 1; dd < G.DUNGEONS.length; dd++) rec(`ch2-d${dd}-c${combo}`, new G.Battle(party, items, dd, { autoHorn: true }).runToEnd());
+  for (let dd = G.CH1_TOP + 1; dd <= G.CH2_TOP; dd++) rec(`ch2-d${dd}-c${combo}`, new G.Battle(party, items, dd, { autoHorn: true }).runToEnd());
+}
+// 6) 第三章（v0.25）：潮汐、魅惑、登船（接在最後，前面的紀錄不受影響）
+for (let combo = 0; combo < 2; combo++) {
+  party.slice(0, 4).forEach((h, i) => G.setSpec(h, specs[h.cls][(combo >> (i % 2)) & 1]));
+  for (let dd = G.CH2_TOP + 1; dd < G.DUNGEONS.length; dd++) rec(`ch3-d${dd}-c${combo}`, new G.Battle(party, items, dd, { autoHorn: true }).runToEnd());
 }
 G.setSeed(null);
+if (process.argv.includes('--prefix')) { // 只比對舊基準的筆數（新增章節只接在後面時用）
+  const base = JSON.parse(fs.readFileSync(new URL('./regress-baseline.json', import.meta.url), 'utf8'));
+  const d = base.out.findIndex((r, i) => JSON.stringify(r) !== JSON.stringify(out[i]));
+  console.log(d < 0 ? `✅ 舊基準 ${base.out.length} 筆完全一致（新增 ${out.length - base.out.length} 筆）` : `❌ 第 ${d} 筆不同`); process.exit(d < 0 ? 0 : 1);
+}
 
 const digest = crypto.createHash('sha256').update(JSON.stringify(out)).digest('hex').slice(0, 16);
 const file = new URL('./regress-baseline.json', import.meta.url);

@@ -1,7 +1,7 @@
 // ===== 入口：分頁切換、事件、離線結算、啟動 =====
 import { tx } from '../core/i18n.js';
 import * as G from '../core/index.js';
-import { app, KEY, canSkip } from './state.js';
+import { app, KEY, canSkip, e2eMode } from './state.js';
 import { load, save, exportCode, importCode } from './save.js';
 import { moveAway, takeMoved } from './move.js';
 import * as N from './news.js';
@@ -12,7 +12,7 @@ import { viewTeam } from './views/team.js';
 import { viewBag, visibleBag } from './views/bag.js';
 import { viewTavern } from './views/tavern.js';
 import { renderModal, openModal, closeModal, playDialog } from './views/sheets.js';
-import { PROLOGUE, STORY } from './story.js';
+import { PROLOGUE, STORY, storyLines, CH1_EXTRA } from './story.js';
 import { LANGS, getLang, setLang, localName } from '../core/i18n.js';
 import { startBattle, startMythic, startMythicIdle, startVault, runTimer, finishBattle } from './battle-runner.js';
 import * as T from './telemetry.js';
@@ -134,7 +134,9 @@ document.addEventListener('click', e => {
   if (a !== 'mselgo') app.mselConfirm = false;
   switch (a) {
     case 'fight': { const d = +t.dataset.d; stopIdleFor(d); const go = () => { startBattle(d); app.tab = 'battle'; render(); };
-      if (!storyOnce(d === G.CH1_TOP + 1 ? ['post' + G.CH1_TOP, 'pre' + d] : 'pre' + d, go)) go(); return; }
+      // 章節開頭的過場（第二章序章、v0.25 渡海）＋這層的戰前對話（v0.25 第一章補的對話只在還沒通關過時播，舊玩家改在劇情回顧看）
+      const keys = [...(d === G.CH1_TOP + 1 ? ['post' + G.CH1_TOP] : []), ...(d === G.CH2_TOP + 1 ? ['sail'] : []), ...(app.S.clears[d] && CH1_EXTRA.has('pre' + d) ? [] : ['pre' + d])];
+      if (!storyOnce(keys, go)) go(); return; }
     case 'mythic': {
       const d = +t.dataset.d;
       if (app.battle && !app.battle.over && app.battle.mythic && !app.battle.mythicIdle) { toast(tx('秘境挑戰進行中')); break; }
@@ -179,7 +181,9 @@ document.addEventListener('click', e => {
     case 'ach': openModal({ type: 'ach' }); return;
     case 'achcat': app.achCat = t.dataset.v; renderModal(); return;
     case 'mode': app.mode = t.dataset.v; break;
-    case 'chapter': app.chapter = +t.dataset.v; if (app.chapter === 1) storyOnce('post6'); break;
+    case 'chapter': app.chapter = +t.dataset.v; if (app.chapter === 1) storyOnce('post6'); if (app.chapter === 2) storyOnce('sail'); break;
+    case 'storylog': openModal({ type: 'storylog', ch: +t.dataset.v }); return; // v0.25 劇情回顧
+    case 'storyplay': { const ch = app.modal && app.modal.ch; playDialog(storyLines(t.dataset.v), () => openModal({ type: 'storylog', ch })); return; }
     case 'close-settings': closeModal(); return;
     case 'replaystory': playDialog(PROLOGUE, () => openModal({ type: 'settings' })); return;
     case 'lang': if (t.dataset.v !== getLang()) { // 新玩家還沒按開始就換語言：不留存檔，重新載入後仍是「開始冒險」
@@ -509,7 +513,7 @@ function stopIdleFor(d) {
 }
 // 劇情只播一次：沒看過就播放並記錄，回傳 true；看過了回傳 false（不呼叫 done）
 function storyOnce(keys, done) {
-  const seen = app.S.story.seen, todo = [].concat(keys).filter(k => STORY[k] && !seen.includes(k));
+  const seen = app.S.story.seen, todo = [].concat(keys).filter(k => STORY[k] && !seen.includes(k) && !(e2eMode() && CH1_EXTRA.has(k)));
   if (!todo.length) return false;
   seen.push(...todo); save(); playDialog(todo.flatMap(k => STORY[k]), done || (() => {})); return true;
 }

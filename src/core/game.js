@@ -287,6 +287,7 @@ export function applyResult(s, dIdx, battle) {
     s.stats.wins++;
     s.clears[dIdx] = (s.clears[dIdx] || 0) + 1;
     if (dIdx + 1 >= s.unlocked && dIdx + 1 < DUNGEONS.length) s.unlocked = dIdx + 2;
+    if (!battle.charms && (DUNGEONS[dIdx].mech || []).some(m => m.t === 'charm') && dIdx === 16) s.stats.nocharm = 1; // v0.25 成就「不為歌聲所動」
   }
   // 第二章：T0 套裝部件（出戰隊員其中一人的職業）
   if (battle.win && dIdx > CH1_TOP && party.length && R() < SET_DROP.chance) rw.loot.push(makeSetDrop(s, pick(party).cls, dungeonInfo(dIdx).dropIlvl + 2));

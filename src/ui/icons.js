@@ -9,7 +9,9 @@ export const CLASS_GLYPH = { guardian: 'templar-shield', cleric: 'holy-symbol', 
 export const SLOT_GLYPH = { weapon: 'broadsword', head: 'visored-helm', chest: 'breastplate', hands: 'gauntlet', legs: 'leg-armor', trinket: 'gem-pendant' };
 // 各層首領（雙首領各自一個）
 const BOSS_GLYPH = ['mushroom-gills', 'golem-head', 'trident', 'fire-shield', 'crowned-skull', 'tentacles-skull', 'dragon-head',
-  'rock-golem', 'anvil-impact', 'cultist', ['sun', 'moon'], 'crystal-growth', 'portal', 'horned-skull'];
+  'rock-golem', 'anvil-impact', 'cultist', ['sun', 'moon'], 'crystal-growth', 'portal', 'horned-skull',
+  'pirate-hat', 'lighthouse', 'siren', ['pirate-captain', 'cannon'], 'broken-shield', 'hooded-figure', 'sperm-whale']; // v0.25 第三章
+export const MAP_GLYPH = { island: 'island', sea: 'big-wave', ship: 'sailboat', compass: 'compass', lock: 'padlock', story: 'open-book' }; // v0.25 世界地圖
 const TRASH = 'imp-laugh', GOBLIN = 'goblin-head', COIN = 'two-coins';
 export const HORN = 'hunting-horn'; // 英勇號角按鈕
 export const TROPHY = 'trophy-cup';  // 成就

@@ -13,7 +13,7 @@ const K = 2, CR = 9, CC = 7, MID = 4;          // 粗格列數、欄數、中線
 const ROWS = CR * K, COLS = CC * K;
 const COL = {
   phys: '#f4ead0', enemy: '#ff4d5e', heal: '#57e09a', shield: '#7fe3ff', cast: '#ff8a3d',
-  curse: '#b072ff', bolt: '#ffe14d', gold: '#e8c06a', white: '#ffffff',
+  curse: '#b072ff', bolt: '#ffe14d', gold: '#e8c06a', white: '#ffffff', tide: '#3f8fe0', charm: '#e05fd0',
 };
 const CLASS_COL = { guardian: '#5d8ff0', cleric: '#4fc17f', rogue: '#e3664f', mage: '#f08a4b', druid: '#8bc34a', shaman: '#5fb8e8' };
 const BOSS_COL = '#b13e53', BOSS_PHASE = '#d8344a', FOE_COL = '#7a3a46', GOBLIN_COL = '#b8902e', DEAD_COL = '#3a4150';
@@ -289,7 +289,7 @@ export function playFx(b, evs, tickMs) {
     switch (e.k) {
       case 'hit': {
         if (!t) break;
-        const o = own(e.s), col = e.proc ? COL.bolt : o ? (CLASS_COL[o.unit.cls] || COL.phys) : COL.phys;
+        const o = own(e.s), col = e.charm ? COL.charm : e.proc ? COL.bolt : o ? (CLASS_COL[o.unit.cls] || COL.phys) : COL.phys;
         if (e.dot) { const key = 'dot' + e.t; if (lite || seen.has(key)) break; seen.add(key); flash(t, { color: col, delay: d, dur: 220, peak: 0.35 }); play('dot'); break; }
         if (e.aoe) { // 範圍：同一位施放者這一秒只畫一次「一片」
           const key = 'aoe' + e.s; if (seen.has(key)) break; seen.add(key);
@@ -327,17 +327,47 @@ export function playFx(b, evs, tickMs) {
         play('kick', hitAt / 1000);
         break;
       }
-      case 'dispel': stopLong('curse' + e.t); if (tc) flashCells(tc, COL.heal, { delay: d, dur: 500, peak: 0.9 }); play('heal', d / 1000); break;
+      // v0.25 潮汐：漲潮＝藍色從我方最下排往上漫，持續到退潮；退潮＝金色由上往下退
+      case 'tide': {
+        stopLong('tide');
+        const rows = area(MID + 1, CR - 1);
+        if (e.high) {
+          const total = e.dur * tickMs, anims = [];
+          for (const p of rows) anims.push(flash(p, { color: COL.tide, delay: d + (ROWS - 1 - p[0]) * step / 2, dur: Math.max(500, total / 2), times: 2, peak: 0.42 }));
+          longAnims.set('tide', anims); play('tide', d / 1000);
+        } else {
+          for (const p of rows) flash(p, { color: COL.gold, delay: d + (p[0] - (MID + 1) * K) * step / 2, dur: 420, peak: 0.35 });
+          play('ebb', d / 1000);
+        }
+        break;
+      }
+      // v0.25 魅惑：被點名的隊員持續閃紫紅色，直到被淨化或時間到
+      case 'charm': {
+        stopLong('charm' + e.t);
+        if (!tc) break;
+        const total = e.dur * tickMs, anims = [];
+        if (s && !lite) projectile(s, t, COL.charm, step, d);
+        for (const p of tc) anims.push(flash(p, { color: COL.charm, delay: d, dur: 450, times: Math.max(2, Math.floor(total / 450)), peak: 0.8 }));
+        longAnims.set('charm' + e.t, anims); play('charm', d / 1000);
+        break;
+      }
+      // v0.25 登船：敵方區域左右兩側先閃一下，增援的海盜由 syncGrid 放上格子
+      case 'board': {
+        for (const p of area(0, MID - 1)) if (p[1] < K || p[1] >= COLS - K) flash(p, { color: COL.enemy, delay: d + p[0] * step / 3, dur: 420, peak: 0.7 });
+        play('board', d / 1000);
+        break;
+      }
+      case 'dispel': stopLong('curse' + e.t); stopLong('charm' + e.t); if (tc) flashCells(tc, COL.heal, { delay: d, dur: 500, peak: 0.9 }); play('heal', d / 1000); break;
       case 'cast': { // 讀條：我方區域的警示框由慢閃變快閃
         if (!sc) break;
         stopLong('cast' + e.s);
-        const total = e.time * tickMs, anims = [];
+        const total = e.time * tickMs, anims = [], cc = e.charm ? COL.charm : COL.cast; // 魅惑之歌用紫紅色
         const slowN = Math.max(1, Math.floor((total * 0.6) / 700)), fastStart = slowN * 700, fastN = Math.max(2, Math.floor((total - fastStart) / 180));
         for (const p of partyCells()) {
-          anims.push(flash(p, { color: COL.cast, outline: true, dur: 700, times: slowN, delay: d }));
-          anims.push(flash(p, { color: COL.cast, outline: true, dur: 180, times: fastN, delay: d + fastStart }));
+          anims.push(flash(p, { color: cc, outline: true, dur: 700, times: slowN, delay: d }));
+          anims.push(flash(p, { color: cc, outline: true, dur: 180, times: fastN, delay: d + fastStart }));
         }
-        for (const p of sc) anims.push(flash(p, { color: COL.cast, dur: 400, times: Math.max(2, Math.floor(total / 400)), peak: 0.6, delay: d }));
+        for (const p of sc) anims.push(flash(p, { color: cc, dur: 400, times: Math.max(2, Math.floor(total / 400)), peak: 0.6, delay: d }));
         longAnims.set('cast' + e.s, anims); play('cast', d / 1000);
         break;
       }

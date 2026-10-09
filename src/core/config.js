@@ -99,7 +99,8 @@ export const BASE_INFO = Object.fromEntries(Object.entries(ITEM_BASES).flatMap((
 // v0.19 掉落：smart 的比例先從出戰隊員抽一位，再從他的本職基底（可用武器／本職甲類）挑；其餘完全隨機
 export const LOOT = { smart: 0.7 };
 // 裝等階級材質（每 6 裝等一階），只影響名稱
-export const ITEM_TIERS = ['', tx('鐵製'), tx('精鋼'), tx('灼焰'), tx('寒霜'), tx('虛空'), tx('遠古'), tx('龍鱗')];
+export const ITEM_TIERS = ['', tx('鐵製'), tx('精鋼'), tx('灼焰'), tx('寒霜'), tx('虛空'), tx('遠古'), tx('龍鱗'), tx('潮紋')];
+export const TIDE_TIER_ILVL = 160; // v0.25 第三章：裝等 160 以上是「潮紋」（舊裝備名稱不變）
 // 詞綴：重新分配威力／耐力，或換一點暴擊；總量大致不變。w = 各稀有度的出現權重（普通→傳說）
 export const GEAR_AFFIX = {
   balanced: { name: '', pow: 1, sta: 1, crit: 0, w: [50, 30, 20, 10, 10] },
@@ -149,19 +150,34 @@ export const DUNGEONS = [
   { name: tx('寒淵冰窟'), boss: tx('冰晶女皇'), trash: tx('霜縛戰士'), mech: [{ t: 'curse', every: 8, pct: 0.045, dur: 8 }, { t: 'enrage', at: 75, mult: 3 }], tip: tx('詛咒＋狂暴 → 治療淨化與輸出') },
   { name: tx('虛影迴廊'), boss: tx('虛空守門人'), trash: tx('虛影潛伏者'), mech: [{ t: 'cast', every: 13, time: 3, mult: 2.4 }, { t: 'phase', at: 0.5, atk: 1.4 }], tip: tx('讀條＋轉階段 → 打斷；血量低於 50% 後攻擊大增，號角留到後半') },
   { name: tx('深淵之心'), boss: tx('裂谷之主・莫瑞斯'), trash: tx('深淵化身'), mech: [{ t: 'curse', every: 10, pct: 0.04, dur: 8 }, { t: 'shield', every: 22, pct: 0.06, window: 10, heal: 0.1 }, { t: 'phase', at: 0.5, atk: 1.4 }], tip: tx('詛咒＋護盾＋轉階段 → 全隊綜合考驗') },
+  // ---- 第三章：維爾達・潮痕海岸（v0.25：XV~XXI）。新機制：潮汐 tide、魅惑 charm、登船 board ----
+  { name: tx('鹽冠碼頭'), boss: tx('走私頭目・葛蘭'), trash: tx('碼頭暴徒'), mech: [{ t: 'board', at: [0.75, 0.5, 0.25], n: 3, hp: 1.6, name: tx('走私販') }, { t: 'buster', every: 8, mult: 3.2 }], tip: tx('登船＋重擊 → 坦克與範圍（血量每掉一段就有增援跳上岸）') },
+  { name: tx('鹽沼燈塔'), boss: tx('燈塔守望者・瑪蕾'), trash: tx('鹽沼甲蟹'), mech: [{ t: 'tide', every: 20, dur: 8, ebb: 6, tank: 0.4, heal: 0.2, dmg: 0.15 }, { t: 'pulse', every: 7, dmg: 0.9 }], tip: tx('潮汐＋脈衝 → 治療（漲潮時坦克很痛、治療變弱；退潮時全力輸出）') },
+  { name: tx('沉鐘海窟'), boss: tx('潮鳴海妖・席拉'), trash: tx('海窟歌者'), mech: [{ t: 'charm', every: 15, time: 3, dur: 8 }, { t: 'curse', every: 9, pct: 0.04, dur: 8 }], tip: tx('魅惑＋詛咒 → 打斷與淨化（沒打斷，會有隊員轉頭打自己人）') },
+  { name: tx('黑帆艦隊'), boss: tx('黑帆雙雄'), trash: tx('黑帆水手'), mech: [],
+    twin: [{ name: tx('船長「鐵鉤」貝洛'), mech: [{ t: 'buster', every: 8, mult: 3.0 }, { t: 'board', at: [0.66, 0.33], n: 2, hp: 1.4, name: tx('黑帆水手') }, { t: 'bond', mult: 1.5 }] },
+           { name: tx('砲術長・莫格'), mech: [{ t: 'pulse', every: 7, dmg: 0.8 }, { t: 'bond', mult: 1.5 }] }],
+    tip: tx('雙首領 → 兩個坦克各扛一隻；船長會叫水手登船，一隻先倒，另一隻會悲憤') },
+  { name: tx('白隼前哨'), boss: tx('叛誓騎士長・艾德溫'), trash: tx('叛誓侍從'), mech: [{ t: 'shield', every: 24, pct: 0.05, window: 10, heal: 0.08 }, { t: 'phase', at: 0.5, atk: 1.4 }, { t: 'enrage', at: 140, mult: 3 }], tip: tx('護盾＋轉階段＋狂暴 → 爆發與輸出（號角留到後半段）') },
+  { name: tx('霧祭壇'), boss: tx('霧祭司・薇恩'), trash: tx('教團霧行者'), mech: [{ t: 'tide', every: 22, dur: 8, ebb: 6, tank: 0.4, heal: 0.2, dmg: 0.15 }, { t: 'cast', every: 14, time: 3, mult: 2.3 }, { t: 'summon', every: 12, n: 2 }], tip: tx('潮汐＋讀條＋召喚 → 綜合（打斷留給讀條、範圍留給小怪）') },
+  { name: tx('海淚之喉'), boss: tx('被侵蝕的守護者・艾瓦拉'), trash: tx('海淚觸手'), mech: [{ t: 'tide', every: 20, dur: 8, ebb: 6, tank: 0.4, heal: 0.2, dmg: 0.15 }, { t: 'charm', every: 16, time: 3, dur: 8 }, { t: 'phase', at: 0.5, atk: 1.4 }], tip: tx('潮汐＋魅惑＋轉階段 → 全隊綜合考驗') },
 ];
 // 章節：floors = [第一層 index, 最後一層 index]
 export const CHAPTERS = [
   { name: tx('第一章'), sub: tx('龍眠之路'), floors: [0, 6] },
   { name: tx('第二章'), sub: tx('深淵裂谷'), floors: [7, 13] },
+  { name: tx('第三章'), sub: tx('潮痕海岸'), floors: [14, 20], land: 'verdane' }, // v0.25 出海：維爾達大陸
 ];
+export const CH2_TOP = 13; // 第二章最後一層（第三章倍率以這層為基準）
 export const CH1_TOP = 6; // 第一章最後一層（秘境、寶庫目前以第一章為範圍）
 export const DUNGEON = {
   hpGrowth: 2.15, atkGrowth: 1.82,  // 每層敵人生命 / 攻擊倍率（v0.3 天賦上線後調高）
-  difficulty: [1, 1.1, 1, 1.4, 1, 1.35, 1, 1, 1, 1, 1, 1, 1, 1], // 個別層加難
-  recLevel: [1, 2, 3, 5, 10, 14, 19, 25, 30, 35, 40, 45, 50, 55],       // 建議等級（第一章為 v0.3 模擬首通時的等級）
+  difficulty: [1, 1.1, 1, 1.4, 1, 1.35, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 個別層加難
+  recLevel: [1, 2, 3, 5, 10, 14, 19, 25, 30, 35, 40, 45, 50, 55, 60, 60, 60, 60, 60, 60, 60],       // 建議等級（第一章為 v0.3 模擬首通時的等級）
   // 第二章：相對第 7 層的生命／攻擊倍率（逐層列出，方便調；避免第一章 ×2.15 的成長讓數字爆掉）
-  ch2: { hp: [3.2, 2.8, 4.0, 5.0, 5.4, 8.5, 8.0], atk: [1.6, 1.45, 1.75, 1.9, 2.0, 2.6, 2.6], dropGrowth: 1.12 },
+  ch2: { hp: [3.2, 2.8, 4.0, 5.8, 6.6, 8.5, 8.4], atk: [1.6, 1.45, 1.75, 2.05, 2.15, 2.6, 2.65], dropGrowth: 1.12 },
+  // v0.25 第三章：相對第 14 層（第二章最後一層）的生命／攻擊倍率（tools/sim-ch3.js 調）
+  ch3: { hp: [1.4, 1.7, 1.7, 1.8, 1.9, 2.0, 2.9], atk: [1.45, 1.65, 1.7, 1.8, 1.95, 2.0, 2.5] },
   dropBase: 6, dropGrowth: 1.5,     // 掉落裝等 = base × growth^層
   trash: { count: 3, hp: 85, atk: 6.5 },
   boss: { hp: 850, atk: 13, addHp: 70, addAtk: 5 },
@@ -290,4 +306,4 @@ export const ECONOMY = {
 };
 
 // 樓層編號（羅馬數字，配合西方奇幻風格；第二章接著用 VIII 起）
-export const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV'];
+export const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX', 'XXI'];
