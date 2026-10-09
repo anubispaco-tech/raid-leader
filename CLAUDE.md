@@ -36,7 +36,7 @@
 - 格子戰場只能用 `Math.random`，不能呼叫 core 的 `R()`（會改變戰鬥結果）；演出事件只在畫面層設了 `b.fxq` 才記錄。
 - 圖示來自 game-icons.net（CC BY 3.0）：改 `src/ui/icons.js` 對照表後跑 `node tools/icons-build.js`。
 
-## 目前狀態（v0.24.0，GAS 對應 v0.21.1 版）
+## 目前狀態（v0.24.1，GAS 對應 v0.21.1 版）
 - 內容：格子戰場（`src/ui/grid.js`，14×18，戰鬥核心 `Battle.fx()` 演出事件不耗亂數）＋合成音效（`src/ui/sfx.js`）＋裝置偏好（`src/ui/prefs.js`）、6 職業（含德魯伊、薩滿）、2 章 14 層、傳奇秘境＋深淵秘境（共用體力）、寶庫（14 層，第二章樓層另產精華；新樓層的 par 用 `tools/sim-vault.js` 量）、每日任務／首勝／簽到、45 個成就、T0 職業套裝＋T0.5 升級（防重複掉落、套裝圖鑑、可能掉落面板）、雲端存檔（Google 登入、自動同步、衝突偵測）、公告（試算表「公告」分頁 → GAS `?action=news`）、團長系統（`src/core/leader.js`：團長等級由場數推算、三系天賦，戰鬥效果經 `opts.leader` 傳進 Battle，所有建立 Battle 的地方都要帶 `leader: G.leaderModsOf(s, dIdx)`，以及 v0.24 的 `actives`（'auto'／'manual'）與 `autoCmd`；天賦是一格一點的樹（`pre`、`fork`、`soon`），團長指令 `COMMANDS` 最多帶 2 個；英雄主動技能在 `src/core/actives.js`，模擬與 regress 沒給 `actives` 就不會施放；天賦分支有 `region` 欄位，之後大陸各區的地區戰法只在該區生效）、推廣準備（`src/ui/acq.js`：連結 `?src=`／`?ref=` 來源追蹤、邀請朋友、App 內建瀏覽器提示、加到主畫面 manifest、開始畫面登入入口與綁定提示）。
 - 已決定：秘境體力制、套裝依職業分、樓層用羅馬數字、日文上線前再做、帳密登入不做（只用 Google）。
 - 待辦／候選：戰前陣型＋首領方向性技能＋團長指令「散開」「集中」（天賦節點 t12／t13 已預留，`soon: true`）、戰鬥紀錄 emoji 換圖示、技能名稱改成原創（商業化前）、日文、活動副本、T1 套裝、刷寶模式、10 人團本、主動技能。

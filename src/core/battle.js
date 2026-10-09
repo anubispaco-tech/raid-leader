@@ -154,8 +154,8 @@ export class Battle {
   useActive(id) {
     const u = this.units.find(x => x.id === id); if (!u || !this.activeReady(u)) return false;
     const A = ACTIVES[u.act.key]; u.act.ready = this.tick + ACTIVE.cd; u.act.used = (u.act.used || 0) + 1;
-    this.fx({ k: 'lust', s: u.id });
-    this.push(tx('✨ {0} {1}：{2}', u.icon, u.name, A.name), 'skill');
+    this.fx({ k: 'act', s: u.id, key: u.act.key }); // v0.24.1 格子上顯示技能名標籤（以前借用嗜血的特效，看不出是誰放了什麼）
+    this.push(tx('✨ {0} {1}：{2}', u.icon, u.name, A.name), 'skill act');
     A.use(this, u);
     return true;
   }

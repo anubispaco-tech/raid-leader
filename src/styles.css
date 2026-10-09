@@ -467,6 +467,7 @@ h3 .gi{vertical-align:-.12em}
 .pstrip .pc{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:3px 4px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:5px 6px;min-width:0}
 .pstrip .pc .ic{font-size:16px;display:flex}
 .pstrip .pc .num{font-size:11px;text-align:right;color:var(--fg)}
+.pstrip .pc .pn{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .pstrip .pc .bar{grid-column:1/-1;height:5px}
 .pstrip .pc.dead{opacity:.4}
 .log.short{height:132px;margin-top:8px}
@@ -552,11 +553,20 @@ h3 .gi{vertical-align:-.12em}
 
 /* v0.24 主動技能（我方卡片）、團長指令列、天賦樹 */
 .pstrip .pc.act{font:inherit;color:inherit;cursor:pointer;text-align:left;padding:4px 5px;gap:2px 4px}
-.pstrip .pc .sk{grid-column:1/-1;line-height:1.15;font-size:10.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
-.pstrip .pc .cd{font-size:10.5px;color:var(--dim)}
 .pstrip .pc.ready{border-color:var(--r4);box-shadow:0 0 0 2px color-mix(in srgb,var(--r4) 30%,transparent)}
-.pstrip .pc.ready .sk,.pstrip .pc.ready .cd{color:var(--r4)}
 .pstrip .pc.act:active{transform:scale(.97)}
+/* v0.24.1 主動技能圖示：冷卻中灰色＋冷卻環＋剩餘秒數，可施放時發亮 */
+.pstrip .pc .hp{align-self:center}
+.skic{position:relative;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(color-mix(in srgb,var(--bg) 70%,transparent) var(--cd,0%),transparent 0) ,var(--panel2);border:1px solid var(--line)}
+.skic .gi{width:15px;height:15px;color:var(--dim)}
+.skic b{position:absolute;inset:0;display:grid;place-items:center;font-size:9.5px;color:var(--fg);text-shadow:0 0 3px #000,0 0 3px #000}
+.skic.ready{border-color:var(--r4);background:color-mix(in srgb,var(--r4) 22%,var(--panel2));box-shadow:0 0 6px color-mix(in srgb,var(--r4) 60%,transparent);animation:skpulse 1.4s ease-in-out infinite}
+.skic.ready .gi{color:var(--r4)}
+@keyframes skpulse{50%{box-shadow:0 0 1px transparent}}
+@media (prefers-reduced-motion:reduce){.skic.ready{animation:none}}
+.gcast{position:absolute;z-index:5;pointer-events:none;display:flex;align-items:center;gap:4px;padding:3px 8px 3px 5px;border-radius:999px;background:color-mix(in srgb,var(--bg) 82%,transparent);border:1.5px solid var(--cc,var(--r4));color:#fff;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,.45)}
+.gcast .gi{width:15px;height:15px;color:var(--cc,var(--r4))}
+.log .act{color:var(--r4);font-weight:700}
 .cmdrow{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
 .cmdbtn{display:flex;align-items:center;gap:5px}.cmdbtn .gi{width:1.1em;height:1.1em}
 .cmdbtn.ready{border-color:var(--r4);color:var(--r4)}
@@ -580,6 +590,15 @@ h3 .gi{vertical-align:-.12em}
 .lnode2.soon{opacity:.45}
 .lnode2.sel .bg{stroke-width:4.5;stroke:var(--fg)}
 .lnode2:focus-visible{outline:none}.lnode2:focus-visible .bg{stroke:var(--fg);stroke-width:4.5}
+/* v0.24.1 天賦樹由上往下；說明卡浮在節點旁邊 */
+.ltreewrap{position:relative;max-width:400px;margin:0 auto}
+.ldetail.lpop{position:absolute;z-index:3;margin:0;padding:9px 10px;gap:5px;box-shadow:0 6px 22px rgba(0,0,0,.55);border-color:var(--brass-d);cursor:default}
+.ldetail.lpop b{font-size:14px}.ldetail.lpop p{font-size:12.5px;line-height:1.45}
+.ldetail.lpop .btn{width:100%}
+.ldetail.lpop::before{content:'';position:absolute;top:50%;width:10px;height:10px;background:var(--panel2);border:1px solid var(--brass-d);transform:translateY(-50%) rotate(45deg)}
+.ldetail.lpop.r::before{left:-6px;border-right:0;border-top:0}
+.ldetail.lpop.l::before{right:-6px;border-left:0;border-bottom:0}
+.lhint{margin:6px 2px 0}
 .ldetail{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:6px;margin-top:8px}
 .ldetail b{font-size:15px}.ldetail p{margin:0;font-size:13.5px}
 .ltag{display:inline-block;font-size:10.5px;font-weight:700;color:var(--ink);background:var(--brass);border-radius:999px;padding:1px 7px;margin-right:6px;vertical-align:2px}

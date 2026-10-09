@@ -192,6 +192,8 @@ document.addEventListener('click', e => {
       const id = t.dataset.v, a = { ...(app.leaderDraft || G.leaderAlloc(app.S)) };
       if (app.leaderSel === id && G.canAdd(a, id, G.leaderLevel(app.S), app.S)) { a[id] = 1; app.leaderDraft = a; }
       app.leaderSel = id; break; }
+    case 'lclose': if (!app.leaderSel) return; app.leaderSel = null; break; // v0.24.1 點樹的空白處關閉說明卡
+    case 'lkeep': return;
     case 'lcmd': if (G.toggleCmd(app.S, t.dataset.v)) save(); break;
     case 'skip': if (app.battle && !app.battle.over) {
       if (!canSkip(app.battle)) { toast(tx('首次挑戰需完整觀戰（可用 4× 加速）')); break; }

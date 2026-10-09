@@ -7,6 +7,7 @@ import { tx } from '../core/i18n.js';
 import { prefs, setPref } from './prefs.js';
 import { play } from './sfx.js';
 import { svg, CLASS_GLYPH, enemyGlyph } from './icons.js';
+import { ACTIVES } from '../core/actives.js';
 
 const K = 2, CR = 9, CC = 7, MID = 4;          // 粗格列數、欄數、中線（粗格列）
 const ROWS = CR * K, COLS = CC * K;
@@ -127,6 +128,7 @@ function placeWave(b) {
 function reset(b) {
   for (const id of [...owners.keys()]) drop(id);
   ghosts.clear(); occ.clear();
+  for (const t of tags) t.el.remove(); tags = [];
   for (const k of [...longAnims.keys()]) stopLong(k);
   for (const row of cells) for (const c of row) { clearCell(c); c.sig = ''; }
   placeHeroes(b); placeWave(b); cur = b;
@@ -241,6 +243,28 @@ function shake(px) {
 }
 function stopLong(key) { const l = longAnims.get(key); if (l) { l.forEach(a => a.cancel()); longAnims.delete(key); } }
 
+// ---------- v0.24.1 主動技能標籤 ----------
+const ACT_KIND = { wall: 'guard', roar: 'guard', dawn: 'heal', grove: 'heal', tide: 'heal', nova: 'aoe', storm: 'aoe', shadow: 'one', rend: 'one' };
+const TAG_MS = 1500; // 固定真實時間，不跟著戰鬥速度縮短
+let tags = [];
+function castTag(o, A, col) {
+  if (!root || !root.isConnected || !o.lab.isConnected) return;
+  const now = performance.now(); tags = tags.filter(t => t.end > now && t.el.isConnected);
+  const rr = root.getBoundingClientRect(), lr = o.lab.getBoundingClientRect();
+  const el = document.createElement('div'); el.className = 'gcast'; el.style.setProperty('--cc', col);
+  el.innerHTML = `${svg(A.icon)}<span>${A.name}</span>`;
+  root.appendChild(el);
+  const w = el.offsetWidth, h = el.offsetHeight;
+  let x = lr.left - rr.left + lr.width / 2 - w / 2, y = lr.top - rr.top - h - 4;
+  x = Math.max(4, Math.min(rr.width - w - 4, x));
+  for (const t of tags) if (Math.abs(t.y - y) < h && Math.abs(t.x - x) < w) y = t.y - h - 2; // 同時施放：往上疊，不互相蓋住
+  y = Math.max(2, y);
+  el.style.left = x + 'px'; el.style.top = y + 'px';
+  tags.push({ el, x, y, end: now + TAG_MS });
+  const a = el.animate([{ opacity: 0, transform: 'translateY(6px) scale(.85)' }, { opacity: 1, transform: 'none', offset: 0.12 }, { opacity: 1, offset: 0.75 }, { opacity: 0, transform: 'translateY(-8px)' }], { duration: TAG_MS, easing: 'ease-out' });
+  a.onfinish = () => el.remove();
+}
+
 // ---------- 播放一個 tick 的事件 ----------
 const NOISY = new Set(['hit', 'hurt', 'heal']);
 export function playFx(b, evs, tickMs) {
@@ -353,6 +377,18 @@ export function playFx(b, evs, tickMs) {
       case 'immune': if (tc) flashCells(tc, COL.shield, { delay: d, dur: 600, peak: 0.9 }); break;
       case 'volc': if (tc) flashCells(tc, COL.cast, { delay: d, dur: 500, peak: 0.85 }); break;
       case 'horn': { ring(ME, area(MID + 1, CR - 1), COL.gold, step * 2, { delay: d, dur: 500, peak: 0.5 }); lift(heroCore(), 1, 700, d); play('horn', d / 1000); break; }
+      case 'act': { // v0.24.1 英雄主動技能：施放者發光升高＋頭上技能名標籤（標籤用真實時間，4 倍速也看得到）
+        const o = own(e.s), A = ACTIVES[e.key]; if (!o || !A) break;
+        const col = CLASS_COL[o.unit.cls] || COL.gold;
+        flashCells(o.cells, COL.gold, { delay: d, dur: 600, peak: 0.95 }); lift(o.core, 2, 800, d);
+        const kind = ACT_KIND[e.key];
+        if (kind === 'heal') ring(s, area(MID + 1, CR - 1), COL.heal, step * 2, { delay: d + 80, dur: 520, peak: 0.55 });
+        else if (kind === 'guard') ring(s, e.key === 'wall' ? o.cells : area(MID + 1, CR - 1), COL.shield, step * 2, { delay: d + 80, dur: 520, peak: 0.6 });
+        else if (kind === 'aoe') flashCells(foeCells(), col, { delay: d + 120, dur: 480, peak: 0.7 });
+        setTimeout(() => castTag(o, A, col), d);
+        play('horn', d / 1000);
+        break;
+      }
       case 'lust': { ring(s || ME, area(MID + 1, CR - 1), COL.bolt, step * 2, { delay: d, dur: 450, peak: 0.45 }); play('horn', d / 1000); break; }
       case 'wave': if (e.boss) { const o = [...owners.values()].find(x => x.kind === 'boss'); if (o) { flashCells(o.cells, COL.enemy, { delay: d, dur: 700, peak: 0.8 }); lift(o.cells, 2, 600, d); } play('boss', d / 1000); } break;
       case 'end': {

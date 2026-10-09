@@ -58,17 +58,20 @@ function foeBar(b) {
   const alive = b.enemies.filter(e => e.hp > 0), hp = alive.reduce((a, e) => a + e.hp, 0), max = b.enemies.reduce((a, e) => a + e.max, 0) || 1;
   return `<div class="foebar"><div class="fb"><span class="nm">${b.waveIdx === b.waves.length - 1 ? tx('首領戰') : tx('第 {0} 波', b.waveIdx + 1)}・${tx('剩 {0} 隻', alive.length)}</span><span class="num">${Math.ceil(pct(hp, max))}%</span><span class="bar"><i class="enemy-bar" style="width:${pct(hp, max)}%"></i></span></div></div>`;
 }
-// 我方 5 人一排：職業圖示＋血條＋百分比（名字放在 title／aria-label）
-// v0.24 有主動技能時卡片變成按鈕：點了施放，冷卻中顯示秒數，可以施放時發亮
+// 我方 5 人一排：第一行職業圖示＋名字、血條、第三行主動技能圖示（冷卻環）＋血量%
+// v0.24.1：技能名不再蓋在卡片上（名字照常顯示），可以施放時圖示發亮；施放時格子上的隊員頭上會跳出技能名
+const shortName = n => String(n).split('・')[0];
 function partyStrip(b) {
   return `<div class="pstrip">${b.units.map(u => {
     const A = u.act && G.ACTIVES[u.act.key], ready = A && b.activeReady(u), left = A ? Math.max(0, u.act.ready - b.tick) : 0;
-    const inner = `<span class="ic">${u.icon}</span><span class="num">${u.hp <= 0 ? '✕' : Math.ceil(pct(u.hp, u.max)) + '%'}</span><span class="bar"><i class="role-${u.role}" style="width:${pct(u.hp, u.max)}%"></i></span>`
-      + (A ? `<span class="sk">${ready ? A.name : `<span class="cd num">${u.hp <= 0 ? '—' : `${left}s`}</span>`}</span>` : ''); // 一行：可施放時顯示技能名、冷卻中顯示秒數
-    const label = `${u.name} ${Math.ceil(pct(u.hp, u.max))}%` + (A ? `・${A.name}` : '');
+    const dead = u.hp <= 0, hp = dead ? '✕' : Math.ceil(pct(u.hp, u.max)) + '%';
+    const cdPct = A && !ready && !dead ? Math.min(100, Math.round(left / (u.act.used ? G.ACTIVE.cd : G.ACTIVE.first) * 100)) : 0;
+    const sk = A ? `<span class="skic ${ready ? 'ready' : ''}" style="--cd:${cdPct}%">${svg(A.icon)}${!ready && !dead && left ? `<b class="num">${left}</b>` : ''}</span>` : '';
+    const inner = `<span class="ic">${u.icon}</span><span class="pn">${shortName(u.name)}</span><span class="bar"><i class="role-${u.role}" style="width:${pct(u.hp, u.max)}%"></i></span>${sk}<span class="num hp">${hp}</span>`;
+    const label = `${u.name} ${hp}` + (A ? `・${A.name}${ready ? tx('（可施放）') : ''}` : '');
     return A && !b.over
-      ? `<button class="pc act ${u.hp <= 0 ? 'dead' : ''} ${ready ? 'ready' : ''}" data-act="active" data-id="${u.id}" ${ready ? '' : 'aria-disabled="true"'} title="${A.name}：${A.desc}" aria-label="${label}">${inner}</button>`
-      : `<div class="pc ${u.hp <= 0 ? 'dead' : ''}" title="${u.name}" aria-label="${label}">${inner}</div>`;
+      ? `<button class="pc act ${dead ? 'dead' : ''} ${ready ? 'ready' : ''}" data-act="active" data-id="${u.id}" ${ready ? '' : 'aria-disabled="true"'} title="${A.name}：${A.desc}" aria-label="${label}">${inner}</button>`
+      : `<div class="pc ${dead ? 'dead' : ''}" title="${u.name}" aria-label="${label}">${inner}</div>`;
   }).join('')}</div>` + cmdRow(b);
 }
 // v0.24 團長指令列（號角在下方控制列，這裡放天賦樹點出來的指令，最多兩個）

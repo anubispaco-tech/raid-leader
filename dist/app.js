@@ -1,4 +1,4 @@
-/* 副本團長 v0.24.0 */
+/* 副本團長 v0.24.1 */
 (() => {
   // src/i18n/en.js
   var en_default = {
@@ -1021,7 +1021,7 @@
     "\u8B77\u76FE": "Shield",
     "\u8B80\u689D\u4E2D": "Casting",
     "\u5269 {0} \u96BB": "{0} left",
-    "\u53EF\u65BD\u653E": "Ready",
+    "\uFF08\u53EF\u65BD\u653E\uFF09": " (ready)",
     "\u30FB\u5DF2\u7528": " \xB7 used",
     '<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">\u64A4\u9000</button></div></div>': '<div class="ctrlbar"><div class="ctrl"><div class="seg">{0}</div> {1} {2} <button class="btn" data-act="retreat">Retreat</button></div></div>',
     '<button class="btn" data-act="skip">\u76F4\u63A5\u7D50\u7B97</button>': '<button class="btn" data-act="skip">Skip</button>',
@@ -1147,7 +1147,6 @@
     "\u9019\u662F\u5206\u5C94\uFF0C\u5DF2\u7D93\u9078\u4E86\u53E6\u4E00\u689D\u8DEF": "This is a fork and you already chose the other path",
     "\u9EDE\u6578\u4E0D\u5920\uFF0C\u5718\u9577\u5347\u7D1A\u53EF\u4EE5\u62FF\u5230\u66F4\u591A\u9EDE\u6578": "Not enough points. Level up your leader for more",
     "\uFF08\u5DF2\u9EDE\uFF09": " (learned)",
-    "\u9EDE\u6A39\u4E0A\u7684\u5716\u793A\u770B\u8AAA\u660E\u3002\u5713\u5F62\u662F\u88AB\u52D5\uFF0C\u83F1\u5F62\u662F\u6230\u9B25\u4E2D\u53EF\u4EE5\u6309\u7684\u5718\u9577\u6307\u4EE4\u3002": "Tap an icon on the tree for details. Circles are passive; diamonds are leader commands you can use in battle.",
     "\u5DF2\u9EDE\u4EAE\uFF08\u8981\u6539\u9700\u91CD\u7F6E\uFF09": "Learned (reset to change)",
     "\u53D6\u6D88\u9019\u683C": "Undo",
     "\u9EDE\u4EAE\uFF081 \u9EDE\uFF09": "Learn (1 point)",
@@ -1163,10 +1162,11 @@
     "\u53EF\u7528\u9EDE\u6578": "Points",
     "\u5DF2\u9054\u76EE\u524D\u4E0A\u9650\uFF08\u51FA\u6D77\u5F8C\u6BCF\u6253\u901A\u4E00\u500B\u5730\u5340 +{0} \u7D1A\uFF09": "At the current cap (each region cleared overseas adds +{0} levels)",
     "\u5718\u9577\u7D93\u9A57 {0} / {1}\u30FB\u6BCF\u5834\u6230\u9B25 +1\u3001\u9996\u6B21\u901A\u95DC +{2}": "Leader XP {0} / {1} \xB7 +1 per fight, +{2} per first clear",
+    "\u9EDE\u6A39\u4E0A\u7684\u5716\u793A\u770B\u8AAA\u660E\u3002\u5713\u5F62\u662F\u88AB\u52D5\uFF0C\u83F1\u5F62\u662F\u6230\u9B25\u4E2D\u53EF\u4EE5\u6309\u7684\u5718\u9577\u6307\u4EE4\u3002": "Tap an icon on the tree for details. Circles are passive; diamonds are leader commands you can use in battle.",
     "\u65B0\u589E {0} \u9EDE": "{0} new point(s)",
     "\u78BA\u8A8D\u5F8C\u8981\u91CD\u7F6E\u624D\u80FD\u6536\u56DE": "Only a reset can undo this",
     "\u78BA\u8A8D\u914D\u9EDE": "Confirm",
-    "<b>\u5718\u9577\u5929\u8CE6</b>\u662F\u516C\u6703\u50B3\u6388\u7684\u6307\u63EE\u5B78\uFF1A\u6230\u8853\u3001\u58EB\u6C23\u3001\u5F8C\u52E4\u4E09\u68F5\u6A39\uFF0C\u5F9E\u6A39\u6839\u5F80\u4E0A\u9EDE\uFF0C\u6BCF\u683C 1 \u9EDE\u3002\u9EDE\u6578\u4E0D\u5920\u5168\u90E8\u9EDE\u4EAE\uFF0C\u8981\u81EA\u5DF1\u6C7A\u5B9A\u5148\u8D70\u54EA\u689D\u8DEF\uFF1B\u865B\u7DDA\u7684\u683C\u5B50\u662F\u5206\u5C94\uFF0C\u53EA\u80FD\u9078\u4E00\u683C\u3002\u51FA\u6D77\u4E4B\u5F8C\uFF0C\u5404\u5730\u7684\u52E2\u529B\u6703\u518D\u50B3\u6388\u7576\u5730\u7684\u6230\u6CD5\u3002": "<b>Leader talents</b> are the guild's art of command: Tactics, Morale and Logistics trees. Grow each from the root up, 1 point per node. You can't light up everything, so pick your paths; dashed nodes are forks where only one can be learned. Once you sail overseas, local factions will teach their own regional doctrines.",
+    "<b>\u5718\u9577\u5929\u8CE6</b>\u662F\u516C\u6703\u50B3\u6388\u7684\u6307\u63EE\u5B78\uFF1A\u6230\u8853\u3001\u58EB\u6C23\u3001\u5F8C\u52E4\u4E09\u68F5\u6A39\uFF0C\u5F9E\u6700\u4E0A\u9762\u7684\u6A39\u6839\u5F80\u4E0B\u9EDE\uFF0C\u6BCF\u683C 1 \u9EDE\u3002\u9EDE\u6578\u4E0D\u5920\u5168\u90E8\u9EDE\u4EAE\uFF0C\u8981\u81EA\u5DF1\u6C7A\u5B9A\u5148\u8D70\u54EA\u689D\u8DEF\uFF1B\u865B\u7DDA\u7684\u683C\u5B50\u662F\u5206\u5C94\uFF0C\u53EA\u80FD\u9078\u4E00\u683C\u3002\u51FA\u6D77\u4E4B\u5F8C\uFF0C\u5404\u5730\u7684\u52E2\u529B\u6703\u518D\u50B3\u6388\u7576\u5730\u7684\u6230\u6CD5\u3002": "<b>Leader talents</b> are the guild's art of command: Tactics, Morale and Logistics trees. Grow each from the root at the top downward, 1 point per node. You can't light up everything, so pick your paths; dashed nodes are forks where only one can be learned. Once you sail overseas, local factions will teach their own regional doctrines.",
     "\u91CD\u7F6E\u5929\u8CE6\uFF08{0} \u91D1\uFF09": "Reset talents ({0} gold)",
     "\u96F2\u7AEF\u5B58\u6A94": "Cloud save",
     "\u7528 Google \u5E33\u865F\u767B\u5165\uFF0C\u9032\u5EA6\u6703\u81EA\u52D5\u5099\u4EFD\u5230\u96F2\u7AEF\uFF1B\u63DB\u624B\u6A5F\u767B\u5165\u540C\u4E00\u500B\u5E33\u865F\u5C31\u80FD\u63A5\u7E8C\u3002\u53EA\u6703\u8A18\u4E0B Google \u5E33\u865F\u7DE8\u865F\uFF0C\u4E0D\u6703\u5132\u5B58 Email \u6216\u5176\u4ED6\u8CC7\u6599\u3002": "Sign in with Google to back up your progress automatically. Sign in with the same account on another phone to pick up where you left off. Only your Google account ID is stored, never your email or other data.",
@@ -3394,8 +3394,8 @@
       const A = ACTIVES[u.act.key];
       u.act.ready = this.tick + ACTIVE.cd;
       u.act.used = (u.act.used || 0) + 1;
-      this.fx({ k: "lust", s: u.id });
-      this.push(tx("\u2728 {0} {1}\uFF1A{2}", u.icon, u.name, A.name), "skill");
+      this.fx({ k: "act", s: u.id, key: u.act.key });
+      this.push(tx("\u2728 {0} {1}\uFF1A{2}", u.icon, u.name, A.name), "skill act");
       A.use(this, u);
       return true;
     }
@@ -5284,7 +5284,7 @@
   }
 
   // src/core/version.js
-  var VERSION = "0.24.0";
+  var VERSION = "0.24.1";
 
   // src/ui/telemetry.js
   var URL_ = TELEMETRY.url;
@@ -5728,12 +5728,16 @@
     const alive = b.enemies.filter((e) => e.hp > 0), hp = alive.reduce((a, e) => a + e.hp, 0), max = b.enemies.reduce((a, e) => a + e.max, 0) || 1;
     return `<div class="foebar"><div class="fb"><span class="nm">${b.waveIdx === b.waves.length - 1 ? tx("\u9996\u9818\u6230") : tx("\u7B2C {0} \u6CE2", b.waveIdx + 1)}\u30FB${tx("\u5269 {0} \u96BB", alive.length)}</span><span class="num">${Math.ceil(pct(hp, max))}%</span><span class="bar"><i class="enemy-bar" style="width:${pct(hp, max)}%"></i></span></div></div>`;
   }
+  var shortName = (n2) => String(n2).split("\u30FB")[0];
   function partyStrip(b) {
     return `<div class="pstrip">${b.units.map((u) => {
       const A = u.act && ACTIVES[u.act.key], ready2 = A && b.activeReady(u), left = A ? Math.max(0, u.act.ready - b.tick) : 0;
-      const inner = `<span class="ic">${u.icon}</span><span class="num">${u.hp <= 0 ? "\u2715" : Math.ceil(pct(u.hp, u.max)) + "%"}</span><span class="bar"><i class="role-${u.role}" style="width:${pct(u.hp, u.max)}%"></i></span>` + (A ? `<span class="sk">${ready2 ? A.name : `<span class="cd num">${u.hp <= 0 ? "\u2014" : `${left}s`}</span>`}</span>` : "");
-      const label = `${u.name} ${Math.ceil(pct(u.hp, u.max))}%` + (A ? `\u30FB${A.name}` : "");
-      return A && !b.over ? `<button class="pc act ${u.hp <= 0 ? "dead" : ""} ${ready2 ? "ready" : ""}" data-act="active" data-id="${u.id}" ${ready2 ? "" : 'aria-disabled="true"'} title="${A.name}\uFF1A${A.desc}" aria-label="${label}">${inner}</button>` : `<div class="pc ${u.hp <= 0 ? "dead" : ""}" title="${u.name}" aria-label="${label}">${inner}</div>`;
+      const dead = u.hp <= 0, hp = dead ? "\u2715" : Math.ceil(pct(u.hp, u.max)) + "%";
+      const cdPct = A && !ready2 && !dead ? Math.min(100, Math.round(left / (u.act.used ? ACTIVE.cd : ACTIVE.first) * 100)) : 0;
+      const sk = A ? `<span class="skic ${ready2 ? "ready" : ""}" style="--cd:${cdPct}%">${svg(A.icon)}${!ready2 && !dead && left ? `<b class="num">${left}</b>` : ""}</span>` : "";
+      const inner = `<span class="ic">${u.icon}</span><span class="pn">${shortName(u.name)}</span><span class="bar"><i class="role-${u.role}" style="width:${pct(u.hp, u.max)}%"></i></span>${sk}<span class="num hp">${hp}</span>`;
+      const label = `${u.name} ${hp}` + (A ? `\u30FB${A.name}${ready2 ? tx("\uFF08\u53EF\u65BD\u653E\uFF09") : ""}` : "");
+      return A && !b.over ? `<button class="pc act ${dead ? "dead" : ""} ${ready2 ? "ready" : ""}" data-act="active" data-id="${u.id}" ${ready2 ? "" : 'aria-disabled="true"'} title="${A.name}\uFF1A${A.desc}" aria-label="${label}">${inner}</button>` : `<div class="pc ${dead ? "dead" : ""}" title="${u.name}" aria-label="${label}">${inner}</div>`;
     }).join("")}</div>` + cmdRow(b);
   }
   function cmdRow(b) {
@@ -5786,8 +5790,10 @@
   // src/ui/views/leader.js
   var draft = () => app.leaderDraft || leaderAlloc(app.S);
   var dirty = () => !!app.leaderDraft && spentPts(app.leaderDraft) !== spentPts(leaderAlloc(app.S));
+  var VW = 420;
+  var VH = 590;
   var X = (c) => 46 + c * 82;
-  var Y = (r) => 600 - r * 106;
+  var Y = (r) => 56 + r * 92;
   var R2 = 27;
   var WHY = {
     soon: () => tx("\u7AD9\u4F4D\u73A9\u6CD5\u958B\u653E\u5F8C\u624D\u80FD\u9EDE"),
@@ -5799,29 +5805,32 @@
   var iconPath = (name) => icon_data_default[name] || "";
   function treeSvg(br, a, level) {
     const nodes = LEADER_TREE[br].nodes, root2 = nodes[0];
-    let h = `<path class="lground" d="M40 ${Y(0) + 52} Q 210 ${Y(0) + 34} 380 ${Y(0) + 52}"/>`;
-    h += `<path class="lbranch ${a[root2.id] ? "on" : ""}" style="stroke-width:20" d="M${X(root2.c) - 6} ${Y(0) + 48} C ${X(root2.c) - 4} ${Y(0) + 30}, ${X(root2.c)} ${Y(0) + 20}, ${X(root2.c)} ${Y(0)}"/>`;
+    let h = `<path class="lbranch ${a[root2.id] ? "on" : ""}" style="stroke-width:18" d="M${X(root2.c)} 4 L ${X(root2.c)} ${Y(0)}"/>`;
     for (const n2 of nodes) for (const p of n2.pre || []) {
       const o = NODE[p], lit = a[p] && a[n2.id], w = Math.max(5, 15 - o.r * 2.4);
-      const x1 = X(o.c), y1 = Y(o.r), x2 = X(n2.c), y2 = Y(n2.r);
-      h += `<path class="lbranch ${lit ? "on" : ""}" style="stroke-width:${w}" d="M${x1} ${y1} C ${x1 + (x2 - x1) * 0.15} ${y1 - 55}, ${x2 - (x2 - x1) * 0.35} ${y2 + 50}, ${x2} ${y2}"/>`;
+      const x1 = X(o.c), y1 = Y(o.r), x2 = X(n2.c), y2 = Y(n2.r), dy = (y2 - y1) * 0.5;
+      h += `<path class="lbranch ${lit ? "on" : ""}" style="stroke-width:${w}" d="M${x1} ${y1} C ${x1} ${y1 + dy}, ${x2} ${y2 - dy}, ${x2} ${y2}"/>`;
     }
-    const sel = app.leaderSel && NODE[app.leaderSel] && NODE[app.leaderSel].branch === br ? app.leaderSel : null;
+    const sel = selIn(br);
     for (const n2 of nodes) {
       const on2 = !!a[n2.id], can = canAdd(a, n2.id, level, app.S), cmd = !!n2.cmd;
       const cls2 = ["lnode2", cmd ? "cmd" : "", on2 ? "on" : "", can ? "can" : "", n2.soon ? "soon" : "", n2.fork ? "fork" : "", n2.id === sel ? "sel" : ""].join(" ");
       const shape = cmd ? `<path class="bg" d="M0 ${-R2 - 6} L${R2 + 6} 0 L0 ${R2 + 6} L${-R2 - 6} 0 Z"/>` : `<circle class="bg" r="${R2}"/>`;
       h += `<g class="${cls2}" transform="translate(${X(n2.c)} ${Y(n2.r)})" data-act="lnode" data-v="${n2.id}" tabindex="0" role="button" aria-label="${n2.n}${on2 ? tx("\uFF08\u5DF2\u9EDE\uFF09") : ""}">${shape}<g transform="translate(-15 -15) scale(${30 / 512})"><path class="ic" d="${iconPath(n2.icon)}"/></g></g>`;
     }
-    return `<svg class="ltree" viewBox="0 0 420 680" role="group" aria-label="${LEADER_TREE[br].name}">${h}</svg>`;
+    return `<svg class="ltree" viewBox="0 0 ${VW} ${VH}" role="group" aria-label="${LEADER_TREE[br].name}">${h}</svg>`;
   }
-  function detail(a, level) {
-    const id = app.leaderSel;
-    if (!id || !NODE[id]) return `<div class="ldetail"><p class="sub" style="margin:0">${tx("\u9EDE\u6A39\u4E0A\u7684\u5716\u793A\u770B\u8AAA\u660E\u3002\u5713\u5F62\u662F\u88AB\u52D5\uFF0C\u83F1\u5F62\u662F\u6230\u9B25\u4E2D\u53EF\u4EE5\u6309\u7684\u5718\u9577\u6307\u4EE4\u3002")}</p></div>`;
+  var selIn = (br) => app.leaderSel && NODE[app.leaderSel] && NODE[app.leaderSel].branch === br ? app.leaderSel : null;
+  function detail(a, level, br) {
+    const id = selIn(br);
+    if (!id) return "";
     const n2 = NODE[id], on2 = !!a[id], saved = !!leaderAlloc(app.S)[id], why = whyNot(a, id, level, app.S);
     const reason = why && why !== "on" && WHY[why] ? `<span class="lwhy">${WHY[why](n2)}</span>` : "";
     const btns = on2 ? saved ? `<span class="sub" style="margin:0">${tx("\u5DF2\u9EDE\u4EAE\uFF08\u8981\u6539\u9700\u91CD\u7F6E\uFF09")}</span>` : `<button class="btn sm" data-act="lsub" data-v="${id}" ${canRemove(a, id) ? "" : "disabled"}>${tx("\u53D6\u6D88\u9019\u683C")}</button>` : `<button class="btn sm main" data-act="ladd" data-v="${id}" ${why ? "disabled" : ""}>${tx("\u9EDE\u4EAE\uFF081 \u9EDE\uFF09")}</button>`;
-    return `<div class="ldetail"><b>${n2.cmd ? `<span class="ltag cmd">${tx("\u5718\u9577\u6307\u4EE4")}</span>` : `<span class="ltag">${tx("\u88AB\u52D5")}</span>`}${n2.n}</b><p>${n2.desc}</p>${n2.fork ? `<small class="sub" style="margin:0">${tx("\u5206\u5C94\uFF1A\u548C\u53E6\u4E00\u683C\u53EA\u80FD\u9078\u4E00\u683C")}</small>` : ""}${reason}<div class="row" style="align-items:center">${btns}</div></div>`;
+    const x = X(n2.c) / VW * 100, y = Y(n2.r) / VH * 100, gap = (R2 + 12) / VW * 100;
+    const side = n2.c <= 2 ? `left:${(x + gap).toFixed(1)}%;right:2%` : `left:2%;right:${(100 - x + gap).toFixed(1)}%`;
+    const ty = n2.r < 0.6 ? "-20%" : n2.r > 4.4 ? "-85%" : "-50%";
+    return `<div class="ldetail lpop ${n2.c <= 2 ? "r" : "l"}" data-act="lkeep" style="${side};top:${y.toFixed(1)}%;transform:translateY(${ty})"><b>${n2.cmd ? `<span class="ltag cmd">${tx("\u5718\u9577\u6307\u4EE4")}</span>` : `<span class="ltag">${tx("\u88AB\u52D5")}</span>`}${n2.n}</b><p>${n2.desc}</p>${n2.fork ? `<small class="sub" style="margin:0">${tx("\u5206\u5C94\uFF1A\u548C\u53E6\u4E00\u683C\u53EA\u80FD\u9078\u4E00\u683C")}</small>` : ""}${reason}<div class="row" style="align-items:center">${btns}</div></div>`;
   }
   function cmdPicker() {
     const learned = learnedCmds(app.S);
@@ -5841,11 +5850,12 @@
     <div class="xpbar" style="grid-column:1/-1"><i style="width:${lv >= max ? 100 : pct(xp - lo, hi - lo)}%"></i></div>
     <small class="sub" style="grid-column:1/-1;margin:0">${lv >= max ? tx("\u5DF2\u9054\u76EE\u524D\u4E0A\u9650\uFF08\u51FA\u6D77\u5F8C\u6BCF\u6253\u901A\u4E00\u500B\u5730\u5340 +{0} \u7D1A\uFF09", LEADER.perRegion) : tx("\u5718\u9577\u7D93\u9A57 {0} / {1}\u30FB\u6BCF\u5834\u6230\u9B25 +1\u3001\u9996\u6B21\u901A\u95DC +{2}", fmt(xp), fmt(hi), LEADER.xpFirst)}</small></div>`;
     h += `<div class="seg modes lbranch">${Object.entries(LEADER_TREE).map(([k, b]) => `<button data-act="lbranch" data-v="${k}" class="${k === br ? "sel" : ""}" ${branchOpen(S, k) ? "" : "disabled"}>${b.name}<small class="num"> ${branchPts(a, k)}/${b.nodes.length}</small></button>`).join("")}</div>`;
-    h += `<div class="ltreebox">${treeSvg(br, a, lv)}</div>` + detail(a, lv);
+    h += `<div class="ltreebox" data-act="lclose"><div class="ltreewrap">${treeSvg(br, a, lv)}${detail(a, lv, br)}</div></div>`;
+    if (!selIn(br)) h += `<p class="sub lhint">${tx("\u9EDE\u6A39\u4E0A\u7684\u5716\u793A\u770B\u8AAA\u660E\u3002\u5713\u5F62\u662F\u88AB\u52D5\uFF0C\u83F1\u5F62\u662F\u6230\u9B25\u4E2D\u53EF\u4EE5\u6309\u7684\u5718\u9577\u6307\u4EE4\u3002")}</p>`;
     if (dirty()) h += `<div class="ctrlbar mselbar"><div class="ctrl"><span class="mcount">${tx("\u65B0\u589E {0} \u9EDE", spentPts(a) - spentPts(leaderAlloc(S)))}<small>${tx("\u78BA\u8A8D\u5F8C\u8981\u91CD\u7F6E\u624D\u80FD\u6536\u56DE")}</small></span><button class="btn" data-act="lcancel">${tx("\u53D6\u6D88")}</button><button class="btn main" data-act="lcommit">${tx("\u78BA\u8A8D\u914D\u9EDE")}</button></div></div>`;
     h += cmdPicker();
     const spent = spentPts(leaderAlloc(S));
-    h += `<div class="howto" style="margin-top:14px">${tx("<b>\u5718\u9577\u5929\u8CE6</b>\u662F\u516C\u6703\u50B3\u6388\u7684\u6307\u63EE\u5B78\uFF1A\u6230\u8853\u3001\u58EB\u6C23\u3001\u5F8C\u52E4\u4E09\u68F5\u6A39\uFF0C\u5F9E\u6A39\u6839\u5F80\u4E0A\u9EDE\uFF0C\u6BCF\u683C 1 \u9EDE\u3002\u9EDE\u6578\u4E0D\u5920\u5168\u90E8\u9EDE\u4EAE\uFF0C\u8981\u81EA\u5DF1\u6C7A\u5B9A\u5148\u8D70\u54EA\u689D\u8DEF\uFF1B\u865B\u7DDA\u7684\u683C\u5B50\u662F\u5206\u5C94\uFF0C\u53EA\u80FD\u9078\u4E00\u683C\u3002\u51FA\u6D77\u4E4B\u5F8C\uFF0C\u5404\u5730\u7684\u52E2\u529B\u6703\u518D\u50B3\u6388\u7576\u5730\u7684\u6230\u6CD5\u3002")}</div>`;
+    h += `<div class="howto" style="margin-top:14px">${tx("<b>\u5718\u9577\u5929\u8CE6</b>\u662F\u516C\u6703\u50B3\u6388\u7684\u6307\u63EE\u5B78\uFF1A\u6230\u8853\u3001\u58EB\u6C23\u3001\u5F8C\u52E4\u4E09\u68F5\u6A39\uFF0C\u5F9E\u6700\u4E0A\u9762\u7684\u6A39\u6839\u5F80\u4E0B\u9EDE\uFF0C\u6BCF\u683C 1 \u9EDE\u3002\u9EDE\u6578\u4E0D\u5920\u5168\u90E8\u9EDE\u4EAE\uFF0C\u8981\u81EA\u5DF1\u6C7A\u5B9A\u5148\u8D70\u54EA\u689D\u8DEF\uFF1B\u865B\u7DDA\u7684\u683C\u5B50\u662F\u5206\u5C94\uFF0C\u53EA\u80FD\u9078\u4E00\u683C\u3002\u51FA\u6D77\u4E4B\u5F8C\uFF0C\u5404\u5730\u7684\u52E2\u529B\u6703\u518D\u50B3\u6388\u7576\u5730\u7684\u6230\u6CD5\u3002")}</div>`;
     h += `<div class="row" style="margin-top:10px"><button class="btn sm" data-act="lreset" ${spent ? "" : "disabled"}>${tx("\u91CD\u7F6E\u5929\u8CE6\uFF08{0} \u91D1\uFF09", fmt(resetCost(S)))}</button></div>`;
     return h;
   }
@@ -6917,6 +6927,8 @@
     for (const id of [...owners.keys()]) drop(id);
     ghosts.clear();
     occ.clear();
+    for (const t of tags) t.el.remove();
+    tags = [];
     for (const k of [...longAnims.keys()]) stopLong(k);
     for (const row2 of cells) for (const c of row2) {
       clearCell(c);
@@ -7087,6 +7099,30 @@
       l.forEach((a) => a.cancel());
       longAnims.delete(key);
     }
+  }
+  var ACT_KIND = { wall: "guard", roar: "guard", dawn: "heal", grove: "heal", tide: "heal", nova: "aoe", storm: "aoe", shadow: "one", rend: "one" };
+  var TAG_MS = 1500;
+  var tags = [];
+  function castTag(o, A, col) {
+    if (!root || !root.isConnected || !o.lab.isConnected) return;
+    const now2 = performance.now();
+    tags = tags.filter((t) => t.end > now2 && t.el.isConnected);
+    const rr = root.getBoundingClientRect(), lr = o.lab.getBoundingClientRect();
+    const el = document.createElement("div");
+    el.className = "gcast";
+    el.style.setProperty("--cc", col);
+    el.innerHTML = `${svg(A.icon)}<span>${A.name}</span>`;
+    root.appendChild(el);
+    const w = el.offsetWidth, h = el.offsetHeight;
+    let x = lr.left - rr.left + lr.width / 2 - w / 2, y = lr.top - rr.top - h - 4;
+    x = Math.max(4, Math.min(rr.width - w - 4, x));
+    for (const t of tags) if (Math.abs(t.y - y) < h && Math.abs(t.x - x) < w) y = t.y - h - 2;
+    y = Math.max(2, y);
+    el.style.left = x + "px";
+    el.style.top = y + "px";
+    tags.push({ el, x, y, end: now2 + TAG_MS });
+    const a = el.animate([{ opacity: 0, transform: "translateY(6px) scale(.85)" }, { opacity: 1, transform: "none", offset: 0.12 }, { opacity: 1, offset: 0.75 }, { opacity: 0, transform: "translateY(-8px)" }], { duration: TAG_MS, easing: "ease-out" });
+    a.onfinish = () => el.remove();
   }
   var NOISY = /* @__PURE__ */ new Set(["hit", "hurt", "heal"]);
   function playFx(b, evs, tickMs) {
@@ -7305,6 +7341,20 @@
         case "horn": {
           ring(ME, area(MID + 1, CR - 1), COL.gold, step2 * 2, { delay: d, dur: 500, peak: 0.5 });
           lift(heroCore(), 1, 700, d);
+          play("horn", d / 1e3);
+          break;
+        }
+        case "act": {
+          const o = own(e.s), A = ACTIVES[e.key];
+          if (!o || !A) break;
+          const col = CLASS_COL[o.unit.cls] || COL.gold;
+          flashCells(o.cells, COL.gold, { delay: d, dur: 600, peak: 0.95 });
+          lift(o.core, 2, 800, d);
+          const kind = ACT_KIND[e.key];
+          if (kind === "heal") ring(s, area(MID + 1, CR - 1), COL.heal, step2 * 2, { delay: d + 80, dur: 520, peak: 0.55 });
+          else if (kind === "guard") ring(s, e.key === "wall" ? o.cells : area(MID + 1, CR - 1), COL.shield, step2 * 2, { delay: d + 80, dur: 520, peak: 0.6 });
+          else if (kind === "aoe") flashCells(foeCells(), col, { delay: d + 120, dur: 480, peak: 0.7 });
+          setTimeout(() => castTag(o, A, col), d);
           play("horn", d / 1e3);
           break;
         }
@@ -7794,6 +7844,13 @@
         app.leaderSel = id2;
         break;
       }
+      case "lclose":
+        if (!app.leaderSel) return;
+        app.leaderSel = null;
+        break;
+      // v0.24.1 點樹的空白處關閉說明卡
+      case "lkeep":
+        return;
       case "lcmd":
         if (toggleCmd(app.S, t.dataset.v)) save();
         break;

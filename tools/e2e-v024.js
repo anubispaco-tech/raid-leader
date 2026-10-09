@@ -103,8 +103,13 @@ check(/改成天賦樹/.test(await page.locator('#view').textContent()), '舊配
 await page.click('[data-act="lrefundok"]'); await page.waitForTimeout(200);
 check(await page.locator('.ltree .lnode2').count() === 14, '戰術樹 14 格');
 const node = id => page.locator(`.lnode2[data-v="${id}"]`);
+{ const y0 = (await node('t0').boundingBox()).y, y6 = (await node('t6').boundingBox()).y; check(y0 < y6, `v0.24.1 樹由上往下長（樹根 y=${Math.round(y0)} < 下層 y=${Math.round(y6)}）`); }
 await node('t1').click(); await page.waitForTimeout(150);
 check(/要先點亮/.test(await page.locator('.ldetail').textContent()), '點了還不能點的格子會說明原因');
+{ const nb = await node('t1').boundingBox(), pb = await page.locator('.ldetail.lpop').boundingBox();
+  check(pb && pb.x >= nb.x + nb.width - 2 && Math.abs((pb.y + pb.height / 2) - (nb.y + nb.height / 2)) < pb.height, 'v0.24.1 說明卡浮在節點旁邊（左半邊的節點→卡片在右邊）'); }
+await page.locator('.ltreebox').click({ position: { x: 8, y: 8 } }); await page.waitForTimeout(150);
+check(await page.locator('.ldetail.lpop').count() === 0, '點樹的空白處關閉說明卡');
 await node('t0').click(); await page.waitForTimeout(150);
 check(/號角手/.test(await page.locator('.ldetail').textContent()) && !(await node('t0').getAttribute('class')).includes(' on'), '第一次點：只顯示說明');
 await node('t0').click(); await page.waitForTimeout(150);
@@ -125,6 +130,11 @@ for (let k = 0; k < 20 && !(await page.locator('.pstrip .pc.ready').count()); k+
 const ready = page.locator('.pstrip .pc.ready').first();
 if (await ready.count()) { await ready.click(); await page.waitForTimeout(300); }
 check(/✨/.test(await page.locator('.log').textContent()), '點亮著的卡片會施放主動技能（紀錄出現 ✨）');
+check(await page.locator('.gcast').count() >= 1 && /\S/.test(await page.locator('.gcast').first().textContent()), 'v0.24.1 施放時格子上跳出技能名標籤（4 倍速）');
+await page.waitForTimeout(700);
+check(await page.locator('.gcast').count() >= 1, 'v0.24.1 標籤用真實時間：4 倍速 0.7 秒後還看得到');
+{ const names = await page.locator('.pstrip .pc .pn').allTextContents(); check(names.length === 5 && names.every(n => n.trim().length >= 1), `v0.24.1 隊員卡片保留名字（${names.join('、')}），技能改成圖示`);
+  check(await page.locator('.pstrip .pc .skic').count() === 5, '每張卡片有技能圖示（冷卻環）'); }
 await page.screenshot({ path: '/tmp/v024-battle.png' });
 check(!errs.length, '沒有錯誤' + (errs.length ? '：' + errs[0] : ''));
 await browser.close();
